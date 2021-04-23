@@ -4,6 +4,6 @@ namespace Tgs.Payment
 {
 	public interface IPaymentClient
 	{
-		ValueTask<string> DepositAsync(string subject, decimal amount, string applyInfo);
+		ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo);
 	}
 }

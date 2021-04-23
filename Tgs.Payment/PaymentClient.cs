@@ -18,11 +18,11 @@ namespace Tgs.Payment
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async ValueTask<string> DepositAsync(string subject, decimal amount, string applyInfo)
+		public async ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo)
 		{
 			var request = new DepositRequest
 			{
-				ApplyInfo = applyInfo,
+				ApplyInfo = applyInfo ?? string.Empty,
 				Amount = amount.ToString()
 			};
 
