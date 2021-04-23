@@ -7,7 +7,7 @@ using Tgs.Payment.Protos;
 
 namespace Tgs.Payment
 {
-	internal class PaymentClient
+	internal class PaymentClient : IPaymentClient
 	{
 		private readonly IMessageSender _messageSender;
 		private readonly ILogger<PaymentClient> _logger;
