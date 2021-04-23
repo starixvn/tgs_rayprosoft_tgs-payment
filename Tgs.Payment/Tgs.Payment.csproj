@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<IsPackable>true</IsPackable>
+		<Version>0.0.1-alpha</Version>
+		<Authors>Raypro</Authors>
+		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
+		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>tgs payment</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Protos\payment.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.15.8" />
+		<PackageReference Include="Grpc.Tools" Version="2.37.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="0.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Protos\payment.proto" GrpcServices="None" Access="Public" />
+	</ItemGroup>
+
+</Project>

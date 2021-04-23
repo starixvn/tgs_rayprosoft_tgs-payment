@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option csharp_namespace = "Tgs.Payment.Protos";
+package payment;
+
+message DepositRequest {
+	string apply_info = 1;
+	string amount = 2;
+}
+
+message DepositResponse {
+	string result = 1;
+}
