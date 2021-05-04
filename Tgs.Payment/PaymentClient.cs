@@ -9,8 +9,8 @@ namespace Tgs.Payment
 {
 	internal class PaymentClient : IPaymentClient
 	{
-		private readonly IMessageSender _messageSender;
 		private readonly ILogger<PaymentClient> _logger;
+		private readonly IMessageSender _messageSender;
 
 		public PaymentClient(IMessageSender messageSender, ILogger<PaymentClient> logger)
 		{
@@ -31,6 +31,25 @@ namespace Tgs.Payment
 				.ConfigureAwait(false);
 
 			var response = DepositResponse.Parser.ParseFrom(result);
+
+			_logger.LogInformation(response.Result);
+
+			return response.Result;
+		}
+
+		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)
+		{
+			var request = new WithdrawRequest
+			{
+				ApplyInfo = applyInfo ?? string.Empty,
+				Amount = amount.ToString()
+			};
+
+			var result = await _messageSender
+				.RequestAsync(subject, request.ToByteArray())
+				.ConfigureAwait(false);
+
+			var response = WithdrawResponse.Parser.ParseFrom(result);
 
 			_logger.LogInformation(response.Result);
 
