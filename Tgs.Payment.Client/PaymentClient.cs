@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
 
-namespace Tgs.Payment
+namespace Tgs.Payment.Clients
 {
 	internal class PaymentClient : IPaymentClient
 	{
