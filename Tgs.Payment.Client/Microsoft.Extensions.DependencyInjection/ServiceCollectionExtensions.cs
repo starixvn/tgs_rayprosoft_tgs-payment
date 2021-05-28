@@ -1,4 +1,4 @@
-﻿using Tgs.Payment;
+﻿using Tgs.Payment.Clients;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

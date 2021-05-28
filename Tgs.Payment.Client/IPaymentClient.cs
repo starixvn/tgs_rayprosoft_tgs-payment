@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Tgs.Payment
+namespace Tgs.Payment.Clients
 {
 	public interface IPaymentClient
 	{

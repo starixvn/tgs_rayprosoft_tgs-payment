@@ -4,12 +4,16 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
-		<Version>0.0.5</Version>
+		<Version>0.1.0-alpha</Version>
 		<Authors>Raypro</Authors>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tgs payment</PackageTags>
+		<PackageId>Tgs.Payment.Client</PackageId>
+		<Product>Tgs.Payment.Client</Product>
+		<RootNamespace>Tgs.Payment.Clients</RootNamespace>
+		<AssemblyName>Tgs.Payment.Client</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
