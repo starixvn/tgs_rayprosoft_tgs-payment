@@ -7,7 +7,7 @@
 		<PackageId>Tgs.Payment.Core</PackageId>
 		<Product>Tgs.Payment.Core</Product>
 		<Authors>Raypro</Authors>
-		<Version>0.0.1-alpha</Version>
+		<Version>0.0.2-alpha</Version>
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 

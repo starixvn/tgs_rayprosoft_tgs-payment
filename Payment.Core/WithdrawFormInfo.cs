@@ -4,7 +4,8 @@ namespace Tgs.Payment
 {
 	public record WithdrawFormInfo(
 		Guid Id,
-		string PlayerCode,
+		string UserId,
+		UserType UserType,
 		string UserName,
 		Guid BrandId,
 		decimal Amount,
