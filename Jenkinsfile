@@ -17,7 +17,8 @@ pipeline {
 			steps {
 				sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
 				sh 'dotnet pack -c $BuildConfiguration "Payment.Core/Payment.Core.csproj" --no-build'
-				sh 'dotnet nuget push "Tgs.Payment/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+				sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+				sh 'dotnet nuget push "Payment.Core/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
 			}
 		}
 	}
