@@ -15,6 +15,7 @@ namespace Tgs.Payment
 		int Status,
 		string? ApplyInfo,
 		string? PaymentReturn,
+		Guid? PromotionId,
 		DateTimeOffset CreatedOn,
 		DateTimeOffset UpdatedOn);
 }
