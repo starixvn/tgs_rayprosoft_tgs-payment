@@ -6,13 +6,19 @@ namespace Tgs.Payment
 {
 	public interface IPaymentRepository
 	{
+		ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser);
+
 		ValueTask CreateBankInfoAsync(BankInfo bankInfo, string modifyUser);
 
 		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormInfo form);
 
 		ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form);
 
+		ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
+
 		ValueTask DeleteBankInfoAsync(string playerCode, Guid bankInfoId);
+
+		ValueTask<AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id);
 
 		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
@@ -41,7 +47,7 @@ namespace Tgs.Payment
 		ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null);
 
 		ValueTask SignOffWithdrawFormAsync(
-					Guid formId,
+			Guid formId,
 			Guid? brandPaymentId,
 			string? applyInfo,
 			ReviewState reviewStatus,
