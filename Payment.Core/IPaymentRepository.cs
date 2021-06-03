@@ -20,6 +20,8 @@ namespace Tgs.Payment
 
 		ValueTask<AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id);
 
+		IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId);
+
 		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
 		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
