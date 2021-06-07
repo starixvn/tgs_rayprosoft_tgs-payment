@@ -20,3 +20,11 @@ message WithdrawRequest {
 message WithdrawResponse {
 	string result = 1;
 }
+
+message GeneralRequest {
+	string content = 1;
+}
+
+message GeneralResponse {
+	string result = 1;
+}

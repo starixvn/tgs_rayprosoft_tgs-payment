@@ -18,6 +18,24 @@ namespace Tgs.Payment.Clients
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
+		public async ValueTask<string> AskAsync(string subject, string requestInfo)
+		{
+			var request = new GeneralRequest
+			{
+				Content = requestInfo
+			};
+
+			var result = await _messageSender
+				.RequestAsync(subject, request.ToByteArray())
+				.ConfigureAwait(false);
+
+			var response = GeneralResponse.Parser.ParseFrom(result);
+
+			_logger.LogInformation(response.Result);
+
+			return response.Result;
+		}
+
 		public async ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo)
 		{
 			var request = new DepositRequest
