@@ -7,5 +7,7 @@ namespace Tgs.Payment.Clients
 		ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo);
 
 		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
+
+		ValueTask<string> AskAsync(string subject, string requestInfo);
 	}
 }
