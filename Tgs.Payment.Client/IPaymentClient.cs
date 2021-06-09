@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Tgs.Payment.Clients
 {
@@ -9,5 +10,7 @@ namespace Tgs.Payment.Clients
 		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
 
 		ValueTask<string> AskAsync(string subject, string requestInfo);
+
+		ValueTask ApproveDepositAsync(Guid formId);
 	}
 }
