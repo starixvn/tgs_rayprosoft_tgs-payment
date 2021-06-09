@@ -11,6 +11,6 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<string> AskAsync(string subject, string requestInfo);
 
-		ValueTask ApproveDepositAsync(Guid formId);
+		ValueTask ApproveDepositAsync(Guid formId, Guid brandId);
 	}
 }
