@@ -10,7 +10,7 @@ namespace Tgs.Payment
 
 		ValueTask CreateBankInfoAsync(BankInfo bankInfo, string modifyUser);
 
-		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormInfo form);
+		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form);
 
 		ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form);
 
@@ -38,7 +38,7 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds);
 
-		ValueTask<DepositFormDetail> GetDepositFormByIdAsync(Guid id);
+		ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id);
 
 		ValueTask<PaymentInfo> GetPaymentAsync(Guid id);
 

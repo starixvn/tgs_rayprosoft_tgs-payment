@@ -28,3 +28,7 @@ message GeneralRequest {
 message GeneralResponse {
 	string result = 1;
 }
+
+message ApproveDepositRequest {
+	string form_id = 1;
+}
