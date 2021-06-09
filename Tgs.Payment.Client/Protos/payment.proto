@@ -31,4 +31,5 @@ message GeneralResponse {
 
 message ApproveDepositRequest {
 	string form_id = 1;
+	string brand_id = 2;
 }
