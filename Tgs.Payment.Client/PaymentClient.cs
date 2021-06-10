@@ -18,7 +18,7 @@ namespace Tgs.Payment.Clients
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async ValueTask ApproveDepositAsync(Guid formId, Guid brandId)
+		public ValueTask ApproveDepositAsync(Guid formId, Guid brandId)
 		{
 			var request = new ApproveDepositRequest
 			{
@@ -26,9 +26,8 @@ namespace Tgs.Payment.Clients
 				BrandId = brandId.ToString()
 			};
 
-			await _messageSender
-				.SendAsync("tgs.payment.approve", request.ToByteArray())
-				.ConfigureAwait(false);
+			return _messageSender
+				.SendAsync("tgs.payment.approve", request.ToByteArray());
 		}
 
 		public async ValueTask<string> AskAsync(string subject, string requestInfo)
@@ -66,6 +65,28 @@ namespace Tgs.Payment.Clients
 			_logger.LogInformation(response.Result);
 
 			return response.Result;
+		}
+
+		public ValueTask EmitDepositFormCreatedEventAsync(Guid formId, Guid brandId)
+		{
+			var request = new DepositFormEvent
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString()
+			};
+
+			return _messageSender.SendAsync("tgs.payment.deposit.created", request.ToByteArray());
+		}
+
+		public ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId)
+		{
+			var request = new DepositFormEvent
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString()
+			};
+
+			return _messageSender.SendAsync("tgs.payment.deposit.status", request.ToByteArray());
 		}
 
 		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)

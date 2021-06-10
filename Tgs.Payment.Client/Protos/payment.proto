@@ -33,3 +33,8 @@ message ApproveDepositRequest {
 	string form_id = 1;
 	string brand_id = 2;
 }
+
+message DepositFormEvent {
+	string form_id = 1;
+	string brand_id = 2;
+}

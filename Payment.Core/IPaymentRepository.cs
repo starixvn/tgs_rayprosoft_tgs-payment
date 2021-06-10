@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TGS.Paging;
 
 namespace Tgs.Payment
 {
 	public interface IPaymentRepository
 	{
+		ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions);
+
 		ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser);
 
 		ValueTask CreateBankInfoAsync(BankInfo bankInfo, string modifyUser);
@@ -45,6 +48,13 @@ namespace Tgs.Payment
 		IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync();
 
 		ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId);
+
+		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
+			DepositFormQueryConditions conditions,
+			Paging<DepositFormInfo> paging);
+
+		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
+			DepositFormQueryConditions conditions);
 
 		ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null);
 
