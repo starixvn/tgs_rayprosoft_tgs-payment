@@ -9,7 +9,7 @@ using TGS.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("[controller]")]
 	[ApiController]
 	public class DepositController : ControllerBase
 	{
@@ -89,10 +89,11 @@ namespace Tgs.Payment.Controllers
 		/// <param name="formQuery">The form query.</param>
 		/// <param name="paging">The paging.</param>
 		/// <returns></returns>
-		[HttpGet]
+		[HttpGet("{brandId}")]
 		public async Task<PagingResponseViewModel<DepositFormViewModel>> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
+			Guid brandId,
 			[FromQuery] DepositFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
 		{
@@ -110,7 +111,7 @@ namespace Tgs.Payment.Controllers
 			if (paging.ShowAll == true)
 			{
 				var query = new DepositFormQuery(
-					formQuery.BrandId,
+					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.PaymentMethodId,
@@ -160,7 +161,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
 
 				var query = new DepositFormQuery(
-					formQuery.BrandId,
+					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.PaymentMethodId,

@@ -29,8 +29,5 @@ namespace Tgs.Payment.ViewModels
 
 		[FromQuery(Name = "user_name")]
 		public string? UserName { get; set; }
-
-		[FromQuery(Name = "brand_id")]
-		public Guid BrandId { get; set; }
 	}
 }
