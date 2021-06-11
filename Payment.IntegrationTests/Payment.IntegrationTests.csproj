@@ -13,7 +13,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="coverlet.collector" Version="3.0.2" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.8.14" />
-    <PackageReference Include="SpecFlow.NUnit.Runners" Version="3.8.14" />
   </ItemGroup>
 
   <ItemGroup>

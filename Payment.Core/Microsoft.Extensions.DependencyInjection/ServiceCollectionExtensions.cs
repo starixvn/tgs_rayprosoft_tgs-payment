@@ -1,4 +1,5 @@
-﻿using Tgs.Payment;
+﻿using System.Reflection;
+using Tgs.Payment;
 using Tgs.Payment.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -9,8 +10,14 @@ namespace Microsoft.Extensions.DependencyInjection
 		{
 			var configuration = new PaymentConfiguration(services);
 
+			services.RegisterAllServiceUtilityTypes(
+				Assembly.GetExecutingAssembly(),
+				ServiceLifetime.Transient);
+
 			services.AddSingleton<IWithdrawProcessorFactory>(
-				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(sp, configuration.GetAllRegisterWithdrawProcessorTypes()));
+				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
+					sp,
+					configuration.GetAllRegisterWithdrawProcessorTypes()));
 
 			return configuration;
 		}

@@ -86,6 +86,7 @@ namespace Tgs.Payment.Controllers
 		/// </summary>
 		/// <param name="countService">The count service.</param>
 		/// <param name="queryService">The query service.</param>
+		/// <param name="brandId">The brand identifier.</param>
 		/// <param name="formQuery">The form query.</param>
 		/// <param name="paging">The paging.</param>
 		/// <returns></returns>

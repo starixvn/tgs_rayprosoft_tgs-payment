@@ -65,7 +65,7 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormInfo form)
+		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form)
 		{
 			var currentDate = DateTimeOffset.UtcNow;
 
@@ -88,8 +88,6 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form) => throw new NotImplementedException();
-
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
 			var currentDate = DateTimeOffset.UtcNow;
@@ -105,7 +103,7 @@ namespace TGS.Payment.Repositories
 					BrandPaymentId = form.BrandPaymentId,
 					Amount = form.Amount,
 					BankInfoId = form.BankInfoId,
-					BankInfo = form.BankInfo,
+					BankInfo = form.BankInfo!,
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
 					Status = form.Status,
@@ -157,7 +155,7 @@ namespace TGS.Payment.Repositories
 				bankInfo.BrandId,
 				bankInfo.PaymentChannelId,
 				bankInfo.BankType,
-				bankInfo.Detail);
+				bankInfo.Detail!);
 		}
 
 		public IAsyncEnumerable<Tgs.Payment.AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId)
@@ -191,7 +189,7 @@ namespace TGS.Payment.Repositories
 				bankInfo.BrandId,
 				bankInfo.PaymentChannelId,
 				bankInfo.BankType,
-				bankInfo.Detail);
+				bankInfo.Detail!);
 		}
 
 		public IAsyncEnumerable<BankInfo> GetBankInfosByPlayerCodeAsync(string playerCode)
@@ -203,7 +201,7 @@ namespace TGS.Payment.Repositories
 					info.BrandId,
 					info.PaymentChannelId,
 					info.BankType,
-					info.Detail));
+					info.Detail!));
 
 		public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode)
 		{
@@ -359,7 +357,7 @@ namespace TGS.Payment.Repositories
 		public ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId)
 		{
 			var query = from df in _tgsContext.WithdrawForms
-							.Include(f => f.BrandPayment)
+							.Include(f => f.BrandPayment!)
 							.ThenInclude(bp => bp.PaymentMethodChannel)
 							.AsAsyncEnumerable()
 						where df.Id == formId

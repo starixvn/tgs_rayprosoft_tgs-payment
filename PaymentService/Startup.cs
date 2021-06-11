@@ -39,6 +39,7 @@ namespace PaymentService
 				{
 					options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 				});
+
 			services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentService", Version = "v1" });
@@ -48,6 +49,15 @@ namespace PaymentService
 				if (File.Exists(path))
 					c.IncludeXmlComments(path);
 			});
+
+			services
+				.AddPaymentClient()
+				.AddNatsMessageQueue(config => { })
+				.AddPayment()
+				.UseTgsPaymentRepository((sp, builder) =>
+				{
+
+				});
 		}
 	}
 }
