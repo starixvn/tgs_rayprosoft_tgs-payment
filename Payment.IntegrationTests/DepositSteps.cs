@@ -2,18 +2,24 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
+using Tgs.Payment.Repositories.Entities;
 
 namespace Payment.IntegrationTests
 {
 	[Binding]
 	public class DepositSteps
 	{
-		private readonly IHost _testHost;
 		private readonly PaymentServiceClient _paymentServiceClient;
+		private readonly IHost _testHost;
 		private DepositFormCreateInfo _depositForm;
+		private Guid _createdFormId;
 
 		public DepositSteps()
 		{
@@ -22,7 +28,21 @@ namespace Payment.IntegrationTests
 				{
 					webBuilder
 						.UseStartup<PaymentService.Startup>()
-						.UseTestServer();
+						.UseTestServer()
+						.ConfigureTestServices(services =>
+						{
+							services
+								.AddScoped<TgsContext>(sp =>
+								{
+									var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+									dbContextOptionsBuilder
+										.UseInMemoryDatabase(Guid.NewGuid().ToString())
+										.ConfigureWarnings(x => x.Ignore(
+											InMemoryEventId.TransactionIgnoredWarning));
+
+									return new TgsContext(dbContextOptionsBuilder.Options);
+								});
+						});
 				})
 				.Build();
 
@@ -30,6 +50,7 @@ namespace Payment.IntegrationTests
 
 			_paymentServiceClient = new PaymentServiceClient(_testHost.GetTestClient(), null);
 		}
+
 		[Given(@"I will create deposit form")]
 		public void GivenIWillCreateDepositForm()
 		{
@@ -44,16 +65,22 @@ namespace Payment.IntegrationTests
 			};
 		}
 
-		[When(@"call payment api")]
-		public async Task WhenCallPaymentApiAsync()
-		{
-			await _paymentServiceClient.CreateDepositFormAsync(_depositForm);
-		}
-
 		[Then(@"deposit form created")]
 		public void ThenDepositFormCreated()
 		{
-			ScenarioContext.Current.Pending();
+			Assert.AreNotEqual(Guid.Empty, _createdFormId);
+		}
+
+		[When(@"call payment api")]
+		public async Task WhenCallPaymentApiAsync()
+		{
+			_createdFormId = await _paymentServiceClient.CreateDepositFormAsync(_depositForm);
+		}
+
+		[AfterScenario]
+		public void CleanUp()
+		{
+			_ = _testHost.StopAsync();
 		}
 	}
 }

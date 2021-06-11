@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace PaymentService
 {
@@ -56,7 +57,7 @@ namespace PaymentService
 				.AddPayment()
 				.UseTgsPaymentRepository((sp, builder) =>
 				{
-
+					builder.UseNpgsql("Server=localhost;Database=tgs;User Id=tgs;Password=1qaz2wsx!@");
 				});
 		}
 	}

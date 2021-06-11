@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
@@ -21,6 +23,8 @@ namespace Tgs.Payment.Clients
 		{
 			var requestContent = new StringContent(
 				JsonSerializer.Serialize(createInfo, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
 			var response = await _httpClient
 				.PutAsync(

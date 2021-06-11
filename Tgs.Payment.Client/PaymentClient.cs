@@ -75,7 +75,7 @@ namespace Tgs.Payment.Clients
 				BrandId = brandId.ToString()
 			};
 
-			return _messageSender.SendAsync("tgs.payment.deposit.created", request.ToByteArray());
+			return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray());
 		}
 
 		public ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId)
@@ -86,7 +86,7 @@ namespace Tgs.Payment.Clients
 				BrandId = brandId.ToString()
 			};
 
-			return _messageSender.SendAsync("tgs.payment.deposit.status", request.ToByteArray());
+			return _messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray());
 		}
 
 		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)
