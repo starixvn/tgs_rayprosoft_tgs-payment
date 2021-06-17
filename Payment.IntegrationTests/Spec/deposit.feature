@@ -20,3 +20,8 @@ Scenario: Review a deposit form
 	Given I review a deposit form
 	When approve form
 	Then form status change to approved
+
+Scenario: Change a deposit form status
+	Given I have a deposit form
+	When I change status to "WaitPayment"
+	Then form status change to "WaitPayment"
