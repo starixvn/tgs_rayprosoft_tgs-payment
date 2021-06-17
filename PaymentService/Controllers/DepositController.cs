@@ -54,7 +54,7 @@ namespace Tgs.Payment.Controllers
 			Guid brandId,
 			Guid formId)
 		{
-			var query = new GetDepositFormDetailQuery(brandId, formId);
+			var query = new GetDepositFormDetailQuery(formId, brandId);
 
 			var formData = await getService.GetAsync(query).ConfigureAwait(false);
 

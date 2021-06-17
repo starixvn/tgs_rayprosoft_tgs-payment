@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -14,14 +15,14 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class DepositSteps
+	public class CreateDepositForm
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
 		private DepositFormCreateInfo _depositForm;
 		private Guid _createdFormId;
 
-		public DepositSteps()
+		public CreateDepositForm()
 		{
 			_testHost = Host.CreateDefaultBuilder(Array.Empty<string>())
 				.ConfigureWebHostDefaults(webBuilder =>
@@ -32,7 +33,7 @@ namespace Payment.IntegrationTests
 						.ConfigureTestServices(services =>
 						{
 							services
-								.AddScoped<TgsContext>(sp =>
+								.AddSingleton<TgsContext>(sp =>
 								{
 									var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
 									dbContextOptionsBuilder
@@ -48,7 +49,12 @@ namespace Payment.IntegrationTests
 
 			_ = _testHost.StartAsync();
 
-			_paymentServiceClient = new PaymentServiceClient(_testHost.GetTestClient(), null);
+			_paymentServiceClient = new PaymentServiceClient(
+				_testHost.GetTestClient(),
+				new JsonSerializerOptions
+				{
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+				});
 		}
 
 		[Given(@"I will create deposit form")]

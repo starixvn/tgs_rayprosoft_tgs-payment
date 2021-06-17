@@ -18,7 +18,12 @@ namespace TGS.Payment.Repositories
 			_tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
 		}
 
-		public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions) => throw new NotImplementedException();
+		public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery.CountAsync();
+		}
 
 		public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser)
 		{
@@ -335,8 +340,6 @@ namespace TGS.Payment.Repositories
 			return query.SingleAsync();
 		}
 
-		ValueTask<DepositFormInfo> IPaymentRepository.GetDepositFormByIdAsync(Guid id) => throw new NotImplementedException();
-
 		public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id)
 		{
 			var payment = await _tgsContext.PaymentItems
@@ -383,9 +386,59 @@ namespace TGS.Payment.Repositories
 			return query.SingleAsync();
 		}
 
-		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging<DepositFormInfo> paging) => throw new NotImplementedException();
+		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
+			DepositFormQueryConditions conditions,
+			Paging<DepositFormInfo> paging)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions)
+				.Select(form => new DepositFormInfo(
+					form.Id,
+					form.PlayerCode,
+					form.PlayerCodeNavigation.Username,
+					form.BrandId,
+					form.BrandPaymentId,
+					form.BrandPayment.ChannelName,
+					form.BrandPayment.PaymentMethodChannel.MethodId,
+					form.Amount,
+					form.Remark,
+					form.Status,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.PromotionId,
+					form.CreatedOn,
+					form.UpdatedOn));
 
-		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(DepositFormQueryConditions conditions) => throw new NotImplementedException();
+			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+
+			return dataQuery
+				.ToEnumerable()
+				.ToAsyncEnumerable();
+		}
+
+		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery
+				.Select(form => new DepositFormInfo(
+					form.Id,
+					form.PlayerCode,
+					form.PlayerCodeNavigation.Username,
+					form.BrandId,
+					form.BrandPaymentId,
+					form.BrandPayment.ChannelName,
+					form.BrandPayment.PaymentMethodChannel.MethodId,
+					form.Amount,
+					form.Remark,
+					form.Status,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.PromotionId,
+					form.CreatedOn,
+					form.UpdatedOn))
+				.ToEnumerable()
+				.ToAsyncEnumerable();
+		}
 
 		public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null)
 		{
@@ -428,6 +481,38 @@ namespace TGS.Payment.Repositories
 			formData.PaymentReturn = paymentReturn;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = _tgsContext.DepositForms
+				.Include(f => f.PlayerCodeNavigation)
+				.Include(f => f.BrandPayment)
+				.ThenInclude(bp => bp.PaymentMethodChannel)
+				.Where(form => form.BrandId == conditions.BrandId);
+
+			if (!string.IsNullOrWhiteSpace(conditions.UserName))
+				dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
+			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
+				dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
+			if (conditions.PaymentMethodId != null)
+				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+			if (conditions.Status != null)
+			{
+				var statusList = conditions.Status.Cast<int>().ToArray();
+
+				if (statusList.Length > 0)
+					dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
+			}
+			if (conditions.CreateOnRange != null)
+				dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
+					&& form.CreatedOn < conditions.CreateOnRange.Value.End);
+
+			if (conditions.UpdateOnRange != null)
+				dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
+					&& form.UpdatedOn < conditions.UpdateOnRange.Value.End);
+
+			return dataQuery.AsAsyncEnumerable();
 		}
 	}
 }

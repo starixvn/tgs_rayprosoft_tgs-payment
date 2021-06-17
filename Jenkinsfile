@@ -3,7 +3,7 @@ pipeline {
 	
 	environment {
 		gitlab_user_pwd=credentials('gitlab-user-pwd')
-        BuildConfiguration="Debug"
+        BuildConfiguration='Debug'
 	}
 
     stages {
