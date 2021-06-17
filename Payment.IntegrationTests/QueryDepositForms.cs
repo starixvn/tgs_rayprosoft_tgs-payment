@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
-using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
@@ -54,6 +53,12 @@ namespace Payment.IntegrationTests
 				{
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
+		}
+
+		[AfterScenario]
+		public void CleanUp()
+		{
+			_ = _testHost.StopAsync();
 		}
 
 		[Given(@"I Query deposit forms")]

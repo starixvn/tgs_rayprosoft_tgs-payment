@@ -15,3 +15,8 @@ Scenario: Query deposit forms
 	Given I Query deposit forms
 	When call get deposit forms api
 	Then return deposit forms list
+
+Scenario: Review a deposit form
+	Given I review a deposit form
+	When approve form
+	Then form status change to approved

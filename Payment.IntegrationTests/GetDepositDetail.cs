@@ -17,11 +17,11 @@ namespace Payment.IntegrationTests
 	[Binding]
 	public class GetDepositDetail
 	{
+		private DepositFormInfo _actual;
 		private Guid _brandId;
 		private Guid _formId;
-		private IHost _testHost;
 		private PaymentServiceClient _paymentServiceClient;
-		private DepositFormInfo _actual;
+		private IHost _testHost;
 
 		public GetDepositDetail()
 		{
@@ -57,10 +57,10 @@ namespace Payment.IntegrationTests
 				});
 		}
 
-		[Given(@"I have a brand id \{(.*)}")]
-		public void GivenIHaveABrandId(Guid brandId)
+		[AfterScenario]
+		public void CleanUp()
 		{
-			_brandId = brandId;
+			_ = _testHost.StopAsync();
 		}
 
 		[Given(@"a form id \{(.*)}")]
@@ -69,13 +69,22 @@ namespace Payment.IntegrationTests
 			_formId = formId;
 		}
 
+		[Given(@"I have a brand id \{(.*)}")]
+		public void GivenIHaveABrandId(Guid brandId)
+		{
+			_brandId = brandId;
+		}
+
+		[Then(@"return detail data")]
+		public void ThenReturnDetailData()
+		{
+			Assert.IsNotNull(_actual);
+		}
 
 		[When(@"call get deposit form detail api")]
 		public async Task WhenCallGetDepositFormDetailApiAsync()
 		{
-			using var scope = _testHost.Services.CreateScope();
-
-			var dbContext = scope.ServiceProvider.GetRequiredService<TgsContext>();
+			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
 			await dbContext.Players.AddAsync(new Player
 			{
@@ -114,12 +123,5 @@ namespace Payment.IntegrationTests
 
 			_actual = await _paymentServiceClient.GetDepositFormAsync(_brandId, _formId);
 		}
-
-		[Then(@"return detail data")]
-		public void ThenReturnDetailData()
-		{
-			Assert.IsNotNull(_actual);
-		}
-
 	}
 }
