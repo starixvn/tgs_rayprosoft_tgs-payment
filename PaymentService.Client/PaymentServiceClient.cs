@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Tgs.Payment.Clients
 {
-	internal class PaymentServiceClient
+	internal class PaymentServiceClient : IPaymentServiceClient
 	{
 		private readonly HttpClient _httpClient;
 		private readonly JsonSerializerOptions? _serializerOptions;
