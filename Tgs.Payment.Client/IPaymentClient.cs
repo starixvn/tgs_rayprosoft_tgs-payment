@@ -15,6 +15,10 @@ namespace Tgs.Payment.Clients
 
 		ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId);
 
+		ValueTask EmitWithdrawFormCreatedEventAsync(Guid fromId, Guid brandId);
+
+		ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId);
+
 		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
 	}
 }

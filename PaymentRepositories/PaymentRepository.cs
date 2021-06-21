@@ -111,7 +111,7 @@ namespace TGS.Payment.Repositories
 					BankInfo = form.BankInfo!,
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
-					Status = form.Status,
+					Status = (int)form.Status,
 					CreatedOn = currentDate.UtcDateTime,
 					UpdatedOn = currentDate.UtcDateTime
 				})
@@ -483,6 +483,17 @@ namespace TGS.Payment.Repositories
 
 			formData.Status = (int)status;
 			formData.PaymentReturn = paymentReturn;
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async ValueTask SubmitWithdrawFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn, decimal? actualAmount)
+		{
+			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
+
+			formData.Status = (int)status;
+			formData.PaymentReturn = paymentReturn;
+			formData.ActualAmount = actualAmount;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}

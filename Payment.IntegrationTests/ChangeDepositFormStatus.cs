@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
@@ -15,6 +12,7 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
+	[Scope(Feature = "deposit")]
 	public class ChangeDepositFormStatus
 	{
 		private Guid _formId;
@@ -35,9 +33,9 @@ namespace Payment.IntegrationTests
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_ = _testHost.StopAsync();
+			await _testHost.StopAsync();
 		}
 
 		[Given(@"I have a deposit form")]

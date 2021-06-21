@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
-using Tgs.Payment.Repositories.Entities;
 
 namespace Payment.IntegrationTests
 {
@@ -19,8 +14,8 @@ namespace Payment.IntegrationTests
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
-		private DepositFormCreateInfo _depositForm;
 		private Guid _createdFormId;
+		private DepositFormCreateInfo _depositForm;
 
 		public CreateDepositForm()
 		{
@@ -34,6 +29,12 @@ namespace Payment.IntegrationTests
 				{
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				});
+		}
+
+		[AfterScenario]
+		public async Task CleanUpAsync()
+		{
+			await _testHost.StopAsync();
 		}
 
 		[Given(@"I will create deposit form")]
@@ -60,12 +61,6 @@ namespace Payment.IntegrationTests
 		public async Task WhenCallPaymentApiAsync()
 		{
 			_createdFormId = await _paymentServiceClient.CreateDepositFormAsync(_depositForm);
-		}
-
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
 		}
 	}
 }

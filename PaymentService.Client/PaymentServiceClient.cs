@@ -62,6 +62,28 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(createInfo, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					"/withdraw",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content
+				.ReadAsStringAsync()
+				.ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId)
 		{
 			var response = await _httpClient
@@ -261,6 +283,33 @@ namespace Tgs.Payment.Clients
 			var response = await _httpClient
 				.PatchAsync(
 					$"/deposit/{formId}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState state,
+			string? paymentReturn = null,
+			decimal? actualAmount = null)
+		{
+			var request = new WithdrawFormStatus
+			{
+				Status = state,
+				PaymentReturn = paymentReturn,
+				ActualAmount = actualAmount
+			};
+
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(request, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PatchAsync(
+					$"/withdraw/{formId}",
 					requestContent)
 				.ConfigureAwait(false);
 

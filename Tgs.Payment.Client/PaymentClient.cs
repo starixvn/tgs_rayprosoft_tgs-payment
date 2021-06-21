@@ -69,7 +69,7 @@ namespace Tgs.Payment.Clients
 
 		public ValueTask EmitDepositFormCreatedEventAsync(Guid formId, Guid brandId)
 		{
-			var request = new DepositFormEvent
+			var request = new FormEvent
 			{
 				FormId = formId.ToString(),
 				BrandId = brandId.ToString()
@@ -80,13 +80,35 @@ namespace Tgs.Payment.Clients
 
 		public ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId)
 		{
-			var request = new DepositFormEvent
+			var request = new FormEvent
 			{
 				FormId = formId.ToString(),
 				BrandId = brandId.ToString()
 			};
 
 			return _messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray());
+		}
+
+		public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId)
+		{
+			var request = new FormEvent
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString()
+			};
+
+			return _messageSender.PublishAsync("tgs.payment.withdraw.created", request.ToByteArray());
+		}
+
+		public ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId)
+		{
+			var request = new FormEvent
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString()
+			};
+
+			return _messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray());
 		}
 
 		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)

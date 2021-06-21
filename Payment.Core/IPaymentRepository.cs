@@ -68,5 +68,11 @@ namespace Tgs.Payment
 			string? remark = null);
 
 		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn);
+
+		ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount);
 	}
 }
