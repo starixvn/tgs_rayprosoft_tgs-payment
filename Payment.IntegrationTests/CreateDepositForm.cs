@@ -63,9 +63,9 @@ namespace Payment.IntegrationTests
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_ = _testHost.StopAsync();
+			await _testHost.StopAsync();
 		}
 	}
 }

@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplicationServices;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
@@ -12,9 +15,29 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PlayerBankInfoController : ControllerBase
 	{
+		[HttpPut("{brandId}/{playerCode}")]
+		public async Task<Guid> CreatePlayerBankInfoAsync(
+			[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
+			[FromServices] IOptions<JsonOptions> jsonOptions,
+			Guid brandId,
+			string playerCode,
+			[FromBody] CreateBankInfoViewModel request)
+		{
+			var command = new CreatePlayerBankInfoCommand(
+				brandId,
+				playerCode,
+				request.PaymentChannelId,
+				request.BankType,
+				JsonSerializer.Serialize(request.Detail, jsonOptions.Value.JsonSerializerOptions));
+
+			await createService.ExecuteAsync(command).ConfigureAwait(false);
+
+			return await command.TaskSource.Task.ConfigureAwait(false);
+		}
+
 		[HttpGet("{playerCode}")]
 		public IAsyncEnumerable<PlayerBankInfoViewModel> GetPlayerBankInfosAsync(
-			[FromServices] IQueryService<GetPlayerBankInfosQuery, BankInfo> queryService,
+			[FromServices] IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo> queryService,
 			string playerCode)
 		{
 			var query = new GetPlayerBankInfosQuery(playerCode);

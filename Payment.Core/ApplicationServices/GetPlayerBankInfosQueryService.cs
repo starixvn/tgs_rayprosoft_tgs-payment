@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Tgs.Payment;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices
 {
-	internal class GetPlayerBankInfosQueryService : IQueryService<GetPlayerBankInfosQuery, BankInfo>
+	internal class GetPlayerBankInfosQueryService : IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo>
 	{
 		private readonly IPaymentRepository _paymentRepository;
 
@@ -15,7 +14,7 @@ namespace Tgs.Payment.ApplicationServices
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
-		public IAsyncEnumerable<BankInfo> QueryAsync(GetPlayerBankInfosQuery query, CancellationToken cancellationToken = default)
+		public IAsyncEnumerable<PlayerBankInfo> QueryAsync(GetPlayerBankInfosQuery query, CancellationToken cancellationToken = default)
 			=> _paymentRepository.GetBankInfosByPlayerCodeAsync(query.PlayerCode);
 	}
 }

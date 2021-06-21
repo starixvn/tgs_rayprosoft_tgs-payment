@@ -47,12 +47,12 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask CreateBankInfoAsync(BankInfo bankInfo, string modifyUser)
+		public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser)
 		{
 			var createTime = DateTimeOffset.UtcNow;
 
 			await _tgsContext.PlayerBankInfos
-				.AddAsync(new PlayerBankInfo
+				.AddAsync(new Tgs.Payment.Repositories.Entities.PlayerBankInfo
 				{
 					Id = bankInfo.Id,
 					PlayerCode = bankInfo.PlayerCode,
@@ -186,13 +186,13 @@ namespace TGS.Payment.Repositories
 			=> _tgsContext.PaymentItems.AsAsyncEnumerable()
 				.Select(row => new PaymentInfo(row.Id, row.Code));
 
-		public async ValueTask<BankInfo> GetBankInfoByIdAsync(Guid id)
+		public async ValueTask<Tgs.Payment.PlayerBankInfo> GetBankInfoByIdAsync(Guid id)
 		{
 			var bankInfo = await _tgsContext.PlayerBankInfos
 				.FindAsync(id)
 				.ConfigureAwait(false);
 
-			return new BankInfo(
+			return new Tgs.Payment.PlayerBankInfo(
 				bankInfo.Id,
 				bankInfo.PlayerCode,
 				bankInfo.BrandId,
@@ -201,10 +201,10 @@ namespace TGS.Payment.Repositories
 				bankInfo.Detail!);
 		}
 
-		public IAsyncEnumerable<BankInfo> GetBankInfosByPlayerCodeAsync(string playerCode)
+		public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode)
 			=> _tgsContext.PlayerBankInfos.AsAsyncEnumerable()
 				.Where(info => info.PlayerCode == playerCode)
-				.Select(info => new BankInfo(
+				.Select(info => new Tgs.Payment.PlayerBankInfo(
 					info.Id,
 					info.PlayerCode,
 					info.BrandId,

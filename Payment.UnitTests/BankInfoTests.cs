@@ -1,4 +1,7 @@
-﻿using NSubstitute;
+﻿using System;
+using System.Text.Json;
+using System.Threading.Tasks;
+using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices;
@@ -21,6 +24,38 @@ namespace Payment.UnitTests
 
 			fakePaymentRepository.Received(1)
 				.GetBankInfosByPlayerCodeAsync(Arg.Is(query.PlayerCode));
+		}
+
+
+		[Test]
+		public async Task Can_Create_Player_BankInfoAsync()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository);
+
+			var brandId = Guid.NewGuid();
+			var playerCode = "ThisIsPlayerCode";
+			var paymentChannelId = Guid.NewGuid();
+			var bankType = "Bank";
+			var detail = new
+			{
+				bankAccount = "1234567890"
+			};
+
+			var command = new CreatePlayerBankInfoCommand(
+				brandId,
+				playerCode,
+				paymentChannelId,
+				bankType,
+				JsonSerializer.Serialize(detail));
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreateBankInfoAsync(
+					Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
+					Arg.Is(playerCode));
 		}
 	}
 }

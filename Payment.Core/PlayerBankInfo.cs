@@ -2,7 +2,7 @@
 
 namespace Tgs.Payment
 {
-	public record BankInfo(
+	public record PlayerBankInfo(
 		Guid Id,
 		string PlayerCode,
 		Guid BrandId,

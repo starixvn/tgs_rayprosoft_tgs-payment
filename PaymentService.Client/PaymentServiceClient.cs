@@ -20,7 +20,7 @@ namespace Tgs.Payment.Clients
 			_serializerOptions = serializerOptions;
 		}
 
-		public async Task<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo)
+		public async ValueTask<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo)
 		{
 			var requestContent = new StringContent(
 				JsonSerializer.Serialize(createInfo, _serializerOptions));
@@ -38,6 +38,26 @@ namespace Tgs.Payment.Clients
 			var contentJson = await response.Content
 				.ReadAsStringAsync()
 				.ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		}
+
+		public async ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(info, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					$"/bankinfo/player/{brandId}/{playerCode}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
