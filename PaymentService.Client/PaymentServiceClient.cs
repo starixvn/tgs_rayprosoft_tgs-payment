@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
@@ -41,6 +42,22 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync()
+		{
+			var response = await _httpClient
+				.GetAsync("/payment")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var payments = JsonSerializer.Deserialize<PaymentInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var payment in payments!)
+				yield return payment;
+		}
+
 		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId)
 		{
 			var response = await _httpClient
@@ -52,6 +69,19 @@ namespace Tgs.Payment.Clients
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 			return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
+		}
+
+		public async ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/payment/{paymentId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<PaymentInfo>(contentJson, _serializerOptions);
 		}
 
 		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
@@ -114,28 +144,6 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<PagingResponse<DepositFormInfo>>(contentJson, _serializerOptions)!;
 		}
 
-		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null)
-		{
-			var request = new DepositFormStatus
-			{
-				Status = state,
-				PaymentReturn = paymentReturn
-			};
-
-			var requestContent = new StringContent(
-				JsonSerializer.Serialize(request, _serializerOptions));
-
-			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
-
-			var response = await _httpClient
-				.PatchAsync(
-					$"/deposit/{formId}",
-					requestContent)
-				.ConfigureAwait(false);
-
-			response.EnsureSuccessStatusCode();
-		}
-
 		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null)
 		{
 			var request = new SignOffForm
@@ -151,6 +159,28 @@ namespace Tgs.Payment.Clients
 
 			var response = await _httpClient
 				.PostAsync(
+					$"/deposit/{formId}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null)
+		{
+			var request = new DepositFormStatus
+			{
+				Status = state,
+				PaymentReturn = paymentReturn
+			};
+
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(request, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PatchAsync(
 					$"/deposit/{formId}",
 					requestContent)
 				.ConfigureAwait(false);

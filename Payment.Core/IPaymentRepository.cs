@@ -29,6 +29,8 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
 
+		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
+
 		ValueTask<BankInfo> GetBankInfoByIdAsync(Guid id);
 
 		IAsyncEnumerable<BankInfo> GetBankInfosByPlayerCodeAsync(string playerCode);

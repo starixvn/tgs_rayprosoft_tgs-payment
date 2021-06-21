@@ -35,6 +35,7 @@ namespace PaymentService
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services
+				.AddRouting(options => options.LowercaseUrls = true)
 				.AddControllers()
 				.AddJsonOptions(options =>
 				{

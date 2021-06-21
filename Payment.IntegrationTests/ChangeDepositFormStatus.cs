@@ -23,28 +23,7 @@ namespace Payment.IntegrationTests
 
 		public ChangeDepositFormStatus()
 		{
-			_testHost = Host.CreateDefaultBuilder(Array.Empty<string>())
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder
-						.UseStartup<PaymentService.Startup>()
-						.UseTestServer()
-						.ConfigureTestServices(services =>
-						{
-							services
-								.AddSingleton<TgsContext>(sp =>
-								{
-									var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
-									dbContextOptionsBuilder
-										.UseInMemoryDatabase(Guid.NewGuid().ToString())
-										.ConfigureWarnings(x => x.Ignore(
-											InMemoryEventId.TransactionIgnoredWarning));
-
-									return new TgsContext(dbContextOptionsBuilder.Options);
-								});
-						});
-				})
-				.Build();
+			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = new PaymentServiceClient(

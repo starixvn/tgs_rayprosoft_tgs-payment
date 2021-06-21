@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Tgs.Payment.Clients
@@ -7,7 +8,11 @@ namespace Tgs.Payment.Clients
 	{
 		Task<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo);
 
+		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
+
 		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
+
+		ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
 
 		ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
