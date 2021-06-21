@@ -18,6 +18,8 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
 
+		IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
+
 		ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
 		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);

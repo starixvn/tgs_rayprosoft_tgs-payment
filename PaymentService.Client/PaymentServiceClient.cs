@@ -118,6 +118,22 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<PaymentInfo>(contentJson, _serializerOptions);
 		}
 
+		public async IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode)
+		{
+			var response = await _httpClient
+				.GetAsync($"/bankinfo/player/{playerCode}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var bankInfos = JsonSerializer.Deserialize<PlayerBankInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var bankInfo in bankInfos!)
+				yield return bankInfo;
+		}
+
 		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
 			DepositFormQueryConditions conditions,
 			Paging paging)
