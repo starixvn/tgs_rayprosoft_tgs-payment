@@ -42,6 +42,40 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync()
+		{
+			var response = await _httpClient
+				.GetAsync("/payment/channel")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var paymentChannels = JsonSerializer.Deserialize<PaymentChannelInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var pc in paymentChannels!)
+				yield return pc;
+		}
+
+		public async IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethosAsync()
+		{
+			var response = await _httpClient
+				.GetAsync("/payment/method")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var paymentMethods = JsonSerializer.Deserialize<PaymentMethodInfo[]>(
+				  contentJson,
+				  _serializerOptions);
+
+			foreach (var pm in paymentMethods!)
+				yield return pm;
+		}
+
 		public async IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync()
 		{
 			var response = await _httpClient

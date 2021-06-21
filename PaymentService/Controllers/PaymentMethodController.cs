@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Tgs.Payment.ApplicationServices;
+using TGS.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {
@@ -11,9 +9,9 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentMethodController : ControllerBase
 	{
-		public void GetAllPaymentMethods()
-		{
-
-		}
+		[HttpGet]
+		public IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync(
+			[FromServices] IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> paymentMethodService)
+			=> paymentMethodService.QueryAsync(new AllPaymentMethodsQuery());
 	}
 }

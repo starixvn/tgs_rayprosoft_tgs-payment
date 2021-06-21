@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices
 {
-	internal class AllPaymentChannelsQueryService : IGetService<AllPaymentChannelsQuery, IDictionary<Guid, PaymentChannelInfo>>
+	internal class AllPaymentChannelsQueryService : IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo>
 	{
 		private readonly IPaymentRepository _payamentRepository;
 
@@ -17,13 +14,9 @@ namespace Tgs.Payment.ApplicationServices
 			_payamentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
-		public async ValueTask<IDictionary<Guid, PaymentChannelInfo>> GetAsync(AllPaymentChannelsQuery query, CancellationToken cancellationToken = default)
-		{
-			var allPaymentChannels = await _payamentRepository.GetAllPaymentChannelsAsync()
-				.ToDictionaryAsync(method => method.Id)
-				.ConfigureAwait(false);
-
-			return new ReadOnlyDictionary<Guid, PaymentChannelInfo>(allPaymentChannels);
-		}
+		public IAsyncEnumerable<PaymentChannelInfo> QueryAsync(
+			AllPaymentChannelsQuery query,
+			CancellationToken cancellationToken = default)
+			=> _payamentRepository.GetAllPaymentChannelsAsync();
 	}
 }

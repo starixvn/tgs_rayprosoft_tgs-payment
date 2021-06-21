@@ -8,6 +8,10 @@ namespace Tgs.Payment.Clients
 	{
 		Task<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo);
 
+		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
+
+		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethosAsync();
+
 		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
 		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);

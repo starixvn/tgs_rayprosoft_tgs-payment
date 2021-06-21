@@ -9,3 +9,13 @@ Scenario: Get one payment
 	Given I has a payment id {A93D94EA-8067-4006-A1B3-0A44FDFE9225}
 	When call get payment api
 	Then return payment data
+
+Scenario: Get all payment methods
+	Given I will list all payment methods
+	When call get all payment methods api
+	Then return all payment methods data
+
+Scenario: Get all payment channels
+	Given I will list all payment channels
+	When call get all payment channels
+	Then return all payment channels data
