@@ -53,5 +53,13 @@ namespace Tgs.Payment.Controllers
 					Detail = JsonDocument.Parse(bankInfo.Detail)
 				});
 		}
+
+		[HttpDelete("{playerCode}/{id}")]
+		public ValueTask DeletePlayerBankInfoAsync(
+			[FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
+			string playerCode,
+			Guid id)
+			=> deleteService.ExecuteAsync(
+				new DeletePlayerBankInfoCommand(playerCode, id));
 	}
 }

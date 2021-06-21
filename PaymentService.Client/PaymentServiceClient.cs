@@ -62,6 +62,15 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId)
+		{
+			var response = await _httpClient
+				.DeleteAsync($"/bankinfo/player/{playerCode}/{bankInfoId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync()
 		{
 			var response = await _httpClient

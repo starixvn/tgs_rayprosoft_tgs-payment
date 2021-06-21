@@ -12,23 +12,7 @@ namespace Payment.UnitTests
 	public class BankInfoTests
 	{
 		[Test]
-		public void Can_List_BankInfos_By_PlayerCode()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new GetPlayerBankInfosQueryService(fakePaymentRepository);
-
-			var query = new GetPlayerBankInfosQuery("ThisIsPlayerCode");
-
-			sut.QueryAsync(query);
-
-			fakePaymentRepository.Received(1)
-				.GetBankInfosByPlayerCodeAsync(Arg.Is(query.PlayerCode));
-		}
-
-
-		[Test]
-		public async Task Can_Create_Player_BankInfoAsync()
+		public async Task Can_Create_Player_BankInfo()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
@@ -56,6 +40,38 @@ namespace Payment.UnitTests
 				.CreateBankInfoAsync(
 					Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
 					Arg.Is(playerCode));
+		}
+
+		[Test]
+		public async Task Can_Delete_Player_BankInfo()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new DeletePlayerBankInfoCommandService(fakePaymentRepository);
+
+			var command = new DeletePlayerBankInfoCommand("ThisIsPlayerCode", Guid.NewGuid());
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.DeleteBankInfoAsync(
+					Arg.Is(command.PlayerCode),
+					Arg.Is(command.BankInfoId));
+		}
+
+		[Test]
+		public void Can_List_BankInfos_By_PlayerCode()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetPlayerBankInfosQueryService(fakePaymentRepository);
+
+			var query = new GetPlayerBankInfosQuery("ThisIsPlayerCode");
+
+			sut.QueryAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.GetBankInfosByPlayerCodeAsync(Arg.Is(query.PlayerCode));
 		}
 	}
 }

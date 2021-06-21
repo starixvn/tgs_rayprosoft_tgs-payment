@@ -12,6 +12,7 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
+	[Scope(Tag = "CreateBankInfo")]
 	public class CreatePlayerBankInfoSteps
 	{
 		private BankCreateInfo _bankInfo;
