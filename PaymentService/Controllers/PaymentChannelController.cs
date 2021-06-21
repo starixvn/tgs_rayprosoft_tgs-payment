@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
@@ -13,8 +11,13 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentChannelController : ControllerBase
 	{
-		public IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChennelsAsync(
+		public IAsyncEnumerable<PaymentChannelViewModel> GetAllPaymentChennelsAsync(
 			[FromServices] IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo> paymentChannelService)
-			=> paymentChannelService.QueryAsync(new AllPaymentChannelsQuery());
+			=> paymentChannelService.QueryAsync(new AllPaymentChannelsQuery())
+				.Select(pc => new PaymentChannelViewModel
+				{
+					Id = pc.Id,
+					Name = pc.Name
+				});
 	}
 }

@@ -2,5 +2,10 @@
 
 namespace Tgs.Payment.Clients
 {
-	public record PaymentChannelInfo(Guid Id, string Name);
+	public class PaymentChannelInfo
+	{
+		public Guid Id { get; init; }
+
+		public string Name { get; init; } = default!;
+	}
 }
