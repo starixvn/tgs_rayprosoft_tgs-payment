@@ -20,6 +20,8 @@ namespace Tgs.Payment.Clients
 
 		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
+		ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId);
+
 		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
 
 		ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
@@ -31,6 +33,7 @@ namespace Tgs.Payment.Clients
 		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);
 
 		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null);
+
 		ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
 			PaymentFlowState state,

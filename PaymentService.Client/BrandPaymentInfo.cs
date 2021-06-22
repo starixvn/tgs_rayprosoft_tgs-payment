@@ -2,21 +2,38 @@
 
 namespace Tgs.Payment.Clients
 {
-	public record BrandPaymentInfo(
-		Guid Id,
-		Guid PaymentMethodChannelId,
-		Guid PaymentId,
-		Guid MethodId,
-		Guid ChannelId,
-		string ChannelName,
-		string ChannelCode,
-		string ExtendedData,
-		ValueRange<decimal> TransferLimit,
-		bool IsAllPlayers,
-		bool AuthenticateIdentity,
-		bool AuthenticatePhone,
-		ValueRange<decimal> DepositedAmountLimit,
-		ConditionMatchType ConditionMatchType,
-		TransferType TransferType,
-		bool Enabled);
+	public record BrandPaymentInfo
+	{
+		public bool AuthenticateIdentity { get; set; }
+
+		public bool AuthenticatePhone { get; set; }
+
+		public string ChannelCode { get; set; } = default!;
+
+		public Guid ChannelId { get; set; }
+
+		public string ChannelName { get; set; } = default!;
+
+		public ConditionMatchType ConditionMatchType { get; set; }
+
+		public ValueRange<decimal> DepositedAmountLimit { get; set; }
+
+		public bool Enabled { get; set; }
+
+		public string? ExtendedData { get; set; }
+
+		public Guid Id { get; set; }
+
+		public bool IsAllPlayers { get; set; }
+
+		public Guid MethodId { get; set; }
+
+		public Guid PaymentId { get; set; }
+
+		public Guid PaymentMethodChannelId { get; set; }
+
+		public ValueRange<decimal> TransferLimit { get; set; }
+
+		public TransferType TransferType { get; set; }
+	}
 }

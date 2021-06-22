@@ -1,42 +1,37 @@
 ﻿using System;
-using Microsoft.AspNetCore.TestHost;
-using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
-using Microsoft.Extensions.DependencyInjection;
 using Tgs.Payment.Repositories.Entities;
-using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace Payment.IntegrationTests
 {
 	[Binding]
 	public class GetOnePaymentSteps
 	{
-		private IHost _testHost;
-		private PaymentServiceClient _paymentServiceClient;
-		private Guid _paymentId;
-		private string _paymentCode;
 		private PaymentInfo _actual;
+		private string _paymentCode;
+		private Guid _paymentId;
+		private PaymentServiceClient _paymentServiceClient;
+		private IHost _testHost;
 
 		public GetOnePaymentSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 			_testHost.StartAsync();
 
-			_paymentServiceClient = new PaymentServiceClient(
-				_testHost.GetTestClient(),
-				new JsonSerializerOptions
-				{
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-				});
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
+
 		[AfterScenario]
 		public void CleanUp()
 		{
 			_testHost.StopAsync();
 		}
+
 		[Given(@"I has a payment id \{(.*)}")]
 		public async Task GivenIHasAPaymentIdAsync(Guid paymentId)
 		{
@@ -58,16 +53,16 @@ namespace Payment.IntegrationTests
 			await dbContext.SaveChangesAsync();
 		}
 
-		[When(@"call get payment api")]
-		public async Task WhenCallGetPaymentApiAsync()
-		{
-			_actual = await _paymentServiceClient.GetPaymentByIdAsync(_paymentId);
-		}
-
 		[Then(@"return payment data")]
 		public void ThenReturnPaymentData()
 		{
 			Assert.AreEqual(_paymentCode, _actual.Code);
+		}
+
+		[When(@"call get payment api")]
+		public async Task WhenCallGetPaymentApiAsync()
+		{
+			_actual = await _paymentServiceClient.GetPaymentByIdAsync(_paymentId);
 		}
 	}
 }

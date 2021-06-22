@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -23,12 +21,7 @@ namespace Payment.IntegrationTests
 
 			_ = _testHost.StartAsync();
 
-			_paymentServiceClient = new PaymentServiceClient(
-				_testHost.GetTestClient(),
-				new JsonSerializerOptions
-				{
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-				});
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
 
 		[AfterScenario]

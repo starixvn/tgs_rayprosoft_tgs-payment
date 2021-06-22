@@ -143,6 +143,19 @@ namespace Tgs.Payment.Clients
 				yield return payment;
 		}
 
+		public async ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/brand/payment/{brandPaymentId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId)
 		{
 			var response = await _httpClient

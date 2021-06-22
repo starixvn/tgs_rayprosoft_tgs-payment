@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
@@ -28,12 +23,7 @@ namespace Payment.IntegrationTests
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 			_ = _testHost.StartAsync();
 
-			_paymentServiceClient = new PaymentServiceClient(
-				_testHost.GetTestClient(),
-				new JsonSerializerOptions
-				{
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-				});
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
 
 		[AfterScenario]
