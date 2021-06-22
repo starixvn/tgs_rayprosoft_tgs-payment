@@ -1,0 +1,84 @@
+﻿{
+   "CodeGenerationMode": 0,
+   "ContextClassName": "TgsContext",
+   "ContextNamespace": "Entities",
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": true,
+   "IncludeConnectionString": false,
+   "ModelNamespace": "Entities",
+   "OutputContextPath": "Models",
+   "OutputPath": "Models\/Entities",
+   "ProjectRootNamespace": "Tgs.Payment.Repositories",
+   "Schemas": [
+      {
+         "Name": "dbo"
+      }
+   ],
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "dbo.payment_channels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.payment_method_channels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.payment_methods",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.payments",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.brand_payments",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.brand_payment_vip_levels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.players",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.brand_payment_players",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.deposit_forms",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.player_bank_infos",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.withdraw_forms",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.agent_bank_infos",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": ".tgs",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseNoConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}

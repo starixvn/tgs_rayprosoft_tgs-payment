@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TGS.Paging;
 
 namespace Tgs.Payment
 {
 	public interface IPaymentRepository
 	{
+		ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions);
+
 		ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser);
 
-		ValueTask CreateBankInfoAsync(BankInfo bankInfo, string modifyUser);
+		ValueTask CreateBankInfoAsync(PlayerBankInfo bankInfo, string modifyUser);
 
 		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form);
 
@@ -26,9 +29,11 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
 
-		ValueTask<BankInfo> GetBankInfoByIdAsync(Guid id);
+		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
-		IAsyncEnumerable<BankInfo> GetBankInfosByPlayerCodeAsync(string playerCode);
+		ValueTask<PlayerBankInfo> GetBankInfoByIdAsync(Guid id);
+
+		IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode);
 
 		IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode);
 
@@ -46,6 +51,13 @@ namespace Tgs.Payment
 
 		ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId);
 
+		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
+			DepositFormQueryConditions conditions,
+			Paging<DepositFormInfo> paging);
+
+		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
+			DepositFormQueryConditions conditions);
+
 		ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null);
 
 		ValueTask SignOffWithdrawFormAsync(
@@ -56,5 +68,11 @@ namespace Tgs.Payment
 			string? remark = null);
 
 		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn);
+
+		ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount);
 	}
 }

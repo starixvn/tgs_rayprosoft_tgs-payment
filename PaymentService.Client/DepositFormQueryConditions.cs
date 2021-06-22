@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Tgs.Payment.Clients
+{
+	public class DepositFormQueryConditions
+	{
+		public Guid BrandId { get; init; }
+
+		public string? ChannelName { get; init; }
+
+		public (DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange { get; init; }
+
+		public Guid? PaymentMethodId { get; init; }
+
+		public IEnumerable<PaymentFlowState> Status { get; init; } = Array.Empty<PaymentFlowState>();
+
+		public (DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange { get; init; }
+
+		public string? UserName { get; init; }
+	}
+}
