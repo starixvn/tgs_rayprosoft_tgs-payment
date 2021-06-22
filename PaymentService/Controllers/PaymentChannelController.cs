@@ -11,6 +11,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentChannelController : ControllerBase
 	{
+		[HttpGet]
 		public IAsyncEnumerable<PaymentChannelViewModel> GetAllPaymentChennelsAsync(
 			[FromServices] IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo> paymentChannelService)
 			=> paymentChannelService.QueryAsync(new AllPaymentChannelsQuery())

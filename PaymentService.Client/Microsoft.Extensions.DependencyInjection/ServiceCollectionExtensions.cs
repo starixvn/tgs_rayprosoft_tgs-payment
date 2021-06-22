@@ -25,6 +25,6 @@ namespace Microsoft.Extensions.DependencyInjection
 					httpClient.BaseAddress = options.PaymentServiceBaseUrl;
 				})
 				.Services
-				.AddTransient<IPaymentServiceClient, PaymentServiceClient>();
+				.AddTransient<IPaymentServiceClient>(sp => sp.GetRequiredService<PaymentServiceClient>());
 	}
 }

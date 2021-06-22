@@ -1,13 +1,13 @@
-using System.IO;
-using System.Reflection;
 using System;
+using System.IO;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
 
 namespace PaymentService
 {
@@ -54,11 +54,21 @@ namespace PaymentService
 
 			services
 				.AddPaymentClient()
-				.AddNatsMessageQueue(config => { })
+				.AddNatsMessageQueue(config =>
+				{
+					config.ConfigQueueOptions((options, sp) =>
+					{
+						var config = sp.GetRequiredService<IConfiguration>();
+
+						options.Url = config.GetConnectionString("Nats");
+					});
+				})
 				.AddPayment()
 				.UseTgsPaymentRepository((sp, builder) =>
 				{
-					builder.UseNpgsql("Server=localhost;Database=tgs;User Id=tgs;Password=1qaz2wsx!@");
+					var config = sp.GetRequiredService<IConfiguration>();
+
+					builder.UseNpgsql(config.GetConnectionString("Tgs"));
 				});
 		}
 	}
