@@ -31,6 +31,10 @@ namespace Payment.IntegrationTests
 				{
 					webBuilder
 						.UseStartup<PaymentService.Startup>()
+						.ConfigureAppConfiguration((ctx, builder) =>
+						{
+							builder.Sources.Clear();
+						})
 						.UseTestServer()
 						.ConfigureTestServices(services =>
 						{
