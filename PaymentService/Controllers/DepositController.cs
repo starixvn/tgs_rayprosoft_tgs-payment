@@ -17,11 +17,13 @@ namespace Tgs.Payment.Controllers
 		/// Creates the deposit form asynchronous.
 		/// </summary>
 		/// <param name="createService">The create service.</param>
+		/// <param name="createFormId">The create form identifier.</param>
 		/// <param name="request">The request.</param>
 		/// <returns></returns>
-		[HttpPut]
+		[HttpPut("{createFormId}")]
 		public async Task<Guid> CreateDepositFormAsync(
 			[FromServices] ICommandService<CreateDepositFormCommand> createService,
+			Guid createFormId,
 			[FromBody] CreateDepositFormViewModel request)
 		{
 			var createInfo = new DepositFormCreateInfo(
@@ -33,7 +35,7 @@ namespace Tgs.Payment.Controllers
 				request.ApplyInfo);
 
 			var createCommand = new CreateDepositFormCommand(
-				Guid.NewGuid(),
+				createFormId,
 				createInfo);
 
 			await createService.ExecuteAsync(createCommand).ConfigureAwait(false);

@@ -20,7 +20,7 @@ namespace Tgs.Payment.Clients
 			_serializerOptions = serializerOptions;
 		}
 
-		public async ValueTask<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo)
+		public async ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo)
 		{
 			var requestContent = new StringContent(
 				JsonSerializer.Serialize(createInfo, _serializerOptions));
@@ -29,7 +29,7 @@ namespace Tgs.Payment.Clients
 
 			var response = await _httpClient
 				.PutAsync(
-					"/deposit",
+					$"/deposit/{createFormId}",
 					requestContent)
 				.ConfigureAwait(false);
 
@@ -109,7 +109,7 @@ namespace Tgs.Payment.Clients
 				yield return pc;
 		}
 
-		public async IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethosAsync()
+		public async IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync()
 		{
 			var response = await _httpClient
 				.GetAsync("/payment/method")

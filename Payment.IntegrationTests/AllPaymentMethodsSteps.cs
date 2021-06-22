@@ -49,7 +49,7 @@ namespace Payment.IntegrationTests
 		[When(@"call get all payment methods api")]
 		public async Task WhenCallGetAllPaymentMethodsApiAsync()
 		{
-			var paymentMethods = _paymentServiceClient.GetAllPaymentMethosAsync();
+			var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
 
 			await paymentMethods.ToArrayAsync();
 		}

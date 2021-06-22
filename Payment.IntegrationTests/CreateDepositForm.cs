@@ -60,7 +60,8 @@ namespace Payment.IntegrationTests
 		[When(@"call payment api")]
 		public async Task WhenCallPaymentApiAsync()
 		{
-			_createdFormId = await _paymentServiceClient.CreateDepositFormAsync(_depositForm);
+			_createdFormId = Guid.NewGuid();
+			await _paymentServiceClient.CreateDepositFormAsync(_createdFormId, _depositForm);
 		}
 	}
 }

@@ -6,7 +6,7 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentServiceClient
 	{
-		ValueTask<Guid> CreateDepositFormAsync(DepositFormCreateInfo createInfo);
+		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
 
 		ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
 
@@ -16,7 +16,7 @@ namespace Tgs.Payment.Clients
 
 		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
-		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethosAsync();
+		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
 
 		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
