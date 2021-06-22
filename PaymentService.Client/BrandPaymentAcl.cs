@@ -2,8 +2,12 @@
 
 namespace Tgs.Payment.Clients
 {
-	public record BrandPaymentAcl(
-		Guid BrandPaymentId,
-		string PlayerCode,
-		bool IsBlock);
+	public class BrandPaymentAcl
+	{
+		public Guid BrandPaymentId { get; init; }
+
+		public bool IsBlock { get; init; }
+
+		public string PlayerCode { get; init; } = default!;
+	}
 }

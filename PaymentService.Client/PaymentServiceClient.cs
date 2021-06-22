@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
@@ -143,6 +144,27 @@ namespace Tgs.Payment.Clients
 				yield return payment;
 		}
 
+		public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
+			string playerCode,
+			IEnumerable<Guid> brandPaymentIds)
+		{
+			var brandQueryString = string.Join(
+				"&",
+				brandPaymentIds.Select(id => $"brand={id}"));
+			var response = await _httpClient
+				.GetAsync($"/brand/payment/acl/{playerCode}?{brandQueryString}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var acls = JsonSerializer.Deserialize<BrandPaymentAcl[]>(contentJson, _serializerOptions);
+
+			foreach (var acl in acls!)
+				yield return acl;
+		}
+
 		public async ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId)
 		{
 			var response = await _httpClient
@@ -154,6 +176,41 @@ namespace Tgs.Payment.Clients
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 			return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _serializerOptions);
+		}
+
+		public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/brand/payment?brand={brandId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var bp in brandPayments!)
+				yield return bp;
+		}
+
+		public async IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds)
+		{
+			var brandQueryString = string.Join(
+				"&",
+				brandPaymentIds.Select(id => $"brand={id}"));
+			var response = await _httpClient
+				.GetAsync($"/brand/payment/vip?{brandQueryString}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var vips = JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _serializerOptions);
+
+			foreach (var vip in vips!)
+				yield return vip;
 		}
 
 		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId)

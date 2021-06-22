@@ -2,7 +2,10 @@
 
 namespace Tgs.Payment.Clients
 {
-	public record BrandPaymentVip(
-		Guid BrandPaymentId,
-		Guid VipLevelId);
+	public class BrandPaymentVip
+	{
+		public Guid BrandPaymentId { get; init; }
+
+		public Guid VipLevelId { get; init; }
+	}
 }

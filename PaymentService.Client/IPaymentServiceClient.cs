@@ -20,7 +20,15 @@ namespace Tgs.Payment.Clients
 
 		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
+		IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
+			string playerCode,
+			IEnumerable<Guid> brandPaymentIds);
+
 		ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId);
+
+		IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId);
+
+		IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds);
 
 		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
 
