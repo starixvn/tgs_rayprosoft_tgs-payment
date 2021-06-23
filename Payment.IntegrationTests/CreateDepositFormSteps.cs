@@ -8,14 +8,14 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class CreateDepositForm
+	public class CreateDepositFormSteps
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
 		private Guid _createdFormId;
 		private DepositFormCreateInfo _depositForm;
 
-		public CreateDepositForm()
+		public CreateDepositFormSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
