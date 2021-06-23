@@ -65,14 +65,14 @@ pipeline {
 									--set image.tag=v${BUILD_NUMBER} \
 									--set namespace=dev \
 									--set "connectionStrings.tgs=${TGS}" \
-									--set nats=${NatsUri} 
+									--set "connectionStrings.nats=${NatsUri}" 
 							'''
 							sh '''
 								helm template k8s/payment \
 									--set image.tag=v${BUILD_NUMBER} \
 									--set namespace=dev \
 									--set "connectionStrings.tgs=${TGS}" \
-									--set nats=${NatsUri} | kubectl -n dev apply -f -
+									--set "connectionStrings.nats=${NatsUri}" | kubectl -n dev apply -f -
 							'''
 						}
 					}
