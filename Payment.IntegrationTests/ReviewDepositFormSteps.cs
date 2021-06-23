@@ -10,15 +10,13 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class GetDepositDetail
+	public class ReviewDepositFormSteps
 	{
-		private DepositFormInfo _actual;
-		private Guid _brandId;
 		private Guid _formId;
 		private PaymentServiceClient _paymentServiceClient;
 		private IHost _testHost;
 
-		public GetDepositDetail()
+		public ReviewDepositFormSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 			_ = _testHost.StartAsync();
@@ -32,27 +30,11 @@ namespace Payment.IntegrationTests
 			_ = _testHost.StopAsync();
 		}
 
-		[Given(@"a form id \{(.*)}")]
-		public void GivenAFormId(Guid formId)
+		[Given(@"I review a deposit form")]
+		public async Task GivenIReviewADepositFormAsync()
 		{
-			_formId = formId;
-		}
+			_formId = Guid.NewGuid();
 
-		[Given(@"I have a brand id \{(.*)}")]
-		public void GivenIHaveABrandId(Guid brandId)
-		{
-			_brandId = brandId;
-		}
-
-		[Then(@"return detail data")]
-		public void ThenReturnDetailData()
-		{
-			Assert.IsNotNull(_actual);
-		}
-
-		[When(@"call get deposit form detail api")]
-		public async Task WhenCallGetDepositFormDetailApiAsync()
-		{
 			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
 			await dbContext.Players.AddAsync(new Player
@@ -80,17 +62,34 @@ namespace Payment.IntegrationTests
 			await dbContext.DepositForms.AddAsync(new DepositForm
 			{
 				Id = _formId,
-				BrandId = _brandId,
+				BrandId = Guid.NewGuid(),
 				PlayerCode = "PlayerCode",
 				BrandPaymentId = bp.Id,
 				Amount = 1000M,
+				Status = (int)PaymentFlowState.WaitApprove,
 				CreatedOn = DateTime.Now,
 				UpdatedOn = DateTime.Now
 			});
 
 			await dbContext.SaveChangesAsync();
+		}
 
-			_actual = await _paymentServiceClient.GetDepositFormAsync(_brandId, _formId);
+		[Then(@"form status change to approved")]
+		public async Task ThenFormStatusChangeToApprovedAsync()
+		{
+			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+			var formData = await dbContext.DepositForms.FindAsync(_formId);
+
+			var formStatus = (PaymentFlowState)formData.Status;
+
+			Assert.AreEqual(PaymentFlowState.Approved, formStatus);
+		}
+
+		[When(@"approve form")]
+		public async Task WhenApproveFormAsync()
+		{
+			await _paymentServiceClient.ReviewDepositFormAsync(_formId, ReviewState.Approve);
 		}
 	}
 }

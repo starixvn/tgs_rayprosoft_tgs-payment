@@ -8,13 +8,13 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class QueryDepositForms
+	public class QueryDepositFormsSteps
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
 		private PagingResponse<Tgs.Payment.Clients.DepositFormInfo> _actual;
 
-		public QueryDepositForms()
+		public QueryDepositFormsSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 			_ = _testHost.StartAsync();

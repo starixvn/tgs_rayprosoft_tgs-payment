@@ -4,7 +4,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
-		<Version>0.1.4</Version>
+		<Version>0.1.5</Version>
 		<Authors>Raypro</Authors>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
@@ -21,12 +21,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.15.8" />
-		<PackageReference Include="Grpc.Tools" Version="2.37.0">
+		<PackageReference Include="Google.Protobuf" Version="3.17.3" />
+		<PackageReference Include="Grpc.Tools" Version="2.38.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="0.0.2" />
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="0.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
