@@ -30,6 +30,7 @@ namespace PaymentService
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
+				endpoints.MapHealthChecks("/health");
 			});
 		}
 
@@ -72,6 +73,8 @@ namespace PaymentService
 
 					builder.UseNpgsql(config.GetConnectionString("Tgs"));
 				});
+
+			services.AddHealthChecks();
 		}
 	}
 }
