@@ -14,10 +14,12 @@ namespace Microsoft.Extensions.DependencyInjection
 				Assembly.GetExecutingAssembly(),
 				ServiceLifetime.Transient);
 
-			services.AddSingleton<IWithdrawProcessorFactory>(
-				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
-					sp,
-					configuration.GetAllRegisterWithdrawProcessorTypes()));
+			services
+				.AddSingleton<IWithdrawProcessorFactory>(
+					sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
+						sp,
+						configuration.GetAllRegisterWithdrawProcessorTypes()))
+				.AddOptions<PaymentOptions>();
 
 			return configuration;
 		}

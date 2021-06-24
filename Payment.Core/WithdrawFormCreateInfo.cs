@@ -11,8 +11,8 @@ namespace Tgs.Payment
 		PaymentFlowState Status,
 		string? Remark,
 		Guid BankInfoId,
+		string BankInfo,
 		Guid? BrandPaymentId = null,
-		string? BankInfo = null,
 		string? ApplyInfo = null,
 		string? PaymentReturn = null);
 }

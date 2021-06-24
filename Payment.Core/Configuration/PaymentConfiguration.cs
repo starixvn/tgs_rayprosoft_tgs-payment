@@ -26,8 +26,16 @@ namespace Tgs.Payment.Configuration
 
 		public PaymentConfiguration UsePaymentRepository<TPaymentRepository>() where TPaymentRepository : class, IPaymentRepository
 		{
+			Services.AddTransient<IPaymentRepository, TPaymentRepository>();
+
+			return this;
+		}
+
+		public PaymentConfiguration ConfigureOptions(Action<PaymentOptions, IServiceProvider> configure)
+		{
 			Services
-				.AddTransient<IPaymentRepository, TPaymentRepository>();
+				.AddOptions<PaymentOptions>()
+				.Configure(configure);
 
 			return this;
 		}

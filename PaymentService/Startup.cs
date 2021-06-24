@@ -3,13 +3,13 @@ using System.IO;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using Tgs.MessageQueue;
-using Tgs.Payment;
 
 namespace PaymentService
 {
@@ -72,6 +72,12 @@ namespace PaymentService
 					var config = sp.GetRequiredService<IConfiguration>();
 
 					builder.UseNpgsql(config.GetConnectionString("Tgs"));
+				})
+				.ConfigureOptions((options, sp) =>
+				{
+					var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
+
+					options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
 				});
 
 			services.AddHealthChecks();
