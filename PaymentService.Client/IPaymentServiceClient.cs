@@ -40,6 +40,8 @@ namespace Tgs.Payment.Clients
 
 		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);
 
+		ValueTask ReviewWithdrawFormAsync(Guid formId, Guid? brandPaymentId, ReviewState state, string? remark = null);
+
 		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null);
 
 		ValueTask SubmitWithdrawFormStatusAsync(

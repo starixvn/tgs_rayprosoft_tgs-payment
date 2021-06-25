@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Tgs.Payment.Configuration;
 
 namespace PaymentService
 {
@@ -78,7 +79,8 @@ namespace PaymentService
 					var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
 
 					options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
-				});
+				})
+				.RegisterWithdrawProcessors();
 
 			services.AddHealthChecks();
 		}

@@ -9,3 +9,8 @@ Scenario: Change a withdraw form status
 	Given I have a withdraw form
 	When I change status to "Approved"
 	Then form status change to "Approved"
+
+Scenario: Review a withdraw form
+	Given I review a withdraw form
+	When approve form
+	Then form status change to "Approved"

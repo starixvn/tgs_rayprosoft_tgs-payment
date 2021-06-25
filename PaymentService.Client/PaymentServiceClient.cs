@@ -337,6 +337,33 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
+		public async ValueTask ReviewWithdrawFormAsync(
+			Guid formId,
+			Guid? brandPaymentId,
+			ReviewState state,
+			string? remark = null)
+		{
+			var request = new SignOffForm
+			{
+				ReviewState = state,
+				Remark = remark,
+				BrandPaymentId = brandPaymentId
+			};
+
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(request, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PostAsync(
+					$"/withdraw/{formId}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null)
 		{
 			var request = new DepositFormStatus

@@ -29,6 +29,21 @@ namespace Tgs.Payment.Controllers
 			return await command.ReturnFormIdSource.Task.ConfigureAwait(false);
 		}
 
+		[HttpPost("{formId}")]
+		public async Task ReviewWithdrawFormAsync(
+			[FromServices] ICommandService<SignOffWithdrawFormCommand> signOffService,
+			Guid formId,
+			[FromBody] SignOffWithdrawFormViewModel request)
+		{
+			var command = new SignOffWithdrawFormCommand(
+				formId,
+				request.BrandPaymentId,
+				request.ReviewState,
+				request.Remark);
+
+			await signOffService.ExecuteAsync(command).ConfigureAwait(false);
+		}
+
 		[HttpPatch("{formId}")]
 		public async Task SubmitWithdrawFormStatusAsync(
 			[FromServices] ICommandService<SubmitWithdrawFormStatusCommand> submitService,

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Tgs.Payment.WithdrawProcessors</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tgs.Payment.ApplePay.Client" Version="0.0.4-alpha" />
+    <PackageReference Include="Tgs.Payment.LeePay.Client" Version="0.0.9-alpha" />
+    <PackageReference Include="Tgs.Payment.PrimePay.Client" Version="0.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Payment.Core\Payment.Core.csproj" />
+  </ItemGroup>
+
+</Project>
