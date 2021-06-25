@@ -110,10 +110,59 @@ namespace Payment.UnitTests
 
 			var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
 
+			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new DepositFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  "UserName",
+					  query.BrandId,
+					  Guid.NewGuid(),
+					  "ChannelName",
+					  Guid.NewGuid(),
+					  1000M,
+					  null,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  null,
+					  null,
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now));
+
 			var actual = await sut.GetAsync(query);
 
-			_ = fakePaymentRepository.Received(1)
-				.GetDepositFormByIdAsync(Arg.Is(query.FormId));
+			Assert.IsNotNull(actual);
+		}
+
+		[Test]
+		public async Task BrandId_Not_Match_Can_Not_Get_DepositForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetDepositFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new DepositFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  "UserName",
+					  Guid.NewGuid(),
+					  Guid.NewGuid(),
+					  "ChannelName",
+					  Guid.NewGuid(),
+					  1000M,
+					  null,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  null,
+					  null,
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNull(actual);
 		}
 
 		[Test]
@@ -140,7 +189,7 @@ namespace Payment.UnitTests
 					Guid.NewGuid(),
 					1000M,
 					null,
-					1000,
+					PaymentFlowState.WaitApprove,
 					"{}",
 					null,
 					null,
@@ -183,7 +232,7 @@ namespace Payment.UnitTests
 					Guid.NewGuid(),
 					1000M,
 					null,
-					1000,
+					PaymentFlowState.WaitApprove,
 					"{}",
 					null,
 					null,

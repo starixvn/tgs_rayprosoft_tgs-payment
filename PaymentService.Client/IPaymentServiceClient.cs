@@ -36,6 +36,8 @@ namespace Tgs.Payment.Clients
 
 		IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
 
+		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId);
+
 		ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
 		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);

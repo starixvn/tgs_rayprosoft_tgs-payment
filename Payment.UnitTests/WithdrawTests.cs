@@ -81,7 +81,7 @@ namespace Payment.UnitTests
 					"UserName",
 					Guid.NewGuid(),
 					1000M,
-					1000,
+					PaymentFlowState.WaitApprove,
 					null,
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
@@ -227,6 +227,72 @@ namespace Payment.UnitTests
 					Assert.IsNotNull(createInfo.BankInfo);
 				});
 			await sut.ExecuteAsync(command);
+		}
+
+		[Test]
+		public async Task Can_Get_One_WithdrawForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetWithdrawFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetWithdrawFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new WithdrawFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  UserType.Player,
+					  "UserName",
+					  query.BrandId,
+					  1000M,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  Guid.NewGuid(),
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now,
+					  null,
+					  null,
+					  null,
+					  null,
+					  null));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNotNull(actual);
+		}
+
+		[Test]
+		public async Task BrandId_Not_Match_Can_Not_Get_WithdrawForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetWithdrawFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetWithdrawFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new WithdrawFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  UserType.Player,
+					  "UserName",
+					  Guid.NewGuid(),
+					  1000M,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  Guid.NewGuid(),
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now,
+					  null,
+					  null,
+					  null,
+					  null,
+					  null));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNull(actual);
 		}
 	}
 }

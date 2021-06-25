@@ -255,6 +255,19 @@ namespace Tgs.Payment.Clients
 				yield return bankInfo;
 		}
 
+		public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/withdraw/{brandId}/{formId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
 			DepositFormQueryConditions conditions,
 			Paging paging)
