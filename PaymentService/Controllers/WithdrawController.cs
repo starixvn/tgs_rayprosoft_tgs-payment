@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 

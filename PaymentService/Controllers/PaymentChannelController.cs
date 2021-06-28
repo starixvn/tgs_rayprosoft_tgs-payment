@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 

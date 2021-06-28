@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
 using TGS.ServiceUtility;

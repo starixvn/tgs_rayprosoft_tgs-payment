@@ -3,15 +3,74 @@ using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
-using TGS.Paging;
 
 namespace Payment.UnitTests
 {
 	[TestFixture]
 	public class DepositTests
 	{
+		[Test]
+		public async Task BrandId_Not_Match_Can_Not_Get_DepositForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetDepositFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new DepositFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  "UserName",
+					  Guid.NewGuid(),
+					  Guid.NewGuid(),
+					  "ChannelName",
+					  Guid.NewGuid(),
+					  1000M,
+					  null,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  null,
+					  null,
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNull(actual);
+		}
+
+		[Test]
+		public void Can_Count_DepositForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new DepositFormQueryService(fakePaymentRepository);
+
+			var query = new DepositFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.GetAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.CountDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+		}
+
 		[Test]
 		public async Task Can_Create_Deposit_Form()
 		{
@@ -43,62 +102,6 @@ namespace Payment.UnitTests
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
-		}
-
-		[Test]
-		public void Can_Query_DepositForms()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new DepositFormQueryService(fakePaymentRepository);
-
-			var query = new DepositFormQuery(
-				Guid.NewGuid(),
-				null,
-				null,
-				null,
-				new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-				},
-				null,
-				null,
-				null);
-
-			var actual = sut.QueryAsync(query);
-
-			fakePaymentRepository.Received(1)
-				.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
-		}
-
-		[Test]
-		public void Can_Count_DepositForms()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new DepositFormQueryService(fakePaymentRepository);
-
-			var query = new DepositFormQuery(
-				Guid.NewGuid(),
-				null,
-				null,
-				null,
-				new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-				},
-				null,
-				null,
-				null);
-
-			var actual = sut.GetAsync(query);
-
-			fakePaymentRepository.Received(1)
-				.CountDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
 		}
 
 		[Test]
@@ -134,35 +137,31 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
-		public async Task BrandId_Not_Match_Can_Not_Get_DepositForm()
+		public void Can_Query_DepositForms()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-			var sut = new GetDepositFormDetailQueryService(fakePaymentRepository);
+			var sut = new DepositFormQueryService(fakePaymentRepository);
 
-			var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+			var query = new DepositFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
 
-			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
-				.Returns(new DepositFormInfo(
-					query.FormId,
-					  "PlayerCode",
-					  "UserName",
-					  Guid.NewGuid(),
-					  Guid.NewGuid(),
-					  "ChannelName",
-					  Guid.NewGuid(),
-					  1000M,
-					  null,
-					  PaymentFlowState.WaitApprove,
-					  null,
-					  null,
-					  null,
-					  DateTimeOffset.Now,
-					  DateTimeOffset.Now));
+			var actual = sut.QueryAsync(query);
 
-			var actual = await sut.GetAsync(query);
-
-			Assert.IsNull(actual);
+			fakePaymentRepository.Received(1)
+				.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
 		}
 
 		[Test]
