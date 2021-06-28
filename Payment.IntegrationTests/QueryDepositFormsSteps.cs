@@ -23,9 +23,9 @@ namespace Payment.IntegrationTests
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_ = _testHost.StopAsync();
+			await _testHost.StopAsync();
 		}
 
 		[Given(@"I Query deposit forms")]
@@ -44,7 +44,7 @@ namespace Payment.IntegrationTests
 		[When(@"call get deposit forms api")]
 		public async Task WhenCallGetDepositFormsApiAsync()
 		{
-			var conditions = new Tgs.Payment.Clients.DepositFormQueryConditions
+			var conditions = new DepositFormQueryConditions
 			{
 				BrandId = Guid.NewGuid()
 			};

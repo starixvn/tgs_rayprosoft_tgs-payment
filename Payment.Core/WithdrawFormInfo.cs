@@ -9,7 +9,7 @@ namespace Tgs.Payment
 		string? UserName,
 		Guid BrandId,
 		decimal Amount,
-		int Status,
+		PaymentFlowState Status,
 		string? Remark,
 		Guid BankInfoId,
 		DateTimeOffset CreatedOn,

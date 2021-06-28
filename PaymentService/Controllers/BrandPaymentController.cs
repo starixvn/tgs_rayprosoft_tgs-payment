@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 

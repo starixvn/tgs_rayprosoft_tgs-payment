@@ -10,6 +10,7 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
+	[Scope(Scenario = "Get deposit detail")]
 	public class GetDepositDetailSteps
 	{
 		private DepositFormInfo _actual;
@@ -27,9 +28,9 @@ namespace Payment.IntegrationTests
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_ = _testHost.StopAsync();
+			await _testHost.StopAsync();
 		}
 
 		[Given(@"a form id \{(.*)}")]

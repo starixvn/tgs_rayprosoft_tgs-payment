@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 
@@ -35,6 +35,14 @@ namespace Tgs.Payment.Controllers
 			return await command.TaskSource.Task.ConfigureAwait(false);
 		}
 
+		[HttpDelete("{playerCode}/{id}")]
+		public ValueTask DeletePlayerBankInfoAsync(
+			[FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
+			string playerCode,
+			Guid id)
+			=> deleteService.ExecuteAsync(
+				new DeletePlayerBankInfoCommand(playerCode, id));
+
 		[HttpGet("{playerCode}")]
 		public IAsyncEnumerable<PlayerBankInfoViewModel> GetPlayerBankInfosAsync(
 			[FromServices] IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo> queryService,
@@ -53,13 +61,5 @@ namespace Tgs.Payment.Controllers
 					Detail = JsonDocument.Parse(bankInfo.Detail)
 				});
 		}
-
-		[HttpDelete("{playerCode}/{id}")]
-		public ValueTask DeletePlayerBankInfoAsync(
-			[FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
-			string playerCode,
-			Guid id)
-			=> deleteService.ExecuteAsync(
-				new DeletePlayerBankInfoCommand(playerCode, id));
 	}
 }

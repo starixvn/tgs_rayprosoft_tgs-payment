@@ -10,7 +10,7 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	[Scope(Feature = "withdraw")]
+	[Scope(Scenario = "Change a withdraw form status")]
 	public class ChangeWithdrawStatusSteps
 	{
 		private Guid _formId;

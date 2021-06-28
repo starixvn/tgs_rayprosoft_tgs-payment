@@ -28,7 +28,7 @@ namespace Tgs.Payment.Clients
 
 		public string? Remark { get; init; }
 
-		public int Status { get; init; }
+		public PaymentFlowState Status { get; init; }
 
 		public DateTimeOffset UpdatedOn { get; init; }
 

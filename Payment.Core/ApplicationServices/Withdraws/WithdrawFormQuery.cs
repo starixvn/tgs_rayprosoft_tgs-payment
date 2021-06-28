@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using TGS.Paging;
+
+namespace Tgs.Payment.ApplicationServices.Withdraws
+{
+	public record WithdrawFormQuery(
+		Guid BrandId,
+		string? UserName,
+		string? ChannelName,
+		Guid? PaymentMethodId,
+		IEnumerable<PaymentFlowState> Status,
+		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
+		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
+		Paging<WithdrawFormInfo>? Paging);
+}

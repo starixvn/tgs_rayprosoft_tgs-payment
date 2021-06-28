@@ -12,7 +12,7 @@ namespace Tgs.Payment
 		Guid PaymentMethodId,
 		decimal Amount,
 		string? Remark,
-		int Status,
+		PaymentFlowState Status,
 		string? ApplyInfo,
 		string? PaymentReturn,
 		Guid? PromotionId,
