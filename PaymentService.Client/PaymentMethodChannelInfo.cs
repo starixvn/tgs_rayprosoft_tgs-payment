@@ -2,9 +2,14 @@
 
 namespace Tgs.Payment.Clients
 {
-	public record PaymentMethodChannelInfo(
-		Guid Id,
-		Guid PaymentId,
-		Guid MethodId,
-		Guid ChannelId);
+	public class PaymentMethodChannelInfo
+	{
+		public Guid ChannelId { get; init; }
+
+		public Guid Id { get; init; }
+
+		public Guid MethodId { get; init; }
+
+		public Guid PaymentId { get; init; }
+	}
 }

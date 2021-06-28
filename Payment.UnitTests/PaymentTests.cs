@@ -24,6 +24,19 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public void User_Can_Get_All_PaymentMethodChannelInfos()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new AllPaymentMethodChannelsQueryService(fakePaymentRepository);
+
+			_ = sut.QueryAsync(new AllPaymentMethodChannelsQuery());
+
+			_ = fakePaymentRepository.Received(1)
+				.GetAllPaymentMethodChannelsAsync();
+		}
+
+		[Test]
 		public void User_Can_Get_All_PaymentMethodInfos()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();

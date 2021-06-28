@@ -29,6 +29,8 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
+		IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync();
+
 		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
 
 		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();

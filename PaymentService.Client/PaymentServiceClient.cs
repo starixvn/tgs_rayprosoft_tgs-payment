@@ -110,6 +110,22 @@ namespace Tgs.Payment.Clients
 				yield return pc;
 		}
 
+		public async IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync()
+		{
+			var response = await _httpClient
+				.GetAsync("/payment/pmc")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var pmcs = JsonSerializer.Deserialize<PaymentMethodChannelInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var pmc in pmcs!)
+				yield return pmc;
+		}
+
 		public async IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync()
 		{
 			var response = await _httpClient

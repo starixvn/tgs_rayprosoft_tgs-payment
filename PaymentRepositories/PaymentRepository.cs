@@ -185,6 +185,14 @@ namespace TGS.Payment.Repositories
 			=> _tgsContext.PaymentChannels.AsAsyncEnumerable()
 				.Select(row => new PaymentChannelInfo(row.Id, row.Code));
 
+		public IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync()
+			=> _tgsContext.PaymentMethodChannels.AsAsyncEnumerable()
+				.Select(row => new PaymentMethodChannelInfo(
+					row.Id,
+					row.PaymentId,
+					row.MethodId,
+					row.ChannelId));
+
 		public IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync()
 			=> _tgsContext.PaymentMethods.AsAsyncEnumerable()
 				.Select(row => new PaymentMethodInfo(row.Id, row.Code, row.BankType));

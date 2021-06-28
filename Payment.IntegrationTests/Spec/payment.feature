@@ -19,3 +19,8 @@ Scenario: Get all payment channels
 	Given I will list all payment channels
 	When call get all payment channels
 	Then return all payment channels data
+
+Scenario: Get all payment_method_channels
+	Given I will list all payment_method_channels
+	When call get all payment_method_channels api
+	Then return all payment_method_channels data
