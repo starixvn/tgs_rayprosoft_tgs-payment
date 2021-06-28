@@ -20,3 +20,8 @@ Scenario: Get withdraw detail
 	And a form id {EF74B68B-EB8F-4031-BFBA-3AEC7CD7C0F3}
 	When call get withdraw form detail api
 	Then return detail data
+
+Scenario: Query withdraw forms
+	Given I Query withdraw forms
+	When call get withdraw forms api
+	Then return withdraw forms list

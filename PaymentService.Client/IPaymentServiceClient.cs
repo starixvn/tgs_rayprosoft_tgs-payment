@@ -40,6 +40,8 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
+		ValueTask<PagingResponse<WithdrawFormInfo>> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
+
 		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);
 
 		ValueTask ReviewWithdrawFormAsync(Guid formId, Guid? brandPaymentId, ReviewState state, string? remark = null);

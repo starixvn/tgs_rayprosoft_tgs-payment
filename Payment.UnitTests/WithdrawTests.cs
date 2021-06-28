@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
+using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
 
@@ -293,6 +294,34 @@ namespace Payment.UnitTests
 					Assert.IsNotNull(createInfo.BankInfo);
 				});
 			await sut.ExecuteAsync(command);
+		}
+
+		[Test]
+		public void Can_Query_WithdrawForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new WithdrawFormQueryService(fakePaymentRepository);
+
+			var query = new WithdrawFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.QueryAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.QueryWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
 		}
 	}
 }
