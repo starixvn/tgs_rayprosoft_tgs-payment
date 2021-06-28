@@ -2,23 +2,19 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.LeePay;
-using TGS.Core.Infrastructures.Json;
 
 namespace Tgs.Payment.WithdrawProcessors
 {
 	public class LeePayProcessor : IWithdrawProcessor
 	{
-		private readonly IJsonSerializationProvider _jsonSerializationProvider;
 		private readonly JsonSerializerOptions _jsonSerializerOptions;
 		private readonly LeePaySerializer _leePaySerializer;
 		public string Subject => "tgs.payment.leepay.withdraw";
 
 		public LeePayProcessor(
-			IJsonSerializationProvider jsonSerializationProvider,
 			IOptions<PaymentOptions> jsonOptionsAccessor,
 			LeePaySerializer leePaySerializer)
 		{
-			_jsonSerializationProvider = jsonSerializationProvider ?? throw new ArgumentNullException(nameof(jsonSerializationProvider));
 			_leePaySerializer = leePaySerializer ?? throw new ArgumentNullException(nameof(leePaySerializer));
 			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		}
@@ -29,12 +25,12 @@ namespace Tgs.Payment.WithdrawProcessors
 			string bankInfo,
 			BrandPaymentInfo brandPayment)
 		{
-			var withdrawBankInfo = _jsonSerializationProvider
-				.DeserializeFromString<WithdrawBankInfo<LeePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<LeePayBankInfo>>(bankInfo, _jsonSerializerOptions);
 			var destinationAddress = withdrawBankInfo.Detail.Address;
 
-			var brandPaymentExtendedData = _jsonSerializationProvider
-				.DeserializeFromString<JsonDocument>(brandPayment.ExtendedData);
+			var brandPaymentExtendedData = JsonSerializer
+				.Deserialize<JsonDocument>(brandPayment.ExtendedData);
 
 			var settings = new LeePayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("systemId").GetString(),

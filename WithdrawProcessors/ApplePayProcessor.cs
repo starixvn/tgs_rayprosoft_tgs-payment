@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplePay;
 
 namespace Tgs.Payment.WithdrawProcessors
@@ -7,11 +8,14 @@ namespace Tgs.Payment.WithdrawProcessors
 	public class ApplePayProcessor : IWithdrawProcessor
 	{
 		private readonly ApplePaySerializer _applePaySerializer;
-
+		private readonly JsonSerializerOptions _jsonSerializerOptions;
 		public string Subject => "tgs.payment.applepay.withdraw";
 
-		public ApplePayProcessor(ApplePaySerializer applePaySerializer)
+		public ApplePayProcessor(
+			IOptions<PaymentOptions> jsonOptionsAccessor,
+			ApplePaySerializer applePaySerializer)
 		{
+			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 			_applePaySerializer = applePaySerializer ?? throw new ArgumentNullException(nameof(applePaySerializer));
 		}
 
@@ -21,9 +25,11 @@ namespace Tgs.Payment.WithdrawProcessors
 			string bankInfo,
 			BrandPaymentInfo brandPayment)
 		{
-			var withdrawBankInfo = _applePaySerializer.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo);
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
-			var brandPaymentExtendedData = _applePaySerializer.Deserialize<JsonDocument>(brandPayment.ExtendedData);
+			var brandPaymentExtendedData = JsonSerializer
+				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
 
 			var settings = new ApplePayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("apiKey").GetString(),

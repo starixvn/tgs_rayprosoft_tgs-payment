@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using Tgs.Payment.PrimePay;
 
 namespace Tgs.Payment.WithdrawProcessors
 {
 	public class PrimePayProcessor : IWithdrawProcessor
 	{
+		private readonly JsonSerializerOptions _jsonSerializerOptions;
 		private readonly PrimePaySerializer _primePaySerializer;
 
 		public string Subject => "tgs.payment.primepay.withdraw";
 
-		public PrimePayProcessor(PrimePaySerializer primePaySerializer)
+		public PrimePayProcessor(
+			IOptions<PaymentOptions> jsonOptionsAccessor,
+			PrimePaySerializer primePaySerializer)
 		{
+			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 			_primePaySerializer = primePaySerializer ?? throw new ArgumentNullException(nameof(primePaySerializer));
 		}
 
@@ -21,9 +26,11 @@ namespace Tgs.Payment.WithdrawProcessors
 			string bankInfo,
 			BrandPaymentInfo brandPayment)
 		{
-			var withdrawBankInfo = _primePaySerializer.Deserialize<WithdrawBankInfo<PrimePayBankInfo>>(bankInfo);
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<PrimePayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
-			var brandPaymentExtendedData = _primePaySerializer.Deserialize<JsonDocument>(brandPayment.ExtendedData);
+			var brandPaymentExtendedData = JsonSerializer
+				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
 
 			var settings = new PrimePayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("merchantId").GetString(),

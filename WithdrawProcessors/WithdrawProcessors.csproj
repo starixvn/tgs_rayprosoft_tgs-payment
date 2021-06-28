@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Tgs.Payment.ApplePay.Client" Version="0.0.4-alpha" />
-    <PackageReference Include="Tgs.Payment.LeePay.Client" Version="0.0.9-alpha" />
+    <PackageReference Include="Tgs.Payment.LeePay.Client" Version="0.0.10" />
     <PackageReference Include="Tgs.Payment.PrimePay.Client" Version="0.0.5" />
   </ItemGroup>
 
