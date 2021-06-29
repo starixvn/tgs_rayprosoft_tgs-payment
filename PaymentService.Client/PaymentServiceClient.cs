@@ -21,6 +21,26 @@ namespace Tgs.Payment.Clients
 			_serializerOptions = serializerOptions;
 		}
 
+		public async ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(info, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					$"/bankinfo/agent/{brandId}/{agentId}?name={agentName}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo)
 		{
 			var requestContent = new StringContent(
@@ -85,6 +105,15 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId)
+		{
+			var response = await _httpClient
+				.DeleteAsync($"/bankinfo/agent/{agentId}/{bankInfoId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId)
 		{
 			var response = await _httpClient
@@ -92,6 +121,22 @@ namespace Tgs.Payment.Clients
 				.ConfigureAwait(false);
 
 			response.EnsureSuccessStatusCode();
+		}
+
+		public async IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/bankinfo/agent/{agentId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			var bankInfos = JsonSerializer.Deserialize<AgentBankInfo[]>(contentJson, _serializerOptions);
+
+			foreach (var bankInfo in bankInfos!)
+				yield return bankInfo;
 		}
 
 		public async IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync()

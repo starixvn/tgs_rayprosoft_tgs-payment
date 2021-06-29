@@ -1,7 +1,14 @@
 ﻿Feature: withdraw
 
-Scenario: Create withdraw form
+Scenario: Create player withdraw form
 	Given I will create withdraw form
+	And playerCode is "4ucmqplxb029"
+	When call create withdraw form api
+	Then withdraw form created
+
+Scenario: Create agent withdraw form
+	Given I will create withdraw form
+	And agentId is {C9D9CAAA-2091-4824-8647-E9866E86C8D9}
 	When call create withdraw form api
 	Then withdraw form created
 

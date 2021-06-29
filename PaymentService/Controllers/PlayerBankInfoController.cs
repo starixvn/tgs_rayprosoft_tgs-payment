@@ -18,7 +18,7 @@ namespace Tgs.Payment.Controllers
 		[HttpPut("{brandId}/{playerCode}")]
 		public async Task<Guid> CreatePlayerBankInfoAsync(
 			[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
-			[FromServices] IOptions<JsonOptions> jsonOptions,
+			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
 			Guid brandId,
 			string playerCode,
 			[FromBody] CreateBankInfoViewModel request)
@@ -28,7 +28,7 @@ namespace Tgs.Payment.Controllers
 				playerCode,
 				request.PaymentChannelId,
 				request.BankType,
-				JsonSerializer.Serialize(request.Detail, jsonOptions.Value.JsonSerializerOptions));
+				JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions));
 
 			await createService.ExecuteAsync(command).ConfigureAwait(false);
 
