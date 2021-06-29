@@ -6,13 +6,19 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentServiceClient
 	{
+		ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
+
 		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
 
 		ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
 
 		ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo);
 
+		ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
+
 		ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId);
+
+		IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId);
 
 		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
