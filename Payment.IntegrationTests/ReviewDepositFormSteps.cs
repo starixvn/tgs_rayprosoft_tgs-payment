@@ -10,6 +10,7 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
+	[Scope(Scenario = "Review a deposit form")]
 	public class ReviewDepositFormSteps
 	{
 		private Guid _formId;
@@ -25,9 +26,9 @@ namespace Payment.IntegrationTests
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_ = _testHost.StopAsync();
+			await _testHost.StopAsync();
 		}
 
 		[Given(@"I review a deposit form")]

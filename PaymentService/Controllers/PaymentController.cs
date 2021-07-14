@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
 
@@ -13,6 +13,19 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentController : ControllerBase
 	{
+		[HttpGet]
+		public IAsyncEnumerable<PaymentViewModel> GetAllPaymentsAsync(
+			[FromServices] IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
+		{
+			var allPayments = queryService.QueryAsync(new GetAllPaymentsQuery());
+
+			return allPayments.Select(payment => new PaymentViewModel
+			{
+				Id = payment.Id,
+				Code = payment.Code
+			});
+		}
+
 		[HttpGet("{id}")]
 		public async Task<PaymentViewModel> GetPaymentByIdAsync(
 			[FromServices] IGetService<GetPaymentQuery, PaymentInfo> getService,
@@ -27,19 +40,6 @@ namespace Tgs.Payment.Controllers
 				Id = info.Id,
 				Code = info.Code
 			};
-		}
-
-		[HttpGet]
-		public IAsyncEnumerable<PaymentViewModel> GetAllPaymentsAsync(
-			[FromServices] IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
-		{
-			var allPayments = queryService.QueryAsync(new GetAllPaymentsQuery());
-
-			return allPayments.Select(payment => new PaymentViewModel
-			{
-				Id = payment.Id,
-				Code = payment.Code
-			});
 		}
 	}
 }

@@ -37,7 +37,7 @@ namespace Payment.IntegrationTests
 		}
 
 		[Given(@"brandId is \{(.*)}")]
-		public void GivenBrandIdIsFFBFDCFEC_A_ABFE(Guid brandId)
+		public void GivenBrandIdIs(Guid brandId)
 		{
 			_brandId = brandId;
 		}

@@ -8,6 +8,7 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
+	[Scope(Scenario = "List player bank infos")]
 	public class GetPlayerBankInfosSteps
 	{
 		private PaymentServiceClient _paymentServiceClient;
