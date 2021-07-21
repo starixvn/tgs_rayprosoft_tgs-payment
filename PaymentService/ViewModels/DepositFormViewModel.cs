@@ -28,7 +28,7 @@ namespace Tgs.Payment.ViewModels
 
 		public string? Remark { get; set; }
 
-		public int Status { get; set; }
+		public PaymentFlowState Status { get; set; }
 
 		public DateTimeOffset UpdatedOn { get; set; }
 

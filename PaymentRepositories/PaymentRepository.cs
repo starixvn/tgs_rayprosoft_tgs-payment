@@ -25,6 +25,13 @@ namespace TGS.Payment.Repositories
 			return dataQuery.CountAsync();
 		}
 
+		public ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.CountAsync();
+		}
+
 		public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser)
 		{
 			var createTime = DateTimeOffset.UtcNow;
@@ -177,6 +184,14 @@ namespace TGS.Payment.Repositories
 		public IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync()
 			=> _tgsContext.PaymentChannels.AsAsyncEnumerable()
 				.Select(row => new PaymentChannelInfo(row.Id, row.Code));
+
+		public IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync()
+			=> _tgsContext.PaymentMethodChannels.AsAsyncEnumerable()
+				.Select(row => new PaymentMethodChannelInfo(
+					row.Id,
+					row.PaymentId,
+					row.MethodId,
+					row.ChannelId));
 
 		public IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync()
 			=> _tgsContext.PaymentMethods.AsAsyncEnumerable()
@@ -334,7 +349,7 @@ namespace TGS.Payment.Repositories
 							df.BrandPayment.PaymentMethodChannel.MethodId,
 							df.Amount,
 							df.Remark,
-							df.Status,
+							(PaymentFlowState)df.Status,
 							df.ApplyInfo,
 							df.PaymentReturn,
 							df.PromotionId,
@@ -375,7 +390,7 @@ namespace TGS.Payment.Repositories
 							df.UserName,
 							df.BrandId,
 							df.Amount,
-							df.Status,
+							(PaymentFlowState)df.Status,
 							df.Remark,
 							df.BankInfoId,
 							df.CreatedOn,
@@ -405,7 +420,7 @@ namespace TGS.Payment.Repositories
 					form.BrandPayment.PaymentMethodChannel.MethodId,
 					form.Amount,
 					form.Remark,
-					form.Status,
+					(PaymentFlowState)form.Status,
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.PromotionId,
@@ -434,12 +449,60 @@ namespace TGS.Payment.Repositories
 					form.BrandPayment.PaymentMethodChannel.MethodId,
 					form.Amount,
 					form.Remark,
-					form.Status,
+					(PaymentFlowState)form.Status,
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn))
+				.ToEnumerable()
+				.ToAsyncEnumerable();
+		}
+
+		public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
+			WithdrawFormQueryConditions conditions,
+			Paging<WithdrawFormInfo> paging)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions)
+				.Select(form => new WithdrawFormInfo(
+					form.Id,
+					form.UserId,
+					(UserType)form.UserType,
+					form.UserName,
+					form.BrandId,
+					form.ActualAmount ?? form.Amount,
+					(PaymentFlowState)form.Status,
+					form.Remark,
+					form.BankInfoId,
+					form.CreatedOn,
+					form.UpdatedOn,
+					form.BrandPaymentId));
+
+			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+
+			return dataQuery
+				.ToEnumerable()
+				.ToAsyncEnumerable();
+		}
+
+		public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery
+				.Select(form => new WithdrawFormInfo(
+					form.Id,
+					form.UserId,
+					(UserType)form.UserType,
+					form.UserName,
+					form.BrandId,
+					form.ActualAmount ?? form.Amount,
+					(PaymentFlowState)form.Status,
+					form.Remark,
+					form.BankInfoId,
+					form.CreatedOn,
+					form.UpdatedOn,
+					form.BrandPaymentId))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
@@ -512,6 +575,37 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
 			if (conditions.PaymentMethodId != null)
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+			if (conditions.Status != null)
+			{
+				var statusList = conditions.Status.Cast<int>().ToArray();
+
+				if (statusList.Length > 0)
+					dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
+			}
+			if (conditions.CreateOnRange != null)
+				dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
+					&& form.CreatedOn < conditions.CreateOnRange.Value.End);
+
+			if (conditions.UpdateOnRange != null)
+				dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
+					&& form.UpdatedOn < conditions.UpdateOnRange.Value.End);
+
+			return dataQuery.AsAsyncEnumerable();
+		}
+
+		private IAsyncEnumerable<WithdrawForm> MakeWithdrawFormQueryAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = _tgsContext.WithdrawForms
+				.Include(f => f.BrandPayment)
+				.ThenInclude(bp => bp!.PaymentMethodChannel)
+				.Where(form => form.BrandId == conditions.BrandId);
+
+			if (!string.IsNullOrWhiteSpace(conditions.UserName))
+				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
+			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
+				dataQuery = dataQuery.Where(form => form.BrandPayment!.ChannelName == conditions.ChannelName);
+			if (conditions.PaymentMethodId != null)
+				dataQuery = dataQuery.Where(form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 			if (conditions.Status != null)
 			{
 				var statusList = conditions.Status.Cast<int>().ToArray();

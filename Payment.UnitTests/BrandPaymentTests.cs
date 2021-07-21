@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.BrandPayments;
 
 namespace Payment.UnitTests
 {

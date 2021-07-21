@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
-using Tgs.Payment.ApplicationServices;
+using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
 
 namespace Payment.UnitTests
@@ -13,7 +13,83 @@ namespace Payment.UnitTests
 	public class WithdrawTests
 	{
 		[Test]
-		public async Task Can_Create_Withdraw_Form()
+		public async Task BrandId_Not_Match_Can_Not_Get_WithdrawForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetWithdrawFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetWithdrawFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new WithdrawFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  UserType.Player,
+					  "UserName",
+					  Guid.NewGuid(),
+					  1000M,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  Guid.NewGuid(),
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now,
+					  null,
+					  null,
+					  null,
+					  null,
+					  null));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNull(actual);
+		}
+
+		[Test]
+		public async Task Can_Create_Agent_WithdrawForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
+
+			var sut = new CreateWithdrawFormCommandService(
+				fakePaymentRepository,
+				fakePaymentClient,
+				optionsAccessor);
+
+			var command = new CreateWithdrawFormCommand(
+				Guid.NewGuid().ToString(),
+				"TestAgent",
+				UserType.Agent,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				1000M);
+
+			fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+				.Returns(new AgentBankInfo(
+					command.BankInfoId,
+					Guid.Parse(command.UserId),
+					command.BrandId,
+					Guid.NewGuid(),
+					"Bank",
+					"{}"));
+
+			await sut.ExecuteAsync(command);
+
+			var actual = await command.ReturnFormIdSource.Task;
+
+			Assert.AreNotEqual(Guid.Empty, actual);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreateWithdrawFormAsync(Arg.Is(actual), Arg.Any<WithdrawFormCreateInfo>());
+
+			_ = fakePaymentClient.Received(1)
+				.EmitWithdrawFormCreatedEventAsync(Arg.Is(actual), Arg.Any<Guid>());
+		}
+
+		[Test]
+		public async Task Can_Create_Player_Withdraw_Form()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
@@ -56,6 +132,67 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public async Task Can_Get_One_WithdrawForm()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new GetWithdrawFormDetailQueryService(fakePaymentRepository);
+
+			var query = new GetWithdrawFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new WithdrawFormInfo(
+					query.FormId,
+					  "PlayerCode",
+					  UserType.Player,
+					  "UserName",
+					  query.BrandId,
+					  1000M,
+					  PaymentFlowState.WaitApprove,
+					  null,
+					  Guid.NewGuid(),
+					  DateTimeOffset.Now,
+					  DateTimeOffset.Now,
+					  null,
+					  null,
+					  null,
+					  null,
+					  null));
+
+			var actual = await sut.GetAsync(query);
+
+			Assert.IsNotNull(actual);
+		}
+
+		[Test]
+		public void Can_Query_WithdrawForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new WithdrawFormQueryService(fakePaymentRepository);
+
+			var query = new WithdrawFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.QueryAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.QueryWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
+		}
+
+		[Test]
 		public async Task Can_SignOff_Form()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -81,7 +218,7 @@ namespace Payment.UnitTests
 					"UserName",
 					Guid.NewGuid(),
 					1000M,
-					1000,
+					PaymentFlowState.WaitApprove,
 					null,
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
@@ -184,6 +321,96 @@ namespace Payment.UnitTests
 				.EmitWithdrawFormStatusChangedEventAsync(
 					Arg.Is(command.FormId),
 					Arg.Any<Guid>());
+		}
+
+		[Test]
+		public void Create_Agent_WithdrawForm_If_BankInfo_Not_Self_Will_Fail()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
+
+			var sut = new CreateWithdrawFormCommandService(
+				fakePaymentRepository,
+				fakePaymentClient,
+				optionsAccessor);
+
+			var command = new CreateWithdrawFormCommand(
+				Guid.NewGuid().ToString(),
+				"TestAgent",
+				UserType.Agent,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				1000M);
+
+			fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+				.Returns(new AgentBankInfo(
+					command.BankInfoId,
+					Guid.NewGuid(),
+					command.BrandId,
+					Guid.NewGuid(),
+					"Bank",
+					"{}"));
+
+			Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
+		}
+
+		[Test]
+		public void Create_Player_Withdraw_Form_If_BankInfo_Not_Self_Will_Fail()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
+
+			var sut = new CreateWithdrawFormCommandService(
+				fakePaymentRepository,
+				fakePaymentClient,
+				optionsAccessor);
+
+			var command = new CreateWithdrawFormCommand(
+				"ThisIsPlayerCode",
+				"TestUser",
+				UserType.Player,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				1000M);
+
+			fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+				.Returns(new PlayerBankInfo(
+					command.BankInfoId,
+					"OtherPlayerCode",
+					command.BrandId,
+					Guid.NewGuid(),
+					"Bank",
+					"{}"));
+
+			Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
+		}
+
+		[Test]
+		public void Create_Withdraw_Form_With_Invalid_UserType_Will_Fail()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
+
+			var sut = new CreateWithdrawFormCommandService(
+				fakePaymentRepository,
+				fakePaymentClient,
+				optionsAccessor);
+
+			var command = new CreateWithdrawFormCommand(
+				"Unknown",
+				"Unknown",
+				UserType.None,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				1000M);
+
+			Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
 		}
 
 		[Test]

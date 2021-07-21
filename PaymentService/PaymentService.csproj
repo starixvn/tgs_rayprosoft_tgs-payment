@@ -32,5 +32,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Payment.Core\Payment.Core.csproj" />
 		<ProjectReference Include="..\PaymentRepositories\PaymentRepositories.csproj" />
+		<ProjectReference Include="..\WithdrawProcessors\WithdrawProcessors.csproj" />
 	</ItemGroup>
 </Project>

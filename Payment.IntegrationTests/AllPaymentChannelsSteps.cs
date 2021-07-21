@@ -22,6 +22,12 @@ namespace Payment.IntegrationTests
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
 
+		[AfterScenario]
+		public async Task CleanUpAsync()
+		{
+			await _testHost.StopAsync();
+		}
+
 		[Given(@"I will list all payment channels")]
 		public void GivenIWillListAllPaymentChannels()
 		{
