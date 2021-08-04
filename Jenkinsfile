@@ -10,7 +10,6 @@ pipeline {
     stages {
 		stage('Prepare') {
             steps {
-                sh "echo 'Process components: $Components'";
                 sh "echo 'Branch: $GIT_BRANCH'";
 
                 script {
@@ -42,8 +41,7 @@ pipeline {
                             env."tgs_${key}" = value;
                         }
 
-                        env.TAG = env.kube_ns + '-' 
-							+ sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
+                        env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
 					}
 				}
 
@@ -104,25 +102,20 @@ pipeline {
 		stage('Deploy to dev') {
 			steps {
 				script {
-					def json = readJSON file: "$paymentdev";
-
-					env.TGS = json.tgs;
-					env.NatsUri = json.nats;
-
 					withKubeConfig([credentialsId: env.k8s_config]) {
 						sh '''
 							helm template deployment/k8s/payment-api \
 								--set image.tag=${TAG} \
 								--set namespace=${kube_ns} \
-								--set "connectionStrings.tgs=${tgs_tgs}" \
-								--set "connectionStrings.nats=${tgs_nats}" 
+								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
+								--set \\"connectionStrings.nats=\\${tgs_nats}\\" 
 						'''
 						sh '''
 							helm template deployment/k8s/payment-api \
 								--set image.tag=${TAG} \
 								--set namespace=${kube_ns} \
-								--set "connectionStrings.tgs=${tgs_tgs}" \
-								--set "connectionStrings.nats=${tgs_nats}" | kubectl apply -f -
+								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
+								--set \\"connectionStrings.nats=\\${tgs_nats}\\" | kubectl apply -f -
 						'''
 					}
 				}
