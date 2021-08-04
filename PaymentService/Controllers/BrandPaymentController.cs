@@ -79,7 +79,8 @@ namespace Tgs.Payment.Controllers
 					PaymentId = brandPayment.PaymentId,
 					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 					TransferLimit = brandPayment.TransferLimit,
-					TransferType = brandPayment.TransferType
+					TransferType = brandPayment.TransferType,
+					DisplayOrder = brandPayment.DisplayOrder
 				});
 
 		[HttpGet("vip")]

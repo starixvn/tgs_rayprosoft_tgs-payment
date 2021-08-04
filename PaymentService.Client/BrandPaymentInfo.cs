@@ -35,5 +35,7 @@ namespace Tgs.Payment.Clients
 		public ValueRange<decimal> TransferLimit { get; init; }
 
 		public TransferType TransferType { get; init; }
+
+		public int DisplayOrder { get; init; }
 	}
 }

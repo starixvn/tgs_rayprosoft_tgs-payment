@@ -35,5 +35,7 @@ namespace Tgs.Payment.ViewModels
 		public ValueRange<decimal> TransferLimit { get; set; }
 
 		public TransferType TransferType { get; set; }
+
+		public int DisplayOrder { get; set; }
 	}
 }
