@@ -99,25 +99,23 @@ pipeline {
             }
         }
 
-		stage('Deploy to dev') {
+		stage('Deploy to k8s') {
 			steps {
-				script {
-					withKubeConfig([credentialsId: env.k8s_config]) {
-						sh '''
-							helm template deployment/k8s/payment-api \
-								--set image.tag=${TAG} \
-								--set namespace=${kube_ns} \
-								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
-								--set \\"connectionStrings.nats=\\${tgs_nats}\\" 
-						'''
-						sh '''
-							helm template deployment/k8s/payment-api \
-								--set image.tag=${TAG} \
-								--set namespace=${kube_ns} \
-								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
-								--set \\"connectionStrings.nats=\\${tgs_nats}\\" | kubectl apply -f -
-						'''
-					}
+				withKubeConfig([credentialsId: env.k8s_config]) {
+					sh '''
+						helm template deployment/k8s/payment-api \
+							--set image.tag=${TAG} \
+							--set namespace=${kube_ns} \
+							--set connectionStrings.tgs="$tgs_tgs" \
+							--set connectionStrings.nats="$tgs_nats" 
+					'''
+					sh '''
+						helm template deployment/k8s/payment-api \
+							--set image.tag=${TAG} \
+							--set namespace=${kube_ns} \
+							--set connectionStrings.tgs="$tgs_tgs" \
+							--set connectionStrings.nats="$tgs_nats" | kubectl apply -f -
+					'''
 				}
 			}
 		}
