@@ -279,7 +279,8 @@ namespace TGS.Payment.Repositories
 					1 => TransferType.Withdraw,
 					_ => TransferType.Deposit,
 				},
-				row.PaymentStatus == 0);
+				row.PaymentStatus == 0,
+				row.DisplayOrder);
 		}
 
 		public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId)
@@ -319,7 +320,8 @@ namespace TGS.Payment.Repositories
 					1 => TransferType.Withdraw,
 					_ => TransferType.Deposit
 				},
-				bp.PaymentStatus == 0));
+				bp.PaymentStatus == 0,
+				bp.DisplayOrder));
 		}
 
 		public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds)

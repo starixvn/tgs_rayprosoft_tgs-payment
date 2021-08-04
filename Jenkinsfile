@@ -8,6 +8,49 @@ pipeline {
 	}
 
     stages {
+		stage('Prepare') {
+            steps {
+                sh "echo 'Process components: $Components'";
+                sh "echo 'Branch: $GIT_BRANCH'";
+
+                script {
+                    switch(env.GIT_BRANCH)
+                    {
+                        case 'origin/main':
+                            env.kube_ns = "prod";
+                            env.k8s_config = 'stag-k8s-config';
+                            break;
+                        case 'origin/release':
+                            env.kube_ns = "staging";
+                            env.k8s_config = 'stag-k8s-config';
+                            break;
+                        default:
+                            env.kube_ns = "dev";
+                            env.k8s_config='k8s-kube-config' 
+                            break;
+                    }
+                }
+
+                configFileProvider([
+					configFile(
+						fileId: 'tgs.' + env.kube_ns , 
+						variable: 'tgsconfig')]) {
+					script {
+						def envItems = readProperties file: "$tgsconfig";
+
+                        envItems.each { key, value -> 
+                            env."tgs_${key}" = value;
+                        }
+
+                        env.TAG = env.kube_ns + '-' 
+							+ sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
+					}
+				}
+
+                sh "echo tag: $TAG"
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'dotnet build -c $BuildConfiguration'
@@ -42,39 +85,45 @@ pipeline {
 			}
 		}
 
+		stage('Deploy') {
+            when {
+                expression {
+                    return env.kube_ns != 'dev';
+                }
+            }
+
+            steps {
+                script {
+                    input message: 'Ready to go?', ok: 'yes';
+                }
+                
+                sh "echo start deploy"
+            }
+        }
+
 		stage('Deploy to dev') {
-			input {
-				message 'Ready to go?'
-				ok 'yes'
-			}
-
 			steps {
-				configFileProvider([
-					configFile(
-						fileId: 'payment.dev.json', 
-						variable: 'paymentdev')]) {
-					script {
-						def json = readJSON file: "$paymentdev";
+				script {
+					def json = readJSON file: "$paymentdev";
 
-						env.TGS = json.tgs;
-						env.NatsUri = json.nats;
+					env.TGS = json.tgs;
+					env.NatsUri = json.nats;
 
-						withKubeConfig([credentialsId: 'k8s-kube-config', serverUrl: 'https://192.168.50.105:6443']) {
-							sh '''
-								helm template k8s/payment \
-									--set image.tag=v${BUILD_NUMBER} \
-									--set namespace=dev \
-									--set "connectionStrings.tgs=${TGS}" \
-									--set "connectionStrings.nats=${NatsUri}" 
-							'''
-							sh '''
-								helm template k8s/payment \
-									--set image.tag=v${BUILD_NUMBER} \
-									--set namespace=dev \
-									--set "connectionStrings.tgs=${TGS}" \
-									--set "connectionStrings.nats=${NatsUri}" | kubectl -n dev apply -f -
-							'''
-						}
+					withKubeConfig([credentialsId: env.k8s_config]) {
+						sh '''
+							helm template deployment/k8s/payment-api \
+								--set image.tag=${TAG} \
+								--set namespace=${kube_ns} \
+								--set "connectionStrings.tgs=${tgs_tgs}" \
+								--set "connectionStrings.nats=${tgs_nats}" 
+						'''
+						sh '''
+							helm template deployment/k8s/payment-api \
+								--set image.tag=${TAG} \
+								--set namespace=${kube_ns} \
+								--set "connectionStrings.tgs=${tgs_tgs}" \
+								--set "connectionStrings.nats=${tgs_nats}" | kubectl apply -f -
+						'''
 					}
 				}
 			}
