@@ -10,7 +10,6 @@ pipeline {
     stages {
 		stage('Prepare') {
             steps {
-                sh "echo 'Process components: $Components'";
                 sh "echo 'Branch: $GIT_BRANCH'";
 
                 script {
@@ -42,8 +41,7 @@ pipeline {
                             env."tgs_${key}" = value;
                         }
 
-                        env.TAG = env.kube_ns + '-' 
-							+ sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
+                        env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
 					}
 				}
 
