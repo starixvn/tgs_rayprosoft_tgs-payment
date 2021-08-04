@@ -112,15 +112,15 @@ pipeline {
 							helm template deployment/k8s/payment-api \
 								--set image.tag=${TAG} \
 								--set namespace=${kube_ns} \
-								--set "connectionStrings.tgs=${tgs_tgs}" \
-								--set "connectionStrings.nats=${tgs_nats}" 
+								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
+								--set \\"connectionStrings.nats=\\${tgs_nats}\\" 
 						'''
 						sh '''
 							helm template deployment/k8s/payment-api \
 								--set image.tag=${TAG} \
 								--set namespace=${kube_ns} \
-								--set "connectionStrings.tgs=${tgs_tgs}" \
-								--set "connectionStrings.nats=${tgs_nats}" | kubectl apply -f -
+								--set \\"connectionStrings.tgs=\\${tgs_tgs}\\" \
+								--set \\"connectionStrings.nats=\\${tgs_nats}\\" | kubectl apply -f -
 						'''
 					}
 				}
