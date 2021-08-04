@@ -102,11 +102,6 @@ pipeline {
 		stage('Deploy to dev') {
 			steps {
 				script {
-					def json = readJSON file: "$paymentdev";
-
-					env.TGS = json.tgs;
-					env.NatsUri = json.nats;
-
 					withKubeConfig([credentialsId: env.k8s_config]) {
 						sh '''
 							helm template deployment/k8s/payment-api \
