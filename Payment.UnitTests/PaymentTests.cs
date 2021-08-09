@@ -93,5 +93,20 @@ namespace Payment.UnitTests
 			_ = fakePaymentRepository.Received(1)
 				.CreatePaymentAsync(Arg.Any<PaymentCreateInfo>());
 		}
+
+		[Test]
+		public async Task Can_Create_PaymentChannel()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePaymentChannelCommandService(fakePaymentRepository);
+
+			var command = new CreatePaymentChannelCommand("ChannelCode");
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreatePaymentChannelAsync(Arg.Is(command.ChannelCode));
+		}
 	}
 }

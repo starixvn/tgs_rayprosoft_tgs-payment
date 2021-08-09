@@ -100,6 +100,41 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
+		{
+			var createPayment = new PaymentItem
+			{
+				Id = Guid.NewGuid(),
+				Code = createInfo.Code,
+				Name = createInfo.Code,
+				Description = createInfo.Description,
+				ExtendData = createInfo.ExtendedData,
+				CreatedByUsername = "admin.enabled",
+				UpdatedByUsername = "admin.enabled"
+			};
+
+			await _tgsContext.PaymentItems
+				.AddAsync(createPayment)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async ValueTask CreatePaymentChannelAsync(string channelCode)
+		{
+			var createChannel = new PaymentChannel
+			{
+				Id = Guid.NewGuid(),
+				Code = channelCode
+			};
+
+			await _tgsContext.PaymentChannels
+				.AddAsync(createChannel)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
 			var currentDate = DateTimeOffset.UtcNow;
@@ -629,26 +664,6 @@ namespace TGS.Payment.Repositories
 					&& form.UpdatedOn < conditions.UpdateOnRange.Value.End);
 
 			return dataQuery.AsAsyncEnumerable();
-		}
-
-		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
-		{
-			var createPayment = new PaymentItem
-			{
-				Id = Guid.NewGuid(),
-				Code = createInfo.Code,
-				Name = createInfo.Code,
-				Description = createInfo.Description,
-				ExtendData = createInfo.ExtendedData,
-				CreatedByUsername = "admin.enabled",
-				UpdatedByUsername = "admin.enabled"
-			};
-
-			await _tgsContext.PaymentItems
-				.AddAsync(createPayment)
-				.ConfigureAwait(false);
-
-			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 	}
 }

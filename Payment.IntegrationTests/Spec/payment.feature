@@ -29,3 +29,8 @@ Scenario: Create a payment
 	Given I will create payment info
 	When call create payment api
 	Then the payment info created
+
+Scenario: Create a payment channel
+	Given I will create payment channel info
+	When call create payment channel api
+	Then the payment channel created
