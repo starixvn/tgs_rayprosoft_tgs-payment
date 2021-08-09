@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
 using TGS.ServiceUtility;
@@ -40,6 +42,24 @@ namespace Tgs.Payment.Controllers
 				Id = info.Id,
 				Code = info.Code
 			};
+		}
+
+		[HttpPut]
+		public ValueTask CreatePaymentAsync(
+			[FromServices] ICommandService<CreatePaymentCommand> createService,
+			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+			[FromBody] PaymentCreateViewModel request)
+		{
+			var jsonOptions = jsonOptionsAccessor.Value;
+
+			var command = new CreatePaymentCommand(
+				request.Code,
+				request.Description,
+				JsonSerializer.Serialize(
+					request.ExtendedData,
+					jsonOptions.JsonSerializerOptions));
+
+			return createService.ExecuteAsync(command);
 		}
 	}
 }

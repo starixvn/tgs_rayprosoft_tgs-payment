@@ -100,6 +100,57 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
+		{
+			var createPayment = new PaymentItem
+			{
+				Id = Guid.NewGuid(),
+				Code = createInfo.Code,
+				Name = createInfo.Code,
+				Description = createInfo.Description,
+				ExtendData = createInfo.ExtendedData,
+				CreatedByUsername = "admin.enabled",
+				UpdatedByUsername = "admin.enabled"
+			};
+
+			await _tgsContext.PaymentItems
+				.AddAsync(createPayment)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async ValueTask CreatePaymentChannelAsync(string channelCode)
+		{
+			var createChannel = new PaymentChannel
+			{
+				Id = Guid.NewGuid(),
+				Code = channelCode
+			};
+
+			await _tgsContext.PaymentChannels
+				.AddAsync(createChannel)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async ValueTask CreatePaymentMethodAsync(string methodCode, string bankType)
+		{
+			var createMethod = new PaymentMethod
+			{
+				Id = Guid.NewGuid(),
+				Code = methodCode,
+				BankType = bankType
+			};
+
+			await _tgsContext.PaymentMethods
+				.AddAsync(createMethod)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
 			var currentDate = DateTimeOffset.UtcNow;
@@ -604,10 +655,14 @@ namespace TGS.Payment.Repositories
 
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
+
 			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 				dataQuery = dataQuery.Where(form => form.BrandPayment!.ChannelName == conditions.ChannelName);
+
 			if (conditions.PaymentMethodId != null)
-				dataQuery = dataQuery.Where(form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+				dataQuery = dataQuery.Where(
+					 form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+
 			if (conditions.Status != null)
 			{
 				var statusList = conditions.Status.Cast<int>().ToArray();
@@ -615,6 +670,7 @@ namespace TGS.Payment.Repositories
 				if (statusList.Length > 0)
 					dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 			}
+
 			if (conditions.CreateOnRange != null)
 				dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
 					&& form.CreatedOn < conditions.CreateOnRange.Value.End);
