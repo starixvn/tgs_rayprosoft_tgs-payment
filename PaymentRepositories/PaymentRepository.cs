@@ -135,6 +135,22 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		public async ValueTask CreatePaymentMethodAsync(string methodCode, string bankType)
+		{
+			var createMethod = new PaymentMethod
+			{
+				Id = Guid.NewGuid(),
+				Code = methodCode,
+				BankType = bankType
+			};
+
+			await _tgsContext.PaymentMethods
+				.AddAsync(createMethod)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
 			var currentDate = DateTimeOffset.UtcNow;

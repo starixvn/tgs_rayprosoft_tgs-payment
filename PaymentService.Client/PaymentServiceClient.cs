@@ -95,6 +95,22 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
+		public async ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(createInfo, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					"/payment/method",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info)
 		{
 			var requestContent = new StringContent(

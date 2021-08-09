@@ -11,6 +11,51 @@ namespace Payment.UnitTests
 	public class PaymentTests
 	{
 		[Test]
+		public async Task Can_Create_Payment()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePaymentCommandService(fakePaymentRepository);
+
+			var command = new CreatePaymentCommand("PaymentCode", null, null);
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreatePaymentAsync(Arg.Any<PaymentCreateInfo>());
+		}
+
+		[Test]
+		public async Task Can_Create_PaymentChannel()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePaymentChannelCommandService(fakePaymentRepository);
+
+			var command = new CreatePaymentChannelCommand("ChannelCode");
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreatePaymentChannelAsync(Arg.Is(command.ChannelCode));
+		}
+
+		[Test]
+		public async Task Can_Create_PaymentMethod()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePaymentMethodCommandService(fakePaymentRepository);
+
+			var command = new CreatePaymentMethodCommand("MethodCode", "Bank");
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreatePaymentMethodAsync(Arg.Is(command.Code), Arg.Is(command.BankType));
+		}
+
+		[Test]
 		public void User_Can_Get_All_PaymentChannelInfos()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -77,36 +122,6 @@ namespace Payment.UnitTests
 
 			_ = fakePaymentRepository.Received(1)
 				.GetPaymentAsync(Arg.Is(paymentId));
-		}
-
-		[Test]
-		public async Task Can_Create_Payment()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new CreatePaymentCommandService(fakePaymentRepository);
-
-			var command = new CreatePaymentCommand("PaymentCode", null, null);
-
-			await sut.ExecuteAsync(command);
-
-			_ = fakePaymentRepository.Received(1)
-				.CreatePaymentAsync(Arg.Any<PaymentCreateInfo>());
-		}
-
-		[Test]
-		public async Task Can_Create_PaymentChannel()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new CreatePaymentChannelCommandService(fakePaymentRepository);
-
-			var command = new CreatePaymentChannelCommand("ChannelCode");
-
-			await sut.ExecuteAsync(command);
-
-			_ = fakePaymentRepository.Received(1)
-				.CreatePaymentChannelAsync(Arg.Is(command.ChannelCode));
 		}
 	}
 }
