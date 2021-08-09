@@ -78,5 +78,20 @@ namespace Payment.UnitTests
 			_ = fakePaymentRepository.Received(1)
 				.GetPaymentAsync(Arg.Is(paymentId));
 		}
+
+		[Test]
+		public async Task Can_Create_Payment()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CreatePaymentCommandService(fakePaymentRepository);
+
+			var command = new CreatePaymentCommand("PaymentCode", null, null);
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.CreatePaymentAsync(Arg.Any<PaymentCreateInfo>());
+		}
 	}
 }

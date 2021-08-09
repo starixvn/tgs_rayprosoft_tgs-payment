@@ -604,10 +604,14 @@ namespace TGS.Payment.Repositories
 
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
+
 			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 				dataQuery = dataQuery.Where(form => form.BrandPayment!.ChannelName == conditions.ChannelName);
+
 			if (conditions.PaymentMethodId != null)
-				dataQuery = dataQuery.Where(form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+				dataQuery = dataQuery.Where(
+					 form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+
 			if (conditions.Status != null)
 			{
 				var statusList = conditions.Status.Cast<int>().ToArray();
@@ -615,6 +619,7 @@ namespace TGS.Payment.Repositories
 				if (statusList.Length > 0)
 					dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 			}
+
 			if (conditions.CreateOnRange != null)
 				dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
 					&& form.CreatedOn < conditions.CreateOnRange.Value.End);
@@ -624,6 +629,26 @@ namespace TGS.Payment.Repositories
 					&& form.UpdatedOn < conditions.UpdateOnRange.Value.End);
 
 			return dataQuery.AsAsyncEnumerable();
+		}
+
+		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
+		{
+			var createPayment = new PaymentItem
+			{
+				Id = Guid.NewGuid(),
+				Code = createInfo.Code,
+				Name = createInfo.Code,
+				Description = createInfo.Description,
+				ExtendData = createInfo.ExtendedData,
+				CreatedByUsername = "admin.enabled",
+				UpdatedByUsername = "admin.enabled"
+			};
+
+			await _tgsContext.PaymentItems
+				.AddAsync(createPayment)
+				.ConfigureAwait(false);
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 	}
 }

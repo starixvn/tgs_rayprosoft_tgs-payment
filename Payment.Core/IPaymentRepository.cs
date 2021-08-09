@@ -17,6 +17,8 @@ namespace Tgs.Payment
 
 		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form);
 
+		ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
+
 		ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form);
 
 		ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
