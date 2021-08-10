@@ -25,7 +25,7 @@ pipeline {
                             break;
                         default:
                             env.kube_ns = "dev";
-                            env.k8s_config='k8s-kube-config' 
+                            env.k8s_config = 'k8s-kube-config' 
                             break;
                     }
                 }
