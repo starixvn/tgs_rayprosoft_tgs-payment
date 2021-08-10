@@ -83,21 +83,21 @@ pipeline {
 			}
 		}
 
-		stage('Deploy') {
-            when {
-                expression {
-                    return env.kube_ns != 'dev';
-                }
-            }
+		// stage('Deploy') {
+        //     when {
+        //         expression {
+        //             return env.kube_ns != 'dev';
+        //         }
+        //     }
 
-            steps {
-                script {
-                    input message: 'Ready to go?', ok: 'yes';
-                }
+        //     steps {
+        //         script {
+        //             input message: 'Ready to go?', ok: 'yes';
+        //         }
                 
-                sh "echo start deploy"
-            }
-        }
+        //         sh "echo start deploy"
+        //     }
+        // }
 
 		stage('Deploy to k8s') {
 			steps {
@@ -114,7 +114,8 @@ pipeline {
 							--set image.tag=${TAG} \
 							--set namespace=${kube_ns} \
 							--set connectionStrings.tgs="$tgs_tgs" \
-							--set connectionStrings.nats="$tgs_nats" | kubectl apply -f -
+							--set connectionStrings.nats="$tgs_nats" \
+							| kubectl -n ${kube_ns} apply -f -
 					'''
 				}
 			}
