@@ -63,6 +63,54 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(createInfo, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					"/payment",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async ValueTask CreatePaymentChannelAsync(string channelCode)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(channelCode, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					"/payment/channel",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo)
+		{
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(createInfo, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PutAsync(
+					"/payment/method",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info)
 		{
 			var requestContent = new StringContent(

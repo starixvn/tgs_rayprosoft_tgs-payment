@@ -18,5 +18,6 @@ namespace Tgs.Payment
 		ValueRange<decimal> DepositedAmountLimit,
 		ConditionMatchType ConditionMatchType,
 		TransferType TransferType,
-		bool Enabled);
+		bool Enabled,
+		int DisplayOrder);
 }

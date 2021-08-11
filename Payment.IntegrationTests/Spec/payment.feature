@@ -24,3 +24,18 @@ Scenario: Get all payment_method_channels
 	Given I will list all payment_method_channels
 	When call get all payment_method_channels api
 	Then return all payment_method_channels data
+
+Scenario: Create a payment
+	Given I will create payment info
+	When call create payment api
+	Then the payment info created
+
+Scenario: Create a payment channel
+	Given I will create payment channel info
+	When call create payment channel api
+	Then the payment channel created
+
+Scenario: Create a payment method
+	Given I will create payment method info
+	When call create payment method api
+	Then the payment channel created
