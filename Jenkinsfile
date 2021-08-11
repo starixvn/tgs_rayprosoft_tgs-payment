@@ -5,6 +5,7 @@ pipeline {
 		gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
 		ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
+		GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
 	}
 
     stages {
@@ -120,6 +121,21 @@ pipeline {
 				}
 			}
 		}
+		
+		stage('Add Tag on Prod') {
+            when {
+                expression {
+                    return env.kube_ns == 'prod';
+                }
+            }
+						
+            steps {	
+				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+				    sh "git tag -a ${TAG} -m ${TAG}"
+				    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
+				}
+            }
+        }
 	}
 
 	post {
