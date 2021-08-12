@@ -106,9 +106,9 @@ pipeline {
                             --set connectionStrings.nats="$tgs_nats" \
                             | kubectl -n ${kube_ns} apply -f -
 					'''
-				}
-			}
-		}
+                }
+            }
+        }
 		
         stage('Add Tag on Prod') {
             when {
@@ -120,12 +120,12 @@ pipeline {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                     sh "git tag -a ${TAG} -m ${TAG}"
                     sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
-				}
+                }
             }
         }
         stage('Remove Image Tags') {					
             steps {	
-			    withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
+                withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
                     sh "curl --request DELETE --data \'name_regex_delete=.*\' --data \'keep_n=10\' --header \'PRIVATE-TOKEN: ${GitLabToken}\' ${ImageTagUrl}"
                 }
             }
