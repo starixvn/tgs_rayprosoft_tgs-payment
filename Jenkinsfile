@@ -6,7 +6,8 @@ pipeline {
         BuildConfiguration='Debug'
         ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
         GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
-	}
+        ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"
+    }
     stages {
         stage('Prepare') {
             steps {
@@ -30,12 +31,12 @@ pipeline {
                 }
                 configFileProvider([
                     configFile(fileId: 'tgs.' + env.kube_ns , variable: 'tgsconfig')]) {
-					    script {
+                        script {
                             def envItems = readProperties file: "$tgsconfig";
                             envItems.each { key, value -> env."tgs_${key}" = value;
                         }
                         env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
-						message += "\nBranch: ${env.GIT_BRANCH}" 
+                        message += "\nBranch: ${env.GIT_BRANCH}" 
                         message += "\nTag: ${env.TAG}"
                         message += "\nEnv: ${env.kube_ns}"
                     }
@@ -64,8 +65,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-			}
-		}
+            }
+        }
         stage('Push Docker Image') {
             steps {
                 sh 'sudo docker push $ImageName:${TAG}'
@@ -87,23 +88,23 @@ pipeline {
         //     }
         // }
 
-		stage('Deploy to k8s') {
-			steps {
-				withKubeConfig([credentialsId: env.k8s_config]) {
-					sh '''
-						helm template deployment/k8s/payment-api \
-							--set image.tag=${TAG} \
-							--set namespace=${kube_ns} \
-							--set connectionStrings.tgs="$tgs_tgs" \
-							--set connectionStrings.nats="$tgs_nats" 
-					'''
-					sh '''
-						helm template deployment/k8s/payment-api \
-							--set image.tag=${TAG} \
-							--set namespace=${kube_ns} \
-							--set connectionStrings.tgs="$tgs_tgs" \
-							--set connectionStrings.nats="$tgs_nats" \
-							| kubectl -n ${kube_ns} apply -f -
+        stage('Deploy to k8s') {
+            steps {
+                withKubeConfig([credentialsId: env.k8s_config]) {
+                    sh '''
+                        helm template deployment/k8s/payment-api \
+                            --set image.tag=${TAG} \
+                            --set namespace=${kube_ns} \
+                            --set connectionStrings.tgs="$tgs_tgs" \
+                            --set connectionStrings.nats="$tgs_nats" 
+                    '''
+                    sh '''
+                        helm template deployment/k8s/payment-api \
+                            --set image.tag=${TAG} \
+                            --set namespace=${kube_ns} \
+                            --set connectionStrings.tgs="$tgs_tgs" \
+                            --set connectionStrings.nats="$tgs_nats" \
+                            | kubectl -n ${kube_ns} apply -f -
 					'''
 				}
 			}
@@ -122,14 +123,14 @@ pipeline {
 				}
             }
         }
-		stage('Remove Image Tags') {					
+        stage('Remove Image Tags') {					
             steps {	
 			    withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
                     sh "curl --request DELETE --data \'name_regex_delete=.*\' --data \'keep_n=10\' --header \'PRIVATE-TOKEN: ${GitLabToken}\' ${ImageTagUrl}"
                 }
             }
         }
-	}
+    }
 
 	post {
 		always {
@@ -141,7 +142,7 @@ pipeline {
         failure {
             sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
-	}
+    }
 }
 
 def sendTelegram(message) {
