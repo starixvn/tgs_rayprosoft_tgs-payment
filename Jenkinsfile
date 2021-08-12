@@ -1,18 +1,16 @@
+def message = "";
 pipeline {
     agent any
-	
-	environment {
-		gitlab_user_pwd=credentials('gitlab-user-pwd')
+    environment {
+        gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
-		ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
-		GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
+        ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
+        GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
 	}
-
     stages {
-		stage('Prepare') {
+        stage('Prepare') {
             steps {
                 sh "echo 'Branch: $GIT_BRANCH'";
-
                 script {
                     switch(env.GIT_BRANCH)
                     {
@@ -30,60 +28,49 @@ pipeline {
                             break;
                     }
                 }
-
                 configFileProvider([
-					configFile(
-						fileId: 'tgs.' + env.kube_ns , 
-						variable: 'tgsconfig')]) {
-					script {
-						def envItems = readProperties file: "$tgsconfig";
-
-                        envItems.each { key, value -> 
-                            env."tgs_${key}" = value;
+                    configFile(fileId: 'tgs.' + env.kube_ns , variable: 'tgsconfig')]) {
+					    script {
+                            def envItems = readProperties file: "$tgsconfig";
+                            envItems.each { key, value -> env."tgs_${key}" = value;
                         }
-
                         env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
-					}
-				}
-
+						message += "\nBranch: ${env.GIT_BRANCH}" 
+                        message += "\nTag: ${env.TAG}"
+                        message += "\nEnv: ${env.kube_ns}"
+                    }
+                }
                 sh "echo tag: $TAG"
             }
         }
-
         stage('Build') {
             steps {
                 sh 'dotnet build -c $BuildConfiguration'
             }
         }
-
-		stage('Test') {
-			steps {
-				sh 'dotnet test -c $BuildConfiguration --logger trx --no-build'
+        stage('Test') {
+            steps {
+                sh 'dotnet test -c $BuildConfiguration --logger trx --no-build'
+            }
+        }
+        stage('Push packages') {
+            steps {
+                sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
+                sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+                sh 'dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build'
+                sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
 			}
 		}
-		
-		stage('Push packages') {
-			steps {
-				sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
-				sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
-
-				sh 'dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build'
-				sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
-			}
-		}
-
-		stage('Build Docker Image') {
-			steps {
-				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-			}
-		}
-
-		stage('Push Docker Image') {
-			steps {
-				sh 'sudo docker push $ImageName:${TAG}'
-			}
-		}
-
+        stage('Push Docker Image') {
+            steps {
+                sh 'sudo docker push $ImageName:${TAG}'
+            }
+        }
 		// stage('Deploy') {
         //     when {
         //         expression {
@@ -122,18 +109,24 @@ pipeline {
 			}
 		}
 		
-		stage('Add Tag on Prod') {
+        stage('Add Tag on Prod') {
             when {
                 expression {
                     return env.kube_ns == 'prod';
                 }
-            }
-						
+            }			
             steps {	
-				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-				    sh "git tag -a ${TAG} -m ${TAG}"
-				    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                    sh "git tag -a ${TAG} -m ${TAG}"
+                    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
 				}
+            }
+        }
+		stage('Remove Image Tags') {					
+            steps {	
+			    withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
+                    sh "curl --request DELETE --data \'name_regex_delete=.*\' --data \'keep_n=10\' --header \'PRIVATE-TOKEN: ${GitLabToken}\' ${ImageTagUrl}"
+                }
             }
         }
 	}
@@ -142,5 +135,25 @@ pipeline {
 		always {
 			step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: false, keepLongStdio: true])
 		}
+		success {
+             sendTelegram("Pipeline: ${currentBuild.fullDisplayName} OK! ${message} \n${currentBuild.getBuildCauses()[0].shortDescription}\n")
+        }
+        failure {
+            sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
+        }
 	}
+}
+
+def sendTelegram(message) {
+    def encodedMessage = URLEncoder.encode(message, "UTF-8")
+
+    withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
+
+        response = httpRequest (consoleLogResponseBody: true,
+                contentType: 'APPLICATION_JSON',
+                httpMode: 'GET',
+                url: "https://api.telegram.org/bot${TOKEN}/sendMessage?text=${encodedMessage}&chat_id=${CHAT_ID}",
+                validResponseCodes: '200')
+        return response
+    }
 }
