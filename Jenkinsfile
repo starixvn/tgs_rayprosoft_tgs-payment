@@ -132,11 +132,11 @@ pipeline {
         }
     }
 
-	post {
-		always {
-			step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: false, keepLongStdio: true])
-		}
-		success {
+    post {
+        always {
+            step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: false, keepLongStdio: true])
+        }
+        success {
              sendTelegram("Pipeline: ${currentBuild.fullDisplayName} OK! ${message} \n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
         failure {
