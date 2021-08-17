@@ -10,6 +10,12 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
 
+		ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
+
+		ValueTask CreatePaymentChannelAsync(string channelCode);
+
+		ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo);
+
 		ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
 
 		ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo);
