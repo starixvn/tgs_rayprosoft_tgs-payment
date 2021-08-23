@@ -18,10 +18,6 @@ namespace Tgs.Payment.Repositories.Entities
         public Guid MethodId { get; set; }
         public Guid ChannelId { get; set; }
         public short Status { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = default!;
-        public string UpdatedByUsername { get; set; } = default!;
 
         public virtual PaymentChannel Channel { get; set; } = default!;
         public virtual PaymentMethod Method { get; set; } = default!;
