@@ -30,31 +30,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.ChannelId).HasColumnName("channel_id");
 
-            entity.Property(e => e.CreatedByUsername)
-                .IsRequired()
-                .HasMaxLength(32)
-                .HasColumnName("created_by_username");
-
-            entity.Property(e => e.CreatedOn)
-                .HasColumnType("timestamp with time zone")
-                .HasColumnName("created_on")
-                .HasDefaultValueSql("now()");
-
             entity.Property(e => e.MethodId).HasColumnName("method_id");
 
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
 
             entity.Property(e => e.Status).HasColumnName("status");
-
-            entity.Property(e => e.UpdatedByUsername)
-                .IsRequired()
-                .HasMaxLength(32)
-                .HasColumnName("updated_by_username");
-
-            entity.Property(e => e.UpdatedOn)
-                .HasColumnType("timestamp with time zone")
-                .HasColumnName("updated_on")
-                .HasDefaultValueSql("now()");
 
             entity.HasOne(d => d.Channel)
                 .WithMany(p => p.PaymentMethodChannels)
