@@ -15,11 +15,11 @@ pipeline {
                 script {
                     switch(env.GIT_BRANCH)
                     {
-                        case 'origin/main':
+                        case ['origin/main','main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
                             break;
-                        case 'origin/release':
+                        case ['origin/release','release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
                             break;
@@ -39,6 +39,8 @@ pipeline {
                         message += "\nBranch: ${env.GIT_BRANCH}" 
                         message += "\nTag: ${env.TAG}"
                         message += "\nEnv: ${env.kube_ns}"
+                        env.commit_url = "${env.GIT_URL}".replace(".git","/-/commit/") + "${env.GIT_COMMIT}"
+                        message += "\n Commit: ${env.commit_url}"
                     }
                 }
                 sh "echo tag: $TAG"
