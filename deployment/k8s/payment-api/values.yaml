@@ -1,0 +1,59 @@
+# Default values for payment.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+namespace: dev
+
+imagePullSecrets:
+  - name: registry-credentials
+
+nameOverride: "payment-api"
+fullnameOverride: "payment-api"
+
+connectionStrings:
+  tgs: Server=localhost;Database=tgs;User Id=tgs;Password=1qaz2wsx!@
+  nats: nats://localhost:4222
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 750m
+    memory: 756Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
