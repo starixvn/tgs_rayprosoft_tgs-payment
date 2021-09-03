@@ -69,13 +69,13 @@ pipeline {
 
 		stage('Build Docker Image') {
 			steps {
-				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
+				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}-${kube_ns}" --no-restore '
 			}
 		}
 
 		stage('Push Docker Image') {
 			steps {
-				sh 'sudo docker push $ImageName:${TAG}'
+				sh 'sudo docker push $ImageName:${TAG}-${kube_ns}'
 			}
 		}
 
@@ -100,14 +100,14 @@ pipeline {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG} \
+                            --set image.tag=${TAG}-${kube_ns} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" 
                     '''
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG} \
+                            --set image.tag=${TAG}-${kube_ns} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" \
