@@ -34,7 +34,7 @@ pipeline {
                             def envItems = readProperties file: "$tgsconfig";
                             envItems.each { key, value -> env."tgs_${key}" = value;
                         }
-                        env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
+                        env.TAG = sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim() + '-' + env.kube_ns;
                         message += "\nBranch: ${env.GIT_BRANCH}" 
                         message += "\nTag: ${env.TAG}"
                         message += "\nEnv: ${env.kube_ns}"
@@ -69,13 +69,13 @@ pipeline {
 
 		stage('Build Docker Image') {
 			steps {
-				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}-${kube_ns}" --no-restore '
+				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
 			}
 		}
 
 		stage('Push Docker Image') {
 			steps {
-				sh 'sudo docker push $ImageName:${TAG}-${kube_ns}'
+				sh 'sudo docker push $ImageName:${TAG}'
 			}
 		}
 
@@ -100,14 +100,14 @@ pipeline {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG}-${kube_ns} \
+                            --set image.tag=${TAG} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" 
                     '''
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG}-${kube_ns} \
+                            --set image.tag=${TAG} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" \
