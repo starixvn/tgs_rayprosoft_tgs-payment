@@ -5,7 +5,6 @@ pipeline {
         gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
         ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
-        GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
         ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"
     }
     stages {
@@ -70,13 +69,13 @@ pipeline {
 
 		stage('Build Docker Image') {
 			steps {
-				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
+				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}-${kube_ns}" --no-restore '
 			}
 		}
 
 		stage('Push Docker Image') {
 			steps {
-				sh 'sudo docker push $ImageName:${TAG}'
+				sh 'sudo docker push $ImageName:${TAG}-${kube_ns}'
 			}
 		}
 
@@ -101,14 +100,14 @@ pipeline {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG} \
+                            --set image.tag=${TAG}-${kube_ns} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" 
                     '''
                     sh '''
                         helm template deployment/k8s/payment-api \
-                            --set image.tag=${TAG} \
+                            --set image.tag=${TAG}-${kube_ns} \
                             --set namespace=${kube_ns} \
                             --set connectionStrings.tgs="$tgs_tgs" \
                             --set connectionStrings.nats="$tgs_nats" \
@@ -125,9 +124,9 @@ pipeline {
                 }
             }			
             steps {	
-                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                sshagent(['ssh-jenkins']) {
                     sh "git tag -a ${TAG} -m ${TAG}"
-                    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
+                    sh "git push ${GIT_URL} ${TAG} HEAD:${GIT_BRANCH}"
                 }
             }
         }
