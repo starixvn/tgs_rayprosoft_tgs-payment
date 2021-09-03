@@ -5,7 +5,6 @@ pipeline {
         gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
         ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
-        GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
         ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"
     }
     stages {
@@ -125,9 +124,9 @@ pipeline {
                 }
             }			
             steps {	
-                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                sshagent(['ssh-jenkins']) {
                     sh "git tag -a ${TAG} -m ${TAG}"
-                    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
+                    sh "git push ${GIT_URL} ${TAG} HEAD:${GIT_BRANCH}"
                 }
             }
         }
