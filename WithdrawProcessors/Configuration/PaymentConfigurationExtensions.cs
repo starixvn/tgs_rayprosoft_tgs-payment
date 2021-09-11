@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tgs.Payment.ApplePay;
 using Tgs.Payment.LeePay;
+using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
 using Tgs.Payment.WithdrawProcessors;
 
@@ -13,12 +14,14 @@ namespace Tgs.Payment.Configuration
 			configuration.Services
 				.AddSingleton<LeePaySerializer>()
 				.AddSingleton<PrimePaySerializer>()
-				.AddSingleton<ApplePaySerializer>();
+				.AddSingleton<ApplePaySerializer>()
+				.AddSingleton<MaticPaySerializer>();
 
 			return configuration
 						   .RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
 						   .RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-						   .RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay");
+						   .RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
+						   .RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay");
 		}
 	}
 }
