@@ -13,12 +13,14 @@ namespace Tgs.Payment.Configuration
 			configuration.Services
 				.AddSingleton<LeePaySerializer>()
 				.AddSingleton<PrimePaySerializer>()
-				.AddSingleton<ApplePaySerializer>();
+				.AddSingleton<ApplePaySerializer>()
+				.AddSingleton<ManualPayProcessor>();
 
 			return configuration
-						   .RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
-						   .RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-						   .RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay");
+				.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
+				.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
+				.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
+				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual");
 		}
 	}
 }
