@@ -1,8 +1,8 @@
 def message = "";
+
 pipeline {
     agent any
     environment {
-        gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
         ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
         ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"

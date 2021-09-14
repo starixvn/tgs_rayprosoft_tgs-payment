@@ -39,8 +39,7 @@ namespace Tgs.Payment.WithdrawProcessors
 				amount,
 				withdrawBankInfo.Detail.Name,
 				withdrawBankInfo.Detail.BankName,
-				withdrawBankInfo.Detail.BankAccount
-				);
+				withdrawBankInfo.Detail.BankAccount);
 
 			return _applePaySerializer.Serialize(settings);
 		}
