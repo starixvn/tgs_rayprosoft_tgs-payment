@@ -38,7 +38,7 @@ namespace Tgs.Payment.WithdrawProcessors
 				formId,
 				amount,
 				withdrawBankInfo.Detail.AccountName,
-				withdrawBankInfo.Detail.BankCode,
+				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 				withdrawBankInfo.Detail.BankBranchName,
 				withdrawBankInfo.Detail.CardNo
 				);
