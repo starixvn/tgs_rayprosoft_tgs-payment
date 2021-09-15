@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tgs.Payment.ApplePay.Client" Version="0.0.4-alpha" />
+    <PackageReference Include="Tgs.Payment.ApplePay.Client" Version="0.0.5" />
     <PackageReference Include="Tgs.Payment.LeePay.Client" Version="0.0.10" />
-    <PackageReference Include="Tgs.Payment.PrimePay.Client" Version="0.0.5" />
+    <PackageReference Include="Tgs.Payment.ManualDeposit" Version="0.1.0" />
+    <PackageReference Include="Tgs.Payment.PrimePay.Client" Version="0.0.6" />
   </ItemGroup>
 
   <ItemGroup>
