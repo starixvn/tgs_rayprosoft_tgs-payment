@@ -4,6 +4,7 @@ using Tgs.Payment.LeePay;
 using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
 using Tgs.Payment.WithdrawProcessors;
+using TGS.Payment.ManualDeposit;
 
 namespace Tgs.Payment.Configuration
 {
@@ -15,13 +16,16 @@ namespace Tgs.Payment.Configuration
 				.AddSingleton<LeePaySerializer>()
 				.AddSingleton<PrimePaySerializer>()
 				.AddSingleton<ApplePaySerializer>()
+				.AddSingleton<ManualDepositSerializer>()
 				.AddSingleton<MaticPaySerializer>();
+							
 
 			return configuration
-						   .RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
-						   .RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-						   .RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
-						   .RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay");
+				.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
+				.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
+				.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
+				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
+				.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay");
 		}
 	}
 }

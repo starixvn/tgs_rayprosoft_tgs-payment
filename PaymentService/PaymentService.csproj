@@ -18,15 +18,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.10.56">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1" />
 		<PackageReference Include="Tgs.Logging" Version="0.0.8" />
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="0.0.4" />
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
