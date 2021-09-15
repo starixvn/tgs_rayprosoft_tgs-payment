@@ -64,7 +64,7 @@ namespace Tgs.Payment.WithdrawProcessors
 				.Deserialize<WithdrawBankInfo<MaticPayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
 			var bankName = withdrawBankInfo.Detail.BankName;
-			var bankCode = _BankMapping[bankName];
+			_BankMapping.TryGetValue(bankName, out var bankCode);
 
 			var brandPaymentExtendedData = JsonSerializer
 				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
