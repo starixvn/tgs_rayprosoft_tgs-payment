@@ -19,5 +19,6 @@ namespace Tgs.Payment
 		Guid? PaymentMethodId = null,
 		string? BankInfo = null,
 		string? ApplyInfo = null,
-		string? PaymentReturn = null);
+		string? PaymentReturn = null,
+		string? ThirdPartyOrderNo = null);
 }

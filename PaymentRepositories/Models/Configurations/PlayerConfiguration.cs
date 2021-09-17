@@ -42,6 +42,10 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.AgentId).HasColumnName("agent_id");
 
+            entity.Property(e => e.AreaCode)
+                .HasMaxLength(10)
+                .HasColumnName("area_code");
+
             entity.Property(e => e.BetLimitId).HasColumnName("bet_limit_id");
 
             entity.Property(e => e.BrandId).HasColumnName("brand_id");

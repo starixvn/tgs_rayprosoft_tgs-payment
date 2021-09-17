@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
@@ -92,6 +91,7 @@ namespace Tgs.Payment.Controllers
 					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
+					formQuery.ThirdPartyOrderNo,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
@@ -112,6 +112,7 @@ namespace Tgs.Payment.Controllers
 						CreatedOn = row.CreatedOn,
 						PaymentMethodId = row.PaymentMethodId,
 						PaymentReturn = row.PaymentReturn,
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
 						UserId = row.UserId,
 						UserType = row.UserType,
 						Remark = row.Remark,
@@ -142,6 +143,7 @@ namespace Tgs.Payment.Controllers
 					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
+					formQuery.ThirdPartyOrderNo,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
