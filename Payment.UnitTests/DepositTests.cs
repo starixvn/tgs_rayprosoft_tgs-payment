@@ -35,6 +35,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -52,6 +53,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -128,6 +130,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -145,6 +148,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -192,6 +196,7 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -233,6 +238,7 @@ namespace Payment.UnitTests
 					null,
 					PaymentFlowState.WaitApprove,
 					"{}",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
