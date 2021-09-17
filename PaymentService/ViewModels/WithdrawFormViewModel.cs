@@ -37,5 +37,6 @@ namespace Tgs.Payment.ViewModels
 		public string? UserName { get; set; }
 
 		public UserType UserType { get; set; }
+		public string? ThirdPartyOrderNo { get; set; }
 	}
 }

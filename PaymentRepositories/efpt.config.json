@@ -38,11 +38,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.brand_payment_vip_levels",
+         "Name": "dbo.players",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.players",
+         "Name": "dbo.brand_payment_vip_levels",
          "ObjectType": 0
       },
       {
@@ -50,11 +50,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.deposit_forms",
+         "Name": "dbo.player_bank_infos",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.player_bank_infos",
+         "Name": "dbo.deposit_forms",
          "ObjectType": 0
       },
       {
@@ -75,6 +75,7 @@
    "UseInflector": true,
    "UseLegacyPluralizer": false,
    "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
    "UseNoNavigations": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,

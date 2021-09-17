@@ -44,6 +44,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string? UpdatedByUsername { get; set; }
         public DateTime UpdatedOn { get; set; }
         public DateTime? FirstDepositOn { get; set; }
+        public string? AreaCode { get; set; }
 
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }

@@ -15,6 +15,7 @@ namespace Tgs.Payment
 		PaymentFlowState Status,
 		string? ApplyInfo,
 		string? PaymentReturn,
+		string? ThirdPartyOrderNo,
 		Guid? PromotionId,
 		DateTimeOffset CreatedOn,
 		DateTimeOffset UpdatedOn);
