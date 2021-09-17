@@ -1,11 +1,10 @@
 def message = "";
+
 pipeline {
     agent any
     environment {
-        gitlab_user_pwd=credentials('gitlab-user-pwd')
         BuildConfiguration='Debug'
         ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
-        GitUrl = "gitlab.com/rayprosoft/tgs-payment.git"
         ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"
     }
     stages {
@@ -35,11 +34,12 @@ pipeline {
                             def envItems = readProperties file: "$tgsconfig";
                             envItems.each { key, value -> env."tgs_${key}" = value;
                         }
-                        env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim();
+                        env.TAG = sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim() + '-' + env.kube_ns;
                         message += "\nBranch: ${env.GIT_BRANCH}" 
                         message += "\nTag: ${env.TAG}"
                         message += "\nEnv: ${env.kube_ns}"
-                        env.commit_url = "${env.GIT_URL}".replace(".git","/-/commit/") + "${env.GIT_COMMIT}"
+                        env.commit_url = "${env.GIT_URL}".replace("git@gitlab.com:","https://gitlab.com/")
+                            .replace(".git","/-/commit/") + "${env.GIT_COMMIT}"
                         message += "\n Commit: ${env.commit_url}"
                     }
                 }
@@ -51,44 +51,50 @@ pipeline {
                 sh 'dotnet build -c $BuildConfiguration'
             }
         }
-        stage('Test') {
-            steps {
-                sh 'dotnet test -c $BuildConfiguration --logger trx --no-build'
-            }
-        }
-        stage('Push packages') {
-            steps {
-                sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
-                sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
-                sh 'dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build'
-                sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                sh 'sudo docker push $ImageName:${TAG}'
-            }
-        }
-		// stage('Deploy') {
-        //     when {
-        //         expression {
-        //             return env.kube_ns != 'dev';
-        //         }
-        //     }
 
-        //     steps {
-        //         script {
-        //             input message: 'Ready to go?', ok: 'yes';
-        //         }
+		stage('Test') {
+			steps {
+				sh 'dotnet test -c $BuildConfiguration --logger trx --no-build'
+			}
+		}
+		
+		stage('Push packages') {
+			steps {
+				sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
+				sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+
+				sh 'dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build'
+				sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+			}
+		}
+
+		stage('Build Docker Image') {
+			steps {
+				sh 'dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
+			}
+		}
+
+		stage('Push Docker Image') {
+			steps {
+				sh 'sudo docker push $ImageName:${TAG}'
+			}
+		}
+
+		stage('Deploy') {
+            when {
+                expression {
+                    return env.kube_ns == 'prod';
+                }
+            }
+
+            steps {
+                script {
+                    input message: 'Ready to go?', ok: 'yes';
+                }
                 
-        //         sh "echo start deploy"
-        //     }
-        // }
+                sh "echo start deploy"
+            }
+        }
 
         stage('Deploy to k8s') {
             steps {
@@ -119,9 +125,9 @@ pipeline {
                 }
             }			
             steps {	
-                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'gitssh-user-pwd', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                sshagent(['ssh-jenkins']) {
                     sh "git tag -a ${TAG} -m ${TAG}"
-                    sh "git push https://$USERNAME:$PASSWORD@${GitUrl} --tags"
+                    sh "git push ${GIT_URL} ${TAG} HEAD:${GIT_BRANCH}"
                 }
             }
         }
