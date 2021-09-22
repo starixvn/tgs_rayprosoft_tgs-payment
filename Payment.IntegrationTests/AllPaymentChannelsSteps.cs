@@ -8,43 +8,43 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class AllPaymentChannelsSteps
-	{
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+    public class AllPaymentChannelsSteps
+    {
+        private PaymentServiceClient _paymentServiceClient;
+        private IHost _testHost;
 
-		public AllPaymentChannelsSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+        public AllPaymentChannelsSteps()
+        {
+            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-			_ = _testHost.StartAsync();
+            _ = _testHost.StartAsync();
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+            _paymentServiceClient = _testHost.GetPaymentServiceClient();
+        }
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
-		}
+        [AfterScenario]
+        public async Task CleanUpAsync()
+        {
+            await _testHost.StopAsync();
+        }
 
-		[Given(@"I will list all payment channels")]
-		public void GivenIWillListAllPaymentChannels()
-		{
-		}
+        [Given(@"I will list all payment channels")]
+        public void GivenIWillListAllPaymentChannels()
+        {
+        }
 
-		[Then(@"return all payment channels data")]
-		public void ThenReturnAllPaymentChannelsData()
-		{
-			Assert.Pass();
-		}
+        [Then(@"return all payment channels data")]
+        public void ThenReturnAllPaymentChannelsData()
+        {
+            Assert.Pass();
+        }
 
-		[When(@"call get all payment channels")]
-		public async Task WhenCallGetAllPaymentChannelsAsync()
-		{
-			var paymentChannels = _paymentServiceClient.GetAllPaymentChannelsAsync();
+        [When(@"call get all payment channels")]
+        public async Task WhenCallGetAllPaymentChannelsAsync()
+        {
+            var paymentChannels = _paymentServiceClient.GetAllPaymentChannelsAsync();
 
-			await paymentChannels.ToArrayAsync();
-		}
-	}
+            await paymentChannels.ToArrayAsync();
+        }
+    }
 }

@@ -67,5 +67,7 @@ namespace Tgs.Payment.Clients
 			PaymentFlowState state,
 			string? paymentReturn = null,
 			decimal? actualAmount = null);
+
+		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo);
 	}
 }

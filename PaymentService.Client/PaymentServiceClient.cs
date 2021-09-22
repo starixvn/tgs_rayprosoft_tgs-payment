@@ -574,6 +574,27 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		{
+			var request = new DepositFormThirdPartyOrderNo
+			{
+				ThirdPartyOrderNo = ThirdPartyOrderNo
+			};
+
+			var requestContent = new StringContent(
+				JsonSerializer.Serialize(request, _serializerOptions));
+
+			requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+			var response = await _httpClient
+				.PatchAsync(
+					$"/deposit/thirdparty/{formId}",
+					requestContent)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public async ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
 			PaymentFlowState state,

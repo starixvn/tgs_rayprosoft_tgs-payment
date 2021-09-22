@@ -9,60 +9,61 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	[Scope(Scenario = "Get brand payment acls")]
-	public class QueryBrandPaymentAclsSteps
-	{
-		private IHost _testHost;
-		private PaymentServiceClient _paymentServiceClient;
-		private string _playerCode;
-		private Guid _brandPaymentId1;
-		private Guid _brandPaymentId2;
+    [Scope(Scenario = "Get brand payment acls")]
+    public class QueryBrandPaymentAclsSteps
+    {
+        private IHost _testHost;
+        private PaymentServiceClient _paymentServiceClient;
+        private string _playerCode;
+        private Guid _brandPaymentId1;
+        private Guid _brandPaymentId2;
 
-		public QueryBrandPaymentAclsSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
+        public QueryBrandPaymentAclsSteps()
+        {
+            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
+            _ = _testHost.StartAsync();
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+            _paymentServiceClient = _testHost.GetPaymentServiceClient();
+        }
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
-		}
-		[Given(@"I will get brand payment acls")]
-		public void GivenIWillGetBrandPaymentAcls()
-		{
-		}
+        [AfterScenario]
+        public async Task CleanUpAsync()
+        {
+            await _testHost.StopAsync();
+        }
 
-		[Given(@"playerCode is ""(.*)""")]
-		public void GivenPlayerCodeIs(string playerCode)
-		{
-			_playerCode = playerCode;
-		}
+        [Given(@"I will get brand payment acls")]
+        public void GivenIWillGetBrandPaymentAcls()
+        {
+        }
 
-		[Given(@"brand payment id is \{(.*)}、\{(.*)}")]
-		public void GivenBrandPaymentIdIs(Guid brandPaymentId1, Guid brandPaymentId2)
-		{
-			_brandPaymentId1 = brandPaymentId1;
-			_brandPaymentId2 = brandPaymentId2;
-		}
+        [Given(@"playerCode is ""(.*)""")]
+        public void GivenPlayerCodeIs(string playerCode)
+        {
+            _playerCode = playerCode;
+        }
 
-		[When(@"call get brand payment acl api")]
-		public async Task WhenCallGetBrandPaymentAclApiAsync()
-		{
-			var acls = _paymentServiceClient.GetBrandPaymentAclsAsync(
-				_playerCode,
-				new[] { _brandPaymentId1, _brandPaymentId2 });
+        [Given(@"brand payment id is \{(.*)}、\{(.*)}")]
+        public void GivenBrandPaymentIdIs(Guid brandPaymentId1, Guid brandPaymentId2)
+        {
+            _brandPaymentId1 = brandPaymentId1;
+            _brandPaymentId2 = brandPaymentId2;
+        }
 
-			await acls.ToArrayAsync();
-		}
+        [When(@"call get brand payment acl api")]
+        public async Task WhenCallGetBrandPaymentAclApiAsync()
+        {
+            var acls = _paymentServiceClient.GetBrandPaymentAclsAsync(
+                _playerCode,
+                new[] { _brandPaymentId1, _brandPaymentId2 });
 
-		[Then(@"return acl data")]
-		public void ThenReturnAclData()
-		{
-			Assert.Pass();
-		}
-	}
+            await acls.ToArrayAsync();
+        }
+
+        [Then(@"return acl data")]
+        public void ThenReturnAclData()
+        {
+            Assert.Pass();
+        }
+    }
 }

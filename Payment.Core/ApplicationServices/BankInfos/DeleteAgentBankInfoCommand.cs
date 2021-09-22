@@ -3,6 +3,6 @@
 namespace Tgs.Payment.ApplicationServices.BankInfos
 {
 	public record DeleteAgentBankInfoCommand(
-		Guid AgentId,
-		Guid BankInfoId);
+        Guid AgentId,
+        Guid BankInfoId);
 }

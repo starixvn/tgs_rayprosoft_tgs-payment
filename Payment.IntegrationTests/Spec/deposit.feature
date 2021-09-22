@@ -25,3 +25,8 @@ Scenario: Change a deposit form status
 	Given I have a deposit form
 	When I change status to "WaitPayment"
 	Then form status change to "WaitPayment"
+
+Scenario: Save thirdparty order no to deposit form
+	Given I get thirdparty order no "AH16322770975542"
+	When I call save api
+	Then form thirdparty_order_no should be "AH16322770975542"
