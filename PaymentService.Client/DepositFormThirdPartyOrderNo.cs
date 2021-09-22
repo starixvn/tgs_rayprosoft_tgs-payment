@@ -2,6 +2,6 @@
 {
 	public class DepositFormThirdPartyOrderNo
 	{
-		public string ThirdPartyOrderNo { get; set; } = default!;
+		public string? ThirdPartyOrderNo { get; set; }
 	}
 }
