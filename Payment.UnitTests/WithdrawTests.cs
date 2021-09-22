@@ -251,7 +251,7 @@ namespace Payment.UnitTests
 					},
 					ConditionMatchType.MatchOne,
 					TransferType.Withdraw,
-					true, 
+					true,
 					0));
 
 			fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())

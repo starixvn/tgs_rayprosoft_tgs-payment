@@ -9,23 +9,22 @@ using TGS.Payment.ManualDeposit;
 namespace Tgs.Payment.Configuration
 {
 	public static class PaymentConfigurationExtensions
-	{
-		public static PaymentConfiguration RegisterWithdrawProcessors(this PaymentConfiguration configuration)
-		{
-			configuration.Services
-				.AddSingleton<LeePaySerializer>()
-				.AddSingleton<PrimePaySerializer>()
-				.AddSingleton<ApplePaySerializer>()
-				.AddSingleton<ManualDepositSerializer>()
-				.AddSingleton<MaticPaySerializer>();
-							
+    {
+        public static PaymentConfiguration RegisterWithdrawProcessors(this PaymentConfiguration configuration)
+        {
+            configuration.Services
+                .AddSingleton<LeePaySerializer>()
+                .AddSingleton<PrimePaySerializer>()
+                .AddSingleton<ApplePaySerializer>()
+                .AddSingleton<ManualDepositSerializer>()
+                .AddSingleton<MaticPaySerializer>();
 
-			return configuration
-				.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
-				.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-				.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
-				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
-				.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay");
-		}
-	}
+            return configuration
+                .RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
+                .RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
+                .RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
+                .RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
+                .RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay");
+        }
+    }
 }

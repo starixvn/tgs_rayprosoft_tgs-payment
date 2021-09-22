@@ -9,43 +9,43 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	public class GetAllPaymentsSteps
-	{
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+    public class GetAllPaymentsSteps
+    {
+        private PaymentServiceClient _paymentServiceClient;
+        private IHost _testHost;
 
-		public GetAllPaymentsSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+        public GetAllPaymentsSteps()
+        {
+            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-			_ = _testHost.StartAsync();
+            _ = _testHost.StartAsync();
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+            _paymentServiceClient = _testHost.GetPaymentServiceClient();
+        }
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
-		}
+        [AfterScenario]
+        public async Task CleanUpAsync()
+        {
+            await _testHost.StopAsync();
+        }
 
-		[Given(@"I will list all payments")]
-		public void GivenIWillListAllPayments()
-		{
-		}
+        [Given(@"I will list all payments")]
+        public void GivenIWillListAllPayments()
+        {
+        }
 
-		[Then(@"return all paymnets data")]
-		public void ThenReturnAllPaymnetsData()
-		{
-			Assert.Pass();
-		}
+        [Then(@"return all paymnets data")]
+        public void ThenReturnAllPaymnetsData()
+        {
+            Assert.Pass();
+        }
 
-		[When(@"call get all payments api")]
-		public async Task WhenCallGetAllPaymentsApiAsync()
-		{
-			var payments = _paymentServiceClient.GetAllPaymentsAsync();
+        [When(@"call get all payments api")]
+        public async Task WhenCallGetAllPaymentsApiAsync()
+        {
+            var payments = _paymentServiceClient.GetAllPaymentsAsync();
 
-			await payments.ToArrayAsync();
-		}
-	}
+            await payments.ToArrayAsync();
+        }
+    }
 }

@@ -6,29 +6,29 @@ using TGS.ServiceUtility;
 namespace Tgs.Payment.ApplicationServices.BankInfos
 {
 	internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayerBankInfoCommand>
-	{
-		private readonly IPaymentRepository _paymentRepository;
+    {
+        private readonly IPaymentRepository _paymentRepository;
 
-		public CreatePlayerBankInfoCommandService(IPaymentRepository paymentRepository)
-		{
-			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		}
+        public CreatePlayerBankInfoCommandService(IPaymentRepository paymentRepository)
+        {
+            _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+        }
 
-		public async ValueTask ExecuteAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
-		{
-			var bankInfo = new PlayerBankInfo(
-				Guid.NewGuid(),
-				command.PlayerCode,
-				command.BrandId,
-				command.PaymentChannelId,
-				command.BankType,
-				command.Detail);
+        public async ValueTask ExecuteAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
+        {
+            var bankInfo = new PlayerBankInfo(
+                Guid.NewGuid(),
+                command.PlayerCode,
+                command.BrandId,
+                command.PaymentChannelId,
+                command.BankType,
+                command.Detail);
 
-			await _paymentRepository
-				.CreateBankInfoAsync(bankInfo, command.PlayerCode)
-				.ConfigureAwait(false);
+            await _paymentRepository
+                .CreateBankInfoAsync(bankInfo, command.PlayerCode)
+                .ConfigureAwait(false);
 
-			command.TaskSource.SetResult(bankInfo.Id);
-		}
-	}
+            command.TaskSource.SetResult(bankInfo.Id);
+        }
+    }
 }

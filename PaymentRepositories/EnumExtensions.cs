@@ -2,7 +2,7 @@
 
 namespace TGS.Payment.Repositories
 {
-    internal static class EnumExtensions
+	internal static class EnumExtensions
     {
         public static int ToNumber(this ReviewState state)
             => state switch
