@@ -60,7 +60,8 @@ namespace Tgs.Payment.Controllers
 					UpdatedOn = formData.UpdatedOn,
 					UserId = formData.UserId,
 					UserName = formData.UserName,
-					UserType = formData.UserType
+					UserType = formData.UserType,
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
 				};
 			else
 				return null;
@@ -169,7 +170,8 @@ namespace Tgs.Payment.Controllers
 						Remark = row.Remark,
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName
+						UserName = row.UserName,
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo
 					});
 
 				return new PagingResponseViewModel<WithdrawFormViewModel>

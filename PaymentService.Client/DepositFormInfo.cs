@@ -33,5 +33,7 @@ namespace Tgs.Payment.Clients
 		public DateTimeOffset UpdatedOn { get; init; }
 
 		public string UserName { get; init; } = default!;
+
+		public string? ThirdPartyOrderNo { get; init; }
 	}
 }

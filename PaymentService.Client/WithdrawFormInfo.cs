@@ -37,5 +37,7 @@ namespace Tgs.Payment.Clients
 		public string? UserName { get; init; }
 
 		public UserType UserType { get; init; }
+
+		public string? ThirdPartyOrderNo { get; init; }
 	}
 }
