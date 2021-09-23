@@ -1,8 +1,8 @@
 ﻿namespace Tgs.Payment
 {
 	public enum ConditionMatchType
-	{
-		MatchAll,
-		MatchOne
-	}
+    {
+        MatchAll,
+        MatchOne
+    }
 }

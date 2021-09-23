@@ -61,6 +61,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.Status).HasColumnName("status");
 
+            entity.Property(e => e.ThirdPartyOrderNo).HasColumnName("third_party_order_no");
+
             entity.Property(e => e.UpdatedOn)
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_on")

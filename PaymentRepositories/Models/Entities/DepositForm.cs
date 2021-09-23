@@ -21,6 +21,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string? Remark { get; set; }
         public int Status { get; set; }
         public DateTime UpdatedOn { get; set; }
+        public string? ThirdPartyOrderNo { get; set; }
 
         public virtual BrandPayment BrandPayment { get; set; } = default!;
         public virtual Player PlayerCodeNavigation { get; set; } = default!;

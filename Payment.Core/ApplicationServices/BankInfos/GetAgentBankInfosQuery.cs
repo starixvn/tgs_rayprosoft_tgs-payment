@@ -2,6 +2,6 @@
 
 namespace Tgs.Payment.ApplicationServices.BankInfos
 {
-    public record GetAgentBankInfosQuery(
+	public record GetAgentBankInfosQuery(
         Guid AgentId);
 }

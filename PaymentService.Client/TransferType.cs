@@ -1,9 +1,8 @@
-﻿using Tgs.Payment;
-namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients
 {
 	public enum TransferType
-	{
-		Deposit,
-		Withdraw
-	}
+    {
+        Deposit,
+        Withdraw
+    }
 }

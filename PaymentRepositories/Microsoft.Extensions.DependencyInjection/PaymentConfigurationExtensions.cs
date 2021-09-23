@@ -7,17 +7,17 @@ using TGS.Payment.Repositories;
 namespace Microsoft.Extensions.DependencyInjection
 {
 	public static class PaymentConfigurationExtensions
-	{
-		public static PaymentConfiguration UseTgsPaymentRepository(
-			this PaymentConfiguration paymentConfiguration,
-			Action<IServiceProvider, DbContextOptionsBuilder> dbConfigure)
-		{
-			paymentConfiguration
-				.UsePaymentRepository<PaymentRepository>()
-				.Services
-				.AddDbContext<TgsContext>(dbConfigure);
+    {
+        public static PaymentConfiguration UseTgsPaymentRepository(
+            this PaymentConfiguration paymentConfiguration,
+            Action<IServiceProvider, DbContextOptionsBuilder> dbConfigure)
+        {
+            paymentConfiguration
+                .UsePaymentRepository<PaymentRepository>()
+                .Services
+                .AddDbContext<TgsContext>(dbConfigure);
 
-			return paymentConfiguration;
-		}
-	}
+            return paymentConfiguration;
+        }
+    }
 }
