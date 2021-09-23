@@ -574,7 +574,7 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
 		{
 			var request = new DepositFormThirdPartyOrderNo
 			{

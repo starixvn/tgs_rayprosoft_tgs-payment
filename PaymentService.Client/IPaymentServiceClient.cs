@@ -68,6 +68,6 @@ namespace Tgs.Payment.Clients
 			string? paymentReturn = null,
 			decimal? actualAmount = null);
 
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo);
+		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 	}
 }
