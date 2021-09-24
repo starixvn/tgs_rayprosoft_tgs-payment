@@ -532,7 +532,13 @@ namespace TGS.Payment.Repositories
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
-					form.BrandPaymentId));
+					form.BrandPaymentId,
+					form.BrandPayment?.ChannelName,
+					form.BrandPayment?.PaymentMethodChannel.MethodId,
+					form.BankInfo,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.ThirdPartyOrderNo));
 
 			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
 
@@ -559,7 +565,12 @@ namespace TGS.Payment.Repositories
 					form.CreatedOn,
 					form.UpdatedOn,
 					form.BrandPaymentId,
-					ThirdPartyOrderNo: form.ThirdPartyOrderNo))
+					form.BrandPayment?.ChannelName,
+					form.BrandPayment?.PaymentMethodChannel.MethodId,
+					form.BankInfo,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.ThirdPartyOrderNo))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
