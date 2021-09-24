@@ -454,7 +454,8 @@ namespace TGS.Payment.Repositories
 							df.BrandPayment?.PaymentMethodChannel?.MethodId,
 							df.BankInfo,
 							df.ApplyInfo,
-							df.PaymentReturn);
+							df.PaymentReturn,
+							df.ThirdPartyOrderNo);
 
 			return query.SingleAsync();
 		}
