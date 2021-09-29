@@ -1,18 +1,18 @@
 ﻿[
-   {
-      "SchemaName": "dbo",
-      "Tables": [
-         {
-            "Columns": [ ],
-            "Name": "payments",
-            "NewName": "PaymentItem"
-         },
-         {
-            "Columns": [ ],
-            "Name": "agent_bank_infos",
-            "NewName": "AgentBankInfoItem"
-         }
-      ],
-      "UseSchemaName": false
-   }
+  {
+    "SchemaName": "dbo",
+    "Tables": [
+      {
+        "Columns": [],
+        "Name": "payments",
+        "NewName": "PaymentItem"
+      },
+      {
+        "Columns": [],
+        "Name": "agent_bank_infos",
+        "NewName": "AgentBankInfoItem"
+      }
+    ],
+    "UseSchemaName": false
+  }
 ]

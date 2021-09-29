@@ -35,6 +35,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -52,6 +53,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -128,6 +130,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -145,6 +148,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -192,6 +196,7 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -235,6 +240,7 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -248,6 +254,22 @@ namespace Payment.UnitTests
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+		}
+
+		[Test]
+		public async Task Can_Submit_DepositForm_Third_Party_Order_No()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var sut = new SubmitDepositFormThirdPartyOrderNoCommandService(fakePaymentRepository);
+
+			var command = new SubmitDepositFormThirdPartyOrderNoCommand(
+				Guid.NewGuid(),
+				"ThirdPartyOrderNo");
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.SubmitDepositFormThirdPartyOrderNoAsync(Arg.Is(command.FormId), Arg.Any<string>());
 		}
 	}
 }

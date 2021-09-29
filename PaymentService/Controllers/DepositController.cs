@@ -77,7 +77,8 @@ namespace Tgs.Payment.Controllers
 					Remark = formData.Remark,
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
-					UserName = formData.UserName
+					UserName = formData.UserName,
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
 				};
 			else
 				return null;
@@ -117,6 +118,7 @@ namespace Tgs.Payment.Controllers
 					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
+					formQuery.ThirdPartyOrderNo,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
@@ -138,6 +140,7 @@ namespace Tgs.Payment.Controllers
 						PaymentMethodId = row.PaymentMethodId,
 						PaymentReturn = row.PaymentReturn,
 						PlayerCode = row.PlayerCode,
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
 						PromotionId = row.PromotionId,
 						Remark = row.Remark,
 						Status = row.Status,
@@ -167,6 +170,7 @@ namespace Tgs.Payment.Controllers
 					brandId,
 					formQuery.UserName,
 					formQuery.ChannelName,
+					formQuery.ThirdPartyOrderNo,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
@@ -192,7 +196,8 @@ namespace Tgs.Payment.Controllers
 						Remark = row.Remark,
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName
+						UserName = row.UserName,
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo
 					});
 
 				return new PagingResponseViewModel<DepositFormViewModel>
@@ -241,6 +246,19 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.Status,
 				request.PaymentReturn);
+
+			await submitService.ExecuteAsync(command).ConfigureAwait(false);
+		}
+
+		[HttpPatch("thirdparty/{formId}")]
+		public async Task SubmitDepositFormThirdPartyOrderNoAsync(
+			[FromServices] ICommandService<SubmitDepositFormThirdPartyOrderNoCommand> submitService,
+			Guid formId,
+			[FromBody] DepositFormThirdPartyOrderNoViewModel request)
+		{
+			var command = new SubmitDepositFormThirdPartyOrderNoCommand(
+				formId,
+				request.ThirdPartyOrderNo);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}

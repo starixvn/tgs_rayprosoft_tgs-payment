@@ -3,7 +3,7 @@
 namespace Tgs.Payment
 {
 	public class PaymentOptions
-	{
-		public JsonSerializerOptions? JsonSerializerOptions { get; set; }
-	}
+    {
+        public JsonSerializerOptions? JsonSerializerOptions { get; set; }
+    }
 }

@@ -12,54 +12,54 @@ using TGS.ServiceUtility;
 namespace Tgs.Payment.Controllers
 {
 	[Route("bankinfo/player")]
-	[ApiController]
-	public class PlayerBankInfoController : ControllerBase
-	{
-		[HttpPut("{brandId}/{playerCode}")]
-		public async Task<Guid> CreatePlayerBankInfoAsync(
-			[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
-			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
-			Guid brandId,
-			string playerCode,
-			[FromBody] CreateBankInfoViewModel request)
-		{
-			var command = new CreatePlayerBankInfoCommand(
-				brandId,
-				playerCode,
-				request.PaymentChannelId,
-				request.BankType,
-				JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions));
+    [ApiController]
+    public class PlayerBankInfoController : ControllerBase
+    {
+        [HttpPut("{brandId}/{playerCode}")]
+        public async Task<Guid> CreatePlayerBankInfoAsync(
+            [FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
+            [FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+            Guid brandId,
+            string playerCode,
+            [FromBody] CreateBankInfoViewModel request)
+        {
+            var command = new CreatePlayerBankInfoCommand(
+                brandId,
+                playerCode,
+                request.PaymentChannelId,
+                request.BankType,
+                JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions));
 
-			await createService.ExecuteAsync(command).ConfigureAwait(false);
+            await createService.ExecuteAsync(command).ConfigureAwait(false);
 
-			return await command.TaskSource.Task.ConfigureAwait(false);
-		}
+            return await command.TaskSource.Task.ConfigureAwait(false);
+        }
 
-		[HttpDelete("{playerCode}/{id}")]
-		public ValueTask DeletePlayerBankInfoAsync(
-			[FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
-			string playerCode,
-			Guid id)
-			=> deleteService.ExecuteAsync(
-				new DeletePlayerBankInfoCommand(playerCode, id));
+        [HttpDelete("{playerCode}/{id}")]
+        public ValueTask DeletePlayerBankInfoAsync(
+            [FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
+            string playerCode,
+            Guid id)
+            => deleteService.ExecuteAsync(
+                new DeletePlayerBankInfoCommand(playerCode, id));
 
-		[HttpGet("{playerCode}")]
-		public IAsyncEnumerable<PlayerBankInfoViewModel> GetPlayerBankInfosAsync(
-			[FromServices] IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo> queryService,
-			string playerCode)
-		{
-			var query = new GetPlayerBankInfosQuery(playerCode);
+        [HttpGet("{playerCode}")]
+        public IAsyncEnumerable<PlayerBankInfoViewModel> GetPlayerBankInfosAsync(
+            [FromServices] IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo> queryService,
+            string playerCode)
+        {
+            var query = new GetPlayerBankInfosQuery(playerCode);
 
-			return queryService.QueryAsync(query)
-				.Select(bankInfo => new PlayerBankInfoViewModel
-				{
-					Id = bankInfo.Id,
-					PlayerCode = bankInfo.PlayerCode,
-					BankType = bankInfo.BankType,
-					BrandId = bankInfo.BrandId,
-					PaymentChannelId = bankInfo.PaymentChannelId,
-					Detail = JsonDocument.Parse(bankInfo.Detail)
-				});
-		}
-	}
+            return queryService.QueryAsync(query)
+                .Select(bankInfo => new PlayerBankInfoViewModel
+                {
+                    Id = bankInfo.Id,
+                    PlayerCode = bankInfo.PlayerCode,
+                    BankType = bankInfo.BankType,
+                    BrandId = bankInfo.BrandId,
+                    PaymentChannelId = bankInfo.PaymentChannelId,
+                    Detail = JsonDocument.Parse(bankInfo.Detail)
+                });
+        }
+    }
 }

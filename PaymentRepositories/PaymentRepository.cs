@@ -405,6 +405,7 @@ namespace TGS.Payment.Repositories
 							(PaymentFlowState)df.Status,
 							df.ApplyInfo,
 							df.PaymentReturn,
+							df.ThirdPartyOrderNo,
 							df.PromotionId,
 							df.CreatedOn,
 							df.UpdatedOn);
@@ -476,6 +477,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.ApplyInfo,
 					form.PaymentReturn,
+					form.ThirdPartyOrderNo,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn));
@@ -505,6 +507,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.ApplyInfo,
 					form.PaymentReturn,
+					form.ThirdPartyOrderNo,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn))
@@ -555,7 +558,8 @@ namespace TGS.Payment.Repositories
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
-					form.BrandPaymentId))
+					form.BrandPaymentId,
+					ThirdPartyOrderNo: form.ThirdPartyOrderNo))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
@@ -603,6 +607,15 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		{
+			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
+
+			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		public async ValueTask SubmitWithdrawFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn, decimal? actualAmount)
 		{
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
@@ -628,6 +641,9 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
 			if (conditions.PaymentMethodId != null)
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
+				dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+
 			if (conditions.Status != null)
 			{
 				var statusList = conditions.Status.Cast<int>().ToArray();
@@ -662,6 +678,9 @@ namespace TGS.Payment.Repositories
 			if (conditions.PaymentMethodId != null)
 				dataQuery = dataQuery.Where(
 					 form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
+				dataQuery = dataQuery.Where(
+					form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
 
 			if (conditions.Status != null)
 			{

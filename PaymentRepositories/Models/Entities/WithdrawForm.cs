@@ -24,6 +24,7 @@ namespace Tgs.Payment.Repositories.Entities
         public DateTime UpdatedOn { get; set; }
         public string? UserName { get; set; }
         public int UserType { get; set; }
+        public string? ThirdPartyOrderNo { get; set; }
 
         public virtual BrandPayment? BrandPayment { get; set; }
     }

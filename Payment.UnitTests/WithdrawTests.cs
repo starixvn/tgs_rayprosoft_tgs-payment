@@ -176,6 +176,7 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				null,
 				new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -250,7 +251,7 @@ namespace Payment.UnitTests
 					},
 					ConditionMatchType.MatchOne,
 					TransferType.Withdraw,
-					true, 
+					true,
 					0));
 
 			fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())

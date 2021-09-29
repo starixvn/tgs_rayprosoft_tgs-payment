@@ -29,5 +29,8 @@ namespace Tgs.Payment.ViewModels
 
 		[FromQuery(Name = "user_name")]
 		public string? UserName { get; set; }
+
+		[FromQuery(Name = "third_party_order_no")]
+		public string? ThirdPartyOrderNo { get; set; }
 	}
 }

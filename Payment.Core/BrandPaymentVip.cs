@@ -3,6 +3,6 @@
 namespace Tgs.Payment
 {
 	public record BrandPaymentVip(
-		Guid BrandPaymentId,
-		Guid VipLevelId);
+        Guid BrandPaymentId,
+        Guid VipLevelId);
 }
