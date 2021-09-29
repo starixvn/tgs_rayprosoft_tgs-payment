@@ -111,7 +111,7 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray());
 		}
 
-		public ValueTask EmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? thirdPartyOrderNo)
+		public ValueTask EmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
 		{
 			var request = new FormThirdNoEvent
 			{
