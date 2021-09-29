@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
+using Tgs.Payment.Services;
 
 namespace Payment.UnitTests
 {
@@ -456,6 +457,19 @@ namespace Payment.UnitTests
 					Assert.IsNotNull(createInfo.BankInfo);
 				});
 			await sut.ExecuteAsync(command);
+		}
+
+		[Test]
+		public async Task Can_Submit_Withdraw_From_Third_Party_Order_No()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var sut = new SaveWithdrawThirdPartyOrderNoCommandService(fakePaymentRepository);
+
+			var command = new SaveWithdrawThirdPartyOrderNoCommand(Guid.NewGuid(), "thirdPartyOrderNo");
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.SubmitWithdrawFormThirdPartyOrderNoAsync(Arg.Is(command.FormId), Arg.Any<string>());
 		}
 	}
 }
