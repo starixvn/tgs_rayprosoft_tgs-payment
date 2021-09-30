@@ -14,7 +14,7 @@ namespace Tgs.Payment.Services
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
-		public async ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
-			=> await _paymentRepository.SubmitWithdrawFormThirdPartyOrderNoAsync(command.FormId, command.ThirdPartyOrderNo);
+		public ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
+			=> _paymentRepository.SubmitWithdrawFormThirdPartyOrderNoAsync(command.FormId, command.ThirdPartyOrderNo);
 	}
 }
