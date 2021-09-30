@@ -38,3 +38,8 @@ message FormEvent {
 	string form_id = 1;
 	string brand_id = 2;
 }
+
+message FormThirdNoEvent {
+	string form_id = 1;
+	string third_party_order_no = 2;
+}
