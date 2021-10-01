@@ -664,8 +664,8 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
-			if (conditions.Id != null)
-				dataQuery = dataQuery.Where(form => form.Id == conditions.Id);
+			if (conditions.FormId != null)
+				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
 			if (conditions.Status != null)
 			{
@@ -704,8 +704,8 @@ namespace TGS.Payment.Repositories
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(
 					form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
-			if (conditions.Id != null)
-				dataQuery = dataQuery.Where(form => form.Id == conditions.Id);
+			if (conditions.FormId != null)
+				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
 			if (conditions.Status != null)
 			{

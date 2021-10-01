@@ -20,6 +20,6 @@ namespace Tgs.Payment.Clients
 		public string? UserName { get; init; }
 
 		public string? ThirdPartyOrderNo { get; init; }
-		public Guid? Id { get; init; }
+		public Guid? FormId { get; init; }
 	}
 }
