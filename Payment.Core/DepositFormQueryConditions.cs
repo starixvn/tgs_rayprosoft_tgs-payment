@@ -8,6 +8,7 @@ namespace Tgs.Payment
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,
+		Guid? Id,
 		Guid? PaymentMethodId,
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
