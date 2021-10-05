@@ -619,7 +619,7 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
