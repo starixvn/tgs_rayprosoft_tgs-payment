@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 							options.Url = configuration.GetConnectionString("Nats");
 						})
-						.AddReplyHandler<SaveWithdrawThirdNoProcessor>("tgs.payment.withdraw.external_id");
+						.AddReplyHandler<SaveWithdrawThirdNoHandler>("tgs.payment.withdraw.external_id");
 				});
 
 			return configuration;

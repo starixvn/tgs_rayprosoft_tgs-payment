@@ -56,7 +56,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser)
 		{
-			var createTime = DateTimeOffset.UtcNow;
+			var createTime = DateTime.UtcNow;
 
 			await _tgsContext.PlayerBankInfos
 				.AddAsync(new Tgs.Payment.Repositories.Entities.PlayerBankInfo
@@ -68,9 +68,9 @@ namespace TGS.Payment.Repositories
 					BankType = bankInfo.BankType,
 					Detail = bankInfo.Detail,
 					CreatedByUsername = modifyUser,
-					CreatedOn = createTime.UtcDateTime,
+					CreatedOn = createTime,
 					UpdatedByUsername = modifyUser,
-					UpdatedOn = createTime.UtcDateTime
+					UpdatedOn = createTime
 				})
 				.ConfigureAwait(false);
 
@@ -79,7 +79,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form)
 		{
-			var currentDate = DateTimeOffset.UtcNow;
+			var currentDate = DateTime.UtcNow;
 
 			await _tgsContext.DepositForms
 				.AddAsync(new DepositForm
@@ -92,8 +92,8 @@ namespace TGS.Payment.Repositories
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
 					PromotionId = form.PromotionId,
-					CreatedOn = currentDate.UtcDateTime,
-					UpdatedOn = currentDate.UtcDateTime
+					CreatedOn = currentDate,
+					UpdatedOn = currentDate
 				})
 				.ConfigureAwait(false);
 
@@ -153,7 +153,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
-			var currentDate = DateTimeOffset.UtcNow;
+			var currentDate = DateTime.UtcNow;
 
 			await _tgsContext.WithdrawForms
 				.AddAsync(new WithdrawForm
@@ -170,8 +170,8 @@ namespace TGS.Payment.Repositories
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
 					Status = (int)form.Status,
-					CreatedOn = currentDate.UtcDateTime,
-					UpdatedOn = currentDate.UtcDateTime
+					CreatedOn = currentDate,
+					UpdatedOn = currentDate
 				})
 				.ConfigureAwait(false);
 
@@ -427,7 +427,11 @@ namespace TGS.Payment.Repositories
 		public IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync()
 		{
 			return _tgsContext.PaymentMethodChannels.ToAsyncEnumerable()
-				.Select(pmc => new PaymentMethodChannelInfo(pmc.Id, pmc.PaymentId, pmc.MethodId, pmc.ChannelId));
+				.Select(pmc => new PaymentMethodChannelInfo(
+					pmc.Id,
+					pmc.PaymentId,
+					pmc.MethodId,
+					pmc.ChannelId));
 		}
 
 		public ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId)
@@ -614,7 +618,8 @@ namespace TGS.Payment.Repositories
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
-			formData.PaymentReturn = paymentReturn;
+			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -624,6 +629,7 @@ namespace TGS.Payment.Repositories
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -633,8 +639,9 @@ namespace TGS.Payment.Repositories
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
-			formData.PaymentReturn = paymentReturn;
-			formData.ActualAmount = actualAmount;
+			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
+			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -644,6 +651,7 @@ namespace TGS.Payment.Repositories
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
