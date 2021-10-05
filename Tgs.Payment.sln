@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EB00A1F-8815-4503-B6AC-202D1E765AD9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		NuGet.Config = NuGet.Config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Core", "Payment.Core\Payment.Core.csproj", "{04B4353E-8BB1-4D4B-BB7B-03622FE206C2}"
@@ -22,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.IntegrationTests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentRepositories", "PaymentRepositories\PaymentRepositories.csproj", "{C6B77650-B2C3-4442-B773-2DED4C94A6B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WithdrawProcessors", "WithdrawProcessors\WithdrawProcessors.csproj", "{527D5848-B988-4F7B-A103-2E3787C2B152}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WithdrawProcessors", "WithdrawProcessors\WithdrawProcessors.csproj", "{527D5848-B988-4F7B-A103-2E3787C2B152}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
