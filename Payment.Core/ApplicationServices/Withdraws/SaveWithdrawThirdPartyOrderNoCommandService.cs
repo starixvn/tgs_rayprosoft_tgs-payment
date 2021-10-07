@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TGS.ServiceUtility;
 
-namespace Tgs.Payment.Services
+namespace Tgs.Payment.ApplicationServices.Withdraws
 {
 	internal class SaveWithdrawThirdPartyOrderNoCommandService : ICommandService<SaveWithdrawThirdPartyOrderNoCommand>
 	{

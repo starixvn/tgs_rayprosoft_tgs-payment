@@ -111,15 +111,25 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray());
 		}
 
-		public ValueTask EmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
+		public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
 		{
-			var request = new FormThirdNoEvent
+			var request = new FormThirdNoRequest
 			{
-				FormId = formId.ToString(),
+				FormId = formId,
 				ThirdPartyOrderNo = thirdPartyOrderNo
 			};
 
-			return _messageSender.PublishAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
+			return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
+		}
+
+		public ValueTask TagWithdrawFormPaidAsync(Guid formId)
+		{
+			var request = new TagPaidRequest
+			{
+				FormId = formId
+			};
+
+			return _messageSender.SendAsync("tgs.payment.withdraw.paid", request.ToByteArray());
 		}
 
 		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)

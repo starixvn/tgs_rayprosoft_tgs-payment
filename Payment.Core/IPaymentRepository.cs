@@ -92,7 +92,7 @@ namespace Tgs.Payment
 			string? paymentReturn,
 			decimal? actualAmount);
 
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo);
+		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 
 		ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 	}
