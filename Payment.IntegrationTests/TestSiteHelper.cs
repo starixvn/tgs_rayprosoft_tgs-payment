@@ -29,7 +29,7 @@ namespace Payment.IntegrationTests
 						{
 							services
 								.AddFakeNatsMessageQueue()
-								.AddSingleton<TgsContext>(sp =>
+								.AddSingleton(sp =>
 								{
 									var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
 									dbContextOptionsBuilder

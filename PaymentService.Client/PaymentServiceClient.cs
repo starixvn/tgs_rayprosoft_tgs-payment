@@ -389,6 +389,9 @@ namespace Tgs.Payment.Clients
 			if (conditions.PaymentMethodId != null)
 				queryStrings.Add("method", conditions.PaymentMethodId.ToString());
 
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				queryStrings.Add("user_id", conditions.UserId);
+
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				queryStrings.Add("user_name", conditions.UserName);
 
@@ -457,6 +460,12 @@ namespace Tgs.Payment.Clients
 
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				queryStrings.Add("user_name", conditions.UserName);
+
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				queryStrings.Add("user_id", conditions.UserId);
+
+			if (conditions.UserType != null)
+				queryStrings.Add("user_type", conditions.UserType.ToString());
 
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				queryStrings.Add("third_party_order_no", conditions.ThirdPartyOrderNo);

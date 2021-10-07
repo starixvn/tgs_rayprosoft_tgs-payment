@@ -6,6 +6,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 {
 	public record DepositFormQuery(
 		Guid BrandId,
+		string? UserId,
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,

@@ -61,10 +61,10 @@ pipeline {
 		stage('Push packages') {
 			steps {
 				sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build'
-				sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+				sh 'dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k admin --skip-duplicate'
 
 				sh 'dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build'
-				sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+				sh 'dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k admin --skip-duplicate'
 			}
 		}
 
