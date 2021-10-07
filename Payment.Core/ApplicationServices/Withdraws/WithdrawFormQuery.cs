@@ -6,7 +6,9 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 {
 	public record WithdrawFormQuery(
 		Guid BrandId,
+		string? UserId,
 		string? UserName,
+		UserType? UserType,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,
 		Guid? FormId,

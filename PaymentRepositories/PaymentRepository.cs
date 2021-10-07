@@ -619,11 +619,11 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
-			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -656,6 +656,8 @@ namespace TGS.Payment.Repositories
 				.ThenInclude(bp => bp.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
 
+			if (string.IsNullOrWhiteSpace(conditions.UserId))
+				dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
 			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))

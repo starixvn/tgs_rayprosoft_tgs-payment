@@ -90,7 +90,9 @@ namespace Tgs.Payment.Controllers
 			{
 				var query = new WithdrawFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
+					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
 					formQuery.FormId,
@@ -143,7 +145,9 @@ namespace Tgs.Payment.Controllers
 
 				var query = new WithdrawFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
+					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
 					formQuery.FormId,
