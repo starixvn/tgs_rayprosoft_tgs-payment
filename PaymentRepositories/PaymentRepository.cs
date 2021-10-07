@@ -656,7 +656,7 @@ namespace TGS.Payment.Repositories
 				.ThenInclude(bp => bp.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
 
-			if (string.IsNullOrWhiteSpace(conditions.UserId))
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
 				dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
