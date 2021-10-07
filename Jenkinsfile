@@ -77,7 +77,9 @@ pipeline {
 
 		stage('Push Docker Image') {
 			steps {
-				sh 'sudo docker push $ImageName:${TAG}'
+				sh 'docker push $ImageName:${TAG}'
+                sh 'docker tag $ImageName:${TAG} harbor.rpgp.cc/tgs/payment-api:${TAG}'
+                sh 'docker push docker push harbor.rpgp.cc/tgs/payment-api:${TAG}'
 			}
 		}
 
