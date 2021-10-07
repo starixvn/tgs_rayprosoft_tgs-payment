@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentRepositories", "Paym
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WithdrawProcessors", "WithdrawProcessors\WithdrawProcessors.csproj", "{527D5848-B988-4F7B-A103-2E3787C2B152}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentRepositories.UnitTests", "PaymentRepositories.UnitTests\PaymentRepositories.UnitTests.csproj", "{F202AACE-6988-4B23-99DE-7719651A7940}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{527D5848-B988-4F7B-A103-2E3787C2B152}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{527D5848-B988-4F7B-A103-2E3787C2B152}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{527D5848-B988-4F7B-A103-2E3787C2B152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F202AACE-6988-4B23-99DE-7719651A7940}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F202AACE-6988-4B23-99DE-7719651A7940}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F202AACE-6988-4B23-99DE-7719651A7940}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F202AACE-6988-4B23-99DE-7719651A7940}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
