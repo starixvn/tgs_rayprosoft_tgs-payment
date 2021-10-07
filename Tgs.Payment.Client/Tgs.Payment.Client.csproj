@@ -26,8 +26,9 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+		<PackageReference Include="Tgs.MessageQueue" Version="1.1.1" />
 		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.3" />
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

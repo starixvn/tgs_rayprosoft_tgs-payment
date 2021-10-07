@@ -21,6 +21,7 @@
 		<PackageReference Include="PagingUtility.AsyncEnumerable" Version="0.0.3" />
 		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.3" />
 		<PackageReference Include="System.Linq.Async" Version="5.0.0" />
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="1.1.1" />
 		<PackageReference Include="TGS.ServiceUtility" Version="0.0.3" />
 	</ItemGroup>
 
