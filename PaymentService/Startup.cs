@@ -58,15 +58,6 @@ namespace PaymentService
 
 			services
 				.AddPaymentClient()
-				.AddNatsMessageQueue(config =>
-				{
-					config.ConfigQueueOptions((options, sp) =>
-					{
-						var config = sp.GetRequiredService<IConfiguration>();
-
-						options.Url = config.GetConnectionString("Nats");
-					});
-				})
 				.AddPayment()
 				.UseTgsPaymentRepository((sp, builder) =>
 				{
@@ -78,9 +69,22 @@ namespace PaymentService
 				{
 					var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
 
-					options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;					
+					options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
 				})
 				.RegisterWithdrawProcessors();
+
+			services
+				.AddMessageQueue()
+				.AddNatsMessageQueue(config =>
+				{
+					config.ConfigQueueOptions((options, sp) =>
+					{
+						var config = sp.GetRequiredService<IConfiguration>();
+
+						options.Url = config.GetConnectionString("Nats");
+					});
+				})
+				.AddNatsGlobPatternExchange("*");
 
 			services.AddHealthChecks();
 		}
