@@ -25,6 +25,9 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				.GetDepositFormByIdAsync(command.FormId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			var formStatus = (PaymentFlowState)formData.Status;
 
 			if (formStatus == PaymentFlowState.Approved || formStatus == PaymentFlowState.Reject)

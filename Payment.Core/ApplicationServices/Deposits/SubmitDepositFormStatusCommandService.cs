@@ -25,6 +25,9 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				.GetDepositFormByIdAsync(command.FormId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			await _paymentRepository
 				.SubmitDepositFormStatusAsync(
 					command.FormId,

@@ -384,7 +384,7 @@ namespace TGS.Payment.Repositories
 				.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId));
 		}
 
-		public ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id)
+		public ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id)
 		{
 			var query = from df in _tgsContext.DepositForms
 							.Include(f => f.PlayerCodeNavigation)
@@ -410,7 +410,7 @@ namespace TGS.Payment.Repositories
 							df.CreatedOn,
 							df.UpdatedOn);
 
-			return query.SingleAsync();
+			return query.SingleOrDefaultAsync();
 		}
 
 		public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id)
@@ -434,7 +434,7 @@ namespace TGS.Payment.Repositories
 					pmc.ChannelId));
 		}
 
-		public ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId)
+		public ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId)
 		{
 			var query = from df in _tgsContext.WithdrawForms
 							.Include(f => f.BrandPayment!)
@@ -461,7 +461,7 @@ namespace TGS.Payment.Repositories
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo);
 
-			return query.SingleAsync();
+			return query.SingleOrDefaultAsync();
 		}
 
 		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
