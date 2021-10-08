@@ -9,7 +9,11 @@ namespace Tgs.Payment
 	{
 		ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions);
 
+		ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions);
+
 		ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
+
+		ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
 
 		ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser);
 

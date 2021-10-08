@@ -129,6 +129,7 @@ namespace Tgs.Payment.Controllers
 		public async Task<PagingResponseViewModel<DepositFormViewModel>> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
+			[FromServices] IGetService<DepositFormQuery, decimal> sumService,
 			Guid brandId,
 			[FromQuery] DepositFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -159,6 +160,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
@@ -212,7 +214,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
 					{

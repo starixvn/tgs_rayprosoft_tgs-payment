@@ -228,6 +228,36 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public void Can_Sum_WithdrawForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new WithdrawFormQuerySumService(fakePaymentRepository);
+
+			var query = new WithdrawFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.GetAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.TotalWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
+		}
+
+		[Test]
 		public async Task Can_SignOff_Form()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();

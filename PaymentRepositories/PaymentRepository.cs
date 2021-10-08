@@ -25,11 +25,25 @@ namespace TGS.Payment.Repositories
 			return dataQuery.CountAsync();
 		}
 
+		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
 		public ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
 		{
 			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
 
 			return dataQuery.CountAsync();
+		}
+
+		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
 		}
 
 		public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser)
