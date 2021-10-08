@@ -28,17 +28,21 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 			if (formData == null)
 				return;
 
+			var originStatus = formData.Status;
+
 			await _paymentRepository
 				.SubmitWithdrawFormStatusAsync(
 					command.FormId,
 					command.Status,
 					command.PaymentReturn,
-					command.ActualAmount)
+					command.ActualAmount,
+					command.ThirdPartyOrderNo)
 				.ConfigureAwait(false);
 
-			await _paymentClient
-				.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId)
-				.ConfigureAwait(false);
+			if (originStatus != command.Status)
+				await _paymentClient
+					.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId)
+					.ConfigureAwait(false);
 		}
 	}
 }

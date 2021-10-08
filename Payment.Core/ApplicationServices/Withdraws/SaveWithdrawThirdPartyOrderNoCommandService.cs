@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tgs.Payment.Clients;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws
@@ -14,7 +15,23 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
-		public ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
-			=> _paymentRepository.SubmitWithdrawFormThirdPartyOrderNoAsync(command.FormId, command.ThirdPartyOrderNo);
+		public async ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
+		{
+			var formData = await _paymentRepository
+				.GetWithdrawFormByIdAsync(command.FormId)
+				.ConfigureAwait(false);
+
+			if (formData == null)
+				return;
+
+			await _paymentRepository
+				.SubmitWithdrawFormStatusAsync(
+					command.FormId,
+					formData.Status,
+					null,
+					null,
+					command.ThirdPartyOrderNo)
+				.ConfigureAwait(false);
+		}
 	}
 }

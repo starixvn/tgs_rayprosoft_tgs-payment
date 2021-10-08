@@ -590,12 +590,19 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
-		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null)
+		public async ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState state,
+			string? paymentReturn = null,
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null)
 		{
 			var request = new DepositFormStatus
 			{
 				Status = state,
-				PaymentReturn = paymentReturn
+				PaymentReturn = paymentReturn,
+				ActualAmount = actualAmount,
+				ThirdPartyOrderNo = thirdPartyOrderNo
 			};
 
 			var requestContent = new StringContent(
@@ -637,13 +644,15 @@ namespace Tgs.Payment.Clients
 			Guid formId,
 			PaymentFlowState state,
 			string? paymentReturn = null,
-			decimal? actualAmount = null)
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null)
 		{
 			var request = new WithdrawFormStatus
 			{
 				Status = state,
 				PaymentReturn = paymentReturn,
-				ActualAmount = actualAmount
+				ActualAmount = actualAmount,
+				ThirdPartyOrderNo = thirdPartyOrderNo
 			};
 
 			var requestContent = new StringContent(

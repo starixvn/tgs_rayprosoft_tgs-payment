@@ -279,13 +279,16 @@ namespace Tgs.Payment.Controllers
 			var command = new SubmitDepositFormStatusCommand(
 				formId,
 				request.Status,
-				request.PaymentReturn);
+				request.PaymentReturn,
+				request.ActualAmount,
+				request.ThirdPartyOrderNo);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
 
 		[HttpPatch("thirdparty/{formId}")]
-		public async Task SubmitDepositFormThirdPartyOrderNoAsync(
+		[Obsolete]
+		public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(
 			[FromServices] ICommandService<SubmitDepositFormThirdPartyOrderNoCommand> submitService,
 			Guid formId,
 			[FromBody] DepositFormThirdPartyOrderNoViewModel request)
@@ -294,7 +297,7 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.ThirdPartyOrderNo);
 
-			await submitService.ExecuteAsync(command).ConfigureAwait(false);
+			return submitService.ExecuteAsync(command);
 		}
 	}
 }
