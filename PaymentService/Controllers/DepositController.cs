@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -85,7 +84,7 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		[HttpGet("{formId}", Order = 1), HttpHeaderConstraint(Header = "FormQuery")]
+		[HttpGet("{formId}", Order = 1), HttpHeaderConstraint("FormQuery")]
 		public async Task<DepositFormViewModel?> GetDepositFormAsync(
 			[FromServices] IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo?> getService,
 			Guid formId)

@@ -14,6 +14,11 @@ namespace Tgs.Payment.Controllers.Constraints
 
 		internal bool AllowEmpty => string.IsNullOrEmpty(Value);
 
+		public HttpHeaderConstraintAttribute(string headerName)
+		{
+			Header = headerName;
+		}
+
 		public bool Accept(ActionConstraintContext context)
 		{
 			if (context.RouteContext.HttpContext.Request.Headers.TryGetValue(Header, out var value))

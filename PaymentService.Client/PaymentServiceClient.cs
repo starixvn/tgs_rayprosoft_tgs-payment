@@ -338,7 +338,7 @@ namespace Tgs.Payment.Clients
 		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId)
 		{
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/deposit/{formId}");
-			requestMessage.Headers.Add("FormQuery", "true");
+			requestMessage.Headers.Add("FormQuery", string.Empty);
 
 			var response = await _httpClient
 				.SendAsync(requestMessage)
@@ -393,8 +393,24 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId)
+		{
+			var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/withdraw/{formId}");
+			requestMessage.Headers.Add("FormQuery", string.Empty);
+
+			var response = await _httpClient
+				.SendAsync(requestMessage)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
-			DepositFormQueryConditions conditions,
+					DepositFormQueryConditions conditions,
 			Paging paging)
 		{
 			var queryStrings = HttpUtility.ParseQueryString(string.Empty);

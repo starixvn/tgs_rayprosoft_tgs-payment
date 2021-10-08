@@ -59,7 +59,7 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync();
 
-		ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId);
+		ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId);
 
 		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 			DepositFormQueryConditions conditions,
@@ -86,13 +86,13 @@ namespace Tgs.Payment
 
 		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn);
 
+		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+
 		ValueTask SubmitWithdrawFormStatusAsync(
-			Guid formId,
+					Guid formId,
 			PaymentFlowState status,
 			string? paymentReturn,
 			decimal? actualAmount);
-
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 
 		ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 	}

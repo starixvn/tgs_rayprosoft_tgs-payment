@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.Withdraws;
+using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
 using TGS.ServiceUtility;
@@ -41,8 +42,8 @@ namespace Tgs.Payment.Controllers
 
 			var formData = await getService.GetAsync(query).ConfigureAwait(false);
 
-			if (formData != null)
-				return new WithdrawFormViewModel
+			return formData != null
+				? new WithdrawFormViewModel
 				{
 					Id = formData.Id,
 					Amount = formData.Amount,
@@ -62,9 +63,42 @@ namespace Tgs.Payment.Controllers
 					UserName = formData.UserName,
 					UserType = formData.UserType,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
-				};
-			else
-				return null;
+				}
+				: null;
+		}
+
+		[HttpGet("{fromId}"), HttpHeaderConstraint("FormQuery")]
+		public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
+			[FromServices] IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo?> getService,
+			Guid formId)
+		{
+			var query = new GetWithdrawFormDetailByFormIdQuery(formId);
+
+			var formData = await getService.GetAsync(query).ConfigureAwait(false);
+
+			return formData != null
+				? new WithdrawFormViewModel
+				{
+					Id = formData.Id,
+					Amount = formData.Amount,
+					ApplyInfo = formData.ApplyInfo,
+					BankInfo = formData.BankInfo,
+					BankInfoId = formData.BankInfoId,
+					BrandId = formData.BrandId,
+					BrandPaymentId = formData.BrandPaymentId,
+					ChannelName = formData.ChannelName,
+					CreatedOn = formData.CreatedOn,
+					PaymentMethodId = formData.PaymentMethodId,
+					PaymentReturn = formData.PaymentReturn,
+					Remark = formData.Remark,
+					Status = formData.Status,
+					UpdatedOn = formData.UpdatedOn,
+					UserId = formData.UserId,
+					UserName = formData.UserName,
+					UserType = formData.UserType,
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+				}
+				: null;
 		}
 
 		[HttpGet("{brandId}")]
