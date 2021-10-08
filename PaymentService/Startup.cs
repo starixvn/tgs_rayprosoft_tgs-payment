@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Tgs.Payment.Configuration;
+using Tgs.Payment.Swagger;
 
 namespace PaymentService
 {
@@ -49,6 +50,8 @@ namespace PaymentService
 			services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentService", Version = "v1" });
+
+				c.OperationFilter<ApiDocOperationFilter>();
 
 				var xml = $"PaymentService.xml";
 				var path = Path.Combine(AppContext.BaseDirectory, xml);

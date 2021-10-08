@@ -53,7 +53,7 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds);
 
-		ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id);
+		ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id);
 
 		ValueTask<PaymentInfo> GetPaymentAsync(Guid id);
 

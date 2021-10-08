@@ -384,7 +384,7 @@ namespace TGS.Payment.Repositories
 				.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId));
 		}
 
-		public ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id)
+		public ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id)
 		{
 			var query = from df in _tgsContext.DepositForms
 							.Include(f => f.PlayerCodeNavigation)
@@ -410,7 +410,7 @@ namespace TGS.Payment.Repositories
 							df.CreatedOn,
 							df.UpdatedOn);
 
-			return query.SingleAsync();
+			return query.SingleOrDefaultAsync();
 		}
 
 		public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id)

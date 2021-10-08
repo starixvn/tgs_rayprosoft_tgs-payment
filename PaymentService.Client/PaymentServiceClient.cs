@@ -335,6 +335,22 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId)
+		{
+			var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/deposit/{formId}");
+			requestMessage.Headers.Add("FormQuery", "true");
+
+			var response = await _httpClient
+				.SendAsync(requestMessage)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId)
 		{
 			var response = await _httpClient
