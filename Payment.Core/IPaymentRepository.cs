@@ -84,16 +84,18 @@ namespace Tgs.Payment
 			ReviewState reviewStatus,
 			string? remark = null);
 
-		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn);
-
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
-
-		ValueTask SubmitWithdrawFormStatusAsync(
-					Guid formId,
+		ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
 			PaymentFlowState status,
 			string? paymentReturn,
-			decimal? actualAmount);
+			decimal? actualAmount,
+			string? thirdPartyOrderNo);
 
-		ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+		ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo);
 	}
 }

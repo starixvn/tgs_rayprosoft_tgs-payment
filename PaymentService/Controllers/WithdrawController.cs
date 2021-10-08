@@ -245,7 +245,8 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.Status,
 				request.PaymentReturn,
-				request.ActualAmount);
+				request.ActualAmount,
+				request.ThirdPartyOrderNo);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
