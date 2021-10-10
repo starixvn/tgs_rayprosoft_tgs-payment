@@ -18,12 +18,13 @@ namespace Tgs.Payment.Clients
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public ValueTask ApproveDepositAsync(Guid formId, Guid brandId)
+		public ValueTask ApproveDepositAsync(Guid formId, Guid brandId, decimal? actualAmount)
 		{
 			var request = new ApproveDepositRequest
 			{
 				FormId = formId.ToString(),
-				BrandId = brandId.ToString()
+				BrandId = brandId.ToString(),
+				ActualAmount = actualAmount
 			};
 
 			return _messageSender
