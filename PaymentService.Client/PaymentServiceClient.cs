@@ -409,7 +409,7 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
 		}
 
-		public async ValueTask<DepositFroms> QueryDepositFormsAsync(
+		public async ValueTask<DepositForms> QueryDepositFormsAsync(
 					DepositFormQueryConditions conditions,
 			Paging paging)
 		{
@@ -472,7 +472,7 @@ namespace Tgs.Payment.Clients
 
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-			return JsonSerializer.Deserialize<DepositFroms>(contentJson, _serializerOptions)!;
+			return JsonSerializer.Deserialize<DepositForms>(contentJson, _serializerOptions)!;
 		}
 
 		public async ValueTask<WithdrawForms> QueryWithdrawFormsAsync(
