@@ -12,54 +12,54 @@ using TGS.ServiceUtility;
 namespace Tgs.Payment.Controllers
 {
 	[Route("[controller]")]
-    [ApiController]
-    public class PaymentController : ControllerBase
-    {
-        [HttpGet]
-        public IAsyncEnumerable<PaymentViewModel> GetAllPaymentsAsync(
-            [FromServices] IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
-        {
-            var allPayments = queryService.QueryAsync(new GetAllPaymentsQuery());
+	[ApiController]
+	public class PaymentController : ControllerBase
+	{
+		[HttpPut]
+		public ValueTask CreatePaymentAsync(
+			[FromServices] ICommandService<CreatePaymentCommand> createService,
+			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+			[FromBody] PaymentCreateViewModel request)
+		{
+			var jsonOptions = jsonOptionsAccessor.Value;
 
-            return allPayments.Select(payment => new PaymentViewModel
-            {
-                Id = payment.Id,
-                Code = payment.Code
-            });
-        }
+			var command = new CreatePaymentCommand(
+				request.Code,
+				request.Description,
+				JsonSerializer.Serialize(
+					request.ExtendedData,
+					jsonOptions.JsonSerializerOptions));
 
-        [HttpGet("{id}")]
-        public async Task<PaymentViewModel> GetPaymentByIdAsync(
-            [FromServices] IGetService<GetPaymentQuery, PaymentInfo> getService,
-            Guid id)
-        {
-            var query = new GetPaymentQuery(id);
+			return createService.ExecuteAsync(command);
+		}
 
-            var info = await getService.GetAsync(query).ConfigureAwait(false);
+		[HttpGet]
+		public IAsyncEnumerable<PaymentViewModel> GetAllPaymentsAsync(
+			[FromServices] IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
+		{
+			var allPayments = queryService.QueryAsync(new GetAllPaymentsQuery());
 
-            return new PaymentViewModel
-            {
-                Id = info.Id,
-                Code = info.Code
-            };
-        }
+			return allPayments.Select(payment => new PaymentViewModel
+			{
+				Id = payment.Id,
+				Code = payment.Code
+			});
+		}
 
-        [HttpPut]
-        public ValueTask CreatePaymentAsync(
-            [FromServices] ICommandService<CreatePaymentCommand> createService,
-            [FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
-            [FromBody] PaymentCreateViewModel request)
-        {
-            var jsonOptions = jsonOptionsAccessor.Value;
+		[HttpGet("{id}")]
+		public async Task<PaymentViewModel> GetPaymentByIdAsync(
+			[FromServices] IGetService<GetPaymentQuery, PaymentInfo> getService,
+			Guid id)
+		{
+			var query = new GetPaymentQuery(id);
 
-            var command = new CreatePaymentCommand(
-                request.Code,
-                request.Description,
-                JsonSerializer.Serialize(
-                    request.ExtendedData,
-                    jsonOptions.JsonSerializerOptions));
+			var info = await getService.GetAsync(query).ConfigureAwait(false);
 
-            return createService.ExecuteAsync(command);
-        }
-    }
+			return new PaymentViewModel
+			{
+				Id = info.Id,
+				Code = info.Code
+			};
+		}
+	}
 }

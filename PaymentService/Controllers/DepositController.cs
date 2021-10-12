@@ -116,19 +116,11 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		/// <summary>
-		/// Queries the deposit forms asynchronous.
-		/// </summary>
-		/// <param name="countService">The count service.</param>
-		/// <param name="queryService">The query service.</param>
-		/// <param name="brandId">The brand identifier.</param>
-		/// <param name="formQuery">The form query.</param>
-		/// <param name="paging">The paging.</param>
-		/// <returns></returns>
 		[HttpGet("{brandId}", Order = 10)]
-		public async Task<PagingResponseViewModel<DepositFormViewModel>> QueryDepositFormsAsync(
+		public async Task<DepositViewModel> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
+			[FromServices] IGetService<DepositFormQuery, decimal> sumService,
 			Guid brandId,
 			[FromQuery] DepositFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -159,6 +151,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
@@ -181,12 +174,16 @@ namespace Tgs.Payment.Controllers
 						UserName = row.UserName
 					});
 
-				return new PagingResponseViewModel<DepositFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<DepositFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 			else
@@ -212,7 +209,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
 					{
@@ -234,12 +231,16 @@ namespace Tgs.Payment.Controllers
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo
 					});
 
-				return new PagingResponseViewModel<DepositFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<DepositFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 		}

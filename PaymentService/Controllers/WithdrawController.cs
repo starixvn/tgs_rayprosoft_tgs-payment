@@ -102,9 +102,10 @@ namespace Tgs.Payment.Controllers
 		}
 
 		[HttpGet("{brandId}")]
-		public async Task<PagingResponseViewModel<WithdrawFormViewModel>> QueryWithdrawFormsAsync(
+		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
+			[FromServices] IGetService<WithdrawFormQuery, decimal> sumService,
 			Guid brandId,
 			[FromQuery] WithdrawFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -135,6 +136,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -157,12 +159,16 @@ namespace Tgs.Payment.Controllers
 						UserName = row.UserName
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 			else
@@ -188,6 +194,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -210,12 +217,16 @@ namespace Tgs.Payment.Controllers
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 		}

@@ -8,22 +8,22 @@ using TGS.ServiceUtility;
 namespace Tgs.Payment.Controllers
 {
 	[Route("payment/pmc")]
-    [ApiController]
-    public class PaymentMethodChannelController : ControllerBase
-    {
-        [HttpGet]
-        public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
-            [FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
-        {
-            var allPayments = queryService.QueryAsync(new AllPaymentMethodChannelsQuery());
+	[ApiController]
+	public class PaymentMethodChannelController : ControllerBase
+	{
+		[HttpGet]
+		public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
+			[FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
+		{
+			var allPayments = queryService.QueryAsync(new AllPaymentMethodChannelsQuery());
 
-            return allPayments.Select(pmc => new PaymentMethodChannelViewModel
-            {
-                Id = pmc.Id,
-                PaymentId = pmc.PaymentId,
-                MethodId = pmc.MethodId,
-                ChannelId = pmc.ChannelId
-            });
-        }
-    }
+			return allPayments.Select(pmc => new PaymentMethodChannelViewModel
+			{
+				Id = pmc.Id,
+				PaymentId = pmc.PaymentId,
+				MethodId = pmc.MethodId,
+				ChannelId = pmc.ChannelId
+			});
+		}
+	}
 }
