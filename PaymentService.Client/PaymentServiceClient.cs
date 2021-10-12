@@ -409,7 +409,7 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
 		}
 
-		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
+		public async ValueTask<DepositFroms> QueryDepositFormsAsync(
 					DepositFormQueryConditions conditions,
 			Paging paging)
 		{
@@ -472,10 +472,10 @@ namespace Tgs.Payment.Clients
 
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-			return JsonSerializer.Deserialize<PagingResponse<DepositFormInfo>>(contentJson, _serializerOptions)!;
+			return JsonSerializer.Deserialize<DepositFroms>(contentJson, _serializerOptions)!;
 		}
 
-		public async ValueTask<PagingResponse<WithdrawFormInfo>> QueryWithdrawFormsAsync(
+		public async ValueTask<WithdrawForms> QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions conditions,
 			Paging paging)
 		{
@@ -538,7 +538,7 @@ namespace Tgs.Payment.Clients
 
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-			return JsonSerializer.Deserialize<PagingResponse<WithdrawFormInfo>>(contentJson, _serializerOptions)!;
+			return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _serializerOptions)!;
 		}
 
 		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null)

@@ -102,7 +102,7 @@ namespace Tgs.Payment.Controllers
 		}
 
 		[HttpGet("{brandId}")]
-		public async Task<PagingResponseViewModel<WithdrawFormViewModel>> QueryWithdrawFormsAsync(
+		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
 			[FromServices] IGetService<WithdrawFormQuery, decimal> sumService,
@@ -159,12 +159,16 @@ namespace Tgs.Payment.Controllers
 						UserName = row.UserName
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 			else
@@ -213,12 +217,16 @@ namespace Tgs.Payment.Controllers
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable()
+					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
+					{
+						TotalCount = totalCount,
+						Page = 1,
+						Rows = -1,
+						Items = items.ToEnumerable()
+					},
+					Sum = sum
 				};
 			}
 		}
