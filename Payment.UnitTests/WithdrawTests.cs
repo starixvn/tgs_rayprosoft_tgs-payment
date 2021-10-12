@@ -352,6 +352,7 @@ namespace Payment.UnitTests
 				Guid.NewGuid(),
 				PaymentFlowState.WaitApprove,
 				null,
+				null,
 				null);
 
 			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
@@ -381,7 +382,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.FormId),
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
-					Arg.Any<decimal?>());
+					Arg.Any<decimal?>(),
+					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitWithdrawFormStatusChangedEventAsync(
@@ -529,10 +531,30 @@ namespace Payment.UnitTests
 			var sut = new SaveWithdrawThirdPartyOrderNoCommandService(fakePaymentRepository);
 
 			var command = new SaveWithdrawThirdPartyOrderNoCommand(Guid.NewGuid(), "thirdPartyOrderNo");
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
+				.Returns(new WithdrawFormInfo(
+					command.FormId,
+					"UserId",
+					  UserType.Player,
+					"UserName",
+					Guid.NewGuid(),
+					1000M,
+					PaymentFlowState.WaitPayment,
+					null,
+					Guid.NewGuid(),
+					DateTimeOffset.UtcNow,
+					DateTimeOffset.UtcNow));
+
 			await sut.ExecuteAsync(command);
 
 			_ = fakePaymentRepository.Received(1)
-				.SubmitWithdrawFormThirdPartyOrderNoAsync(Arg.Is(command.FormId), Arg.Any<string>());
+				.SubmitWithdrawFormStatusAsync(
+					Arg.Is(command.FormId),
+					Arg.Is(PaymentFlowState.WaitPayment),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
+					Arg.Any<string>());
 		}
 	}
 }

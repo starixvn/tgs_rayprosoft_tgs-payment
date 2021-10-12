@@ -37,6 +37,8 @@ namespace PaymentRepositories.UnitTests
 			await sut.SubmitDepositFormStatusAsync(
 				testFormData.Id,
 				Tgs.Payment.PaymentFlowState.Paid,
+				null,
+				null,
 				null);
 
 			Assert.AreEqual("Test", testFormData.PaymentReturn);

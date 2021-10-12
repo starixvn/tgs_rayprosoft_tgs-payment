@@ -45,11 +45,39 @@ namespace Payment.IntegrationTests
 		{
 			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-			await dbContext.DepositForms.AddAsync(
-				new DepositForm
-				{
-					Id = _formId
-				});
+			await dbContext.Players.AddAsync(new Player
+			{
+				PlayerCode = "PlayerCode"
+			});
+
+			var pmc = new PaymentMethodChannel
+			{
+				Id = Guid.NewGuid(),
+				PaymentId = Guid.NewGuid(),
+				MethodId = Guid.NewGuid(),
+				ChannelId = Guid.NewGuid()
+			};
+
+			await dbContext.PaymentMethodChannels.AddAsync(pmc);
+
+			var bp = new BrandPayment
+			{
+				Id = Guid.NewGuid(),
+				PaymentMethodChannelId = pmc.Id
+			};
+			await dbContext.BrandPayments.AddAsync(bp);
+
+			await dbContext.DepositForms.AddAsync(new DepositForm
+			{
+				Id = _formId,
+				BrandId = Guid.NewGuid(),
+				PlayerCode = "PlayerCode",
+				BrandPaymentId = bp.Id,
+				Amount = 1000M,
+				Status = (int)PaymentFlowState.WaitApprove,
+				CreatedOn = DateTime.Now,
+				UpdatedOn = DateTime.Now
+			});
 
 			await dbContext.SaveChangesAsync();
 

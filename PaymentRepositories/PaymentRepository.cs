@@ -627,44 +627,37 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn)
+		public async ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
+			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
-		{
-			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
-
-			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
-			formData.UpdatedOn = DateTime.UtcNow;
-
-			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public async ValueTask SubmitWithdrawFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn, decimal? actualAmount)
+		public async ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
 			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
-			formData.UpdatedOn = DateTime.UtcNow;
-
-			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public async ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
-		{
-			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
-
-			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);

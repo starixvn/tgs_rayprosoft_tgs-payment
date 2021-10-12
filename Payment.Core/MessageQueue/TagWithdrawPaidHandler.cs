@@ -26,6 +26,7 @@ namespace Tgs.Payment.MessageQueue
 				request.FormId,
 				PaymentFlowState.Paid,
 				null,
+				null,
 				null);
 
 			return _submitFormStatusService.ExecuteAsync(command, cancellationToken);

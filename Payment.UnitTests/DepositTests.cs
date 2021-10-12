@@ -130,9 +130,11 @@ namespace Payment.UnitTests
 
 			_ = fakePaymentRepository.Received(1)
 				.SubmitDepositFormStatusAsync(
-				Arg.Is(command.FormId),
-				PaymentFlowState.WaitPayment,
-				Arg.Any<string>());
+					Arg.Is(command.FormId),
+					Arg.Is(PaymentFlowState.WaitPayment),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
+					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -202,6 +204,78 @@ namespace Payment.UnitTests
 			var actual = await sut.GetAsync(query);
 
 			Assert.IsNotNull(actual);
+		}
+
+		[Test]
+		public async Task Can_Not_SignOff_Form_When_Form_Status_Is_Approved()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var sut = new SignOffDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
+			var formId = Guid.NewGuid();
+
+			var depositFormInfo = new DepositFormInfo(
+				formId,
+				"playerCode",
+				"userName",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"channelName",
+				Guid.NewGuid(),
+				100m,
+				null,
+				PaymentFlowState.Approved,
+				null,
+				null,
+				null, null,
+				DateTimeOffset.Now,
+				DateTimeOffset.Now);
+			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
+
+			var command = new SignOffDepositFormCommand(formId, ReviewState.Approve, null);
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository
+				.Received(0)
+				.SignOffDepositFormAsync(formId, ReviewState.Approve);
+		}
+
+		[Test]
+		public async Task Can_Not_SignOff_Form_When_Form_Status_Is_Reject()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var sut = new SignOffDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
+			var formId = Guid.NewGuid();
+
+			var depositFormInfo = new DepositFormInfo(
+				formId,
+				"playerCode",
+				"userName",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"channelName",
+				Guid.NewGuid(),
+				100m,
+				null,
+				PaymentFlowState.Reject,
+				null,
+				null,
+				null, null,
+				DateTimeOffset.Now,
+				DateTimeOffset.Now);
+			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
+
+			var command = new SignOffDepositFormCommand(formId, ReviewState.Reject, null);
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository
+				.Received(0)
+				.SignOffDepositFormAsync(formId, ReviewState.Approve);
 		}
 
 		[Test]
@@ -279,6 +353,50 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public async Task Can_Submit_DepositForm_Third_Party_Order_No()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+			var sut = new SubmitDepositFormThirdPartyOrderNoCommandService(
+				fakePaymentRepository,
+				fakePaymentClient);
+
+			var command = new SubmitDepositFormThirdPartyOrderNoCommand(
+				Guid.NewGuid(),
+				"ThirdPartyOrderNo");
+
+			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(command.FormId))
+				.Returns(new DepositFormInfo(
+					command.FormId,
+					"PlayerCode",
+					"UserName",
+					Guid.NewGuid(),
+					Guid.NewGuid(),
+					"Channel1",
+					Guid.NewGuid(),
+					1000M,
+					null,
+					PaymentFlowState.Approved,
+					null,
+					null,
+					null,
+					null,
+					DateTimeOffset.Now,
+					DateTimeOffset.Now));
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.SubmitDepositFormStatusAsync(
+					Arg.Is(command.FormId),
+					Arg.Is(PaymentFlowState.Approved),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
+					Arg.Is(command.ThirdPartyOrderNo));
+		}
+
+		[Test]
 		public async Task Can_Submit_DepostForm_Status()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -289,6 +407,8 @@ namespace Payment.UnitTests
 			var command = new SubmitDepositFormStatusCommand(
 				Guid.NewGuid(),
 				PaymentFlowState.WaitApprove,
+				null,
+				null,
 				null);
 
 			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
@@ -316,98 +436,60 @@ namespace Payment.UnitTests
 				.SubmitDepositFormStatusAsync(
 					Arg.Is(command.FormId),
 					Arg.Is(command.Status),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
 					Arg.Any<string>());
 
-			_ = fakePaymentClient.Received(1)
+			_ = fakePaymentClient.Received(0)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
 		}
 
 		[Test]
-		public async Task Can_Submit_DepositForm_Third_Party_Order_No()
+		public async Task Submit_DepositForm_With_New_Status_Will_Emit_StatusChangedEvent()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-			var sut = new SubmitDepositFormThirdPartyOrderNoCommandService(fakePaymentRepository);
+			var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-			var command = new SubmitDepositFormThirdPartyOrderNoCommand(
+			var sut = new SubmitDepositFormStatusCommandService(fakePaymentRepository, fakePaymentClient);
+
+			var command = new SubmitDepositFormStatusCommand(
 				Guid.NewGuid(),
-				"ThirdPartyOrderNo");
+				PaymentFlowState.Approved,
+				null,
+				null,
+				null);
+
+			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+				.Returns(new DepositFormInfo(
+					command.FormId,
+					"PlayerCode",
+					"UserName",
+					Guid.NewGuid(),
+					Guid.NewGuid(),
+					"ChannelName",
+					Guid.NewGuid(),
+					1000M,
+					null,
+					PaymentFlowState.WaitApprove,
+					"{}",
+					null,
+					null,
+					null,
+					DateTimeOffset.Now,
+					DateTimeOffset.Now));
 
 			await sut.ExecuteAsync(command);
 
 			_ = fakePaymentRepository.Received(1)
-				.SubmitDepositFormThirdPartyOrderNoAsync(Arg.Is(command.FormId), Arg.Any<string>());
-		}
+				.SubmitDepositFormStatusAsync(
+					Arg.Is(command.FormId),
+					Arg.Is(command.Status),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
+					Arg.Any<string>());
 
-		[Test]
-		public async Task Can_Not_SignOff_Form_When_Form_Status_Is_Approved()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-			var fakePaymentClient = Substitute.For<IPaymentClient>();
-
-			var sut = new SignOffDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
-			var formId = Guid.NewGuid();
-
-			var depositFormInfo = new DepositFormInfo(
-				formId,
-				"playerCode",
-				"userName",
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"channelName",
-				Guid.NewGuid(),
-				100m,
-				null,
-				PaymentFlowState.Approved,
-				null,
-				null,
-				null, null,
-				DateTimeOffset.Now,
-				DateTimeOffset.Now);
-			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
-
-			var command = new SignOffDepositFormCommand(formId, ReviewState.Approve, null);
-
-			await sut.ExecuteAsync(command);
-
-			_ = fakePaymentRepository
-				.Received(0)
-				.SignOffDepositFormAsync(formId, ReviewState.Approve);
-		}
-
-		[Test]
-		public async Task Can_Not_SignOff_Form_When_Form_Status_Is_Reject()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-			var fakePaymentClient = Substitute.For<IPaymentClient>();
-
-			var sut = new SignOffDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
-			var formId = Guid.NewGuid();
-
-			var depositFormInfo = new DepositFormInfo(
-				formId,
-				"playerCode",
-				"userName",
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"channelName",
-				Guid.NewGuid(),
-				100m,
-				null,
-				PaymentFlowState.Reject,
-				null,
-				null,
-				null, null,
-				DateTimeOffset.Now,
-				DateTimeOffset.Now);
-			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
-
-			var command = new SignOffDepositFormCommand(formId, ReviewState.Reject, null);
-
-			await sut.ExecuteAsync(command);
-
-			_ = fakePaymentRepository
-				.Received(0)
-				.SignOffDepositFormAsync(formId, ReviewState.Approve);
+			_ = fakePaymentClient.Received(1)
+				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
 		}
 	}
 }

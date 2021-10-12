@@ -5,7 +5,7 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentClient
 	{
-		ValueTask ApproveDepositAsync(Guid formId, Guid brandId);
+		ValueTask ApproveDepositAsync(Guid formId, Guid brandId, decimal? actualAmount);
 
 		ValueTask<string> AskAsync(string subject, string requestInfo);
 
