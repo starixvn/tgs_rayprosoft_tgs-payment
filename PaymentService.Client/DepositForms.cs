@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tgs.Payment.Clients
 {
-	public class DepositFroms
+	public class DepositForms
 	{
 		public PagingResponse<DepositFormInfo>? Datas { get; init; }
 		public decimal Sum { get; init; }

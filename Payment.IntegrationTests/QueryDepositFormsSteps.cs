@@ -12,7 +12,7 @@ namespace Payment.IntegrationTests
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
-		private DepositFroms _actual;
+		private DepositForms _actual;
 
 		public QueryDepositFormsSteps()
 		{

@@ -56,7 +56,7 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId);
 
-		ValueTask<DepositFroms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
+		ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
 		ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
 
