@@ -76,19 +76,6 @@ namespace PaymentService
 				})
 				.RegisterWithdrawProcessors();
 
-			services
-				.AddMessageQueue()
-				.AddNatsMessageQueue(config =>
-				{
-					config.ConfigQueueOptions((options, sp) =>
-					{
-						var config = sp.GetRequiredService<IConfiguration>();
-
-						options.Url = config.GetConnectionString("Nats");
-					});
-				})
-				.AddNatsGlobPatternExchange("*");
-
 			services.AddHealthChecks();
 		}
 	}
