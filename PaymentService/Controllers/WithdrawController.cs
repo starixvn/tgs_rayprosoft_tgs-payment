@@ -161,13 +161,10 @@ namespace Tgs.Payment.Controllers
 
 				return new()
 				{
-					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
-					{
-						TotalCount = totalCount,
-						Page = 1,
-						Rows = -1,
-						Items = items.ToEnumerable()
-					},
+					TotalCount = totalCount,
+					Page = 1,
+					Rows = -1,
+					Items = items.ToEnumerable(),
 					Sum = sum
 				};
 			}
@@ -219,13 +216,10 @@ namespace Tgs.Payment.Controllers
 
 				return new()
 				{
-					Datas = new PagingResponseViewModel<WithdrawFormViewModel>
-					{
-						TotalCount = totalCount,
-						Page = 1,
-						Rows = -1,
-						Items = items.ToEnumerable()
-					},
+					TotalCount = totalCount,
+					Page = 1,
+					Rows = -1,
+					Items = items.ToEnumerable(),
 					Sum = sum
 				};
 			}
