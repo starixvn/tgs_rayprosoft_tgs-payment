@@ -75,6 +75,37 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public void Can_Sum_DepositForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new DepositFormQuerySumService(fakePaymentRepository);
+
+			var query = new DepositFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.GetAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.TotalDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+		}
+
+
+		[Test]
 		public async Task Can_Create_Deposit_Form()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();

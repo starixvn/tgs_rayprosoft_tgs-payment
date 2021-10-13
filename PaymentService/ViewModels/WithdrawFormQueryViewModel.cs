@@ -21,19 +21,19 @@ namespace Tgs.Payment.ViewModels
 		[FromQuery(Name = "eu")]
 		public DateTimeOffset? EndUpdatedOn { get; set; }
 
+		[FromQuery(Name = "form_id")]
+		public Guid? FormId { get; set; }
+
 		[FromQuery(Name = "method")]
 		public Guid? PaymentMethodId { get; set; }
 
 		[FromQuery(Name = "status")]
 		public IEnumerable<PaymentFlowState>? Status { get; set; }
 
-		[FromQuery(Name = "user_name")]
-		public string? UserName { get; set; }
-
 		[FromQuery(Name = "third_party_order_no")]
 		public string? ThirdPartyOrderNo { get; set; }
 
-		[FromQuery(Name = "form_id")]
-		public Guid? FormId { get; set; }
+		[FromQuery(Name = "user_name")]
+		public string? UserName { get; set; }
 	}
 }
