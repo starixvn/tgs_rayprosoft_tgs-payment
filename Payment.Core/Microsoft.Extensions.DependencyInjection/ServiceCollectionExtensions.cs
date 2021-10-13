@@ -23,17 +23,21 @@ namespace Microsoft.Extensions.DependencyInjection
 						configuration.GetAllRegisterWithdrawProcessorTypes()))
 				.AddOptions<PaymentOptions>()
 				.Services
+				.AddMessageQueue()
 				.AddNatsMessageQueue(config =>
 				{
 					config
 						.ConfigQueueOptions((options, sp) =>
 						{
-							var configuration = sp.GetRequiredService<IConfiguration>();
+							var config = sp.GetRequiredService<IConfiguration>();
 
-							options.Url = configuration.GetConnectionString("Nats");
+							options.Url = config.GetConnectionString("Nats");
 						})
-						.AddReplyHandler<SaveWithdrawThirdNoHandler>("tgs.payment.withdraw.external_id");
-				});
+						.AddReplyHandler<SaveWithdrawThirdNoHandler>(
+							"tgs.payment.withdraw.external_id",
+							"tgs.payment.withdraw.external_id");
+				})
+				.AddNatsGlobPatternExchange("*");
 
 			return configuration;
 		}
