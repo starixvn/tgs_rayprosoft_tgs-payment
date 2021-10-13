@@ -34,8 +34,8 @@ namespace Microsoft.Extensions.DependencyInjection
 							options.Url = config.GetConnectionString("Nats");
 						})
 						.AddReplyHandler<SaveWithdrawThirdNoHandler>(
-							"feats/tgs-677-support-paid-status",
-							"feats/tgs-677-support-paid-status");
+							"tgs.payment.withdraw.external_id",
+							"tgs.payment.withdraw.external_id");
 				})
 				.AddNatsGlobPatternExchange("*");
 
