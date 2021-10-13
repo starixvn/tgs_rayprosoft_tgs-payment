@@ -36,9 +36,9 @@ namespace Payment.IntegrationTests
 		[Then(@"return withdraw forms list")]
 		public void ThenReturnWithdrawFormsList()
 		{
-			Assert.AreEqual(0, _actual.Datas.TotalCount);
-			Assert.AreEqual(-1, _actual.Datas.Rows);
-			Assert.NotNull(_actual.Datas.Items);
+			Assert.AreEqual(0, _actual.TotalCount);
+			Assert.AreEqual(-1, _actual.Rows);
+			Assert.NotNull(_actual.Items);
 			Assert.AreEqual(0, _actual.Sum);
 		}
 
