@@ -167,6 +167,7 @@ namespace Tgs.Payment.Controllers
 						PaymentReturn = row.PaymentReturn,
 						PlayerCode = row.PlayerCode,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						ReviewedUserName = row.ReviewedUserName,
 						PromotionId = row.PromotionId,
 						Remark = row.Remark,
 						Status = row.Status,
@@ -254,6 +255,8 @@ namespace Tgs.Payment.Controllers
 			var command = new SignOffDepositFormCommand(
 				formId,
 				request.ReviewState,
+				request.ReviewUserId,
+				request.ReviewUserName,
 				request.Remark);
 
 			await signOffService.ExecuteAsync(command).ConfigureAwait(false);

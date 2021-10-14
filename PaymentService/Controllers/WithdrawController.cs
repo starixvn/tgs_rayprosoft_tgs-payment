@@ -156,7 +156,8 @@ namespace Tgs.Payment.Controllers
 						Remark = row.Remark,
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName
+						UserName = row.UserName,
+						ReviewedUserName = row.ReviewedUserName
 					});
 
 				return new()
@@ -235,6 +236,8 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.BrandPaymentId,
 				request.ReviewState,
+				request.ReviewUserId,
+				request.ReviewUserName,
 				request.Remark);
 
 			await signOffService.ExecuteAsync(command).ConfigureAwait(false);

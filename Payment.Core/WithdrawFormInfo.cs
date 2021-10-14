@@ -11,6 +11,7 @@ namespace Tgs.Payment
 		decimal Amount,
 		PaymentFlowState Status,
 		string? Remark,
+		string? ReviewedUserName,
 		Guid BankInfoId,
 		DateTimeOffset CreatedOn,
 		DateTimeOffset UpdatedOn,

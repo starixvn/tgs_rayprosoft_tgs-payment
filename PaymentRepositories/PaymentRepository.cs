@@ -25,25 +25,11 @@ namespace TGS.Payment.Repositories
 			return dataQuery.CountAsync();
 		}
 
-		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
-		{
-			var dataQuery = MakeDepositFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
-		}
-
 		public ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
 		{
 			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
 
 			return dataQuery.CountAsync();
-		}
-
-		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
-		{
-			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
 		}
 
 		public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser)
@@ -420,6 +406,7 @@ namespace TGS.Payment.Repositories
 							df.ApplyInfo,
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo,
+							df.ReviewedUserName,
 							df.PromotionId,
 							df.CreatedOn,
 							df.UpdatedOn);
@@ -464,6 +451,7 @@ namespace TGS.Payment.Repositories
 							df.Amount,
 							(PaymentFlowState)df.Status,
 							df.Remark,
+							df.ReviewedUserName,
 							df.BankInfoId,
 							df.CreatedOn,
 							df.UpdatedOn,
@@ -497,6 +485,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn));
@@ -527,6 +516,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn))
@@ -548,6 +538,7 @@ namespace TGS.Payment.Repositories
 					form.ActualAmount ?? form.Amount,
 					(PaymentFlowState)form.Status,
 					form.Remark,
+					form.ReviewedUserName,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -580,6 +571,7 @@ namespace TGS.Payment.Repositories
 					form.ActualAmount ?? form.Amount,
 					(PaymentFlowState)form.Status,
 					form.Remark,
+					form.ReviewedUserName,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -594,7 +586,7 @@ namespace TGS.Payment.Repositories
 				.ToAsyncEnumerable();
 		}
 
-		public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null)
+		public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? reviewedUserId, string? reviewedUserName, string? remark = null)
 		{
 			var formData = await _tgsContext.DepositForms
 				.FindAsync(formId)
@@ -603,6 +595,12 @@ namespace TGS.Payment.Repositories
 			formData.Status = reviewStatus.ToNumber();
 			formData.Remark = remark;
 			formData.UpdatedOn = DateTime.UtcNow;
+			formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
+			formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
+			if (reviewedUserId != null)
+			{
+				formData.ReviewedOn = DateTime.UtcNow;
+			}
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -612,6 +610,8 @@ namespace TGS.Payment.Repositories
 			Guid? brandPaymentId,
 			string? applyInfo,
 			ReviewState reviewStatus,
+			string? reviewedUserId,
+			string? reviewedUserName,
 			string? remark)
 		{
 			var formData = await _tgsContext.WithdrawForms
@@ -623,6 +623,10 @@ namespace TGS.Payment.Repositories
 			formData.Status = reviewStatus.ToNumber();
 			formData.Remark = remark;
 			formData.UpdatedOn = DateTime.UtcNow;
+			formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
+			formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
+			if (reviewedUserId != null)
+				formData.ReviewedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -661,6 +665,20 @@ namespace TGS.Payment.Repositories
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
+		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
 		}
 
 		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)

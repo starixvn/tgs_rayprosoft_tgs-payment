@@ -139,7 +139,7 @@ namespace Payment.IntegrationTests
                 .ReviewWithdrawFormAsync(
                     _formId,
                     _brandPaymentId,
-                    Tgs.Payment.Clients.ReviewState.Approve);
+                    Tgs.Payment.Clients.ReviewState.Approve, "93a723b2-9ebb-4607-ee8d-08d978fba75f","GPI");
         }
     }
 }
