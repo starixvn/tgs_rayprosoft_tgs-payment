@@ -36,6 +36,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -73,37 +74,6 @@ namespace Payment.UnitTests
 			fakePaymentRepository.Received(1)
 				.CountDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
 		}
-
-		[Test]
-		public void Can_Sum_DepositForms()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new DepositFormQuerySumService(fakePaymentRepository);
-
-			var query = new DepositFormQuery(
-				Guid.NewGuid(),
-				null,
-				null,
-				null,
-				null,
-				null,
-				new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-				},
-				null,
-				null,
-				null);
-
-			var actual = sut.GetAsync(query);
-
-			fakePaymentRepository.Received(1)
-				.TotalDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
-		}
-
 
 		[Test]
 		public async Task Can_Create_Deposit_Form()
@@ -165,6 +135,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -194,6 +165,7 @@ namespace Payment.UnitTests
 					  1000M,
 					  null,
 					  PaymentFlowState.WaitApprove,
+					  null,
 					  null,
 					  null,
 					  null,
@@ -228,18 +200,29 @@ namespace Payment.UnitTests
 				PaymentFlowState.Approved,
 				null,
 				null,
-				null, null,
+				null,
+				"reviewedUserName",
+				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
 			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
-			var command = new SignOffDepositFormCommand(formId, ReviewState.Approve, null);
+			var command = new SignOffDepositFormCommand(
+				formId, 
+				ReviewState.Approve, 
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+				"reviewedUserName", 
+				null);
 
 			await sut.ExecuteAsync(command);
 
 			_ = fakePaymentRepository
 				.Received(0)
-				.SignOffDepositFormAsync(formId, ReviewState.Approve);
+				.SignOffDepositFormAsync(
+					formId, 
+					ReviewState.Approve, 
+					"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+					"reviewedUserName");
 		}
 
 		[Test]
@@ -264,18 +247,29 @@ namespace Payment.UnitTests
 				PaymentFlowState.Reject,
 				null,
 				null,
-				null, null,
+				null,
+				"reviewedUserName",
+				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
 			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
-			var command = new SignOffDepositFormCommand(formId, ReviewState.Reject, null);
+			var command = new SignOffDepositFormCommand(
+				formId, 
+				ReviewState.Reject, 
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+				"reviewedUserName",
+				null);
 
 			await sut.ExecuteAsync(command);
 
 			_ = fakePaymentRepository
 				.Received(0)
-				.SignOffDepositFormAsync(formId, ReviewState.Approve);
+				.SignOffDepositFormAsync(
+					formId, 
+					ReviewState.Approve, 
+					"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+					"reviewedUserName");
 		}
 
 		[Test]
@@ -319,6 +313,8 @@ namespace Payment.UnitTests
 			var command = new SignOffDepositFormCommand(
 				Guid.NewGuid(),
 				ReviewState.Approve,
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+				"reviewedUserName",
 				null);
 
 			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
@@ -336,6 +332,7 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					"reviewedUserName",
 					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
@@ -346,6 +343,8 @@ namespace Payment.UnitTests
 				.SignOffDepositFormAsync(
 					Arg.Is(command.FormId),
 					Arg.Is(command.ReviewState),
+					Arg.Is(command.ReviewUserId),
+					Arg.Is(command.ReviewUserName),
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
@@ -378,6 +377,7 @@ namespace Payment.UnitTests
 					1000M,
 					null,
 					PaymentFlowState.Approved,
+					null,
 					null,
 					null,
 					null,
@@ -426,7 +426,8 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
-					null,
+					null,					
+					null,					
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -442,6 +443,36 @@ namespace Payment.UnitTests
 
 			_ = fakePaymentClient.Received(0)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+		}
+
+		[Test]
+		public void Can_Sum_DepositForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new DepositFormQuerySumService(fakePaymentRepository);
+
+			var query = new DepositFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.GetAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.TotalDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
 		}
 
 		[Test]
@@ -472,6 +503,7 @@ namespace Payment.UnitTests
 					null,
 					PaymentFlowState.WaitApprove,
 					"{}",
+					null,
 					null,
 					null,
 					null,

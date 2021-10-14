@@ -541,11 +541,13 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _serializerOptions)!;
 		}
 
-		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null)
+		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? reviewUserId, string? reviewUserName, string? remark = null)
 		{
 			var request = new SignOffForm
 			{
 				ReviewState = state,
+				ReviewUserId = reviewUserId,
+				ReviewUserName = reviewUserName,
 				Remark = remark
 			};
 
@@ -567,12 +569,16 @@ namespace Tgs.Payment.Clients
 			Guid formId,
 			Guid? brandPaymentId,
 			ReviewState state,
+			string? reviewUserId,
+			string? reviewUserName,
 			string? remark = null)
 		{
 			var request = new SignOffForm
 			{
 				ReviewState = state,
 				Remark = remark,
+				ReviewUserId = reviewUserId,
+				ReviewUserName = reviewUserName,
 				BrandPaymentId = brandPaymentId
 			};
 

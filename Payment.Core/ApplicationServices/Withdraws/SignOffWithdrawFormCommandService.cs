@@ -64,6 +64,8 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 						command.BrandPaymentId.Value,
 						applyInfo,
 						command.Status,
+						command.ReviewUserId,
+						command.ReviewUserName,
 						command.Remark)
 					.ConfigureAwait(false);
 			}
@@ -75,6 +77,8 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 						null,
 						null,
 						command.Status,
+						command.ReviewUserId,
+						command.ReviewUserName,
 						command.Remark)
 					.ConfigureAwait(false);
 			}

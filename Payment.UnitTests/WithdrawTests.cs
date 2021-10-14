@@ -31,6 +31,7 @@ namespace Payment.UnitTests
 					  1000M,
 					  PaymentFlowState.WaitApprove,
 					  null,
+					  null,
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -150,6 +151,7 @@ namespace Payment.UnitTests
 					  1000M,
 					  PaymentFlowState.WaitApprove,
 					  null,
+					  null,
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -182,6 +184,7 @@ namespace Payment.UnitTests
 					  Guid.NewGuid(),
 					  1000M,
 					  PaymentFlowState.WaitApprove,
+					  null,
 					  null,
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
@@ -273,6 +276,8 @@ namespace Payment.UnitTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				ReviewState.Approve,
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+				"reviewedUserName",
 				null);
 
 			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
@@ -285,6 +290,7 @@ namespace Payment.UnitTests
 					1000M,
 					PaymentFlowState.WaitApprove,
 					null,
+					"reviewedUserName",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
 					DateTimeOffset.UtcNow));
@@ -332,6 +338,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.BrandPaymentId),
 					Arg.Any<string>(),
 					Arg.Is(command.Status),
+					Arg.Is(command.ReviewUserId),
+					Arg.Is(command.ReviewUserName),
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
@@ -364,6 +372,7 @@ namespace Payment.UnitTests
 					Guid.NewGuid(),
 					1000M,
 					(int)PaymentFlowState.Init,
+					null,
 					null,
 					Guid.NewGuid(),
 					DateTimeOffset.Now,
@@ -541,6 +550,7 @@ namespace Payment.UnitTests
 					Guid.NewGuid(),
 					1000M,
 					PaymentFlowState.WaitPayment,
+					null,
 					null,
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,

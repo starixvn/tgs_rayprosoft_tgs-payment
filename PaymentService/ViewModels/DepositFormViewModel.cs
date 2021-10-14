@@ -28,6 +28,8 @@ namespace Tgs.Payment.ViewModels
 
 		public string? Remark { get; set; }
 
+		public string? ReviewedUserName { get; set; }
+
 		public PaymentFlowState Status { get; set; }
 
 		public string? ThirdPartyOrderNo { get; set; }

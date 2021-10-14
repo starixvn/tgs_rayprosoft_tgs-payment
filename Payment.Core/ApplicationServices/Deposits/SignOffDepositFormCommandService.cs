@@ -34,7 +34,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				return;
 
 			await _paymentRepository
-				.SignOffDepositFormAsync(command.FormId, command.ReviewState, command.Remark)
+				.SignOffDepositFormAsync(command.FormId, command.ReviewState, command.ReviewUserId, command.ReviewUserName, command.Remark)
 				.ConfigureAwait(false);
 
 			await _paymentClient
