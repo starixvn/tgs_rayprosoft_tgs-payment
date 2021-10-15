@@ -698,7 +698,10 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
 
 			if (conditions.UserType != null)
-				dataQuery = dataQuery.Where(form => form.UserType == (int)conditions.UserType);
+			{
+				var userType = (int)conditions.UserType;
+				dataQuery = dataQuery.Where(form => form.UserType == userType);
+			}
 
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
