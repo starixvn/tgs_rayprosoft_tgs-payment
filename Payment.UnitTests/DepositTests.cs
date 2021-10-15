@@ -59,6 +59,7 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				null,
 				new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -208,10 +209,10 @@ namespace Payment.UnitTests
 			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
 			var command = new SignOffDepositFormCommand(
-				formId, 
-				ReviewState.Approve, 
-				"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
-				"reviewedUserName", 
+				formId,
+				ReviewState.Approve,
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+				"reviewedUserName",
 				null);
 
 			await sut.ExecuteAsync(command);
@@ -219,9 +220,9 @@ namespace Payment.UnitTests
 			_ = fakePaymentRepository
 				.Received(0)
 				.SignOffDepositFormAsync(
-					formId, 
-					ReviewState.Approve, 
-					"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+					formId,
+					ReviewState.Approve,
+					"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 					"reviewedUserName");
 		}
 
@@ -255,9 +256,9 @@ namespace Payment.UnitTests
 			fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
 			var command = new SignOffDepositFormCommand(
-				formId, 
-				ReviewState.Reject, 
-				"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+				formId,
+				ReviewState.Reject,
+				"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 				"reviewedUserName",
 				null);
 
@@ -266,9 +267,9 @@ namespace Payment.UnitTests
 			_ = fakePaymentRepository
 				.Received(0)
 				.SignOffDepositFormAsync(
-					formId, 
-					ReviewState.Approve, 
-					"93a723b2-9ebb-4607-ee8d-08d978fba75f", 
+					formId,
+					ReviewState.Approve,
+					"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 					"reviewedUserName");
 		}
 
@@ -281,6 +282,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -426,8 +428,8 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
-					null,					
-					null,					
+					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -454,6 +456,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,

@@ -5,6 +5,7 @@ namespace Tgs.Payment
 {
 	public record DepositFormQueryConditions(
 		Guid BrandId,
+		string? UserId,
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,

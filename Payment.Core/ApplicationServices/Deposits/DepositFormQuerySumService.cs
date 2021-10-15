@@ -21,6 +21,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 		public ValueTask<decimal> GetAsync(DepositFormQuery query, CancellationToken cancellationToken = default)
 			=> _paymentRepository.TotalDepositFormsAsync(new DepositFormQueryConditions(
 				query.BrandId,
+				query.UserId,
 				query.UserName,
 				query.ChannelName,
 				query.ThirdPartyOrderNo,
