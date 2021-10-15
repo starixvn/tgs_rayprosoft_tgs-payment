@@ -689,6 +689,8 @@ namespace TGS.Payment.Repositories
 				.ThenInclude(bp => bp.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
 
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
 			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
@@ -724,6 +726,12 @@ namespace TGS.Payment.Repositories
 				.Include(f => f.BrandPayment)
 				.ThenInclude(bp => bp!.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
+
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
+
+			if (conditions.UserType != null)
+				dataQuery = dataQuery.Where(form => form.UserType == (int)conditions.UserType);
 
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
