@@ -226,7 +226,8 @@ namespace Tgs.Payment.Controllers
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
 						UserName = row.UserName,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						ReviewedUserName = row.ReviewedUserName
 					});
 
 				return new()
