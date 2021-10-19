@@ -51,11 +51,27 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnName("created_on")
                 .HasDefaultValueSql("now()");
 
+            entity.Property(e => e.PaidOn)
+                .HasColumnType("timestamp with time zone")
+                .HasColumnName("paid_on");
+
+            entity.Property(e => e.PaidUserId).HasColumnName("paid_user_id");
+
+            entity.Property(e => e.PaidUserName).HasColumnName("paid_user_name");
+
             entity.Property(e => e.PaymentReturn)
                 .HasColumnType("jsonb")
                 .HasColumnName("payment_return");
 
             entity.Property(e => e.Remark).HasColumnName("remark");
+
+            entity.Property(e => e.ReviewedOn)
+                .HasColumnType("timestamp with time zone")
+                .HasColumnName("reviewed_on");
+
+            entity.Property(e => e.ReviewedUserId).HasColumnName("reviewed_user_id");
+
+            entity.Property(e => e.ReviewedUserName).HasColumnName("reviewed_user_name");
 
             entity.Property(e => e.Status).HasColumnName("status");
 
