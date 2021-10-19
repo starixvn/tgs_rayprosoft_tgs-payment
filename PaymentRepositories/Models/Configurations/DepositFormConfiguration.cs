@@ -59,6 +59,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.Remark).HasColumnName("remark");
 
+
             entity.Property(e => e.Status).HasColumnName("status");
 
             entity.Property(e => e.ThirdPartyOrderNo).HasColumnName("third_party_order_no");
