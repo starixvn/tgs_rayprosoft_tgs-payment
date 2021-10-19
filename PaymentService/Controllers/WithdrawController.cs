@@ -76,7 +76,7 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		[HttpGet("{fromId}"), HttpHeaderConstraint("FormQuery")]
+		[HttpGet("{formId}"), HttpHeaderConstraint("FormQuery")]
 		public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
 			[FromServices] IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo?> getService,
 			Guid formId)
