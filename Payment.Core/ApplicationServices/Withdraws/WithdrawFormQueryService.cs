@@ -20,9 +20,12 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 			=> _paymentRepository.CountWithdrawFormsAsync(
 				new WithdrawFormQueryConditions(
 						query.BrandId,
+						query.UserId,
 						query.UserName,
+						query.UserType,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.FormId,
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,
@@ -33,9 +36,12 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 				? _paymentRepository.QueryWithdrawFormsAsync(
 					new WithdrawFormQueryConditions(
 						query.BrandId,
+						query.UserId,
 						query.UserName,
+						query.UserType,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.FormId,
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,
@@ -43,9 +49,12 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 				: _paymentRepository.QueryWithdrawFormsAsync(
 					new WithdrawFormQueryConditions(
 						query.BrandId,
+						query.UserId,
 						query.UserName,
+						query.UserType,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.FormId,
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,

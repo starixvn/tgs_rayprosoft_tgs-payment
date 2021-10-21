@@ -19,9 +19,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 		public ValueTask<int> GetAsync(DepositFormQuery query, CancellationToken cancellationToken = default)
 			=> _paymentRepository.CountDepositFormsAsync(new DepositFormQueryConditions(
 				query.BrandId,
+				query.UserId,
 				query.UserName,
 				query.ChannelName,
 				query.ThirdPartyOrderNo,
+				query.FormId,
 				query.PaymentMethodId,
 				query.Status,
 				query.CreateOnRange,
@@ -32,9 +34,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				? _paymentRepository.QueryDepositFormsAsync(
 					new DepositFormQueryConditions(
 						query.BrandId,
+						query.UserId,
 						query.UserName,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.FormId,
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,
@@ -42,9 +46,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				: _paymentRepository.QueryDepositFormsAsync(
 					new DepositFormQueryConditions(
 						query.BrandId,
+						query.UserId,
 						query.UserName,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.FormId,
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,

@@ -20,5 +20,7 @@ namespace Tgs.Payment.Clients
 		ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId);
 
 		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
+
+		ValueTask EmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
 	}
 }

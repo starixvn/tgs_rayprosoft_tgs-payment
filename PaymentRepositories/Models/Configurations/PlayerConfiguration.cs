@@ -22,8 +22,6 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.HasIndex(e => e.BetLimitId, "ix_players_bet_limit_id");
 
-            entity.HasIndex(e => e.BrandId, "ix_players_brand_id");
-
             entity.HasIndex(e => e.Username, "ix_players_username");
 
             entity.HasIndex(e => e.VipId, "ix_players_vip_id");
@@ -31,6 +29,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.HasIndex(e => e.Username, "ix_trgm_players_username")
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
+
+            entity.HasIndex(e => new { e.BrandId, e.AreaCode, e.Phone }, "ux_players_brand_phone")
+                .IsUnique();
 
             entity.Property(e => e.PlayerCode)
                 .HasMaxLength(16)
@@ -90,7 +91,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnName("qq");
 
             entity.Property(e => e.RealName)
-                .HasMaxLength(32)
+                .HasMaxLength(256)
                 .HasColumnName("real_name");
 
             entity.Property(e => e.RegisteredOn)

@@ -454,7 +454,8 @@ namespace TGS.Payment.Repositories
 							df.BrandPayment?.PaymentMethodChannel?.MethodId,
 							df.BankInfo,
 							df.ApplyInfo,
-							df.PaymentReturn);
+							df.PaymentReturn,
+							df.ThirdPartyOrderNo);
 
 			return query.SingleAsync();
 		}
@@ -532,7 +533,13 @@ namespace TGS.Payment.Repositories
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
-					form.BrandPaymentId));
+					form.BrandPaymentId,
+					form.BrandPayment?.ChannelName,
+					form.BrandPayment?.PaymentMethodChannel.MethodId,
+					form.BankInfo,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.ThirdPartyOrderNo));
 
 			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
 
@@ -559,7 +566,12 @@ namespace TGS.Payment.Repositories
 					form.CreatedOn,
 					form.UpdatedOn,
 					form.BrandPaymentId,
-					ThirdPartyOrderNo: form.ThirdPartyOrderNo))
+					form.BrandPayment?.ChannelName,
+					form.BrandPayment?.PaymentMethodChannel.MethodId,
+					form.BankInfo,
+					form.ApplyInfo,
+					form.PaymentReturn,
+					form.ThirdPartyOrderNo))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
@@ -607,11 +619,11 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string ThirdPartyOrderNo)
+		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
-			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -627,6 +639,15 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		public async ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
+		{
+			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
+
+			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+
+			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)
 		{
 			var dataQuery = _tgsContext.DepositForms
@@ -635,6 +656,8 @@ namespace TGS.Payment.Repositories
 				.ThenInclude(bp => bp.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
 
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
 			if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
@@ -643,6 +666,8 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (conditions.FormId != null)
+				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
 			if (conditions.Status != null)
 			{
@@ -669,6 +694,15 @@ namespace TGS.Payment.Repositories
 				.ThenInclude(bp => bp!.PaymentMethodChannel)
 				.Where(form => form.BrandId == conditions.BrandId);
 
+			if (!string.IsNullOrWhiteSpace(conditions.UserId))
+				dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
+
+			if (conditions.UserType != null)
+			{
+				var userType = (int)conditions.UserType;
+				dataQuery = dataQuery.Where(form => form.UserType == userType);
+			}
+
 			if (!string.IsNullOrWhiteSpace(conditions.UserName))
 				dataQuery = dataQuery.Where(form => form.UserName == conditions.UserName);
 
@@ -681,6 +715,8 @@ namespace TGS.Payment.Repositories
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(
 					form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (conditions.FormId != null)
+				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
 			if (conditions.Status != null)
 			{

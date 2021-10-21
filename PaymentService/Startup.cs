@@ -78,7 +78,7 @@ namespace PaymentService
                 {
                     var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
 
-                    options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
+                    options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;					
                 })
                 .RegisterWithdrawProcessors();
 

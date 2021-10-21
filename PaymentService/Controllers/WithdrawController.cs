@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
@@ -13,6 +15,13 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class WithdrawController : ControllerBase
 	{
+		private readonly ILogger<WithdrawController> _logger;
+
+		public WithdrawController(ILogger<WithdrawController> logger)
+		{
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		}
+
 		[HttpPut]
 		public async Task<Guid> CreateWithdrawFormAsync(
 			[FromServices] ICommandService<CreateWithdrawFormCommand> createService,
@@ -75,6 +84,8 @@ namespace Tgs.Payment.Controllers
 			[FromQuery] WithdrawFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
 		{
+			_logger.LogInformation($"Query WithdrawForms Request => {JsonSerializer.Serialize(formQuery)}");
+
 			var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 			var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 
@@ -90,9 +101,12 @@ namespace Tgs.Payment.Controllers
 			{
 				var query = new WithdrawFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
+					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
@@ -142,9 +156,12 @@ namespace Tgs.Payment.Controllers
 
 				var query = new WithdrawFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
+					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,

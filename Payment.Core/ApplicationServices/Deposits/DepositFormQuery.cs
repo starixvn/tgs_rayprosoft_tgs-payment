@@ -6,9 +6,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 {
 	public record DepositFormQuery(
 		Guid BrandId,
+		string? UserId,
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,
+		Guid? FormId,
 		Guid? PaymentMethodId,
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,

@@ -116,9 +116,11 @@ namespace Tgs.Payment.Controllers
 			{
 				var query = new DepositFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
@@ -168,9 +170,11 @@ namespace Tgs.Payment.Controllers
 
 				var query = new DepositFormQuery(
 					brandId,
+					formQuery.UserId,
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
