@@ -8,12 +8,11 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-	[Scope(Scenario = "Query deposit forms")]
 	public class QueryDepositFormsSteps
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
 		private readonly IHost _testHost;
-		private PagingResponse<Tgs.Payment.Clients.DepositFormInfo> _actual;
+		private DepositForms _actual;
 
 		public QueryDepositFormsSteps()
 		{
@@ -40,6 +39,7 @@ namespace Payment.IntegrationTests
 			Assert.AreEqual(0, _actual.TotalCount);
 			Assert.AreEqual(-1, _actual.Rows);
 			Assert.NotNull(_actual.Items);
+			Assert.AreEqual(0, _actual.Sum);
 		}
 
 		[When(@"call get deposit forms api")]

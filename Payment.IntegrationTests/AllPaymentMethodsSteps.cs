@@ -8,43 +8,43 @@ using Tgs.Payment.Clients;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-    public class AllPaymentMethodsSteps
-    {
-        private PaymentServiceClient _paymentServiceClient;
-        private IHost _testHost;
+	public class AllPaymentMethodsSteps
+	{
+		private PaymentServiceClient _paymentServiceClient;
+		private IHost _testHost;
 
-        public AllPaymentMethodsSteps()
-        {
-            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		public AllPaymentMethodsSteps()
+		{
+			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-            _ = _testHost.StartAsync();
+			_ = _testHost.StartAsync();
 
-            _paymentServiceClient = _testHost.GetPaymentServiceClient();
-        }
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
+		}
 
-        [AfterScenario]
-        public async Task CleanUpAsync()
-        {
-            await _testHost.StopAsync();
-        }
+		[AfterScenario]
+		public async Task CleanUpAsync()
+		{
+			await _testHost.StopAsync();
+		}
 
-        [Given(@"I will list all payment methods")]
-        public void GivenIWillListAllPaymentMethods()
-        {
-        }
+		[Given(@"I will list all payment methods")]
+		public void GivenIWillListAllPaymentMethods()
+		{
+		}
 
-        [Then(@"return all payment methods data")]
-        public void ThenReturnAllPaymentMethodsData()
-        {
-            Assert.Pass();
-        }
+		[Then(@"return all payment methods data")]
+		public void ThenReturnAllPaymentMethodsData()
+		{
+			Assert.Pass();
+		}
 
-        [When(@"call get all payment methods api")]
-        public async Task WhenCallGetAllPaymentMethodsApiAsync()
-        {
-            var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
+		[When(@"call get all payment methods api")]
+		public async Task WhenCallGetAllPaymentMethodsApiAsync()
+		{
+			var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
 
-            await paymentMethods.ToArrayAsync();
-        }
-    }
+			await paymentMethods.ToArrayAsync();
+		}
+	}
 }

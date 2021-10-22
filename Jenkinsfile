@@ -38,7 +38,8 @@ pipeline {
                         message += "\nBranch: ${env.GIT_BRANCH}" 
                         message += "\nTag: ${env.TAG}"
                         message += "\nEnv: ${env.kube_ns}"
-                        env.commit_url = "${env.GIT_URL}".replace("git@gitlab.com:","https://gitlab.com/")
+                        env.commit_url = "${env.GIT_URL}"
+                            .replace("git@gitlab.com:", "https://gitlab.com/")
                             .replace(".git","/-/commit/") + "${env.GIT_COMMIT}"
                         message += "\n Commit: ${env.commit_url}"
                     }
@@ -76,7 +77,7 @@ pipeline {
 
 		stage('Push Docker Image') {
 			steps {
-				sh 'sudo docker push $ImageName:${TAG}'
+				sh 'docker push $ImageName:${TAG}'
 			}
 		}
 

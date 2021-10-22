@@ -30,6 +30,9 @@ namespace Tgs.Payment.ViewModels
 
 		public PaymentFlowState Status { get; set; }
 
+		public string? ThirdPartyOrderNo { get; set; }
+		public string? ReviewedUserName { get; set; }
+
 		public DateTimeOffset UpdatedOn { get; set; }
 
 		public string? UserId { get; set; }
@@ -37,6 +40,5 @@ namespace Tgs.Payment.ViewModels
 		public string? UserName { get; set; }
 
 		public UserType UserType { get; set; }
-		public string? ThirdPartyOrderNo { get; set; }
 	}
 }

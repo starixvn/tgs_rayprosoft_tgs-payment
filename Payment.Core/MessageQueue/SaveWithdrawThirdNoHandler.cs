@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
-using Tgs.Payment.Services;
 using TGS.ServiceUtility;
+using Tgs.Payment.ApplicationServices.Withdraws;
 
 namespace Tgs.Payment.MessageQueue
 {
-	internal class SaveWithdrawThirdNoProcessor : IMessageHandler
+	internal class SaveWithdrawThirdNoHandler : IMessageHandler
 	{
 		private readonly ICommandService<SaveWithdrawThirdPartyOrderNoCommand> _commandService;
-		private readonly ILogger<SaveWithdrawThirdNoProcessor> _logger;
+		private readonly ILogger<SaveWithdrawThirdNoHandler> _logger;
 
-		public SaveWithdrawThirdNoProcessor(
+		public SaveWithdrawThirdNoHandler(
 			ICommandService<SaveWithdrawThirdPartyOrderNoCommand> commandService,
-			ILogger<SaveWithdrawThirdNoProcessor> logger)
+			ILogger<SaveWithdrawThirdNoHandler> logger)
 		{
 			_commandService = commandService;
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -26,9 +26,9 @@ namespace Tgs.Payment.MessageQueue
 		{
 			_logger.LogInformation("Receive SaveWithdrawThirdNo request.");
 
-			var request = FormThirdNoEvent.Parser.ParseFrom(data);
+			var request = FormThirdNoRequest.Parser.ParseFrom(data);
 
-			var formId = Guid.Parse(request.FormId);
+			var formId = (Guid)request.FormId;
 
 			var command = new SaveWithdrawThirdPartyOrderNoCommand(
 				formId,

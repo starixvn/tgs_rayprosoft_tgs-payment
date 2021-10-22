@@ -56,7 +56,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser)
 		{
-			var createTime = DateTimeOffset.UtcNow;
+			var createTime = DateTime.UtcNow;
 
 			await _tgsContext.PlayerBankInfos
 				.AddAsync(new Tgs.Payment.Repositories.Entities.PlayerBankInfo
@@ -68,9 +68,9 @@ namespace TGS.Payment.Repositories
 					BankType = bankInfo.BankType,
 					Detail = bankInfo.Detail,
 					CreatedByUsername = modifyUser,
-					CreatedOn = createTime.UtcDateTime,
+					CreatedOn = createTime,
 					UpdatedByUsername = modifyUser,
-					UpdatedOn = createTime.UtcDateTime
+					UpdatedOn = createTime
 				})
 				.ConfigureAwait(false);
 
@@ -79,7 +79,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form)
 		{
-			var currentDate = DateTimeOffset.UtcNow;
+			var currentDate = DateTime.UtcNow;
 
 			await _tgsContext.DepositForms
 				.AddAsync(new DepositForm
@@ -92,8 +92,8 @@ namespace TGS.Payment.Repositories
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
 					PromotionId = form.PromotionId,
-					CreatedOn = currentDate.UtcDateTime,
-					UpdatedOn = currentDate.UtcDateTime
+					CreatedOn = currentDate,
+					UpdatedOn = currentDate
 				})
 				.ConfigureAwait(false);
 
@@ -153,7 +153,7 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
 		{
-			var currentDate = DateTimeOffset.UtcNow;
+			var currentDate = DateTime.UtcNow;
 
 			await _tgsContext.WithdrawForms
 				.AddAsync(new WithdrawForm
@@ -170,8 +170,8 @@ namespace TGS.Payment.Repositories
 					ApplyInfo = form.ApplyInfo,
 					PaymentReturn = form.PaymentReturn,
 					Status = (int)form.Status,
-					CreatedOn = currentDate.UtcDateTime,
-					UpdatedOn = currentDate.UtcDateTime
+					CreatedOn = currentDate,
+					UpdatedOn = currentDate
 				})
 				.ConfigureAwait(false);
 
@@ -384,7 +384,7 @@ namespace TGS.Payment.Repositories
 				.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId));
 		}
 
-		public ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id)
+		public ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id)
 		{
 			var query = from df in _tgsContext.DepositForms
 							.Include(f => f.PlayerCodeNavigation)
@@ -406,11 +406,12 @@ namespace TGS.Payment.Repositories
 							df.ApplyInfo,
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo,
+							df.ReviewedUserName,
 							df.PromotionId,
 							df.CreatedOn,
 							df.UpdatedOn);
 
-			return query.SingleAsync();
+			return query.SingleOrDefaultAsync();
 		}
 
 		public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id)
@@ -427,10 +428,14 @@ namespace TGS.Payment.Repositories
 		public IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync()
 		{
 			return _tgsContext.PaymentMethodChannels.ToAsyncEnumerable()
-				.Select(pmc => new PaymentMethodChannelInfo(pmc.Id, pmc.PaymentId, pmc.MethodId, pmc.ChannelId));
+				.Select(pmc => new PaymentMethodChannelInfo(
+					pmc.Id,
+					pmc.PaymentId,
+					pmc.MethodId,
+					pmc.ChannelId));
 		}
 
-		public ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId)
+		public ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId)
 		{
 			var query = from df in _tgsContext.WithdrawForms
 							.Include(f => f.BrandPayment!)
@@ -446,6 +451,7 @@ namespace TGS.Payment.Repositories
 							df.Amount,
 							(PaymentFlowState)df.Status,
 							df.Remark,
+							df.ReviewedUserName,
 							df.BankInfoId,
 							df.CreatedOn,
 							df.UpdatedOn,
@@ -457,7 +463,7 @@ namespace TGS.Payment.Repositories
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo);
 
-			return query.SingleAsync();
+			return query.SingleOrDefaultAsync();
 		}
 
 		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
@@ -479,6 +485,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn));
@@ -509,6 +516,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
 					form.UpdatedOn))
@@ -530,6 +538,7 @@ namespace TGS.Payment.Repositories
 					form.ActualAmount ?? form.Amount,
 					(PaymentFlowState)form.Status,
 					form.Remark,
+					form.ReviewedUserName,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -562,6 +571,7 @@ namespace TGS.Payment.Repositories
 					form.ActualAmount ?? form.Amount,
 					(PaymentFlowState)form.Status,
 					form.Remark,
+					form.ReviewedUserName,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -576,7 +586,7 @@ namespace TGS.Payment.Repositories
 				.ToAsyncEnumerable();
 		}
 
-		public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null)
+		public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? reviewedUserId, string? reviewedUserName, string? remark = null)
 		{
 			var formData = await _tgsContext.DepositForms
 				.FindAsync(formId)
@@ -585,6 +595,12 @@ namespace TGS.Payment.Repositories
 			formData.Status = reviewStatus.ToNumber();
 			formData.Remark = remark;
 			formData.UpdatedOn = DateTime.UtcNow;
+			formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
+			formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
+			if (reviewedUserId != null)
+			{
+				formData.ReviewedOn = DateTime.UtcNow;
+			}
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -594,6 +610,8 @@ namespace TGS.Payment.Repositories
 			Guid? brandPaymentId,
 			string? applyInfo,
 			ReviewState reviewStatus,
+			string? reviewedUserId,
+			string? reviewedUserName,
 			string? remark)
 		{
 			var formData = await _tgsContext.WithdrawForms
@@ -605,47 +623,62 @@ namespace TGS.Payment.Repositories
 			formData.Status = reviewStatus.ToNumber();
 			formData.Remark = remark;
 			formData.UpdatedOn = DateTime.UtcNow;
+			formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
+			formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
+			if (reviewedUserId != null)
+				formData.ReviewedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn)
+		public async ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
-			formData.PaymentReturn = paymentReturn;
+			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
+			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? thirdPartyOrderNo)
-		{
-			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
-
-			formData.ThirdPartyOrderNo = thirdPartyOrderNo;
-
-			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public async ValueTask SubmitWithdrawFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn, decimal? actualAmount)
+		public async ValueTask SubmitWithdrawFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo)
 		{
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
 
 			formData.Status = (int)status;
-			formData.PaymentReturn = paymentReturn;
-			formData.ActualAmount = actualAmount;
+			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
+			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
+			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
+			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo)
+		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
 		{
-			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
 
-			formData.ThirdPartyOrderNo = ThirdPartyOrderNo;
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
 
-			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
 		}
 
 		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)

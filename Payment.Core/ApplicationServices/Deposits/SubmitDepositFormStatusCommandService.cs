@@ -25,16 +25,24 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				.GetDepositFormByIdAsync(command.FormId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
+			var originStatus = formData.Status;
+
 			await _paymentRepository
 				.SubmitDepositFormStatusAsync(
 					command.FormId,
 					command.Status,
-					command.PaymentReturn)
+					command.PaymentReturn,
+					command.ActualAmount,
+					command.ThirdPartyOrderNo)
 				.ConfigureAwait(false);
 
-			await _paymentClient
-				.EmitDepositFormStatusChangedEventAsync(command.FormId, formData.BrandId)
-				.ConfigureAwait(false);
+			if (originStatus != command.Status)
+				await _paymentClient
+					.EmitDepositFormStatusChangedEventAsync(command.FormId, formData.BrandId)
+					.ConfigureAwait(false);
 		}
 	}
 }

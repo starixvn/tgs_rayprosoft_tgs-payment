@@ -59,6 +59,13 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.Remark).HasColumnName("remark");
 
+            entity.Property(e => e.ReviewedOn)
+                .HasColumnType("timestamp with time zone")
+                .HasColumnName("reviewed_on");
+
+            entity.Property(e => e.ReviewedUserId).HasColumnName("reviewed_user_id");
+
+            entity.Property(e => e.ReviewedUserName).HasColumnName("reviewed_user_name");
 
             entity.Property(e => e.Status).HasColumnName("status");
 

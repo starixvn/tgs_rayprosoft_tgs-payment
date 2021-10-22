@@ -5,7 +5,7 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentClient
 	{
-		ValueTask ApproveDepositAsync(Guid formId, Guid brandId);
+		ValueTask ApproveDepositAsync(Guid formId, Guid brandId, decimal? actualAmount);
 
 		ValueTask<string> AskAsync(string subject, string requestInfo);
 
@@ -19,8 +19,10 @@ namespace Tgs.Payment.Clients
 
 		ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId);
 
-		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
+		ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
 
-		ValueTask EmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
+		ValueTask TagWithdrawFormPaidAsync(Guid formId);
+
+		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
 	}
 }

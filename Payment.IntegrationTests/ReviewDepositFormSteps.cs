@@ -90,7 +90,7 @@ namespace Payment.IntegrationTests
         [When(@"approve form")]
         public async Task WhenApproveFormAsync()
         {
-            await _paymentServiceClient.ReviewDepositFormAsync(_formId, ReviewState.Approve);
+            await _paymentServiceClient.ReviewDepositFormAsync(_formId, ReviewState.Approve, "93a723b2-9ebb-4607-ee8d-08d978fba75f", "GPI");
         }
     }
 }
