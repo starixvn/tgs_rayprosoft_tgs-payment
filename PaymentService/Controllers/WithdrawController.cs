@@ -23,6 +23,28 @@ namespace Tgs.Payment.Controllers
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
+		[HttpGet("untreated/{brandId}")]
+		public ValueTask<int> CountUntreatedWithdrawFormsAsync(
+			[FromServices] IGetService<WithdrawFormQuery, int> countService,
+			Guid brandId)
+		{
+			var query = new WithdrawFormQuery(
+				brandId,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
+				null,
+				null,
+				null);
+
+			return countService.GetAsync(query);
+		}
+
 		[HttpPut]
 		public async Task<Guid> CreateWithdrawFormAsync(
 			[FromServices] ICommandService<CreateWithdrawFormCommand> createService,
@@ -114,7 +136,7 @@ namespace Tgs.Payment.Controllers
 		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
-			[FromServices] IGetService<WithdrawFormQuery, decimal> sumService,
+			[FromServices] IGetService<WithdrawFormQuery, decimal> totalAmountService,
 			Guid brandId,
 			[FromQuery] WithdrawFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -149,7 +171,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
+				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -207,7 +229,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
+				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
