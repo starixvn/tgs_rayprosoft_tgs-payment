@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws
 {
-	internal class WithdrawFormQuerySumService
+	internal class CalculateWithdrawTotalAmountService
 		: IGetService<WithdrawFormQuery, decimal>
 	{
 		private readonly IPaymentRepository _paymentRepository;
 
-		public WithdrawFormQuerySumService(IPaymentRepository paymentRepository)
+		public CalculateWithdrawTotalAmountService(IPaymentRepository paymentRepository)
 		{
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
 		public ValueTask<decimal> GetAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
-			=> _paymentRepository.TotalWithdrawFormsAsync(
+			=> _paymentRepository.CalculateWithdrawTotalAmountAsync(
 				new WithdrawFormQueryConditions(
 						query.BrandId,
 						query.UserId,

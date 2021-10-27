@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TGS.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits
 {
-	internal class DepositFormQuerySumService
+	internal class CalculateDepositTotalAmountService
 		: IGetService<DepositFormQuery, decimal>
 	{
 		private readonly IPaymentRepository _paymentRepository;
 
-		public DepositFormQuerySumService(IPaymentRepository paymentRepository)
+		public CalculateDepositTotalAmountService(IPaymentRepository paymentRepository)
 		{
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
 		public ValueTask<decimal> GetAsync(DepositFormQuery query, CancellationToken cancellationToken = default)
-			=> _paymentRepository.TotalDepositFormsAsync(new DepositFormQueryConditions(
+			=> _paymentRepository.CalculateDepositTotalAmountAsync(new DepositFormQueryConditions(
 				query.BrandId,
 				query.UserId,
 				query.UserName,

@@ -18,6 +18,20 @@ namespace TGS.Payment.Repositories
 			_tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
 		}
 
+		public ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
+		public ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
 		public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions)
 		{
 			var dataQuery = MakeDepositFormQueryAsync(conditions);
@@ -665,20 +679,6 @@ namespace TGS.Payment.Repositories
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
-		{
-			var dataQuery = MakeDepositFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
-		}
-
-		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
-		{
-			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
 		}
 
 		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)
