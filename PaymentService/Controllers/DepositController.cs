@@ -116,6 +116,47 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
+		/// <summary>
+		/// Gets the untreated deposit form count asynchronous.
+		/// </summary>
+		/// <param name="countService">The count service.</param>
+		/// <param name="brandId">The brand identifier.</param>
+		/// <returns></returns>
+		[HttpGet("untreated/{brandId}")]
+		public ValueTask<int> GetUntreatedDepositFormCountAsync(
+			[FromServices] IGetService<DepositFormQuery, int> countService,
+			Guid brandId)
+		{
+			var query = new DepositFormQuery(
+				brandId,
+				null,
+				null,
+				null,	
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Init,
+					PaymentFlowState.WaitPayment
+				},
+				null,
+				null,
+				null);
+
+			return countService.GetAsync(query);
+		}
+
+		/// <summary>
+		/// Queries the deposit forms asynchronous.
+		/// </summary>
+		/// <param name="countService">The count service.</param>
+		/// <param name="queryService">The query service.</param>
+		/// <param name="totalAmountService">The total amount service.</param>
+		/// <param name="brandId">The brand identifier.</param>
+		/// <param name="formQuery">The form query.</param>
+		/// <param name="paging">The paging.</param>
+		/// <returns></returns>
 		[HttpGet("{brandId}", Order = 10)]
 		public async Task<DepositViewModel> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
@@ -287,6 +328,13 @@ namespace Tgs.Payment.Controllers
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Submits the deposit form third party order no asynchronous.
+		/// </summary>
+		/// <param name="submitService">The submit service.</param>
+		/// <param name="formId">The form identifier.</param>
+		/// <param name="request">The request.</param>
+		/// <returns></returns>
 		[HttpPatch("thirdparty/{formId}")]
 		[Obsolete]
 		public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(

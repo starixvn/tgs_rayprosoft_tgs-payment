@@ -6,6 +6,8 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentServiceClient
 	{
+		ValueTask<int> CountUntreatedDepositFormsAsync(Guid formId);
+
 		ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
 
 		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);

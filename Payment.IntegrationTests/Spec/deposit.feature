@@ -35,3 +35,8 @@ Scenario: Save thirdparty order no to deposit form
 	Given I get thirdparty order no "AH16322770975542"
 	When I call save api
 	Then form thirdparty_order_no should be "AH16322770975542"
+
+Scenario: Get Untreated deposit form Count
+	Given I will count untreated deposit form count
+	When call api
+	Then return form count
