@@ -15,7 +15,7 @@ namespace Tgs.Payment
 
 		ValueTask CreateBankInfoAsync(PlayerBankInfo bankInfo, string modifyUser);
 
-		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form);
+		ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, string orderNo);
 
 		ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
 
@@ -44,6 +44,8 @@ namespace Tgs.Payment
 		ValueTask<PlayerBankInfo> GetBankInfoByIdAsync(Guid id);
 
 		IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode);
+
+		ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id);
 
 		IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode);
 

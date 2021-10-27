@@ -62,6 +62,11 @@ namespace PaymentService
 			services
 				.AddPaymentClient()
 				.AddPayment()
+				.UseRedis((options, sp) =>
+				{
+					var config = sp.GetRequiredService<IConfiguration>();
+					options.ConnectionString = config.GetConnectionString("RedisConfigurationString");
+				})
 				.UseTgsPaymentRepository((sp, builder) =>
 				{
 					var config = sp.GetRequiredService<IConfiguration>();

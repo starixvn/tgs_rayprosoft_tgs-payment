@@ -10,19 +10,26 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 	{
 		private readonly IPaymentClient _paymentClient;
 		private readonly IPaymentRepository _paymentRepository;
+		private readonly ITakeNumberStore _takeNumberStore;
 
 		public CreateDepositFormCommandService(
 			IPaymentRepository paymentRepository,
-			IPaymentClient paymentClient)
+			IPaymentClient paymentClient,
+			ITakeNumberStore takeNumberStore)
 		{
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 			_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+			_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
 		}
 
 		public async ValueTask ExecuteAsync(CreateDepositFormCommand command, CancellationToken cancellationToken = default)
 		{
+			var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.CreateInfo.BrandId);
+
+			var orderNo = await _takeNumberStore.GetOrderNoAsync(brandInfo.Code, FormType.Deposit);
+
 			await _paymentRepository
-				.CreateDepositFormAsync(command.FormId, command.CreateInfo)
+				.CreateDepositFormAsync(command.FormId, command.CreateInfo, orderNo)
 				.ConfigureAwait(false);
 
 			await _paymentRepository

@@ -1,4 +1,4 @@
-﻿Feature: deposit
+﻿Feature: deposit=
 
 Scenario: Create deposit form
 	Given I will create deposit form

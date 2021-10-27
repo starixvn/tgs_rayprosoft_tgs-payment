@@ -10,79 +10,86 @@ using Tgs.Payment.Repositories.Entities;
 namespace Payment.IntegrationTests
 {
 	[Binding]
-    [Scope(Scenario = "Create agent withdraw form")]
-    public class CreateAgentWithdrawFormSteps
-    {
-        private Guid _agentId;
-        private Guid _bankInfoId;
-        private Guid _createFormId;
-        private PaymentServiceClient _paymentServiceClient;
-        private IHost _testHost;
+	[Scope(Scenario = "Create agent withdraw form")]
+	public class CreateAgentWithdrawFormSteps
+	{
+		private Guid _agentId;
+		private Guid _bankInfoId;
+		private Guid _createFormId;
+		private PaymentServiceClient _paymentServiceClient;
+		private IHost _testHost;
 
-        public CreateAgentWithdrawFormSteps()
-        {
-            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
-            _ = _testHost.StartAsync();
+		public CreateAgentWithdrawFormSteps()
+		{
+			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+			_ = _testHost.StartAsync();
 
-            _paymentServiceClient = _testHost.GetPaymentServiceClient();
-        }
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
+		}
 
-        [AfterScenario]
-        public async Task CleanUpAsync()
-        {
-            await _testHost.StopAsync();
-        }
+		[AfterScenario]
+		public async Task CleanUpAsync()
+		{
+			await _testHost.StopAsync();
+		}
 
-        [Given(@"agentId is \{(.*)}")]
-        public void GivenAgentIdIs(Guid agentId)
-        {
-            _agentId = agentId;
-            _bankInfoId = Guid.NewGuid();
-        }
+		[Given(@"agentId is \{(.*)}")]
+		public void GivenAgentIdIs(Guid agentId)
+		{
+			_agentId = agentId;
+			_bankInfoId = Guid.NewGuid();
+		}
 
-        [Given(@"I will create withdraw form")]
-        public void GivenIWillCreateWithdrawForm()
-        {
-        }
+		[Given(@"I will create withdraw form")]
+		public void GivenIWillCreateWithdrawForm()
+		{
+		}
 
-        [Then(@"withdraw form created")]
-        public void ThenWithdrawFormCreated()
-        {
-            Assert.AreNotEqual(Guid.Empty, _createFormId);
-        }
+		[Then(@"withdraw form created")]
+		public void ThenWithdrawFormCreated()
+		{
+			Assert.AreNotEqual(Guid.Empty, _createFormId);
+		}
 
-        [When(@"call create withdraw form api")]
-        public async Task WhenCallCreateWithdrawFormApiAsync()
-        {
-            var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+		[When(@"call create withdraw form api")]
+		public async Task WhenCallCreateWithdrawFormApiAsync()
+		{
+			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-            var brandId = Guid.NewGuid();
+			var brandId = Guid.NewGuid();
 
-            await dbContext.AgentBankInfoItems.AddAsync(
-                new AgentBankInfoItem
-                {
-                    Id = _bankInfoId,
-                    BankType = "Bank",
-                    BrandId = brandId,
-                    AgentId = _agentId,
-                    Detail = "{}",
-                    CreatedOn = DateTime.Now,
-                    UpdatedOn = DateTime.Now
-                });
+			await dbContext.AgentBankInfoItems.AddAsync(
+				new AgentBankInfoItem
+				{
+					Id = _bankInfoId,
+					BankType = "Bank",
+					BrandId = brandId,
+					AgentId = _agentId,
+					Detail = "{}",
+					CreatedOn = DateTime.Now,
+					UpdatedOn = DateTime.Now
+				});
 
-            await dbContext.SaveChangesAsync();
+			await dbContext.Brands.AddAsync(
+				new Brand
+				{
+					Id = brandId,
+					Code = "GPI"
+				});
 
-            var withdrawForm = new WithdrawFormCreateInfo
-            {
-                Amount = 1000M,
-                BankInfoId = _bankInfoId,
-                UserId = _agentId.ToString(),
-                UserName = "AgentName",
-                BrandId = brandId,
-                UserType = UserType.Agent
-            };
+			await dbContext.SaveChangesAsync();
 
-            _createFormId = await _paymentServiceClient.CreateWithdrawFormAsync(withdrawForm);
-        }
-    }
+			var withdrawForm = new WithdrawFormCreateInfo
+			{
+				Amount = 1000M,
+				BankInfoId = _bankInfoId,
+				UserId = _agentId.ToString(),
+				UserName = "AgentName",
+				BrandId = brandId,
+				UserType = UserType.Agent
+			};
+
+			_createFormId = await _paymentServiceClient.CreateWithdrawFormAsync(withdrawForm);
+		}
+	}
 }
