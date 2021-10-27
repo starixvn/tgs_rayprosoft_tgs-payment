@@ -13,10 +13,10 @@ namespace Payment.IntegrationTests
 	[Scope(Scenario = "Get Untreated deposit form Count")]
 	public class GetUntreatedDepositCountSteps
 	{
-		private IHost _testHost;
-		private PaymentServiceClient _paymentServiceClient;
 		private int _actual;
 		private Guid _brandId;
+		private PaymentServiceClient _paymentServiceClient;
+		private IHost _testHost;
 
 		public GetUntreatedDepositCountSteps()
 		{
@@ -31,10 +31,17 @@ namespace Payment.IntegrationTests
 		{
 			await _testHost.StopAsync();
 		}
+
 		[Given(@"I will count untreated deposit form count")]
 		public void GivenIWillCountUntreatedDepositFormCount()
 		{
 			_brandId = Guid.NewGuid();
+		}
+
+		[Then(@"return form count")]
+		public void ThenReturnFormCount()
+		{
+			Assert.AreEqual(3, _actual);
 		}
 
 		[When(@"call api")]
@@ -112,12 +119,6 @@ namespace Payment.IntegrationTests
 			await dbContext.SaveChangesAsync();
 
 			_actual = await _paymentServiceClient.CountUntreatedDepositFormsAsync(_brandId);
-		}
-
-		[Then(@"return form count")]
-		public void ThenReturnFormCount()
-		{
-			Assert.AreEqual(3, _actual);
 		}
 	}
 }

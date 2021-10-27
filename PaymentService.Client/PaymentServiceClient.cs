@@ -21,10 +21,25 @@ namespace Tgs.Payment.Clients
 			_serializerOptions = serializerOptions;
 		}
 
-		public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid formId)
+		public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId)
 		{
 			var response = await _httpClient
-				.GetAsync($"/deposit/untreated/{formId}")
+				.GetAsync($"/deposit/untreated/{brandId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content
+				.ReadAsStringAsync()
+				.ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<int>(contentJson, _serializerOptions);
+		}
+
+		public async ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/withdraw/untreated/{brandId}")
 				.ConfigureAwait(false);
 
 			response.EnsureSuccessStatusCode();
