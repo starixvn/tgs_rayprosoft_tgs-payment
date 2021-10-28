@@ -129,11 +129,13 @@ namespace Tgs.Payment.Controllers
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			Guid brandId)
 		{
+			var currentDate = DateTimeOffset.UtcNow;
+
 			var query = new DepositFormQuery(
 				brandId,
 				null,
 				null,
-				null,	
+				null,
 				null,
 				null,
 				null,
@@ -143,7 +145,7 @@ namespace Tgs.Payment.Controllers
 					PaymentFlowState.WaitPayment
 				},
 				null,
-				null,
+				(Begin: currentDate.AddDays(-1D), End: currentDate),
 				null);
 
 			return countService.GetAsync(query);

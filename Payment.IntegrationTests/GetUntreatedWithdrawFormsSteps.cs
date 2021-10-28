@@ -70,27 +70,32 @@ namespace Payment.IntegrationTests
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Init
+					Status = (int)PaymentFlowState.Init,
+					UpdatedOn = DateTime.Now
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
-					Status = (int)PaymentFlowState.WaitApprove
+					Status = (int)PaymentFlowState.WaitApprove,
+					UpdatedOn = DateTime.Now
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Approved
+					Status = (int)PaymentFlowState.Approved,
+					UpdatedOn = DateTime.Now
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Reject
+					Status = (int)PaymentFlowState.Reject,
+					UpdatedOn = DateTime.Now
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Paid
+					Status = (int)PaymentFlowState.Paid,
+					UpdatedOn = DateTime.Now
 				}
 			});
 
