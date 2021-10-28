@@ -28,6 +28,8 @@ namespace Tgs.Payment.Controllers
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			Guid brandId)
 		{
+			var currentDate = DateTimeOffset.Now;
+
 			var query = new WithdrawFormQuery(
 				brandId,
 				null,
@@ -39,7 +41,7 @@ namespace Tgs.Payment.Controllers
 				null,
 				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
 				null,
-				null,
+				(Begin: currentDate.AddDays(-1D), End: currentDate),
 				null);
 
 			return countService.GetAsync(query);

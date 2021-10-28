@@ -80,7 +80,8 @@ namespace Payment.IntegrationTests
 						BrandId = _brandId,
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.WaitApprove
+						Status = (int)PaymentFlowState.WaitApprove,
+						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
 					{
@@ -88,7 +89,8 @@ namespace Payment.IntegrationTests
 						BrandId = _brandId,
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Approved
+						Status = (int)PaymentFlowState.Approved,
+						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
 					{
@@ -96,7 +98,8 @@ namespace Payment.IntegrationTests
 						BrandId = _brandId,
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Init
+						Status = (int)PaymentFlowState.Init,
+						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
 					{
@@ -104,7 +107,8 @@ namespace Payment.IntegrationTests
 						BrandId = _brandId,
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Reject
+						Status = (int)PaymentFlowState.Reject,
+						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
 					{
@@ -112,7 +116,8 @@ namespace Payment.IntegrationTests
 						BrandId = _brandId,
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.WaitPayment
+						Status = (int)PaymentFlowState.WaitPayment,
+						UpdatedOn = DateTime.Now
 					}
 				});
 
