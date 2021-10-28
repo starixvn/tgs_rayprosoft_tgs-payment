@@ -30,9 +30,8 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 		public async ValueTask ExecuteAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
 		{
 			var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.BrandId);
-			var brandCode = brandInfo.Code;
 
-			var orderNo = await _takeNumberStore.GetOrderNoAsync(brandCode, FormType.Withdraw);
+			var orderNo = await _takeNumberStore.GetWithdrawFormOrderNoAsync(brandInfo.Code);
 
 			var createFormId = command.UserType switch
 			{

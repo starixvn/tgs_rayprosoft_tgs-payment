@@ -15,16 +15,26 @@ namespace Tgs.Payment.Repositories
 			_redisDatabase = redisConnectionFactory.Database;
 		}
 
-		public async ValueTask<string> GetOrderNoAsync(string BrandCode, FormType formType)
+		public async ValueTask<string> GetDepositFormOrderNoAsync(string BrandCode)
 		{
-			var formTypeRule = formType == FormType.Deposit ? "T" : "W";
-			var dateRule = DateTime.Now.ToString("yyMMddHH");
-			var dataKey = $"{_KeyPrefix}:{BrandCode}{formTypeRule}{dateRule}";
+			var dateRule = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).ToString("yyMMddHH");
+			var dataKey = $"{_KeyPrefix}:{BrandCode}T{dateRule}";
 
 			var serialNumber = await _redisDatabase.StringIncrementAsync(dataKey).ConfigureAwait(false);
 			await _redisDatabase.KeyExpireAsync(dataKey, _Expire);
 
-			return $"{BrandCode}{formTypeRule}{dateRule}{serialNumber.ToString().PadLeft(4, '0')}";
+			return $"{BrandCode}T{dateRule}{serialNumber:D4}";
+		}
+
+		public async ValueTask<string> GetWithdrawFormOrderNoAsync(string BrandCode)
+		{
+			var dateRule = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).ToString("yyMMddHH");
+			var dataKey = $"{_KeyPrefix}:{BrandCode}W{dateRule}";
+
+			var serialNumber = await _redisDatabase.StringIncrementAsync(dataKey).ConfigureAwait(false);
+			await _redisDatabase.KeyExpireAsync(dataKey, _Expire);
+
+			return $"{BrandCode}W{dateRule}{serialNumber:D4}";
 		}
 	}
 }

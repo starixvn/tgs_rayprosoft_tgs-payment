@@ -4,6 +4,7 @@ namespace Tgs.Payment
 {
 	public interface ITakeNumberStore
 	{
-		ValueTask<string> GetOrderNoAsync(string BrandCode, FormType formType);
+		ValueTask<string> GetDepositFormOrderNoAsync(string BrandCode);
+		ValueTask<string> GetWithdrawFormOrderNoAsync(string BrandCode);
 	}
 }

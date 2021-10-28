@@ -88,13 +88,15 @@ namespace Payment.UnitTests
 			var brandId = Guid.NewGuid();
 			var command = new CreateDepositFormCommand(
 				Guid.NewGuid(),
-				new DepositFormCreateInfo(
-					"PlayerCode",
-					brandId,
-					Guid.NewGuid(),
-					1000M,
-					null,
-					null));
+				new DepositFormCreateInfo
+				{
+					PlayerCode = "PlayerCode",
+					BrandId = brandId,
+					BrandPaymentId = Guid.NewGuid(),
+					Amount = 1000M,
+					PromotionId = null,
+					ApplyInfo = null
+				});
 
 			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
 				.Returns(new BrandInfo("GPI"));
@@ -105,7 +107,7 @@ namespace Payment.UnitTests
 				.GetBrandInfoByIdAsync(Arg.Is(brandId));
 
 			_ = fakePaymentRepository.Received(1)
-				.CreateDepositFormAsync(Arg.Is(command.FormId), Arg.Any<DepositFormCreateInfo>(), Arg.Any<string>());
+				.CreateDepositFormAsync(Arg.Is(command.FormId), Arg.Any<DepositFormCreateInfo>());
 
 			_ = fakePaymentRepository.Received(1)
 				.SubmitDepositFormStatusAsync(

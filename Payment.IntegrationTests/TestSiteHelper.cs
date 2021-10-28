@@ -44,11 +44,7 @@ namespace Payment.IntegrationTests
 
 							services.AddSingleton(services =>
 							{
-								var fakeStore = Substitute.For<ITakeNumberStore>();
-
-								fakeStore
-									.GetOrderNoAsync(Arg.Any<string>(), Arg.Any<FormType>())
-									.Returns($"GPIT211027140001");
+								var fakeStore = Substitute.For<ITakeNumberStore>();								
 
 								return fakeStore;
 							});

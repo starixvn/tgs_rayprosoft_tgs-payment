@@ -77,7 +77,7 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, string orderNo)
+		public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form)
 		{
 			var currentDate = DateTime.UtcNow;
 
@@ -94,7 +94,7 @@ namespace TGS.Payment.Repositories
 					PromotionId = form.PromotionId,
 					CreatedOn = currentDate,
 					UpdatedOn = currentDate,
-					OrderNo = orderNo
+					OrderNo = form.OrderNo
 				})
 				.ConfigureAwait(false);
 

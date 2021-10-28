@@ -26,10 +26,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 		{
 			var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.CreateInfo.BrandId);
 
-			var orderNo = await _takeNumberStore.GetOrderNoAsync(brandInfo.Code, FormType.Deposit);
+			var orderNo = await _takeNumberStore.GetDepositFormOrderNoAsync(brandInfo.Code);
+			command.CreateInfo.OrderNo = orderNo;
 
 			await _paymentRepository
-				.CreateDepositFormAsync(command.FormId, command.CreateInfo, orderNo)
+				.CreateDepositFormAsync(command.FormId, command.CreateInfo)
 				.ConfigureAwait(false);
 
 			await _paymentRepository

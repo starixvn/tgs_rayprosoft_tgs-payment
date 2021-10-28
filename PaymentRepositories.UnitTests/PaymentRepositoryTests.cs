@@ -20,14 +20,12 @@ namespace PaymentRepositories.UnitTests
 			var sut = new RedisTakeNumberStore(redisConnectionFactory);
 
 			var brandCode = "GPI";
-			var dateTimeRule = DateTime.Now.ToString("yyMMddHH");
-			var formType = Tgs.Payment.FormType.Deposit;
-			var order = await sut.GetOrderNoAsync(brandCode, formType);
-			var formTypeRule = formType == Tgs.Payment.FormType.Deposit ? "T" : "W";
+			var dateTimeRule = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).ToString("yyMMddHH");
+			var order = await sut.GetDepositFormOrderNoAsync(brandCode);
 
 			var actual = order.Substring(0, 12);
 
-			var expected = $"{brandCode}{formTypeRule}{dateTimeRule}";
+			var expected = $"{brandCode}T{dateTimeRule}";
 
 			Assert.AreEqual(16, order.Length);
 			Assert.AreEqual(expected, actual);
@@ -41,13 +39,12 @@ namespace PaymentRepositories.UnitTests
 			var sut = new RedisTakeNumberStore(redisConnectionFactory);
 
 			var brandCode = "GPI";
-			var dateTimeRule = DateTime.Now.ToString("yyMMddHH");
-			var formType = Tgs.Payment.FormType.Withdraw;
-			var order = await sut.GetOrderNoAsync(brandCode, formType);
-			var formTypeRule = formType == Tgs.Payment.FormType.Deposit ? "T" : "W";
+			var dateTimeRule = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).ToString("yyMMddHH");
+
+			var order = await sut.GetWithdrawFormOrderNoAsync(brandCode);
 
 			var actual = order.Substring(0, 12);
-			var expected = $"{brandCode}{formTypeRule}{dateTimeRule}";
+			var expected = $"{brandCode}W{dateTimeRule}";
 
 			Assert.AreEqual(16, order.Length);
 			Assert.AreEqual(expected, actual);
