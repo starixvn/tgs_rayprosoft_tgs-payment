@@ -7,7 +7,7 @@
     <PackageId>Tgs.PaymentService.Client</PackageId>
     <Product>Tgs.PaymentService.Client</Product>
     <Authors>Raypro</Authors>
-    <Version>0.0.32</Version>
+    <Version>0.0.33</Version>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

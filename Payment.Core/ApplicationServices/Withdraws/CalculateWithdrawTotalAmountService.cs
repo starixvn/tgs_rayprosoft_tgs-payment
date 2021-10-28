@@ -24,6 +24,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 						query.UserType,
 						query.ChannelName,
 						query.ThirdPartyOrderNo,
+						query.OrderNo,
 						query.FormId,
 						query.PaymentMethodId,
 						query.Status,

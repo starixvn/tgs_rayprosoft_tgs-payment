@@ -431,6 +431,7 @@ namespace TGS.Payment.Repositories
 							df.ApplyInfo,
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo,
+							df.OrderNo,
 							df.ReviewedUserName,
 							df.PromotionId,
 							df.CreatedOn,
@@ -477,6 +478,7 @@ namespace TGS.Payment.Repositories
 							(PaymentFlowState)df.Status,
 							df.Remark,
 							df.ReviewedUserName,
+							df.OrderNo,
 							df.BankInfoId,
 							df.CreatedOn,
 							df.UpdatedOn,
@@ -510,6 +512,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.OrderNo,
 					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
@@ -541,6 +544,7 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.OrderNo,
 					form.ReviewedUserName,
 					form.PromotionId,
 					form.CreatedOn,
@@ -564,6 +568,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.Remark,
 					form.ReviewedUserName,
+					form.OrderNo,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -597,6 +602,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.Remark,
 					form.ReviewedUserName,
+					form.OrderNo,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -710,6 +716,8 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				dataQuery = dataQuery.Where(form => form.OrderNo == conditions.OrderNo);
 			if (conditions.FormId != null)
 				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
@@ -759,6 +767,9 @@ namespace TGS.Payment.Repositories
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(
 					form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				dataQuery = dataQuery.Where(
+					form => form.OrderNo == conditions.OrderNo);
 			if (conditions.FormId != null)
 				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 

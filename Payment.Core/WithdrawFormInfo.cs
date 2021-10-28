@@ -12,6 +12,7 @@ namespace Tgs.Payment
 		PaymentFlowState Status,
 		string? Remark,
 		string? ReviewedUserName,
+		string? OrderNo,
 		Guid BankInfoId,
 		DateTimeOffset CreatedOn,
 		DateTimeOffset UpdatedOn,

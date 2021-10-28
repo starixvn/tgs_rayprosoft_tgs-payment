@@ -81,7 +81,8 @@ namespace Tgs.Payment.Controllers
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo
 				}
 				: null;
 		}
@@ -139,6 +140,7 @@ namespace Tgs.Payment.Controllers
 				null,
 				null,
 				null,
+				null,
 				new[] {
 					PaymentFlowState.WaitApprove,
 					PaymentFlowState.Init,
@@ -189,6 +191,7 @@ namespace Tgs.Payment.Controllers
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.OrderNo,
 					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
@@ -213,6 +216,7 @@ namespace Tgs.Payment.Controllers
 						PaymentReturn = row.PaymentReturn,
 						PlayerCode = row.PlayerCode,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						OrderNo = row.OrderNo,
 						ReviewedUserName = row.ReviewedUserName,
 						PromotionId = row.PromotionId,
 						Remark = row.Remark,
@@ -246,6 +250,7 @@ namespace Tgs.Payment.Controllers
 					formQuery.UserName,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.OrderNo,
 					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
@@ -274,6 +279,7 @@ namespace Tgs.Payment.Controllers
 						UpdatedOn = row.UpdatedOn,
 						UserName = row.UserName,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						OrderNo = row.OrderNo,
 						ReviewedUserName = row.ReviewedUserName
 					});
 

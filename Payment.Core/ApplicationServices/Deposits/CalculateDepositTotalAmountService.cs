@@ -22,6 +22,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				query.UserName,
 				query.ChannelName,
 				query.ThirdPartyOrderNo,
+				query.OrderNo,
 				query.FormId,
 				query.PaymentMethodId,
 				query.Status,
