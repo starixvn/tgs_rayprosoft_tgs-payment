@@ -440,7 +440,7 @@ namespace Tgs.Payment.Clients
 		}
 
 		public async ValueTask<DepositForms> QueryDepositFormsAsync(
-					DepositFormQueryConditions conditions,
+			DepositFormQueryConditions conditions,
 			Paging paging)
 		{
 			var queryStrings = HttpUtility.ParseQueryString(string.Empty);
@@ -477,7 +477,7 @@ namespace Tgs.Payment.Clients
 
 			if (conditions.UpdateOnRange != null)
 			{
-				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("O"));
+				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("o"));
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 
@@ -552,7 +552,7 @@ namespace Tgs.Payment.Clients
 
 			if (conditions.UpdateOnRange != null)
 			{
-				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("O"));
+				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("o"));
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 
