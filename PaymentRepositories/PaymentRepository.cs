@@ -107,7 +107,8 @@ namespace TGS.Payment.Repositories
 					PaymentReturn = form.PaymentReturn,
 					PromotionId = form.PromotionId,
 					CreatedOn = currentDate,
-					UpdatedOn = currentDate
+					UpdatedOn = currentDate,
+					OrderNo = form.OrderNo
 				})
 				.ConfigureAwait(false);
 
@@ -185,7 +186,8 @@ namespace TGS.Payment.Repositories
 					PaymentReturn = form.PaymentReturn,
 					Status = (int)form.Status,
 					CreatedOn = currentDate,
-					UpdatedOn = currentDate
+					UpdatedOn = currentDate,
+					OrderNo = form.OrderNo
 				})
 				.ConfigureAwait(false);
 
@@ -291,6 +293,15 @@ namespace TGS.Payment.Repositories
 					info.PaymentChannelId,
 					info.BankType,
 					info.Detail!));
+
+		public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id)
+		{
+			var brandInfo = await _tgsContext.Brands
+				.FindAsync(id)
+				.ConfigureAwait(false);
+
+			return new BrandInfo(brandInfo.Code);
+		}
 
 		public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode)
 		{

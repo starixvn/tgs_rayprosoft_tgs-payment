@@ -81,20 +81,30 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
-			var sut = new CreateDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
+			var sut = new CreateDepositFormCommandService(fakePaymentRepository, fakePaymentClient, fakeTakeNumberStore);
 
+			var brandId = Guid.NewGuid();
 			var command = new CreateDepositFormCommand(
 				Guid.NewGuid(),
-				new DepositFormCreateInfo(
-					"PlayerCode",
-					Guid.NewGuid(),
-					Guid.NewGuid(),
-					1000M,
-					null,
-					null));
+				new DepositFormCreateInfo
+				{
+					PlayerCode = "PlayerCode",
+					BrandId = brandId,
+					BrandPaymentId = Guid.NewGuid(),
+					Amount = 1000M,
+					PromotionId = null,
+					ApplyInfo = null
+				});
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.GetBrandInfoByIdAsync(Arg.Is(brandId));
 
 			_ = fakePaymentRepository.Received(1)
 				.CreateDepositFormAsync(Arg.Is(command.FormId), Arg.Any<DepositFormCreateInfo>());

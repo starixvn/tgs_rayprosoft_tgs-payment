@@ -27,13 +27,15 @@ namespace Tgs.Payment.Controllers
 			Guid createFormId,
 			[FromBody] CreateDepositFormViewModel request)
 		{
-			var createInfo = new DepositFormCreateInfo(
-				request.PlayerCode,
-				request.BrandId,
-				request.BrandPaymentId,
-				request.Amount,
-				request.PromotionId,
-				request.ApplyInfo);
+			var createInfo = new DepositFormCreateInfo
+			{
+				PlayerCode = request.PlayerCode,
+				BrandId = request.BrandId,
+				BrandPaymentId = request.BrandPaymentId,
+				Amount = request.Amount,
+				PromotionId = request.PromotionId,
+				ApplyInfo = request.ApplyInfo
+			};
 
 			var createCommand = new CreateDepositFormCommand(
 				createFormId,

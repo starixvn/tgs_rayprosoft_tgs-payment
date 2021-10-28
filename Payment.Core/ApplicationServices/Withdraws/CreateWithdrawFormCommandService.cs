@@ -9,118 +9,131 @@ using TGS.ServiceUtility;
 namespace Tgs.Payment.ApplicationServices.Withdraws
 {
 	internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdrawFormCommand>
-    {
-        private readonly JsonSerializerOptions? _jsonSerializerOptions;
-        private readonly IPaymentClient _paymentClient;
-        private readonly IPaymentRepository _paymentRepository;
+	{
+		private readonly JsonSerializerOptions? _jsonSerializerOptions;
+		private readonly IPaymentClient _paymentClient;
+		private readonly IPaymentRepository _paymentRepository;
+		private readonly ITakeNumberStore _takeNumberStore;
 
-        public CreateWithdrawFormCommandService(
-            IPaymentRepository paymentRepository,
-            IPaymentClient paymentClient,
-            IOptions<PaymentOptions> paymentOptionsAccessor)
-        {
-            _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-            _paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-            _jsonSerializerOptions = paymentOptionsAccessor.Value.JsonSerializerOptions;
-        }
+		public CreateWithdrawFormCommandService(
+			IPaymentRepository paymentRepository,
+			IPaymentClient paymentClient,
+			IOptions<PaymentOptions> paymentOptionsAccessor,
+			ITakeNumberStore takeNumberStore)
+		{
+			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+			_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+			_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
+			_jsonSerializerOptions = paymentOptionsAccessor.Value.JsonSerializerOptions;
+		}
 
-        public async ValueTask ExecuteAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
-        {
-            var createFormId = command.UserType switch
-            {
-                UserType.Player => await CreatePlayerWithdrawFormAsync(
-                    command,
-                    cancellationToken).ConfigureAwait(false),
-                UserType.Agent => await CreateAgentWithdrawFormAsync(
-                    command,
-                    cancellationToken).ConfigureAwait(false),
-                _ => throw new InvalidOperationException($"Can't handle user type: {command.UserType}")
-            };
+		public async ValueTask ExecuteAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
+		{
+			var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.BrandId);
 
-            command.ReturnFormIdSource.SetResult(createFormId);
-        }
+			var orderNo = await _takeNumberStore.GetWithdrawFormOrderNoAsync(brandInfo.Code);
 
-        private async ValueTask<Guid> CreateAgentWithdrawFormAsync(
-            CreateWithdrawFormCommand command,
-            CancellationToken cancellationToken = default)
-        {
-            var createFormId = Guid.NewGuid();
-            var agentId = Guid.Parse(command.UserId!);
+			var createFormId = command.UserType switch
+			{
+				UserType.Player => await CreatePlayerWithdrawFormAsync(
+					command,
+					orderNo,
+					cancellationToken).ConfigureAwait(false),
+				UserType.Agent => await CreateAgentWithdrawFormAsync(
+					command,
+					orderNo,
+					cancellationToken).ConfigureAwait(false),
+				_ => throw new InvalidOperationException($"Can't handle user type: {command.UserType}")
+			};
 
-            var agentBankInfo = await _paymentRepository
-                    .GetAgentBankInfoByIdAsync(command.BankInfoId)
-                    .ConfigureAwait(false);
+			command.ReturnFormIdSource.SetResult(createFormId);
+		}
 
-            if (agentBankInfo.AgentId != agentId)
-                throw new InvalidOperationException("Can't find bank info.");
+		private async ValueTask<Guid> CreateAgentWithdrawFormAsync(
+			CreateWithdrawFormCommand command,
+			string orderNo,
+			CancellationToken cancellationToken = default)
+		{
+			var createFormId = Guid.NewGuid();
+			var agentId = Guid.Parse(command.UserId!);
 
-            var bankInfoData = new WithdrawBankInfo<JsonDocument>(
-                agentBankInfo.Id,
-                agentBankInfo.PaymentChannelId,
-                agentBankInfo.BankType,
-                JsonDocument.Parse(agentBankInfo.Detail));
+			var agentBankInfo = await _paymentRepository
+					.GetAgentBankInfoByIdAsync(command.BankInfoId)
+					.ConfigureAwait(false);
 
-            await _paymentRepository
-                .CreateWithdrawFormAsync(
-                    createFormId,
-                    new WithdrawFormCreateInfo(
-                        command.UserId,
-                        command.UserName,
-                        command.UserType,
-                        command.BrandId,
-                        command.Amount,
-                        PaymentFlowState.Init,
-                        null,
-                        command.BankInfoId,
-                        BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions)))
-                .ConfigureAwait(false);
+			if (agentBankInfo.AgentId != agentId)
+				throw new InvalidOperationException("Can't find bank info.");
 
-            await _paymentClient
-                .EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
-                .ConfigureAwait(false);
+			var bankInfoData = new WithdrawBankInfo<JsonDocument>(
+				agentBankInfo.Id,
+				agentBankInfo.PaymentChannelId,
+				agentBankInfo.BankType,
+				JsonDocument.Parse(agentBankInfo.Detail));
 
-            return createFormId;
-        }
+			await _paymentRepository
+				.CreateWithdrawFormAsync(
+					createFormId,
+					new WithdrawFormCreateInfo(
+						command.UserId,
+						command.UserName,
+						command.UserType,
+						command.BrandId,
+						command.Amount,
+						PaymentFlowState.Init,
+						null,
+						command.BankInfoId,
+						BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
+						OrderNo: orderNo))
+				.ConfigureAwait(false);
 
-        private async ValueTask<Guid> CreatePlayerWithdrawFormAsync(
-                    CreateWithdrawFormCommand command,
-            CancellationToken cancellationToken = default)
-        {
-            var createFormId = Guid.NewGuid();
+			await _paymentClient
+				.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
+				.ConfigureAwait(false);
 
-            var playerBankInfo = await _paymentRepository
-                    .GetBankInfoByIdAsync(command.BankInfoId)
-                    .ConfigureAwait(false);
+			return createFormId;
+		}
 
-            if (playerBankInfo.PlayerCode != command.UserId)
-                throw new InvalidOperationException("Can't find bank info.");
+		private async ValueTask<Guid> CreatePlayerWithdrawFormAsync(
+			CreateWithdrawFormCommand command,
+			string orderNo,
+			CancellationToken cancellationToken = default)
+		{
+			var createFormId = Guid.NewGuid();
 
-            var bankInfoData = new WithdrawBankInfo<JsonDocument>(
-                command.BankInfoId,
-                playerBankInfo.PaymentChannelId,
-                playerBankInfo.BankType,
-                JsonDocument.Parse(playerBankInfo.Detail));
+			var playerBankInfo = await _paymentRepository
+					.GetBankInfoByIdAsync(command.BankInfoId)
+					.ConfigureAwait(false);
 
-            await _paymentRepository
-                .CreateWithdrawFormAsync(
-                    createFormId,
-                    new WithdrawFormCreateInfo(
-                        command.UserId,
-                        command.UserName,
-                        command.UserType,
-                        command.BrandId,
-                        command.Amount,
-                        PaymentFlowState.Init,
-                        null,
-                        command.BankInfoId,
-                        BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions)))
-                .ConfigureAwait(false);
+			if (playerBankInfo.PlayerCode != command.UserId)
+				throw new InvalidOperationException("Can't find bank info.");
 
-            await _paymentClient
-                .EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
-                .ConfigureAwait(false);
+			var bankInfoData = new WithdrawBankInfo<JsonDocument>(
+				command.BankInfoId,
+				playerBankInfo.PaymentChannelId,
+				playerBankInfo.BankType,
+				JsonDocument.Parse(playerBankInfo.Detail));
 
-            return createFormId;
-        }
-    }
+			await _paymentRepository
+				.CreateWithdrawFormAsync(
+					createFormId,
+					new WithdrawFormCreateInfo(
+						command.UserId,
+						command.UserName,
+						command.UserType,
+						command.BrandId,
+						command.Amount,
+						PaymentFlowState.Init,
+						null,
+						command.BankInfoId,
+						BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
+						OrderNo: orderNo))
+				.ConfigureAwait(false);
+
+			await _paymentClient
+				.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
+				.ConfigureAwait(false);
+
+			return createFormId;
+		}
+	}
 }
