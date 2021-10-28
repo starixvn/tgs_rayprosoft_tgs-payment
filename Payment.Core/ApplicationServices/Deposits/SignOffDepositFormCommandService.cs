@@ -25,13 +25,16 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				.GetDepositFormByIdAsync(command.FormId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			var formStatus = (PaymentFlowState)formData.Status;
 
 			if (formStatus == PaymentFlowState.Approved || formStatus == PaymentFlowState.Reject)
 				return;
 
 			await _paymentRepository
-				.SignOffDepositFormAsync(command.FormId, command.ReviewState, command.Remark)
+				.SignOffDepositFormAsync(command.FormId, command.ReviewState, command.ReviewUserId, command.ReviewUserName, command.Remark)
 				.ConfigureAwait(false);
 
 			await _paymentClient

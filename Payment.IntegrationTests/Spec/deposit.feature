@@ -11,6 +11,11 @@ Scenario: Get deposit detail
 	When call get deposit form detail api
 	Then return detail data
 
+Scenario: Get deposit detail by form id
+	Given I have a form id {D7A90C7A-910A-4C43-A047-8D02F2BB1567}
+	When call get deposit form detail api
+	Then return detail data
+
 Scenario: Query deposit forms
 	Given I Query deposit forms
 	When call get deposit forms api

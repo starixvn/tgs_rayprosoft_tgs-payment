@@ -53,13 +53,13 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds);
 
-		ValueTask<DepositFormInfo> GetDepositFormByIdAsync(Guid id);
+		ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id);
 
 		ValueTask<PaymentInfo> GetPaymentAsync(Guid id);
 
 		IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync();
 
-		ValueTask<WithdrawFormInfo> GetWithdrawFormByIdAsync(Guid formId);
+		ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId);
 
 		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 			DepositFormQueryConditions conditions,
@@ -75,25 +75,38 @@ namespace Tgs.Payment
 		IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions conditions);
 
-		ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? remark = null);
+		ValueTask SignOffDepositFormAsync(
+			Guid formId,
+			ReviewState reviewStatus,
+			string? reviewedUserId,
+			string? reviewedUserName,
+			string? remark = null);
 
 		ValueTask SignOffWithdrawFormAsync(
 			Guid formId,
 			Guid? brandPaymentId,
 			string? applyInfo,
 			ReviewState reviewStatus,
+			string? reviewedUserId,
+			string? reviewedUserName,
 			string? remark = null);
 
-		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState status, string? paymentReturn);
+		ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState status,
+			string? paymentReturn,
+			decimal? actualAmount,
+			string? thirdPartyOrderNo);
 
 		ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
 			PaymentFlowState status,
 			string? paymentReturn,
-			decimal? actualAmount);
+			decimal? actualAmount,
+			string? thirdPartyOrderNo);
 
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+		ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions);
 
-		ValueTask SubmitWithdrawFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+		ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
 	}
 }

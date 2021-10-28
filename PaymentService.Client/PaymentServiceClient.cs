@@ -335,6 +335,22 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
 		}
 
+		public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId)
+		{
+			var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/deposit/{formId}");
+			requestMessage.Headers.Add("FormQuery", string.Empty);
+
+			var response = await _httpClient
+				.SendAsync(requestMessage)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId)
 		{
 			var response = await _httpClient
@@ -377,8 +393,24 @@ namespace Tgs.Payment.Clients
 			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
 		}
 
-		public async ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(
-			DepositFormQueryConditions conditions,
+		public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId)
+		{
+			var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/withdraw/{formId}");
+			requestMessage.Headers.Add("FormQuery", string.Empty);
+
+			var response = await _httpClient
+				.SendAsync(requestMessage)
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
+		}
+
+		public async ValueTask<DepositForms> QueryDepositFormsAsync(
+					DepositFormQueryConditions conditions,
 			Paging paging)
 		{
 			var queryStrings = HttpUtility.ParseQueryString(string.Empty);
@@ -443,10 +475,10 @@ namespace Tgs.Payment.Clients
 
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-			return JsonSerializer.Deserialize<PagingResponse<DepositFormInfo>>(contentJson, _serializerOptions)!;
+			return JsonSerializer.Deserialize<DepositForms>(contentJson, _serializerOptions)!;
 		}
 
-		public async ValueTask<PagingResponse<WithdrawFormInfo>> QueryWithdrawFormsAsync(
+		public async ValueTask<WithdrawForms> QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions conditions,
 			Paging paging)
 		{
@@ -515,14 +547,16 @@ namespace Tgs.Payment.Clients
 
 			var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-			return JsonSerializer.Deserialize<PagingResponse<WithdrawFormInfo>>(contentJson, _serializerOptions)!;
+			return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _serializerOptions)!;
 		}
 
-		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null)
+		public async ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? reviewUserId, string? reviewUserName, string? remark = null)
 		{
 			var request = new SignOffForm
 			{
 				ReviewState = state,
+				ReviewUserId = reviewUserId,
+				ReviewUserName = reviewUserName,
 				Remark = remark
 			};
 
@@ -544,12 +578,16 @@ namespace Tgs.Payment.Clients
 			Guid formId,
 			Guid? brandPaymentId,
 			ReviewState state,
+			string? reviewUserId,
+			string? reviewUserName,
 			string? remark = null)
 		{
 			var request = new SignOffForm
 			{
 				ReviewState = state,
 				Remark = remark,
+				ReviewUserId = reviewUserId,
+				ReviewUserName = reviewUserName,
 				BrandPaymentId = brandPaymentId
 			};
 
@@ -567,12 +605,19 @@ namespace Tgs.Payment.Clients
 			response.EnsureSuccessStatusCode();
 		}
 
-		public async ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null)
+		public async ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState state,
+			string? paymentReturn = null,
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null)
 		{
 			var request = new DepositFormStatus
 			{
 				Status = state,
-				PaymentReturn = paymentReturn
+				PaymentReturn = paymentReturn,
+				ActualAmount = actualAmount,
+				ThirdPartyOrderNo = thirdPartyOrderNo
 			};
 
 			var requestContent = new StringContent(
@@ -614,13 +659,15 @@ namespace Tgs.Payment.Clients
 			Guid formId,
 			PaymentFlowState state,
 			string? paymentReturn = null,
-			decimal? actualAmount = null)
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null)
 		{
 			var request = new WithdrawFormStatus
 			{
 				Status = state,
 				PaymentReturn = paymentReturn,
-				ActualAmount = actualAmount
+				ActualAmount = actualAmount,
+				ThirdPartyOrderNo = thirdPartyOrderNo
 			};
 
 			var requestContent = new StringContent(

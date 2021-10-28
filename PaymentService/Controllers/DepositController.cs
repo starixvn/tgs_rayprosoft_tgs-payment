@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.Deposits;
+using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
 using TGS.ServiceUtility;
@@ -60,8 +61,8 @@ namespace Tgs.Payment.Controllers
 
 			var formData = await getService.GetAsync(query).ConfigureAwait(false);
 
-			if (formData != null)
-				return new DepositFormViewModel
+			return formData != null
+				? new DepositFormViewModel
 				{
 					Id = formData.Id,
 					Amount = formData.Amount,
@@ -79,24 +80,47 @@ namespace Tgs.Payment.Controllers
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
-				};
-			else
-				return null;
+				}
+				: null;
 		}
 
-		/// <summary>
-		/// Queries the deposit forms asynchronous.
-		/// </summary>
-		/// <param name="countService">The count service.</param>
-		/// <param name="queryService">The query service.</param>
-		/// <param name="brandId">The brand identifier.</param>
-		/// <param name="formQuery">The form query.</param>
-		/// <param name="paging">The paging.</param>
-		/// <returns></returns>
-		[HttpGet("{brandId}")]
-		public async Task<PagingResponseViewModel<DepositFormViewModel>> QueryDepositFormsAsync(
+		[HttpGet("{formId}", Order = 1), HttpHeaderConstraint("FormQuery")]
+		public async Task<DepositFormViewModel?> GetDepositFormAsync(
+			[FromServices] IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo?> getService,
+			Guid formId)
+		{
+			var query = new GetDepositFormDetailByFormIdQuery(formId);
+
+			var formData = await getService.GetAsync(query).ConfigureAwait(false);
+
+			return formData != null
+				? new DepositFormViewModel
+				{
+					Id = formData.Id,
+					Amount = formData.Amount,
+					ApplyInfo = formData.ApplyInfo,
+					BrandId = formData.BrandId,
+					BrandPaymentId = formData.BrandPaymentId,
+					ChannelName = formData.ChannelName,
+					CreatedOn = formData.CreatedOn,
+					PaymentMethodId = formData.PaymentMethodId,
+					PaymentReturn = formData.PaymentReturn,
+					PlayerCode = formData.PlayerCode,
+					PromotionId = formData.PromotionId,
+					Remark = formData.Remark,
+					Status = formData.Status,
+					UpdatedOn = formData.UpdatedOn,
+					UserName = formData.UserName,
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+				}
+				: null;
+		}
+
+		[HttpGet("{brandId}", Order = 10)]
+		public async Task<DepositViewModel> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
+			[FromServices] IGetService<DepositFormQuery, decimal> sumService,
 			Guid brandId,
 			[FromQuery] DepositFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -128,6 +152,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
@@ -143,6 +168,7 @@ namespace Tgs.Payment.Controllers
 						PaymentReturn = row.PaymentReturn,
 						PlayerCode = row.PlayerCode,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						ReviewedUserName = row.ReviewedUserName,
 						PromotionId = row.PromotionId,
 						Remark = row.Remark,
 						Status = row.Status,
@@ -150,12 +176,13 @@ namespace Tgs.Payment.Controllers
 						UserName = row.UserName
 					});
 
-				return new PagingResponseViewModel<DepositFormViewModel>
+				return new()
 				{
 					TotalCount = totalCount,
 					Page = 1,
 					Rows = -1,
-					Items = items.ToEnumerable()
+					Items = items.ToEnumerable(),
+					Sum = sum
 				};
 			}
 			else
@@ -182,7 +209,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 				var items = queryService.QueryAsync(query)
 					.Select(row => new DepositFormViewModel
 					{
@@ -201,15 +228,17 @@ namespace Tgs.Payment.Controllers
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
 						UserName = row.UserName,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						ReviewedUserName = row.ReviewedUserName
 					});
 
-				return new PagingResponseViewModel<DepositFormViewModel>
+				return new()
 				{
 					TotalCount = totalCount,
 					Page = 1,
 					Rows = -1,
-					Items = items.ToEnumerable()
+					Items = items.ToEnumerable(),
+					Sum = sum
 				};
 			}
 		}
@@ -229,6 +258,8 @@ namespace Tgs.Payment.Controllers
 			var command = new SignOffDepositFormCommand(
 				formId,
 				request.ReviewState,
+				request.ReviewUserId,
+				request.ReviewUserName,
 				request.Remark);
 
 			await signOffService.ExecuteAsync(command).ConfigureAwait(false);
@@ -249,13 +280,16 @@ namespace Tgs.Payment.Controllers
 			var command = new SubmitDepositFormStatusCommand(
 				formId,
 				request.Status,
-				request.PaymentReturn);
+				request.PaymentReturn,
+				request.ActualAmount,
+				request.ThirdPartyOrderNo);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
 
 		[HttpPatch("thirdparty/{formId}")]
-		public async Task SubmitDepositFormThirdPartyOrderNoAsync(
+		[Obsolete]
+		public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(
 			[FromServices] ICommandService<SubmitDepositFormThirdPartyOrderNoCommand> submitService,
 			Guid formId,
 			[FromBody] DepositFormThirdPartyOrderNoViewModel request)
@@ -264,7 +298,7 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.ThirdPartyOrderNo);
 
-			await submitService.ExecuteAsync(command).ConfigureAwait(false);
+			return submitService.ExecuteAsync(command);
 		}
 	}
 }

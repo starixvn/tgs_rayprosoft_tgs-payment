@@ -28,12 +28,14 @@ namespace Tgs.Payment.Clients
 
 		public string? Remark { get; init; }
 
+		public string? ReviewedUserName { get; init; }
+
 		public PaymentFlowState Status { get; init; }
+
+		public string? ThirdPartyOrderNo { get; init; }
 
 		public DateTimeOffset UpdatedOn { get; init; }
 
 		public string UserName { get; init; } = default!;
-
-		public string? ThirdPartyOrderNo { get; init; }
 	}
 }

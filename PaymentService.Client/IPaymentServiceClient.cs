@@ -46,28 +46,50 @@ namespace Tgs.Payment.Clients
 
 		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
 
+		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId);
+
 		ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
 
 		IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
 
 		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId);
 
-		ValueTask<PagingResponse<DepositFormInfo>> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
+		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId);
 
-		ValueTask<PagingResponse<WithdrawFormInfo>> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
+		ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
-		ValueTask ReviewDepositFormAsync(Guid formId, ReviewState state, string? remark = null);
+		ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
 
-		ValueTask ReviewWithdrawFormAsync(Guid formId, Guid? brandPaymentId, ReviewState state, string? remark = null);
+		ValueTask ReviewDepositFormAsync(
+			Guid formId,
+			ReviewState state,
+			string? reviewUserId,
+			string? reviewUserName,
+			string? remark = null);
 
-		ValueTask SubmitDepositFormStatusAsync(Guid formId, PaymentFlowState state, string? paymentReturn = null);
+		ValueTask ReviewWithdrawFormAsync(
+			Guid formId,
+			Guid? brandPaymentId,
+			ReviewState state,
+			string? reviewUserId,
+			string? reviewUserName,
+			string? remark = null);
+
+		ValueTask SubmitDepositFormStatusAsync(
+			Guid formId,
+			PaymentFlowState state,
+			string? paymentReturn = null,
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null);
+
+		[Obsolete]
+		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
 
 		ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
 			PaymentFlowState state,
 			string? paymentReturn = null,
-			decimal? actualAmount = null);
-
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+			decimal? actualAmount = null,
+			string? thirdPartyOrderNo = null);
 	}
 }

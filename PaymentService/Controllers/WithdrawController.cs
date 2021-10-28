@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
+using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
 using TGS.ServiceUtility;
@@ -50,8 +51,8 @@ namespace Tgs.Payment.Controllers
 
 			var formData = await getService.GetAsync(query).ConfigureAwait(false);
 
-			if (formData != null)
-				return new WithdrawFormViewModel
+			return formData != null
+				? new WithdrawFormViewModel
 				{
 					Id = formData.Id,
 					Amount = formData.Amount,
@@ -71,15 +72,49 @@ namespace Tgs.Payment.Controllers
 					UserName = formData.UserName,
 					UserType = formData.UserType,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
-				};
-			else
-				return null;
+				}
+				: null;
+		}
+
+		[HttpGet("{formId}"), HttpHeaderConstraint("FormQuery")]
+		public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
+			[FromServices] IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo?> getService,
+			Guid formId)
+		{
+			var query = new GetWithdrawFormDetailByFormIdQuery(formId);
+
+			var formData = await getService.GetAsync(query).ConfigureAwait(false);
+
+			return formData != null
+				? new WithdrawFormViewModel
+				{
+					Id = formData.Id,
+					Amount = formData.Amount,
+					ApplyInfo = formData.ApplyInfo,
+					BankInfo = formData.BankInfo,
+					BankInfoId = formData.BankInfoId,
+					BrandId = formData.BrandId,
+					BrandPaymentId = formData.BrandPaymentId,
+					ChannelName = formData.ChannelName,
+					CreatedOn = formData.CreatedOn,
+					PaymentMethodId = formData.PaymentMethodId,
+					PaymentReturn = formData.PaymentReturn,
+					Remark = formData.Remark,
+					Status = formData.Status,
+					UpdatedOn = formData.UpdatedOn,
+					UserId = formData.UserId,
+					UserName = formData.UserName,
+					UserType = formData.UserType,
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+				}
+				: null;
 		}
 
 		[HttpGet("{brandId}")]
-		public async Task<PagingResponseViewModel<WithdrawFormViewModel>> QueryWithdrawFormsAsync(
+		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
+			[FromServices] IGetService<WithdrawFormQuery, decimal> sumService,
 			Guid brandId,
 			[FromQuery] WithdrawFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -114,6 +149,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -133,15 +169,17 @@ namespace Tgs.Payment.Controllers
 						Remark = row.Remark,
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName
+						UserName = row.UserName,
+						ReviewedUserName = row.ReviewedUserName
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
 					TotalCount = totalCount,
 					Page = 1,
 					Rows = -1,
-					Items = items.ToEnumerable()
+					Items = items.ToEnumerable(),
+					Sum = sum
 				};
 			}
 			else
@@ -169,6 +207,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -188,15 +227,17 @@ namespace Tgs.Payment.Controllers
 						Status = row.Status,
 						UpdatedOn = row.UpdatedOn,
 						UserName = row.UserName,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo
+						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						ReviewedUserName = row.ReviewedUserName
 					});
 
-				return new PagingResponseViewModel<WithdrawFormViewModel>
+				return new()
 				{
 					TotalCount = totalCount,
 					Page = 1,
 					Rows = -1,
-					Items = items.ToEnumerable()
+					Items = items.ToEnumerable(),
+					Sum = sum
 				};
 			}
 		}
@@ -211,6 +252,8 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.BrandPaymentId,
 				request.ReviewState,
+				request.ReviewUserId,
+				request.ReviewUserName,
 				request.Remark);
 
 			await signOffService.ExecuteAsync(command).ConfigureAwait(false);
@@ -226,7 +269,8 @@ namespace Tgs.Payment.Controllers
 				formId,
 				request.Status,
 				request.PaymentReturn,
-				request.ActualAmount);
+				request.ActualAmount,
+				request.ThirdPartyOrderNo);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
