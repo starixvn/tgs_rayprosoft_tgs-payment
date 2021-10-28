@@ -462,7 +462,7 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-			var sut = new DepositFormQuerySumService(fakePaymentRepository);
+			var sut = new CalculateDepositTotalAmountService(fakePaymentRepository);
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
@@ -485,7 +485,7 @@ namespace Payment.UnitTests
 			var actual = sut.GetAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.TotalDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+				.CalculateDepositTotalAmountAsync(Arg.Any<DepositFormQueryConditions>());
 		}
 
 		[Test]

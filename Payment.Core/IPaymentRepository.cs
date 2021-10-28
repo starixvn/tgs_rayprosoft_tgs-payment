@@ -7,6 +7,10 @@ namespace Tgs.Payment
 {
 	public interface IPaymentRepository
 	{
+		ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions);
+
+		ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions);
+
 		ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions);
 
 		ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
@@ -106,9 +110,5 @@ namespace Tgs.Payment
 			string? paymentReturn,
 			decimal? actualAmount,
 			string? thirdPartyOrderNo);
-
-		ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions);
-
-		ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
 	}
 }

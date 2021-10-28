@@ -430,7 +430,7 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-			var sut = new WithdrawFormQuerySumService(fakePaymentRepository);
+			var sut = new CalculateWithdrawTotalAmountService(fakePaymentRepository);
 
 			var query = new WithdrawFormQuery(
 				Guid.NewGuid(),
@@ -454,7 +454,7 @@ namespace Payment.UnitTests
 			var actual = sut.GetAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.TotalWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
+				.CalculateWithdrawTotalAmountAsync(Arg.Any<WithdrawFormQueryConditions>());
 		}
 
 		[Test]
