@@ -32,6 +32,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -171,6 +172,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -205,6 +207,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -228,6 +231,7 @@ namespace Payment.UnitTests
 
 			var query = new WithdrawFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -282,6 +286,7 @@ namespace Payment.UnitTests
 					PaymentFlowState.WaitApprove,
 					null,
 					"reviewedUserName",
+					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
 					DateTimeOffset.UtcNow));
@@ -356,6 +361,7 @@ namespace Payment.UnitTests
 					PaymentFlowState.WaitPayment,
 					null,
 					null,
+					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
 					DateTimeOffset.UtcNow));
@@ -399,6 +405,7 @@ namespace Payment.UnitTests
 					(int)PaymentFlowState.Init,
 					null,
 					null,
+					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.Now,
 					DateTimeOffset.Now,
@@ -434,6 +441,7 @@ namespace Payment.UnitTests
 
 			var query = new WithdrawFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,

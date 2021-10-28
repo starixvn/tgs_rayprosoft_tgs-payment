@@ -34,6 +34,8 @@ namespace Tgs.Payment.ViewModels
 
 		public string? ThirdPartyOrderNo { get; set; }
 
+		public string? OrderNo { get; set; }
+
 		public DateTimeOffset UpdatedOn { get; set; }
 
 		public string UserName { get; set; } = default!;

@@ -9,6 +9,7 @@ namespace Tgs.Payment
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,
+		string? OrderNo,
 		Guid? FormId,
 		Guid? PaymentMethodId,
 		IEnumerable<PaymentFlowState> Status,

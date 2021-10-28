@@ -460,6 +460,9 @@ namespace Tgs.Payment.Clients
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				queryStrings.Add("third_party_order_no", conditions.ThirdPartyOrderNo);
 
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				queryStrings.Add("order_no", conditions.OrderNo);
+
 			if (conditions.FormId != null)
 				queryStrings.Add("form_id", conditions.FormId.ToString());
 
@@ -531,6 +534,9 @@ namespace Tgs.Payment.Clients
 
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				queryStrings.Add("third_party_order_no", conditions.ThirdPartyOrderNo);
+
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				queryStrings.Add("order_no", conditions.OrderNo);
 
 			if (conditions.FormId != null)
 				queryStrings.Add("form_id", conditions.FormId.ToString());

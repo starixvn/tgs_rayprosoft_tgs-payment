@@ -33,6 +33,9 @@ namespace Tgs.Payment.ViewModels
 		[FromQuery(Name = "third_party_order_no")]
 		public string? ThirdPartyOrderNo { get; set; }
 
+		[FromQuery(Name = "order_no")]
+		public string? OrderNo { get; set; }
+
 		[FromQuery(Name = "user_id")]
 		public string? UserId { get; set; }
 
