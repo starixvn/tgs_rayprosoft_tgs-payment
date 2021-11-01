@@ -19,6 +19,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string CreatedByUsername { get; set; } = default!;
         public string UpdatedByUsername { get; set; } = default!;
 
+        public virtual Brand Brand { get; set; } = default!;
         public virtual PaymentChannel PaymentChannel { get; set; } = default!;
         public virtual Player PlayerCodeNavigation { get; set; } = default!;
     }

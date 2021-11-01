@@ -105,6 +105,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnName("updated_on")
                 .HasDefaultValueSql("now()");
 
+            entity.HasOne(d => d.Brand)
+                .WithMany(p => p.BrandPayments)
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_brand_payments_brands_brand_id");
+
             entity.HasOne(d => d.PaymentMethodChannel)
                 .WithMany(p => p.BrandPayments)
                 .HasForeignKey(d => d.PaymentMethodChannelId)

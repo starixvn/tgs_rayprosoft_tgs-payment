@@ -26,6 +26,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string? ReviewedUserId { get; set; }
         public string? ReviewedUserName { get; set; }
         public string? OrderNo { get; set; }
+        public int? PromotionPlayerId { get; set; }
 
         public virtual Brand Brand { get; set; } = default!;
         public virtual BrandPayment BrandPayment { get; set; } = default!;

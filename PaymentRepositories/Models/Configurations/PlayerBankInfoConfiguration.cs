@@ -60,6 +60,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_on");
 
+            entity.HasOne(d => d.Brand)
+                .WithMany(p => p.PlayerBankInfos)
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_player_bank_infos_brands_brand_id");
+
             entity.HasOne(d => d.PaymentChannel)
                 .WithMany(p => p.PlayerBankInfos)
                 .HasForeignKey(d => d.PaymentChannelId)

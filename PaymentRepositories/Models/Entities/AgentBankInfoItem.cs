@@ -20,6 +20,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string UpdatedByUsername { get; set; } = default!;
         public DateTime UpdatedOn { get; set; }
 
+        public virtual Brand Brand { get; set; } = default!;
         public virtual PaymentChannel PaymentChannel { get; set; } = default!;
         public virtual Player? PlayerCodeNavigation { get; set; }
     }

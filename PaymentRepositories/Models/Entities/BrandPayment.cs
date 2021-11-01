@@ -42,6 +42,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string UpdatedByUsername { get; set; } = default!;
         public string ExtendedData { get; set; } = default!;
 
+        public virtual Brand Brand { get; set; } = default!;
         public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = default!;
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; }
