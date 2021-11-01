@@ -18,6 +18,8 @@ namespace Tgs.Payment.ViewModels
 
 		public Guid Id { get; set; }
 
+		public string? OrderNo { get; set; }
+
 		public Guid PaymentMethodId { get; set; }
 
 		public string? PaymentReturn { get; set; }
@@ -26,6 +28,8 @@ namespace Tgs.Payment.ViewModels
 
 		public Guid? PromotionId { get; set; }
 
+		public int? PromotionPlayerId { get; set; }
+
 		public string? Remark { get; set; }
 
 		public string? ReviewedUserName { get; set; }
@@ -33,8 +37,6 @@ namespace Tgs.Payment.ViewModels
 		public PaymentFlowState Status { get; set; }
 
 		public string? ThirdPartyOrderNo { get; set; }
-
-		public string? OrderNo { get; set; }
 
 		public DateTimeOffset UpdatedOn { get; set; }
 

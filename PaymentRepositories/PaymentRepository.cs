@@ -434,6 +434,7 @@ namespace TGS.Payment.Repositories
 							df.OrderNo,
 							df.ReviewedUserName,
 							df.PromotionId,
+							df.PromotionPlayerId,
 							df.CreatedOn,
 							df.UpdatedOn);
 
@@ -515,6 +516,7 @@ namespace TGS.Payment.Repositories
 					form.OrderNo,
 					form.ReviewedUserName,
 					form.PromotionId,
+					form.PromotionPlayerId,
 					form.CreatedOn,
 					form.UpdatedOn));
 
@@ -547,6 +549,7 @@ namespace TGS.Payment.Repositories
 					form.OrderNo,
 					form.ReviewedUserName,
 					form.PromotionId,
+					form.PromotionPlayerId,
 					form.CreatedOn,
 					form.UpdatedOn))
 				.ToEnumerable()

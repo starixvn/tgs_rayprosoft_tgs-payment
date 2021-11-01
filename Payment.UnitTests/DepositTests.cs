@@ -38,6 +38,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -150,6 +151,7 @@ namespace Payment.UnitTests
 					  "GPIT211028150001",
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -185,6 +187,7 @@ namespace Payment.UnitTests
 					  "GPIT211028150001",
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -218,6 +221,7 @@ namespace Payment.UnitTests
 				null,
 				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -266,6 +270,7 @@ namespace Payment.UnitTests
 				null,
 				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -354,6 +359,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					"reviewedUserName",
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -403,6 +409,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -448,6 +455,7 @@ namespace Payment.UnitTests
 					null,
 					null,
 					"GPIT211028150001",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
@@ -530,6 +538,7 @@ namespace Payment.UnitTests
 					null,
 					null,
 					"GPIT211028150001",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
