@@ -83,7 +83,8 @@ namespace Tgs.Payment.Controllers
 					UserName = formData.UserName,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
 					OrderNo = formData.OrderNo,
-					PromotionPlayerId = formData.PromotionPlayerId
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
@@ -115,7 +116,10 @@ namespace Tgs.Payment.Controllers
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo,
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
