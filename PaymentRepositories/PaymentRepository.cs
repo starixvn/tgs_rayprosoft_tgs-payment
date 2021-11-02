@@ -667,17 +667,19 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState status,
+			PaymentFlowState? status,
 			string? paymentReturn,
 			decimal? actualAmount,
-			string? thirdPartyOrderNo)
+			string? thirdPartyOrderNo,
+			int? promotionPlayerId)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
-			formData.Status = (int)status;
+			formData.Status = status.HasValue ? (int)status.Value : formData.Status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
 			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
 			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
+			formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);

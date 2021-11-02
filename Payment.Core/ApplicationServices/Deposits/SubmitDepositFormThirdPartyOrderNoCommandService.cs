@@ -32,7 +32,8 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 					formData.Status,
 					null,
 					null,
-					command.ThirdPartyOrderNo)
+					command.ThirdPartyOrderNo,
+					null)
 				.ConfigureAwait(false);
 		}
 	}

@@ -338,7 +338,8 @@ namespace Tgs.Payment.Controllers
 				request.Status,
 				request.PaymentReturn,
 				request.ActualAmount,
-				request.ThirdPartyOrderNo);
+				request.ThirdPartyOrderNo,
+				request.PromotionPlayerId);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
