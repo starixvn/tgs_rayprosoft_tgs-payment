@@ -18,6 +18,8 @@ namespace Tgs.Payment.Clients
 
 		public Guid Id { get; init; }
 
+		public string? OrderNo { get; init; }
+
 		public Guid PaymentMethodId { get; init; }
 
 		public string? PaymentReturn { get; init; }
@@ -26,6 +28,8 @@ namespace Tgs.Payment.Clients
 
 		public Guid? PromotionId { get; init; }
 
+		public int? PromotionPlayerId { get; init; }
+
 		public string? Remark { get; init; }
 
 		public string? ReviewedUserName { get; init; }
@@ -33,8 +37,6 @@ namespace Tgs.Payment.Clients
 		public PaymentFlowState Status { get; init; }
 
 		public string? ThirdPartyOrderNo { get; init; }
-
-		public string? OrderNo { get; init; }
 
 		public DateTimeOffset UpdatedOn { get; init; }
 
