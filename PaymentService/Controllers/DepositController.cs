@@ -82,7 +82,9 @@ namespace Tgs.Payment.Controllers
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
-					OrderNo = formData.OrderNo
+					OrderNo = formData.OrderNo,
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
@@ -114,7 +116,10 @@ namespace Tgs.Payment.Controllers
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo,
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
@@ -333,7 +338,8 @@ namespace Tgs.Payment.Controllers
 				request.Status,
 				request.PaymentReturn,
 				request.ActualAmount,
-				request.ThirdPartyOrderNo);
+				request.ThirdPartyOrderNo,
+				request.PromotionPlayerId);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}

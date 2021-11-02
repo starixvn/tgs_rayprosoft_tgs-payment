@@ -131,6 +131,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .IsRequired()
                 .HasColumnName("withdraw_salt");
 
+            entity.HasOne(d => d.Brand)
+                .WithMany(p => p.Players)
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_players_brands_brand_id");
+
             OnConfigurePartial(entity);
         }
 

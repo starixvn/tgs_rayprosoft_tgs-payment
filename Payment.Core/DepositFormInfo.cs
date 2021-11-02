@@ -19,6 +19,7 @@ namespace Tgs.Payment
 		string? OrderNo,
 		string? ReviewedUserName,
 		Guid? PromotionId,
+		int? PromotionPlayerId,
 		DateTimeOffset CreatedOn,
 		DateTimeOffset UpdatedOn);
 }

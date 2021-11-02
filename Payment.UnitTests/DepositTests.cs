@@ -38,6 +38,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -117,7 +118,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.WaitPayment),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -148,6 +150,7 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  "GPIT211028150001",
+					  null,
 					  null,
 					  null,
 					  DateTimeOffset.Now,
@@ -185,6 +188,7 @@ namespace Payment.UnitTests
 					  "GPIT211028150001",
 					  null,
 					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -218,6 +222,7 @@ namespace Payment.UnitTests
 				null,
 				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -266,6 +271,7 @@ namespace Payment.UnitTests
 				null,
 				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -354,6 +360,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					"reviewedUserName",
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -403,6 +410,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -414,7 +422,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.Approved),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Is(command.ThirdPartyOrderNo));
+					Arg.Is(command.ThirdPartyOrderNo),
+					Arg.Any<int?>());
 		}
 
 		[Test]
@@ -428,6 +437,7 @@ namespace Payment.UnitTests
 			var command = new SubmitDepositFormStatusCommand(
 				Guid.NewGuid(),
 				PaymentFlowState.WaitApprove,
+				null,
 				null,
 				null,
 				null);
@@ -450,6 +460,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -461,7 +472,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(0)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -512,6 +524,7 @@ namespace Payment.UnitTests
 				PaymentFlowState.Approved,
 				null,
 				null,
+				null,
 				null);
 
 			fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
@@ -532,6 +545,7 @@ namespace Payment.UnitTests
 					"GPIT211028150001",
 					null,
 					null,
+					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
 
@@ -543,7 +557,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());

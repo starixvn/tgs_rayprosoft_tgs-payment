@@ -61,6 +61,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
 
+            entity.Property(e => e.PromotionPlayerId).HasColumnName("promotion_player_id");
+
             entity.Property(e => e.Remark).HasColumnName("remark");
 
             entity.Property(e => e.ReviewedOn)
