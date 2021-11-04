@@ -190,6 +190,14 @@ namespace Tgs.Payment.Controllers
 
 			if (paging.ShowAll == true)
 			{
+				var sourcePaging = new Paging<DepositFormInfo>();
+
+				sourcePaging.Page = -1;
+				sourcePaging.RowCount = -1;
+
+				if (!string.IsNullOrWhiteSpace(paging.SortBy))
+					sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
+
 				var query = new DepositFormQuery(
 					brandId,
 					formQuery.UserId,
@@ -202,7 +210,7 @@ namespace Tgs.Payment.Controllers
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 					createOnRange,
 					updateOnRange,
-					null);
+					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
 				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);

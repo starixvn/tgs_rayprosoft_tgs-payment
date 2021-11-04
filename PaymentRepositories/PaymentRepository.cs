@@ -520,7 +520,10 @@ namespace TGS.Payment.Repositories
 					form.CreatedOn,
 					form.UpdatedOn));
 
-			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+			dataQuery = dataQuery.ApplyOrderBy(paging);
+
+			if (paging.RowCount > 0)
+				dataQuery = dataQuery.ApplyPaging(paging);
 
 			return dataQuery
 				.ToEnumerable()
