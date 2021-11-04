@@ -4,8 +4,9 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 {
 	public record SubmitDepositFormStatusCommand(
 		Guid FormId,
-		PaymentFlowState Status,
+		PaymentFlowState? Status,
 		string? PaymentReturn,
 		decimal? ActualAmount,
-		string? ThirdPartyOrderNo);
+		string? ThirdPartyOrderNo,
+		int? PromotionPlayerId);
 }

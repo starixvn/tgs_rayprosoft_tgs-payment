@@ -19,6 +19,8 @@ namespace Tgs.Payment.Clients
 
 		public string? ThirdPartyOrderNo { get; init; }
 
+		public string? OrderNo { get; init; }
+
 		public (DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange { get; init; }
 
 		public string? UserId { get; init; }

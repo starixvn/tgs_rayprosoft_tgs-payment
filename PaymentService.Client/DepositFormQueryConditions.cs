@@ -13,6 +13,8 @@ namespace Tgs.Payment.Clients
 
 		public Guid? FormId { get; init; }
 
+		public string? OrderNo { get; init; }
+
 		public Guid? PaymentMethodId { get; init; }
 
 		public IEnumerable<PaymentFlowState> Status { get; init; } = Array.Empty<PaymentFlowState>();

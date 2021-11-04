@@ -20,6 +20,7 @@ namespace Tgs.Payment.Repositories.Entities
         }
 
         public virtual DbSet<AgentBankInfoItem> AgentBankInfoItems { get; set; }
+        public virtual DbSet<Brand> Brands { get; set; }
         public virtual DbSet<BrandPayment> BrandPayments { get; set; }
         public virtual DbSet<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual DbSet<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; }
@@ -38,6 +39,7 @@ namespace Tgs.Payment.Repositories.Entities
                 .HasAnnotation("Relational:Collation", "en_US.utf8");
 
             modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentPlayerConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentVipLevelConfiguration());

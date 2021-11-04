@@ -21,6 +21,36 @@ namespace Tgs.Payment.Clients
 			_serializerOptions = serializerOptions;
 		}
 
+		public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/deposit/untreated/{brandId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content
+				.ReadAsStringAsync()
+				.ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<int>(contentJson, _serializerOptions);
+		}
+
+		public async ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId)
+		{
+			var response = await _httpClient
+				.GetAsync($"/withdraw/untreated/{brandId}")
+				.ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
+
+			var contentJson = await response.Content
+				.ReadAsStringAsync()
+				.ConfigureAwait(false);
+
+			return JsonSerializer.Deserialize<int>(contentJson, _serializerOptions);
+		}
+
 		public async ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info)
 		{
 			var requestContent = new StringContent(
@@ -410,7 +440,7 @@ namespace Tgs.Payment.Clients
 		}
 
 		public async ValueTask<DepositForms> QueryDepositFormsAsync(
-					DepositFormQueryConditions conditions,
+			DepositFormQueryConditions conditions,
 			Paging paging)
 		{
 			var queryStrings = HttpUtility.ParseQueryString(string.Empty);
@@ -430,6 +460,9 @@ namespace Tgs.Payment.Clients
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				queryStrings.Add("third_party_order_no", conditions.ThirdPartyOrderNo);
 
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				queryStrings.Add("order_no", conditions.OrderNo);
+
 			if (conditions.FormId != null)
 				queryStrings.Add("form_id", conditions.FormId.ToString());
 
@@ -444,7 +477,7 @@ namespace Tgs.Payment.Clients
 
 			if (conditions.UpdateOnRange != null)
 			{
-				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("O"));
+				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("o"));
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 
@@ -502,6 +535,9 @@ namespace Tgs.Payment.Clients
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				queryStrings.Add("third_party_order_no", conditions.ThirdPartyOrderNo);
 
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				queryStrings.Add("order_no", conditions.OrderNo);
+
 			if (conditions.FormId != null)
 				queryStrings.Add("form_id", conditions.FormId.ToString());
 
@@ -516,7 +552,7 @@ namespace Tgs.Payment.Clients
 
 			if (conditions.UpdateOnRange != null)
 			{
-				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("O"));
+				queryStrings.Add("bu", conditions.UpdateOnRange.Value.Begin.ToString("o"));
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 

@@ -106,6 +106,7 @@ pipeline {
                                 --set image.tag=${TAG} \
                                 --set namespace=${kube_ns} \
                                 --set connectionStrings.tgs="${conn}" \
+                                --set connectionStrings.redis="$tgs_redis" \
                                 --set connectionStrings.nats="$tgs_nats" 
                         '''
                         sh '''
@@ -113,6 +114,7 @@ pipeline {
                                 --set image.tag=${TAG} \
                                 --set namespace=${kube_ns} \
                                 --set connectionStrings.tgs="${conn}" \
+                                --set connectionStrings.redis="$tgs_redis" \
                                 --set connectionStrings.nats="$tgs_nats" \
                                 | kubectl -n ${kube_ns} apply -f -
                         '''

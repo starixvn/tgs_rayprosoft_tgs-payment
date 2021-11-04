@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSubstitute;
+using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
 
 namespace Payment.IntegrationTests
@@ -39,6 +41,13 @@ namespace Payment.IntegrationTests
 
 									return new TgsContext(dbContextOptionsBuilder.Options);
 								});
+
+							services.AddSingleton(services =>
+							{
+								var fakeStore = Substitute.For<ITakeNumberStore>();								
+
+								return fakeStore;
+							});
 
 							configureServices(services);
 						});

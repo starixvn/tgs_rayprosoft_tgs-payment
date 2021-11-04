@@ -5,41 +5,46 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Tgs.Payment.Configuration
 {
 	public class PaymentConfiguration
-    {
-        private Dictionary<string, Type> _processTypes = new Dictionary<string, Type>();
+	{
+		private Dictionary<string, Type> _processTypes = new Dictionary<string, Type>();
 
-        public IServiceCollection Services { get; }
+		public IServiceCollection Services { get; }
 
-        public PaymentConfiguration(IServiceCollection services)
-        {
-            Services = services ?? throw new System.ArgumentNullException(nameof(services));
-        }
+		public PaymentConfiguration(IServiceCollection services)
+		{
+			Services = services ?? throw new System.ArgumentNullException(nameof(services));
+		}
 
-        public PaymentConfiguration RegisterWithdrawProcessor<TProcessor>(string paymentCode) where TProcessor : class, IWithdrawProcessor
-        {
-            Services.AddSingleton<TProcessor>();
+		public PaymentConfiguration ConfigureOptions(Action<PaymentOptions, IServiceProvider> configure)
+		{
+			Services
+				.AddOptions<PaymentOptions>()
+				.Configure(configure);
 
-            _processTypes[paymentCode] = typeof(TProcessor);
+			return this;
+		}
 
-            return this;
-        }
+		public PaymentConfiguration RegisterWithdrawProcessor<TProcessor>(string paymentCode) where TProcessor : class, IWithdrawProcessor
+		{
+			Services.AddSingleton<TProcessor>();
 
-        public PaymentConfiguration UsePaymentRepository<TPaymentRepository>() where TPaymentRepository : class, IPaymentRepository
-        {
-            Services.AddTransient<IPaymentRepository, TPaymentRepository>();
+			_processTypes[paymentCode] = typeof(TProcessor);
 
-            return this;
-        }
+			return this;
+		}
 
-        public PaymentConfiguration ConfigureOptions(Action<PaymentOptions, IServiceProvider> configure)
-        {
-            Services
-                .AddOptions<PaymentOptions>()
-                .Configure(configure);
+		public PaymentConfiguration UsePaymentRepository<TPaymentRepository>() where TPaymentRepository : class, IPaymentRepository
+		{
+			Services.AddTransient<IPaymentRepository, TPaymentRepository>();
+			return this;
+		}
 
-            return this;
-        }
+		public PaymentConfiguration UseRepository<TRepository>() where TRepository : class, ITakeNumberStore
+		{
+			Services.AddTransient<ITakeNumberStore, TRepository>();
+			return this;
+		}
 
-        internal IDictionary<string, Type> GetAllRegisterWithdrawProcessorTypes() => _processTypes;
-    }
+		internal IDictionary<string, Type> GetAllRegisterWithdrawProcessorTypes() => _processTypes;
+	}
 }
