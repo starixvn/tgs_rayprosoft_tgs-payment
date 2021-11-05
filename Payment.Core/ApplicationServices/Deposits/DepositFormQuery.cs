@@ -16,5 +16,5 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
 		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
-		Paging<DepositFormInfo>? Paging);
+		Paging<DepositFormInfo> Paging);
 }

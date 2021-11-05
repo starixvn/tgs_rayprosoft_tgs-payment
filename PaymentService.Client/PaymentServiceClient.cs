@@ -643,17 +643,19 @@ namespace Tgs.Payment.Clients
 
 		public async ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState state,
+			PaymentFlowState? state,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null)
+			string? thirdPartyOrderNo = null,
+			int? promotionPlayerId = null)
 		{
 			var request = new DepositFormStatus
 			{
 				Status = state,
 				PaymentReturn = paymentReturn,
 				ActualAmount = actualAmount,
-				ThirdPartyOrderNo = thirdPartyOrderNo
+				ThirdPartyOrderNo = thirdPartyOrderNo,
+				PromotionPlayerId = promotionPlayerId
 			};
 
 			var requestContent = new StringContent(

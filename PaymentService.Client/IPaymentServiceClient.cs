@@ -81,10 +81,11 @@ namespace Tgs.Payment.Clients
 
 		ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState state,
+			PaymentFlowState? state = null,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null);
+			string? thirdPartyOrderNo = null,
+			int? promotionPlayerId = null);
 
 		[Obsolete]
 		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
