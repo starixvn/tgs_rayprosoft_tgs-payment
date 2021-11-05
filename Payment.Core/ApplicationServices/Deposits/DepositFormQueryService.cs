@@ -31,33 +31,19 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				query.UpdateOnRange));
 
 		public IAsyncEnumerable<DepositFormInfo> QueryAsync(DepositFormQuery query, CancellationToken cancellationToken = default)
-			=> query.Paging == null
-				? _paymentRepository.QueryDepositFormsAsync(
-					new DepositFormQueryConditions(
-						query.BrandId,
-						query.UserId,
-						query.UserName,
-						query.ChannelName,
-						query.ThirdPartyOrderNo,
-						query.OrderNo,
-						query.FormId,
-						query.PaymentMethodId,
-						query.Status,
-						query.CreateOnRange,
-						query.UpdateOnRange))
-				: _paymentRepository.QueryDepositFormsAsync(
-					new DepositFormQueryConditions(
-						query.BrandId,
-						query.UserId,
-						query.UserName,
-						query.ChannelName,
-						query.ThirdPartyOrderNo,
-						query.OrderNo,
-						query.FormId,
-						query.PaymentMethodId,
-						query.Status,
-						query.CreateOnRange,
-						query.UpdateOnRange),
-					query.Paging);
+			=> _paymentRepository.QueryDepositFormsAsync(
+				new DepositFormQueryConditions(
+					query.BrandId,
+					query.UserId,
+					query.UserName,
+					query.ChannelName,
+					query.ThirdPartyOrderNo,
+					query.OrderNo,
+					query.FormId,
+					query.PaymentMethodId,
+					query.Status,
+					query.CreateOnRange,
+					query.UpdateOnRange),
+				query.Paging);
 	}
 }
