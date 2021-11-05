@@ -71,9 +71,6 @@ namespace Tgs.Payment
 			DepositFormQueryConditions conditions,
 			Paging<DepositFormInfo> paging);
 
-		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
-			DepositFormQueryConditions conditions);
-
 		IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions conditions,
 			Paging<WithdrawFormInfo> paging);

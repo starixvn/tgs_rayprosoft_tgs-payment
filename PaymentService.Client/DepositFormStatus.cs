@@ -6,7 +6,9 @@
 
 		public string? PaymentReturn { get; set; }
 
-		public PaymentFlowState Status { get; set; }
+		public int? PromotionPlayerId { get; set; }
+
+		public PaymentFlowState? Status { get; set; }
 
 		public string? ThirdPartyOrderNo { get; set; }
 	}

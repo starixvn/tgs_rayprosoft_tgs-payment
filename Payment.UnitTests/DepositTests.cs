@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
+using TGS.Paging;
 
 namespace Payment.UnitTests
 {
@@ -319,12 +320,18 @@ namespace Payment.UnitTests
 				},
 				null,
 				null,
-				null);
+				new TGS.Paging.Paging<DepositFormInfo>
+				{
+					Page = -1,
+					RowCount = -1
+				});
 
 			var actual = sut.QueryAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+				.QueryDepositFormsAsync(
+					Arg.Any<DepositFormQueryConditions>(),
+					Arg.Any<Paging<DepositFormInfo>>());
 		}
 
 		[Test]

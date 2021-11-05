@@ -520,38 +520,12 @@ namespace TGS.Payment.Repositories
 					form.CreatedOn,
 					form.UpdatedOn));
 
-			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+			dataQuery = dataQuery.ApplyOrderBy(paging);
+
+			if (paging.RowCount > 0)
+				dataQuery = dataQuery.ApplyPaging(paging);
 
 			return dataQuery
-				.ToEnumerable()
-				.ToAsyncEnumerable();
-		}
-
-		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(DepositFormQueryConditions conditions)
-		{
-			var dataQuery = MakeDepositFormQueryAsync(conditions);
-
-			return dataQuery
-				.Select(form => new DepositFormInfo(
-					form.Id,
-					form.PlayerCode,
-					form.PlayerCodeNavigation.Username,
-					form.BrandId,
-					form.BrandPaymentId,
-					form.BrandPayment.ChannelName,
-					form.BrandPayment.PaymentMethodChannel.MethodId,
-					form.Amount,
-					form.Remark,
-					(PaymentFlowState)form.Status,
-					form.ApplyInfo,
-					form.PaymentReturn,
-					form.ThirdPartyOrderNo,
-					form.OrderNo,
-					form.ReviewedUserName,
-					form.PromotionId,
-					form.PromotionPlayerId,
-					form.CreatedOn,
-					form.UpdatedOn))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
