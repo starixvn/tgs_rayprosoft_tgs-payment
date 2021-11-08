@@ -557,7 +557,10 @@ namespace TGS.Payment.Repositories
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo));
 
-			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+			dataQuery = dataQuery.ApplyOrderBy(paging);
+
+			if (paging.RowCount > 0)
+				dataQuery = dataQuery.ApplyPaging(paging);
 
 			return dataQuery
 				.ToEnumerable()
