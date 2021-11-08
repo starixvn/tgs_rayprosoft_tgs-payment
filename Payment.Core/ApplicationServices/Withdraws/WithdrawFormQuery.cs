@@ -17,5 +17,5 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
 		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
-		Paging<WithdrawFormInfo>? Paging);
+		Paging<WithdrawFormInfo> Paging);
 }

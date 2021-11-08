@@ -30,6 +30,11 @@ namespace Tgs.Payment.Controllers
 		{
 			var currentDate = DateTimeOffset.Now;
 
+			var sourcePaging = new Paging<WithdrawFormInfo>();
+
+			sourcePaging.Page = -1;
+			sourcePaging.RowCount = -1;
+
 			var query = new WithdrawFormQuery(
 				brandId,
 				null,
@@ -43,7 +48,7 @@ namespace Tgs.Payment.Controllers
 				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
 				null,
 				(Begin: currentDate.AddDays(-1D), End: currentDate),
-				null);
+				sourcePaging);
 
 			return countService.GetAsync(query);
 		}
@@ -156,120 +161,69 @@ namespace Tgs.Payment.Controllers
 			if (formQuery.BeginUpdateOn != null && formQuery.EndUpdatedOn != null)
 				updateOnRange = (formQuery.BeginUpdateOn.Value, formQuery.EndUpdatedOn.Value);
 
-			var queryPaging = new Paging<WithdrawFormInfo>();
+			var sourcePaging = new Paging<WithdrawFormInfo>();
+
+			sourcePaging.Page = paging.Page ?? 1;
+			sourcePaging.RowCount = paging.Rows ?? 10;
 
 			if (paging.ShowAll == true)
 			{
-				var query = new WithdrawFormQuery(
-					brandId,
-					formQuery.UserId,
-					formQuery.UserName,
-					formQuery.UserType,
-					formQuery.ChannelName,
-					formQuery.ThirdPartyOrderNo,
-					formQuery.OrderNo,
-					formQuery.FormId,
-					formQuery.PaymentMethodId,
-					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
-					createOnRange,
-					updateOnRange,
-					null);
-
-				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
-
-				var items = queryService.QueryAsync(query)
-					.Select(row => new WithdrawFormViewModel
-					{
-						Id = row.Id,
-						Amount = row.Amount,
-						ApplyInfo = row.ApplyInfo,
-						BrandId = row.BrandId,
-						BrandPaymentId = row.BrandPaymentId,
-						ChannelName = row.ChannelName,
-						CreatedOn = row.CreatedOn,
-						PaymentMethodId = row.PaymentMethodId,
-						PaymentReturn = row.PaymentReturn,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
-						OrderNo = row.OrderNo,
-						UserId = row.UserId,
-						UserType = row.UserType,
-						Remark = row.Remark,
-						Status = row.Status,
-						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName,
-						ReviewedUserName = row.ReviewedUserName
-					});
-
-				return new()
-				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable(),
-					Sum = sum
-				};
+				sourcePaging.Page = -1;
+				sourcePaging.RowCount = -1;
 			}
-			else
+
+			if (!string.IsNullOrWhiteSpace(paging.SortBy))
+				sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
+
+			var query = new WithdrawFormQuery(
+				brandId,
+				formQuery.UserId,
+				formQuery.UserName,
+				formQuery.UserType,
+				formQuery.ChannelName,
+				formQuery.ThirdPartyOrderNo,
+				formQuery.OrderNo,
+				formQuery.FormId,
+				formQuery.PaymentMethodId,
+				formQuery.Status ?? Array.Empty<PaymentFlowState>(),
+				createOnRange,
+				updateOnRange,
+				sourcePaging);
+
+			var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+			var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
+
+			var items = queryService.QueryAsync(query)
+				.Select(row => new WithdrawFormViewModel
+				{
+					Id = row.Id,
+					Amount = row.Amount,
+					ApplyInfo = row.ApplyInfo,
+					BrandId = row.BrandId,
+					BrandPaymentId = row.BrandPaymentId,
+					ChannelName = row.ChannelName,
+					CreatedOn = row.CreatedOn,
+					PaymentMethodId = row.PaymentMethodId,
+					PaymentReturn = row.PaymentReturn,
+					UserId = row.UserId,
+					UserType = row.UserType,
+					Remark = row.Remark,
+					Status = row.Status,
+					UpdatedOn = row.UpdatedOn,
+					UserName = row.UserName,
+					ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+					ReviewedUserName = row.ReviewedUserName,
+					OrderNo = row.OrderNo
+				});
+
+			return new()
 			{
-				var sourcePaging = new Paging<WithdrawFormInfo>();
-
-				sourcePaging.Page = paging.Page ?? 1;
-				sourcePaging.RowCount = paging.Rows ?? 10;
-
-				if (!string.IsNullOrWhiteSpace(paging.SortBy))
-					sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
-
-				var query = new WithdrawFormQuery(
-					brandId,
-					formQuery.UserId,
-					formQuery.UserName,
-					formQuery.UserType,
-					formQuery.ChannelName,
-					formQuery.ThirdPartyOrderNo,
-					formQuery.OrderNo,
-					formQuery.FormId,
-					formQuery.PaymentMethodId,
-					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
-					createOnRange,
-					updateOnRange,
-					sourcePaging);
-
-				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
-
-				var items = queryService.QueryAsync(query)
-					.Select(row => new WithdrawFormViewModel
-					{
-						Id = row.Id,
-						Amount = row.Amount,
-						ApplyInfo = row.ApplyInfo,
-						BrandId = row.BrandId,
-						BrandPaymentId = row.BrandPaymentId,
-						ChannelName = row.ChannelName,
-						CreatedOn = row.CreatedOn,
-						PaymentMethodId = row.PaymentMethodId,
-						PaymentReturn = row.PaymentReturn,
-						UserId = row.UserId,
-						UserType = row.UserType,
-						Remark = row.Remark,
-						Status = row.Status,
-						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
-						ReviewedUserName = row.ReviewedUserName,
-						OrderNo = row.OrderNo
-					});
-
-				return new()
-				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable(),
-					Sum = sum
-				};
-			}
+				TotalCount = totalCount,
+				Page = 1,
+				Rows = -1,
+				Items = items.ToEnumerable(),
+				Sum = sum
+			};
 		}
 
 		[HttpPost("{formId}")]
