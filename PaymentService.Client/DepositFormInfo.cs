@@ -18,6 +18,8 @@ namespace Tgs.Payment.Clients
 
 		public Guid Id { get; init; }
 
+		public string? OrderNo { get; init; }
+
 		public Guid PaymentMethodId { get; init; }
 
 		public string? PaymentReturn { get; init; }
@@ -25,6 +27,8 @@ namespace Tgs.Payment.Clients
 		public string PlayerCode { get; init; } = default!;
 
 		public Guid? PromotionId { get; init; }
+
+		public int? PromotionPlayerId { get; init; }
 
 		public string? Remark { get; init; }
 

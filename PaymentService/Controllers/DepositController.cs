@@ -27,13 +27,15 @@ namespace Tgs.Payment.Controllers
 			Guid createFormId,
 			[FromBody] CreateDepositFormViewModel request)
 		{
-			var createInfo = new DepositFormCreateInfo(
-				request.PlayerCode,
-				request.BrandId,
-				request.BrandPaymentId,
-				request.Amount,
-				request.PromotionId,
-				request.ApplyInfo);
+			var createInfo = new DepositFormCreateInfo
+			{
+				PlayerCode = request.PlayerCode,
+				BrandId = request.BrandId,
+				BrandPaymentId = request.BrandPaymentId,
+				Amount = request.Amount,
+				PromotionId = request.PromotionId,
+				ApplyInfo = request.ApplyInfo
+			};
 
 			var createCommand = new CreateDepositFormCommand(
 				createFormId,
@@ -79,7 +81,10 @@ namespace Tgs.Payment.Controllers
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo,
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
@@ -111,16 +116,63 @@ namespace Tgs.Payment.Controllers
 					Status = formData.Status,
 					UpdatedOn = formData.UpdatedOn,
 					UserName = formData.UserName,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo,
+					PromotionPlayerId = formData.PromotionPlayerId,
+					ReviewedUserName = formData.ReviewedUserName
 				}
 				: null;
 		}
 
+		/// <summary>
+		/// Gets the untreated deposit form count asynchronous.
+		/// </summary>
+		/// <param name="countService">The count service.</param>
+		/// <param name="brandId">The brand identifier.</param>
+		/// <returns></returns>
+		[HttpGet("untreated/{brandId}")]
+		public ValueTask<int> GetUntreatedDepositFormCountAsync(
+			[FromServices] IGetService<DepositFormQuery, int> countService,
+			Guid brandId)
+		{
+			var currentDate = DateTimeOffset.UtcNow;
+
+			var query = new DepositFormQuery(
+				brandId,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Init,
+					PaymentFlowState.WaitPayment
+				},
+				null,
+				(Begin: currentDate.AddDays(-1D), End: currentDate),
+				null);
+
+			return countService.GetAsync(query);
+		}
+
+		/// <summary>
+		/// Queries the deposit forms asynchronous.
+		/// </summary>
+		/// <param name="countService">The count service.</param>
+		/// <param name="queryService">The query service.</param>
+		/// <param name="totalAmountService">The total amount service.</param>
+		/// <param name="brandId">The brand identifier.</param>
+		/// <param name="formQuery">The form query.</param>
+		/// <param name="paging">The paging.</param>
+		/// <returns></returns>
 		[HttpGet("{brandId}", Order = 10)]
 		public async Task<DepositViewModel> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
-			[FromServices] IGetService<DepositFormQuery, decimal> sumService,
+			[FromServices] IGetService<DepositFormQuery, decimal> totalAmountService,
 			Guid brandId,
 			[FromQuery] DepositFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -134,113 +186,69 @@ namespace Tgs.Payment.Controllers
 			if (formQuery.BeginUpdateOn != null && formQuery.EndUpdatedOn != null)
 				updateOnRange = (formQuery.BeginUpdateOn.Value, formQuery.EndUpdatedOn.Value);
 
-			var queryPaging = new Paging<DepositFormInfo>();
+			var sourcePaging = new Paging<DepositFormInfo>();
+
+			sourcePaging.Page = paging.Page ?? 1;
+			sourcePaging.RowCount = paging.Rows ?? 10;
 
 			if (paging.ShowAll == true)
 			{
-				var query = new DepositFormQuery(
-					brandId,
-					formQuery.UserId,
-					formQuery.UserName,
-					formQuery.ChannelName,
-					formQuery.ThirdPartyOrderNo,
-					formQuery.FormId,
-					formQuery.PaymentMethodId,
-					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
-					createOnRange,
-					updateOnRange,
-					null);
-
-				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
-
-				var items = queryService.QueryAsync(query)
-					.Select(row => new DepositFormViewModel
-					{
-						Id = row.Id,
-						Amount = row.Amount,
-						ApplyInfo = row.ApplyInfo,
-						BrandId = row.BrandId,
-						BrandPaymentId = row.BrandPaymentId,
-						ChannelName = row.ChannelName,
-						CreatedOn = row.CreatedOn,
-						PaymentMethodId = row.PaymentMethodId,
-						PaymentReturn = row.PaymentReturn,
-						PlayerCode = row.PlayerCode,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
-						ReviewedUserName = row.ReviewedUserName,
-						PromotionId = row.PromotionId,
-						Remark = row.Remark,
-						Status = row.Status,
-						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName
-					});
-
-				return new()
-				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable(),
-					Sum = sum
-				};
+				sourcePaging.Page = -1;
+				sourcePaging.RowCount = -1;
 			}
-			else
+
+			if (!string.IsNullOrWhiteSpace(paging.SortBy))
+				sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
+
+			var query = new DepositFormQuery(
+				brandId,
+				formQuery.UserId,
+				formQuery.UserName,
+				formQuery.ChannelName,
+				formQuery.ThirdPartyOrderNo,
+				formQuery.OrderNo,
+				formQuery.FormId,
+				formQuery.PaymentMethodId,
+				formQuery.Status ?? Array.Empty<PaymentFlowState>(),
+				createOnRange,
+				updateOnRange,
+				sourcePaging);
+
+			var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+			var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
+
+			var items = queryService.QueryAsync(query)
+				.Select(row => new DepositFormViewModel
+				{
+					Id = row.Id,
+					Amount = row.Amount,
+					ApplyInfo = row.ApplyInfo,
+					BrandId = row.BrandId,
+					BrandPaymentId = row.BrandPaymentId,
+					ChannelName = row.ChannelName,
+					CreatedOn = row.CreatedOn,
+					PaymentMethodId = row.PaymentMethodId,
+					PaymentReturn = row.PaymentReturn,
+					PlayerCode = row.PlayerCode,
+					PromotionId = row.PromotionId,
+					Remark = row.Remark,
+					Status = row.Status,
+					UpdatedOn = row.UpdatedOn,
+					UserName = row.UserName,
+					ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+					OrderNo = row.OrderNo,
+					ReviewedUserName = row.ReviewedUserName,
+					PromotionPlayerId = row.PromotionPlayerId
+				});
+
+			return new()
 			{
-				var sourcePaging = new Paging<DepositFormInfo>();
-
-				sourcePaging.Page = paging.Page ?? 1;
-				sourcePaging.RowCount = paging.Rows ?? 10;
-
-				if (!string.IsNullOrWhiteSpace(paging.SortBy))
-					sourcePaging.SortByPropertyName(paging.SortBy, paging.IsDesc ?? false);
-
-				var query = new DepositFormQuery(
-					brandId,
-					formQuery.UserId,
-					formQuery.UserName,
-					formQuery.ChannelName,
-					formQuery.ThirdPartyOrderNo,
-					formQuery.FormId,
-					formQuery.PaymentMethodId,
-					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
-					createOnRange,
-					updateOnRange,
-					sourcePaging);
-
-				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
-				var items = queryService.QueryAsync(query)
-					.Select(row => new DepositFormViewModel
-					{
-						Id = row.Id,
-						Amount = row.Amount,
-						ApplyInfo = row.ApplyInfo,
-						BrandId = row.BrandId,
-						BrandPaymentId = row.BrandPaymentId,
-						ChannelName = row.ChannelName,
-						CreatedOn = row.CreatedOn,
-						PaymentMethodId = row.PaymentMethodId,
-						PaymentReturn = row.PaymentReturn,
-						PlayerCode = row.PlayerCode,
-						PromotionId = row.PromotionId,
-						Remark = row.Remark,
-						Status = row.Status,
-						UpdatedOn = row.UpdatedOn,
-						UserName = row.UserName,
-						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
-						ReviewedUserName = row.ReviewedUserName
-					});
-
-				return new()
-				{
-					TotalCount = totalCount,
-					Page = 1,
-					Rows = -1,
-					Items = items.ToEnumerable(),
-					Sum = sum
-				};
-			}
+				TotalCount = totalCount,
+				Page = 1,
+				Rows = -1,
+				Items = items.ToEnumerable(),
+				Sum = sum
+			};
 		}
 
 		/// <summary>
@@ -282,11 +290,19 @@ namespace Tgs.Payment.Controllers
 				request.Status,
 				request.PaymentReturn,
 				request.ActualAmount,
-				request.ThirdPartyOrderNo);
+				request.ThirdPartyOrderNo,
+				request.PromotionPlayerId);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Submits the deposit form third party order no asynchronous.
+		/// </summary>
+		/// <param name="submitService">The submit service.</param>
+		/// <param name="formId">The form identifier.</param>
+		/// <param name="request">The request.</param>
+		/// <returns></returns>
 		[HttpPatch("thirdparty/{formId}")]
 		[Obsolete]
 		public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(

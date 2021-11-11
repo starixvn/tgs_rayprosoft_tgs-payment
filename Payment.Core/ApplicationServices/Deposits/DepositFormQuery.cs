@@ -10,10 +10,11 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 		string? UserName,
 		string? ChannelName,
 		string? ThirdPartyOrderNo,
+		string? OrderNo,
 		Guid? FormId,
 		Guid? PaymentMethodId,
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
 		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
-		Paging<DepositFormInfo>? Paging);
+		Paging<DepositFormInfo> Paging);
 }

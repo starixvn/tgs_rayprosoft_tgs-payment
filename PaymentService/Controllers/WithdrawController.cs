@@ -23,6 +23,31 @@ namespace Tgs.Payment.Controllers
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
+		[HttpGet("untreated/{brandId}")]
+		public ValueTask<int> CountUntreatedWithdrawFormsAsync(
+			[FromServices] IGetService<WithdrawFormQuery, int> countService,
+			Guid brandId)
+		{
+			var currentDate = DateTimeOffset.Now;
+
+			var query = new WithdrawFormQuery(
+				brandId,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
+				null,
+				(Begin: currentDate.AddDays(-1D), End: currentDate),
+				null);
+
+			return countService.GetAsync(query);
+		}
+
 		[HttpPut]
 		public async Task<Guid> CreateWithdrawFormAsync(
 			[FromServices] ICommandService<CreateWithdrawFormCommand> createService,
@@ -71,7 +96,8 @@ namespace Tgs.Payment.Controllers
 					UserId = formData.UserId,
 					UserName = formData.UserName,
 					UserType = formData.UserType,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					OrderNo = formData.OrderNo
 				}
 				: null;
 		}
@@ -114,7 +140,7 @@ namespace Tgs.Payment.Controllers
 		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
-			[FromServices] IGetService<WithdrawFormQuery, decimal> sumService,
+			[FromServices] IGetService<WithdrawFormQuery, decimal> totalAmountService,
 			Guid brandId,
 			[FromQuery] WithdrawFormQueryViewModel formQuery,
 			[FromQuery] PagingViewModel paging)
@@ -141,6 +167,7 @@ namespace Tgs.Payment.Controllers
 					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.OrderNo,
 					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
@@ -149,7 +176,7 @@ namespace Tgs.Payment.Controllers
 					null);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
+				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -164,6 +191,7 @@ namespace Tgs.Payment.Controllers
 						PaymentMethodId = row.PaymentMethodId,
 						PaymentReturn = row.PaymentReturn,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
+						OrderNo = row.OrderNo,
 						UserId = row.UserId,
 						UserType = row.UserType,
 						Remark = row.Remark,
@@ -199,6 +227,7 @@ namespace Tgs.Payment.Controllers
 					formQuery.UserType,
 					formQuery.ChannelName,
 					formQuery.ThirdPartyOrderNo,
+					formQuery.OrderNo,
 					formQuery.FormId,
 					formQuery.PaymentMethodId,
 					formQuery.Status ?? Array.Empty<PaymentFlowState>(),
@@ -207,7 +236,7 @@ namespace Tgs.Payment.Controllers
 					sourcePaging);
 
 				var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
-				var sum = await sumService.GetAsync(query).ConfigureAwait(false);
+				var sum = await totalAmountService.GetAsync(query).ConfigureAwait(false);
 
 				var items = queryService.QueryAsync(query)
 					.Select(row => new WithdrawFormViewModel
@@ -228,7 +257,8 @@ namespace Tgs.Payment.Controllers
 						UpdatedOn = row.UpdatedOn,
 						UserName = row.UserName,
 						ThirdPartyOrderNo = row.ThirdPartyOrderNo,
-						ReviewedUserName = row.ReviewedUserName
+						ReviewedUserName = row.ReviewedUserName,
+						OrderNo = row.OrderNo
 					});
 
 				return new()

@@ -36,7 +36,8 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 					command.Status,
 					command.PaymentReturn,
 					command.ActualAmount,
-					command.ThirdPartyOrderNo)
+					command.ThirdPartyOrderNo,
+					command.PromotionPlayerId)
 				.ConfigureAwait(false);
 
 			if (originStatus != command.Status)

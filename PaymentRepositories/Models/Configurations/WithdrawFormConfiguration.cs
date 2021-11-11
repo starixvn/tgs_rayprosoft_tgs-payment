@@ -51,6 +51,18 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnName("created_on")
                 .HasDefaultValueSql("now()");
 
+            entity.Property(e => e.OrderNo)
+                .HasMaxLength(50)
+                .HasColumnName("order_no");
+
+            entity.Property(e => e.PaidOn)
+                .HasColumnType("timestamp with time zone")
+                .HasColumnName("paid_on");
+
+            entity.Property(e => e.PaidUserId).HasColumnName("paid_user_id");
+
+            entity.Property(e => e.PaidUserName).HasColumnName("paid_user_name");
+
             entity.Property(e => e.PaymentReturn)
                 .HasColumnType("jsonb")
                 .HasColumnName("payment_return");
@@ -79,6 +91,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.UserName).HasColumnName("user_name");
 
             entity.Property(e => e.UserType).HasColumnName("user_type");
+
+            entity.HasOne(d => d.Brand)
+                .WithMany(p => p.WithdrawForms)
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_withdraw_forms_brands_brand_id");
 
             entity.HasOne(d => d.BrandPayment)
                 .WithMany(p => p.WithdrawForms)

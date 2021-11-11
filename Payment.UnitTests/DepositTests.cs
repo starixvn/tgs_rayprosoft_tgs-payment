@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
+using TGS.Paging;
 
 namespace Payment.UnitTests
 {
@@ -37,6 +38,8 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  null,
+					  null,
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now));
 
@@ -54,6 +57,7 @@ namespace Payment.UnitTests
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
+				null,
 				null,
 				null,
 				null,
@@ -81,20 +85,30 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
-			var sut = new CreateDepositFormCommandService(fakePaymentRepository, fakePaymentClient);
+			var sut = new CreateDepositFormCommandService(fakePaymentRepository, fakePaymentClient, fakeTakeNumberStore);
 
+			var brandId = Guid.NewGuid();
 			var command = new CreateDepositFormCommand(
 				Guid.NewGuid(),
-				new DepositFormCreateInfo(
-					"PlayerCode",
-					Guid.NewGuid(),
-					Guid.NewGuid(),
-					1000M,
-					null,
-					null));
+				new DepositFormCreateInfo
+				{
+					PlayerCode = "PlayerCode",
+					BrandId = brandId,
+					BrandPaymentId = Guid.NewGuid(),
+					Amount = 1000M,
+					PromotionId = null,
+					ApplyInfo = null
+				});
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.GetBrandInfoByIdAsync(Arg.Is(brandId));
 
 			_ = fakePaymentRepository.Received(1)
 				.CreateDepositFormAsync(Arg.Is(command.FormId), Arg.Any<DepositFormCreateInfo>());
@@ -105,7 +119,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.WaitPayment),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -134,6 +149,8 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  null,
+					  "GPIT211028150001",
 					  null,
 					  null,
 					  null,
@@ -169,6 +186,8 @@ namespace Payment.UnitTests
 					  null,
 					  null,
 					  null,
+					  "GPIT211028150001",
+					  null,
 					  null,
 					  null,
 					  DateTimeOffset.Now,
@@ -202,7 +221,9 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -249,7 +270,9 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				"GPIT211028150001",
 				"reviewedUserName",
+				null,
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now);
@@ -288,6 +311,7 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				null,
 				new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -296,12 +320,18 @@ namespace Payment.UnitTests
 				},
 				null,
 				null,
-				null);
+				new TGS.Paging.Paging<DepositFormInfo>
+				{
+					Page = -1,
+					RowCount = -1
+				});
 
 			var actual = sut.QueryAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+				.QueryDepositFormsAsync(
+					Arg.Any<DepositFormQueryConditions>(),
+					Arg.Any<Paging<DepositFormInfo>>());
 		}
 
 		[Test]
@@ -334,7 +364,9 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					"GPIT211028150001",
 					"reviewedUserName",
+					null,
 					null,
 					DateTimeOffset.Now,
 					DateTimeOffset.Now));
@@ -382,6 +414,8 @@ namespace Payment.UnitTests
 					null,
 					null,
 					null,
+					"GPIT211028150001",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
@@ -395,7 +429,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.Approved),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Is(command.ThirdPartyOrderNo));
+					Arg.Is(command.ThirdPartyOrderNo),
+					Arg.Any<int?>());
 		}
 
 		[Test]
@@ -409,6 +444,7 @@ namespace Payment.UnitTests
 			var command = new SubmitDepositFormStatusCommand(
 				Guid.NewGuid(),
 				PaymentFlowState.WaitApprove,
+				null,
 				null,
 				null,
 				null);
@@ -428,6 +464,8 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					"GPIT211028150001",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
@@ -441,7 +479,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(0)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -452,13 +491,14 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-			var sut = new DepositFormQuerySumService(fakePaymentRepository);
+			var sut = new CalculateDepositTotalAmountService(fakePaymentRepository);
 
 			var query = new DepositFormQuery(
 				Guid.NewGuid(),
 				null,
 				null,
 				null,
+				ThirdPartyOrderNo: null,
 				null,
 				null,
 				null,
@@ -475,7 +515,7 @@ namespace Payment.UnitTests
 			var actual = sut.GetAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.TotalDepositFormsAsync(Arg.Any<DepositFormQueryConditions>());
+				.CalculateDepositTotalAmountAsync(Arg.Any<DepositFormQueryConditions>());
 		}
 
 		[Test]
@@ -489,6 +529,7 @@ namespace Payment.UnitTests
 			var command = new SubmitDepositFormStatusCommand(
 				Guid.NewGuid(),
 				PaymentFlowState.Approved,
+				null,
 				null,
 				null,
 				null);
@@ -508,6 +549,8 @@ namespace Payment.UnitTests
 					"{}",
 					null,
 					null,
+					"GPIT211028150001",
+					null,
 					null,
 					null,
 					DateTimeOffset.Now,
@@ -521,7 +564,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
-					Arg.Any<string>());
+					Arg.Any<string>(),
+					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(1)
 				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());

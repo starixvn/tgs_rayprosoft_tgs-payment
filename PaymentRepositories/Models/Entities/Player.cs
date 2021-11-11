@@ -46,6 +46,7 @@ namespace Tgs.Payment.Repositories.Entities
         public DateTime? FirstDepositOn { get; set; }
         public string? AreaCode { get; set; }
 
+        public virtual Brand Brand { get; set; } = default!;
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual ICollection<DepositForm> DepositForms { get; set; }

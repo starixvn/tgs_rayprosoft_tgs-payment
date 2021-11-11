@@ -7,6 +7,10 @@ namespace Tgs.Payment
 {
 	public interface IPaymentRepository
 	{
+		ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions);
+
+		ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions);
+
 		ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions);
 
 		ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
@@ -45,6 +49,8 @@ namespace Tgs.Payment
 
 		IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode);
 
+		ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id);
+
 		IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode);
 
 		ValueTask<BrandPaymentInfo> GetBrandPaymentByIdAsync(Guid id);
@@ -64,9 +70,6 @@ namespace Tgs.Payment
 		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 			DepositFormQueryConditions conditions,
 			Paging<DepositFormInfo> paging);
-
-		IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
-			DepositFormQueryConditions conditions);
 
 		IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions conditions,
@@ -93,10 +96,11 @@ namespace Tgs.Payment
 
 		ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState status,
+			PaymentFlowState? status,
 			string? paymentReturn,
 			decimal? actualAmount,
-			string? thirdPartyOrderNo);
+			string? thirdPartyOrderNo,
+			int? promotionPlayerId);
 
 		ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
@@ -104,9 +108,5 @@ namespace Tgs.Payment
 			string? paymentReturn,
 			decimal? actualAmount,
 			string? thirdPartyOrderNo);
-
-		ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions);
-
-		ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions);
 	}
 }

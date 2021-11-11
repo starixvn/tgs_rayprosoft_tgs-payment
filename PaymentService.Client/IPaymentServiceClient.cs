@@ -6,6 +6,10 @@ namespace Tgs.Payment.Clients
 {
 	public interface IPaymentServiceClient
 	{
+		ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId);
+
+		ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId);
+
 		ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
 
 		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
@@ -77,10 +81,11 @@ namespace Tgs.Payment.Clients
 
 		ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState state,
+			PaymentFlowState? state = null,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null);
+			string? thirdPartyOrderNo = null,
+			int? promotionPlayerId = null);
 
 		[Obsolete]
 		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);

@@ -32,6 +32,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -51,21 +52,27 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
 
+			var brandId = Guid.NewGuid();
 			var command = new CreateWithdrawFormCommand(
 				Guid.NewGuid().ToString(),
 				"TestAgent",
 				UserType.Agent,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
 				.Returns(new AgentBankInfo(
@@ -83,6 +90,9 @@ namespace Payment.UnitTests
 			Assert.AreNotEqual(Guid.Empty, actual);
 
 			_ = fakePaymentRepository.Received(1)
+				.GetBrandInfoByIdAsync(Arg.Is(brandId));
+
+			_ = fakePaymentRepository.Received(1)
 				.CreateWithdrawFormAsync(Arg.Is(actual), Arg.Any<WithdrawFormCreateInfo>());
 
 			_ = fakePaymentClient.Received(1)
@@ -94,21 +104,28 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
+
+			var brandId = Guid.NewGuid();
 
 			var command = new CreateWithdrawFormCommand(
 				"ThisIsPlayerCode",
 				"TestUser",
 				UserType.Player,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
 				.Returns(new PlayerBankInfo(
@@ -124,6 +141,9 @@ namespace Payment.UnitTests
 			var actual = await command.ReturnFormIdSource.Task;
 
 			Assert.AreNotEqual(Guid.Empty, actual);
+
+			_ = fakePaymentRepository.Received(1)
+				.GetBrandInfoByIdAsync(Arg.Is(brandId));
 
 			_ = fakePaymentRepository.Received(1)
 				.CreateWithdrawFormAsync(Arg.Is(actual), Arg.Any<WithdrawFormCreateInfo>());
@@ -152,6 +172,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -186,6 +207,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
@@ -216,6 +238,7 @@ namespace Payment.UnitTests
 				null,
 				null,
 				null,
+				null,
 				new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -230,38 +253,6 @@ namespace Payment.UnitTests
 
 			fakePaymentRepository.Received(1)
 				.QueryWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
-		}
-
-		[Test]
-		public void Can_Sum_WithdrawForms()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-			var sut = new WithdrawFormQuerySumService(fakePaymentRepository);
-
-			var query = new WithdrawFormQuery(
-				Guid.NewGuid(),
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-				},
-				null,
-				null,
-				null);
-
-			var actual = sut.GetAsync(query);
-
-			fakePaymentRepository.Received(1)
-				.TotalWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
 		}
 
 		[Test]
@@ -295,6 +286,7 @@ namespace Payment.UnitTests
 					PaymentFlowState.WaitApprove,
 					null,
 					"reviewedUserName",
+					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
 					DateTimeOffset.UtcNow));
@@ -351,6 +343,41 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public async Task Can_Submit_Withdraw_From_Third_Party_Order_No()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+			var sut = new SaveWithdrawThirdPartyOrderNoCommandService(fakePaymentRepository);
+
+			var command = new SaveWithdrawThirdPartyOrderNoCommand(Guid.NewGuid(), "thirdPartyOrderNo");
+
+			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
+				.Returns(new WithdrawFormInfo(
+					command.FormId,
+					"UserId",
+					  UserType.Player,
+					"UserName",
+					Guid.NewGuid(),
+					1000M,
+					PaymentFlowState.WaitPayment,
+					null,
+					null,
+					"GPIW211028160001",
+					Guid.NewGuid(),
+					DateTimeOffset.UtcNow,
+					DateTimeOffset.UtcNow));
+
+			await sut.ExecuteAsync(command);
+
+			_ = fakePaymentRepository.Received(1)
+				.SubmitWithdrawFormStatusAsync(
+					Arg.Is(command.FormId),
+					Arg.Is(PaymentFlowState.WaitPayment),
+					Arg.Any<string>(),
+					Arg.Any<decimal?>(),
+					Arg.Any<string>());
+		}
+
+		[Test]
 		public async Task Can_Submit_WithdrawForm_Status()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -378,6 +405,7 @@ namespace Payment.UnitTests
 					(int)PaymentFlowState.Init,
 					null,
 					null,
+					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.Now,
 					DateTimeOffset.Now,
@@ -405,25 +433,65 @@ namespace Payment.UnitTests
 		}
 
 		[Test]
+		public void Can_Sum_WithdrawForms()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			var sut = new CalculateWithdrawTotalAmountService(fakePaymentRepository);
+
+			var query = new WithdrawFormQuery(
+				Guid.NewGuid(),
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new[] {
+					PaymentFlowState.WaitPayment,
+					PaymentFlowState.WaitApprove,
+					PaymentFlowState.Approved,
+					PaymentFlowState.Reject
+				},
+				null,
+				null,
+				null);
+
+			var actual = sut.GetAsync(query);
+
+			fakePaymentRepository.Received(1)
+				.CalculateWithdrawTotalAmountAsync(Arg.Any<WithdrawFormQueryConditions>());
+		}
+
+		[Test]
 		public void Create_Agent_WithdrawForm_If_BankInfo_Not_Self_Will_Fail()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
+
+			var brandId = Guid.NewGuid();
 
 			var command = new CreateWithdrawFormCommand(
 				Guid.NewGuid().ToString(),
 				"TestAgent",
 				UserType.Agent,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
 				.Returns(new AgentBankInfo(
@@ -442,21 +510,28 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
+
+			var brandId = Guid.NewGuid();
 
 			var command = new CreateWithdrawFormCommand(
 				"ThisIsPlayerCode",
 				"TestUser",
 				UserType.Player,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
 				.Returns(new PlayerBankInfo(
@@ -475,21 +550,28 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
+
+			var brandId = Guid.NewGuid();
 
 			var command = new CreateWithdrawFormCommand(
 				"Unknown",
 				"Unknown",
 				UserType.None,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
 		}
@@ -499,21 +581,28 @@ namespace Payment.UnitTests
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 			var fakePaymentClient = Substitute.For<IPaymentClient>();
+			var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 
 			var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
 
 			var sut = new CreateWithdrawFormCommandService(
 				fakePaymentRepository,
 				fakePaymentClient,
-				optionsAccessor);
+				optionsAccessor,
+				fakeTakeNumberStore);
+
+			var brandId = Guid.NewGuid();
 
 			var command = new CreateWithdrawFormCommand(
 				"ThisIsPlayerCode",
 				"TestUser",
 				UserType.Player,
-				Guid.NewGuid(),
+				brandId,
 				Guid.NewGuid(),
 				1000M);
+
+			fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+				.Returns(new BrandInfo("GPI"));
 
 			fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
 				.Returns(new PlayerBankInfo(
@@ -535,40 +624,6 @@ namespace Payment.UnitTests
 					Assert.IsNotNull(createInfo.BankInfo);
 				});
 			await sut.ExecuteAsync(command);
-		}
-
-		[Test]
-		public async Task Can_Submit_Withdraw_From_Third_Party_Order_No()
-		{
-			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-			var sut = new SaveWithdrawThirdPartyOrderNoCommandService(fakePaymentRepository);
-
-			var command = new SaveWithdrawThirdPartyOrderNoCommand(Guid.NewGuid(), "thirdPartyOrderNo");
-
-			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
-				.Returns(new WithdrawFormInfo(
-					command.FormId,
-					"UserId",
-					  UserType.Player,
-					"UserName",
-					Guid.NewGuid(),
-					1000M,
-					PaymentFlowState.WaitPayment,
-					null,
-					null,
-					Guid.NewGuid(),
-					DateTimeOffset.UtcNow,
-					DateTimeOffset.UtcNow));
-
-			await sut.ExecuteAsync(command);
-
-			_ = fakePaymentRepository.Received(1)
-				.SubmitWithdrawFormStatusAsync(
-					Arg.Is(command.FormId),
-					Arg.Is(PaymentFlowState.WaitPayment),
-					Arg.Any<string>(),
-					Arg.Any<decimal?>(),
-					Arg.Any<string>());
 		}
 	}
 }

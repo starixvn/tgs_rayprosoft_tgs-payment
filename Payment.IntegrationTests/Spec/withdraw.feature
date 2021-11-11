@@ -37,3 +37,8 @@ Scenario: Query withdraw forms
 	Given I Query withdraw forms
 	When call get withdraw forms api
 	Then return withdraw forms list
+
+Scenario: Get Untreated withdraw form Count
+	Given I will count untreated withdraw form count
+	When call api
+	Then return form count

@@ -18,6 +18,20 @@ namespace TGS.Payment.Repositories
 			_tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
 		}
 
+		public ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions)
+		{
+			var dataQuery = MakeDepositFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
+		public ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions)
+		{
+			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
+
+			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		}
+
 		public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions)
 		{
 			var dataQuery = MakeDepositFormQueryAsync(conditions);
@@ -93,7 +107,8 @@ namespace TGS.Payment.Repositories
 					PaymentReturn = form.PaymentReturn,
 					PromotionId = form.PromotionId,
 					CreatedOn = currentDate,
-					UpdatedOn = currentDate
+					UpdatedOn = currentDate,
+					OrderNo = form.OrderNo
 				})
 				.ConfigureAwait(false);
 
@@ -171,7 +186,8 @@ namespace TGS.Payment.Repositories
 					PaymentReturn = form.PaymentReturn,
 					Status = (int)form.Status,
 					CreatedOn = currentDate,
-					UpdatedOn = currentDate
+					UpdatedOn = currentDate,
+					OrderNo = form.OrderNo
 				})
 				.ConfigureAwait(false);
 
@@ -277,6 +293,15 @@ namespace TGS.Payment.Repositories
 					info.PaymentChannelId,
 					info.BankType,
 					info.Detail!));
+
+		public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id)
+		{
+			var brandInfo = await _tgsContext.Brands
+				.FindAsync(id)
+				.ConfigureAwait(false);
+
+			return new BrandInfo(brandInfo.Code);
+		}
 
 		public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode)
 		{
@@ -406,8 +431,10 @@ namespace TGS.Payment.Repositories
 							df.ApplyInfo,
 							df.PaymentReturn,
 							df.ThirdPartyOrderNo,
+							df.OrderNo,
 							df.ReviewedUserName,
 							df.PromotionId,
+							df.PromotionPlayerId,
 							df.CreatedOn,
 							df.UpdatedOn);
 
@@ -452,6 +479,7 @@ namespace TGS.Payment.Repositories
 							(PaymentFlowState)df.Status,
 							df.Remark,
 							df.ReviewedUserName,
+							df.OrderNo,
 							df.BankInfoId,
 							df.CreatedOn,
 							df.UpdatedOn,
@@ -485,41 +513,19 @@ namespace TGS.Payment.Repositories
 					form.ApplyInfo,
 					form.PaymentReturn,
 					form.ThirdPartyOrderNo,
+					form.OrderNo,
 					form.ReviewedUserName,
 					form.PromotionId,
+					form.PromotionPlayerId,
 					form.CreatedOn,
 					form.UpdatedOn));
 
-			dataQuery = dataQuery.ApplyOrderBy(paging).ApplyPaging(paging);
+			dataQuery = dataQuery.ApplyOrderBy(paging);
+
+			if (paging.RowCount > 0)
+				dataQuery = dataQuery.ApplyPaging(paging);
 
 			return dataQuery
-				.ToEnumerable()
-				.ToAsyncEnumerable();
-		}
-
-		public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(DepositFormQueryConditions conditions)
-		{
-			var dataQuery = MakeDepositFormQueryAsync(conditions);
-
-			return dataQuery
-				.Select(form => new DepositFormInfo(
-					form.Id,
-					form.PlayerCode,
-					form.PlayerCodeNavigation.Username,
-					form.BrandId,
-					form.BrandPaymentId,
-					form.BrandPayment.ChannelName,
-					form.BrandPayment.PaymentMethodChannel.MethodId,
-					form.Amount,
-					form.Remark,
-					(PaymentFlowState)form.Status,
-					form.ApplyInfo,
-					form.PaymentReturn,
-					form.ThirdPartyOrderNo,
-					form.ReviewedUserName,
-					form.PromotionId,
-					form.CreatedOn,
-					form.UpdatedOn))
 				.ToEnumerable()
 				.ToAsyncEnumerable();
 		}
@@ -539,6 +545,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.Remark,
 					form.ReviewedUserName,
+					form.OrderNo,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -572,6 +579,7 @@ namespace TGS.Payment.Repositories
 					(PaymentFlowState)form.Status,
 					form.Remark,
 					form.ReviewedUserName,
+					form.OrderNo,
 					form.BankInfoId,
 					form.CreatedOn,
 					form.UpdatedOn,
@@ -633,17 +641,19 @@ namespace TGS.Payment.Repositories
 
 		public async ValueTask SubmitDepositFormStatusAsync(
 			Guid formId,
-			PaymentFlowState status,
+			PaymentFlowState? status,
 			string? paymentReturn,
 			decimal? actualAmount,
-			string? thirdPartyOrderNo)
+			string? thirdPartyOrderNo,
+			int? promotionPlayerId)
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
-			formData.Status = (int)status;
+			formData.Status = status.HasValue ? (int)status.Value : formData.Status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
 			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
 			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
+			formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
 			formData.UpdatedOn = DateTime.UtcNow;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
@@ -667,20 +677,6 @@ namespace TGS.Payment.Repositories
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public ValueTask<decimal> TotalDepositFormsAsync(DepositFormQueryConditions conditions)
-		{
-			var dataQuery = MakeDepositFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
-		}
-
-		public ValueTask<decimal> TotalWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
-		{
-			var dataQuery = MakeWithdrawFormQueryAsync(conditions);
-
-			return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
-		}
-
 		private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)
 		{
 			var dataQuery = _tgsContext.DepositForms
@@ -699,6 +695,8 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				dataQuery = dataQuery.Where(form => form.OrderNo == conditions.OrderNo);
 			if (conditions.FormId != null)
 				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
@@ -748,6 +746,9 @@ namespace TGS.Payment.Repositories
 			if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 				dataQuery = dataQuery.Where(
 					form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+			if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
+				dataQuery = dataQuery.Where(
+					form => form.OrderNo == conditions.OrderNo);
 			if (conditions.FormId != null)
 				dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 

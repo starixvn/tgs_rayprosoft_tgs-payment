@@ -18,6 +18,8 @@ namespace Tgs.Payment.ViewModels
 
 		public Guid Id { get; set; }
 
+		public string? OrderNo { get; set; }
+
 		public Guid PaymentMethodId { get; set; }
 
 		public string? PaymentReturn { get; set; }
@@ -25,6 +27,8 @@ namespace Tgs.Payment.ViewModels
 		public string PlayerCode { get; set; } = default!;
 
 		public Guid? PromotionId { get; set; }
+
+		public int? PromotionPlayerId { get; set; }
 
 		public string? Remark { get; set; }
 

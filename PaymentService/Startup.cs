@@ -23,9 +23,8 @@ namespace PaymentService
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-				app.UseSwagger();
-				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentService v1"));
 			}
+			app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentService v1"));
 
 			app.UseRouting();
 
@@ -33,6 +32,7 @@ namespace PaymentService
 			{
 				endpoints.MapControllers();
 				endpoints.MapHealthChecks("/health");
+				endpoints.MapSwagger();
 			});
 		}
 
@@ -62,6 +62,11 @@ namespace PaymentService
 			services
 				.AddPaymentClient()
 				.AddPayment()
+				.UseRedis((options, sp) =>
+				{
+					var config = sp.GetRequiredService<IConfiguration>();
+					options.ConnectionString = config.GetConnectionString("RedisConfigurationString");
+				})
 				.UseTgsPaymentRepository((sp, builder) =>
 				{
 					var config = sp.GetRequiredService<IConfiguration>();
