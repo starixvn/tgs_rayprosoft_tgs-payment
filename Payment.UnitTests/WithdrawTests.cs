@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
+using TGS.Paging;
 
 namespace Payment.UnitTests
 {
@@ -247,12 +248,14 @@ namespace Payment.UnitTests
 				},
 				null,
 				null,
-				null);
+				new Paging<WithdrawFormInfo>());
 
 			var actual = sut.QueryAsync(query);
 
 			fakePaymentRepository.Received(1)
-				.QueryWithdrawFormsAsync(Arg.Any<WithdrawFormQueryConditions>());
+				.QueryWithdrawFormsAsync(
+					Arg.Any<WithdrawFormQueryConditions>(),
+					Arg.Any<Paging<WithdrawFormInfo>>());
 		}
 
 		[Test]

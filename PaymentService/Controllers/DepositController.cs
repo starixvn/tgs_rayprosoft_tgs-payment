@@ -137,6 +137,11 @@ namespace Tgs.Payment.Controllers
 		{
 			var currentDate = DateTimeOffset.UtcNow;
 
+			var sourcePaging = new Paging<DepositFormInfo>();
+
+			sourcePaging.Page = -1;
+			sourcePaging.RowCount = -1;
+
 			var query = new DepositFormQuery(
 				brandId,
 				null,
@@ -153,7 +158,7 @@ namespace Tgs.Payment.Controllers
 				},
 				null,
 				(Begin: currentDate.AddDays(-1D), End: currentDate),
-				null);
+				sourcePaging);
 
 			return countService.GetAsync(query);
 		}
