@@ -111,7 +111,6 @@ namespace Tgs.Payment.WithdrawProcessors
 
 			var settings = new Help2PayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("merchantId").GetString(),
-				formId.ToString(),
 				brandPaymentExtendedData.RootElement.GetProperty("securityCode").GetString(),
 				formId,
 				brandPaymentExtendedData.RootElement.GetProperty("currency").GetString(),
