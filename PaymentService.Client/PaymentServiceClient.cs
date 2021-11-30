@@ -695,7 +695,7 @@ namespace Tgs.Payment.Clients
 
 		public async ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
-			PaymentFlowState state,
+			PaymentFlowState? state,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
 			string? thirdPartyOrderNo = null)
