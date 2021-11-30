@@ -4,6 +4,7 @@ using Tgs.Payment.Help2Pay;
 using Tgs.Payment.LeePay;
 using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
+using Tgs.Payment.SkyPay;
 using Tgs.Payment.WithdrawProcessors;
 using TGS.Payment.ManualDeposit;
 
@@ -19,7 +20,8 @@ namespace Tgs.Payment.Configuration
 				.AddSingleton<ApplePaySerializer>()
 				.AddSingleton<ManualDepositSerializer>()
 				.AddSingleton<MaticPaySerializer>()
-				.AddSingleton<Help2PaySerializer>();
+				.AddSingleton<Help2PaySerializer>()
+				.AddSingleton<SkyPaySerializer>();
 
 			return configuration
 				.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
@@ -27,7 +29,8 @@ namespace Tgs.Payment.Configuration
 				.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
 				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
 				.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
-				.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay");
+				.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
+				.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay");
 		}
 	}
 }

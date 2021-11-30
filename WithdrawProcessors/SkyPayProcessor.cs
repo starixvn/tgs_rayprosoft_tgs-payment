@@ -1,0 +1,58 @@
+﻿using System;
+using System.Text.Json;
+using Microsoft.Extensions.Options;
+using Tgs.Payment.ApplePay;
+using Tgs.Payment.SkyPay;
+
+namespace Tgs.Payment.WithdrawProcessors
+{
+	internal class SkyPayProcessor : IWithdrawProcessor
+	{
+		private readonly JsonSerializerOptions _jsonSerializerOptions;
+		private readonly SkyPaySerializer _skyPaySerializer;
+
+		public string Subject => "tgs.payment.skypay.withdraw";
+
+		public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+		{
+			if (jsonOptionsAccessor is null)
+				throw new ArgumentNullException(nameof(jsonOptionsAccessor));
+
+			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
+			_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
+		}
+
+		public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var brandPaymentExtendedData = JsonSerializer
+				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+
+			switch (withdrawBankInfo.BankType)
+			{
+				case "Bank":
+					return MakeBankWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+
+				default:
+					throw new NotSupportedException();
+			}
+		}
+
+		private string MakeBankWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var settings = new GatewayWithdrawSettings(
+				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				formId,
+				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
+				withdrawBankInfo.Detail.AccountNumber,
+				withdrawBankInfo.Detail.RealName);
+
+			return _skyPaySerializer.Serialize(settings);
+		}
+	}
+}
