@@ -6,7 +6,7 @@
 
 		public string? PaymentReturn { get; init; }
 
-		public PaymentFlowState Status { get; init; }
+		public PaymentFlowState? Status { get; init; }
 
 		public string? ThirdPartyOrderNo { get; init; }
 	}

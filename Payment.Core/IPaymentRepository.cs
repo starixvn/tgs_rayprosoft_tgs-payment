@@ -104,7 +104,7 @@ namespace Tgs.Payment
 
 		ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
-			PaymentFlowState status,
+			PaymentFlowState? status,
 			string? paymentReturn,
 			decimal? actualAmount,
 			string? thirdPartyOrderNo);
