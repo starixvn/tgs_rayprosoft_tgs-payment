@@ -19,49 +19,34 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 		public ValueTask<int> GetAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
 			=> _paymentRepository.CountWithdrawFormsAsync(
 				new WithdrawFormQueryConditions(
-						query.BrandId,
-						query.UserId,
-						query.UserName,
-						query.UserType,
-						query.ChannelName,
-						query.ThirdPartyOrderNo,
-						query.OrderNo,
-						query.FormId,
-						query.PaymentMethodId,
-						query.Status,
-						query.CreateOnRange,
-						query.UpdateOnRange));
+					query.BrandId,
+					query.UserId,
+					query.UserName,
+					query.UserType,
+					query.ChannelName,
+					query.ThirdPartyOrderNo,
+					query.OrderNo,
+					query.FormId,
+					query.PaymentMethodId,
+					query.Status,
+					query.CreateOnRange,
+					query.UpdateOnRange));
 
 		public IAsyncEnumerable<WithdrawFormInfo> QueryAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
-			=> query.Paging == null
-				? _paymentRepository.QueryWithdrawFormsAsync(
-					new WithdrawFormQueryConditions(
-						query.BrandId,
-						query.UserId,
-						query.UserName,
-						query.UserType,
-						query.ChannelName,
-						query.ThirdPartyOrderNo,
-						query.OrderNo,
-						query.FormId,
-						query.PaymentMethodId,
-						query.Status,
-						query.CreateOnRange,
-						query.UpdateOnRange))
-				: _paymentRepository.QueryWithdrawFormsAsync(
-					new WithdrawFormQueryConditions(
-						query.BrandId,
-						query.UserId,
-						query.UserName,
-						query.UserType,
-						query.ChannelName,
-						query.ThirdPartyOrderNo,
-						query.OrderNo,
-						query.FormId,
-						query.PaymentMethodId,
-						query.Status,
-						query.CreateOnRange,
-						query.UpdateOnRange),
-					query.Paging);
+			=> _paymentRepository.QueryWithdrawFormsAsync(
+				new WithdrawFormQueryConditions(
+					query.BrandId,
+					query.UserId,
+					query.UserName,
+					query.UserType,
+					query.ChannelName,
+					query.ThirdPartyOrderNo,
+					query.OrderNo,
+					query.FormId,
+					query.PaymentMethodId,
+					query.Status,
+					query.CreateOnRange,
+					query.UpdateOnRange),
+				query.Paging);
 	}
 }
