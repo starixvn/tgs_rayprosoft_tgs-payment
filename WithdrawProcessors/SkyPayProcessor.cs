@@ -79,7 +79,7 @@ namespace Tgs.Payment.WithdrawProcessors
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
 
-			var settings = new MomoWithdrawSettings(
+			var settings = new ZaloWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
 				formId,
 				withdrawBankInfo.Detail.QrCode);
