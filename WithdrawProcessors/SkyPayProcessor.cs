@@ -33,14 +33,20 @@ namespace Tgs.Payment.WithdrawProcessors
 			switch (withdrawBankInfo.BankType)
 			{
 				case "Bank":
-					return MakeBankWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+					return MakeBankWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
+
+				case "Momo":
+					return MakeMomoWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
+
+				case "Zalo":
+					return MakeZaloWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
 
 				default:
 					throw new NotSupportedException();
 			}
 		}
 
-		private string MakeBankWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 		{
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
@@ -51,6 +57,32 @@ namespace Tgs.Payment.WithdrawProcessors
 				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 				withdrawBankInfo.Detail.AccountNumber,
 				withdrawBankInfo.Detail.RealName);
+
+			return _skyPaySerializer.Serialize(settings);
+		}
+
+		private string MakeMomoWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var settings = new MomoWithdrawSettings(
+				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				formId,
+				withdrawBankInfo.Detail.QrCode);
+
+			return _skyPaySerializer.Serialize(settings);
+		}
+
+		private string MakeZaloWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var settings = new MomoWithdrawSettings(
+				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				formId,
+				withdrawBankInfo.Detail.QrCode);
 
 			return _skyPaySerializer.Serialize(settings);
 		}
