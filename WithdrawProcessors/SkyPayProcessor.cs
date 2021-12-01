@@ -33,20 +33,20 @@ namespace Tgs.Payment.WithdrawProcessors
 			switch (withdrawBankInfo.BankType)
 			{
 				case "Bank":
-					return MakeBankWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+					return MakeBankWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
 
 				case "Momo":
-					return MakeMomoWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+					return MakeMomoWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
 
 				case "Zalo":
-					return MakeZaloWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+					return MakeZaloWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
 
 				default:
 					throw new NotSupportedException();
 			}
 		}
 
-		private string MakeBankWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 		{
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
@@ -61,7 +61,7 @@ namespace Tgs.Payment.WithdrawProcessors
 			return _skyPaySerializer.Serialize(settings);
 		}
 
-		private string MakeMomoWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		private string MakeMomoWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 		{
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, _jsonSerializerOptions);
@@ -74,7 +74,7 @@ namespace Tgs.Payment.WithdrawProcessors
 			return _skyPaySerializer.Serialize(settings);
 		}
 
-		private string MakeZaloWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		private string MakeZaloWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 		{
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
