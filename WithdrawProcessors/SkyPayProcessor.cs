@@ -35,6 +35,12 @@ namespace Tgs.Payment.WithdrawProcessors
 				case "Bank":
 					return MakeBankWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
 
+				case "Momo":
+					return MakeMomoWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+
+				case "Zalo":
+					return MakeZaloWithdrawSettings(formId, amount, bankInfo, brandPaymentExtendedData);
+
 				default:
 					throw new NotSupportedException();
 			}
@@ -51,6 +57,32 @@ namespace Tgs.Payment.WithdrawProcessors
 				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 				withdrawBankInfo.Detail.AccountNumber,
 				withdrawBankInfo.Detail.RealName);
+
+			return _skyPaySerializer.Serialize(settings);
+		}
+
+		private string MakeMomoWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var settings = new MomoWithdrawSettings(
+				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				formId,
+				withdrawBankInfo.Detail.QrCode);
+
+			return _skyPaySerializer.Serialize(settings);
+		}
+
+		private string MakeZaloWithdrawSettings(Guid formId, decimal amount, string bankInfo, JsonDocument brandPaymentExtendedData)
+		{
+			var withdrawBankInfo = JsonSerializer
+				.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+			var settings = new MomoWithdrawSettings(
+				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				formId,
+				withdrawBankInfo.Detail.QrCode);
 
 			return _skyPaySerializer.Serialize(settings);
 		}
