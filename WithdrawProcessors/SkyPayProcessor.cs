@@ -11,15 +11,17 @@ namespace Tgs.Payment.WithdrawProcessors
 		private readonly JsonSerializerOptions _jsonSerializerOptions;
 		private readonly SkyPaySerializer _skyPaySerializer;
 
-		public string Subject => "tgs.payment.skypay.withdraw";
+		public string Subject { get; }
 
-		public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+		public SkyPayProcessor(string subjectFragment, IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
 		{
 			if (jsonOptionsAccessor is null)
 				throw new ArgumentNullException(nameof(jsonOptionsAccessor));
 
 			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 			_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
+
+			Subject = $"tgs.payment.skypay.{subjectFragment}.withdraw";
 		}
 
 		public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)

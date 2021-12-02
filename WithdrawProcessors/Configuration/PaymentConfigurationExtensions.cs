@@ -30,7 +30,7 @@ namespace Tgs.Payment.Configuration
 				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
 				.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
 				.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
-				.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay");
+				.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-VN", "vn");
 		}
 	}
 }
