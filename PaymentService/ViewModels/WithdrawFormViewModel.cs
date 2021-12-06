@@ -22,18 +22,27 @@ namespace Tgs.Payment.ViewModels
 
 		public Guid Id { get; set; }
 
+		public string? OrderNo { get; set; }
+
+		public DateTimeOffset? PaidOn { get; set; }
+
+		public string? PaidUserId { get; set; }
+
+		public string? PaidUserName { get; set; }
+
 		public Guid? PaymentMethodId { get; set; }
 
 		public string? PaymentReturn { get; set; }
 
 		public string? Remark { get; set; }
 
+		public DateTimeOffset? ReviewedOn { get; set; }
+
+		public string? ReviewedUserName { get; set; }
+
 		public PaymentFlowState Status { get; set; }
 
 		public string? ThirdPartyOrderNo { get; set; }
-
-		public string? OrderNo { get; set; }
-		public string? ReviewedUserName { get; set; }
 
 		public DateTimeOffset UpdatedOn { get; set; }
 

@@ -136,13 +136,19 @@ namespace Tgs.Payment.Controllers
 					UserId = formData.UserId,
 					UserName = formData.UserName,
 					UserType = formData.UserType,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					ReviewedUserName = formData.ReviewedUserName,
+					ReviewedOn = formData.ReviewedOn,
+					OrderNo = formData.OrderNo,
+					PaidOn = formData.PaidOn,
+					PaidUserName = formData.PaidUserName,
+					PaidUserId = formData.PaidUserId
 				}
 				: null;
 		}
 
 		[HttpGet("{brandId}")]
-		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
+		public async Task<PagingWithdrawFormViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
 			[FromServices] IGetService<WithdrawFormQuery, decimal> totalAmountService,
@@ -213,10 +219,14 @@ namespace Tgs.Payment.Controllers
 					UserName = row.UserName,
 					ThirdPartyOrderNo = row.ThirdPartyOrderNo,
 					ReviewedUserName = row.ReviewedUserName,
-					OrderNo = row.OrderNo
+					ReviewedOn = row.ReviewedOn,
+					OrderNo = row.OrderNo,
+					PaidUserId = row.PaidUserId,
+					PaidUserName = row.PaidUserName,
+					PaidOn = row.PaidOn
 				});
 
-			return new()
+			return new PagingWithdrawFormViewModel
 			{
 				TotalCount = totalCount,
 				Page = 1,
