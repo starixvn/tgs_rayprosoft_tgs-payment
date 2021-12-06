@@ -15,7 +15,7 @@ namespace Tgs.Payment.WithdrawProcessors
 			["Alliance Bank"] = "ALB",
 			["AM Bank"] = " AMB",
 			["Bank Simpanan National"] = "BSN",
-			["CIMB Bank "] = "CIMB",
+			["CIMB Bank"] = "CIMB",
 			["Citi bank"] = "CITI",
 			["Hong Leong Bank"] = "HLB",
 			["HSBC Bank"] = "HSBC",
