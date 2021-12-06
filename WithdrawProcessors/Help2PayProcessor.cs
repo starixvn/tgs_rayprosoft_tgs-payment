@@ -116,7 +116,8 @@ namespace Tgs.Payment.WithdrawProcessors
 				brandPaymentExtendedData.RootElement.GetProperty("currency").GetString(),
 				withdrawBankInfo.Detail.BankAccount,
 				withdrawBankInfo.Detail.Name,
-				bankCode);
+				bankCode,
+				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 			return _help2PaySerializer.Serialize(settings);
 		}
