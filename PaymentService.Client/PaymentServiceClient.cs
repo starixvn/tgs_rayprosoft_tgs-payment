@@ -698,14 +698,18 @@ namespace Tgs.Payment.Clients
 			PaymentFlowState? state,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null)
+			string? thirdPartyOrderNo = null,
+			string? paidUserId = null,
+			string? paidUserName = null)
 		{
 			var request = new WithdrawFormStatus
 			{
 				Status = state,
 				PaymentReturn = paymentReturn,
 				ActualAmount = actualAmount,
-				ThirdPartyOrderNo = thirdPartyOrderNo
+				ThirdPartyOrderNo = thirdPartyOrderNo,
+				PaidUserId = paidUserId,
+				PaidUserName = paidUserName
 			};
 
 			var requestContent = new StringContent(

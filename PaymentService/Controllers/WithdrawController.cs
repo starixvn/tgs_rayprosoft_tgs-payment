@@ -8,7 +8,7 @@ using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {
@@ -264,7 +264,9 @@ namespace Tgs.Payment.Controllers
 				request.Status,
 				request.PaymentReturn,
 				request.ActualAmount,
-				request.ThirdPartyOrderNo);
+				request.ThirdPartyOrderNo,
+				request.PaidUserId,
+				request.PaidUserName);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}

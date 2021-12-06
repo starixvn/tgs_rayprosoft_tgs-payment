@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tgs.MessageQueue;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Protos;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.MessageQueue
 {
@@ -25,6 +25,8 @@ namespace Tgs.Payment.MessageQueue
 			var command = new SubmitWithdrawFormStatusCommand(
 				request.FormId,
 				PaymentFlowState.Paid,
+				null,
+				null,
 				null,
 				null,
 				null);

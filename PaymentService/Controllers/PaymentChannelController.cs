@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {

@@ -35,7 +35,10 @@ namespace Microsoft.Extensions.DependencyInjection
 						})
 						.AddReplyHandler<SaveWithdrawThirdNoHandler>(
 							"tgs.payment.withdraw.external_id",
-							"tgs.payment.withdraw.external_id");
+							"tgs.payment.withdraw.external_id")
+						.AddReplyHandler<TagWithdrawPaidHandler>(
+							"tgs.payment.withdraw.paid",
+							"tgs.payment.withdraw.paid");
 				})
 				.AddNatsGlobPatternExchange("*");
 

@@ -55,6 +55,7 @@ namespace Tgs.Payment.WithdrawProcessors
 
 			var settings = new GatewayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
 				formId,
 				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 				withdrawBankInfo.Detail.AccountNumber,
@@ -70,6 +71,7 @@ namespace Tgs.Payment.WithdrawProcessors
 
 			var settings = new MomoWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
 				formId,
 				withdrawBankInfo.Detail.QrCode);
 
@@ -83,6 +85,7 @@ namespace Tgs.Payment.WithdrawProcessors
 
 			var settings = new ZaloWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
 				formId,
 				withdrawBankInfo.Detail.QrCode);
 
