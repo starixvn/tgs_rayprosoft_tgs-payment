@@ -95,6 +95,8 @@ namespace Tgs.Payment.Clients
 			PaymentFlowState? state = null,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null);
+			string? thirdPartyOrderNo = null,
+			string? paidUserId = null,
+			string? paidUserName = null);
 	}
 }

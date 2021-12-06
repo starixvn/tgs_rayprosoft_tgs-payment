@@ -7,5 +7,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 		PaymentFlowState? Status,
 		string? PaymentReturn,
 		decimal? ActualAmount,
-		string? ThirdPartyOrderNo);
+		string? ThirdPartyOrderNo,
+		string? PaidUserId,
+		string? PaidUserName);
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 using Tgs.Payment.ApplicationServices.Withdraws;
 
 namespace Tgs.Payment.MessageQueue

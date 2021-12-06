@@ -679,15 +679,23 @@ namespace TGS.Payment.Repositories
 			PaymentFlowState? status,
 			string? paymentReturn,
 			decimal? actualAmount,
-			string? thirdPartyOrderNo)
+			string? thirdPartyOrderNo,
+			string? paidUserId,
+			string? paidUserName)
 		{
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
+
+			var currentTime = DateTime.UtcNow;
 
 			formData.Status = status.HasValue ? (int)status.Value : formData.Status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
 			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
 			formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
-			formData.UpdatedOn = DateTime.UtcNow;
+			formData.PaidUserId = paidUserId ?? formData.PaidUserId;
+			formData.PaidUserName = paidUserName ?? formData.PaidUserName;
+			formData.UpdatedOn = currentTime;
+			if (status == PaymentFlowState.Paid)
+				formData.PaidOn = currentTime;
 
 			await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
 		}

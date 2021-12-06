@@ -386,6 +386,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.WaitPayment),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
+					Arg.Any<string>(),
+					Arg.Any<string>(),
 					Arg.Any<string>());
 		}
 
@@ -402,6 +404,8 @@ namespace Payment.UnitTests
 			var command = new SubmitWithdrawFormStatusCommand(
 				Guid.NewGuid(),
 				PaymentFlowState.WaitApprove,
+				null,
+				null,
 				null,
 				null,
 				null);
@@ -437,6 +441,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
+					Arg.Any<string>(),
+					Arg.Any<string>(),
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
