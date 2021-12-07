@@ -30,7 +30,9 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 					query.PaymentMethodId,
 					query.Status,
 					query.CreateOnRange,
-					query.UpdateOnRange));
+					query.UpdateOnRange,
+					query.ReviewOnRange,
+					query.PaidOnRange));
 
 		public IAsyncEnumerable<WithdrawFormInfo> QueryAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
 			=> _paymentRepository.QueryWithdrawFormsAsync(
@@ -46,7 +48,9 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 					query.PaymentMethodId,
 					query.Status,
 					query.CreateOnRange,
-					query.UpdateOnRange),
+					query.UpdateOnRange,
+					query.ReviewOnRange,
+					 query.PaidOnRange),
 				query.Paging);
 	}
 }

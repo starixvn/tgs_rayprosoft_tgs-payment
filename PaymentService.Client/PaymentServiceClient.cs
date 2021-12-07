@@ -556,6 +556,18 @@ namespace Tgs.Payment.Clients
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 
+			if (conditions.ReviewOnRange != null)
+			{
+				queryStrings.Add("br", conditions.ReviewOnRange.Value.Begin.ToString("o"));
+				queryStrings.Add("er", conditions.ReviewOnRange.Value.End.ToString("o"));
+			}
+
+			if (conditions.PaidOnRange != null)
+			{
+				queryStrings.Add("bp", conditions.PaidOnRange.Value.Begin.ToString("o"));
+				queryStrings.Add("ep", conditions.PaidOnRange.Value.End.ToString("o"));
+			}
+
 			if (paging.ShowAll == true)
 				queryStrings.Add("all", "true");
 			else

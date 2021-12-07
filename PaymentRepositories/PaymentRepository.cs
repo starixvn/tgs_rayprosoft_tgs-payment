@@ -791,6 +791,14 @@ namespace TGS.Payment.Repositories
 				dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
 					&& form.UpdatedOn < conditions.UpdateOnRange.Value.End);
 
+			if (conditions.ReviewOnRange != null)
+				dataQuery = dataQuery.Where(form => form.ReviewedOn >= conditions.ReviewOnRange.Value.Begin
+					&& form.ReviewedOn < conditions.ReviewOnRange.Value.End);
+
+			if (conditions.PaidOnRange != null)
+				dataQuery = dataQuery.Where(form => form.PaidOn >= conditions.PaidOnRange.Value.Begin
+					&& form.PaidOn < conditions.PaidOnRange.Value.End);
+
 			return dataQuery.AsAsyncEnumerable();
 		}
 	}

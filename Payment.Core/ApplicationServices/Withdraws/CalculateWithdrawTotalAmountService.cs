@@ -29,6 +29,8 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,
-						query.UpdateOnRange));
+						query.UpdateOnRange,
+						query.ReviewOnRange,
+						query.PaidOnRange));
 	}
 }

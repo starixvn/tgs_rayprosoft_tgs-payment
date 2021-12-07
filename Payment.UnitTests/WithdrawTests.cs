@@ -249,6 +249,8 @@ namespace Payment.UnitTests
 				},
 				null,
 				null,
+				null,
+				null,
 				new Paging<WithdrawFormInfo>());
 
 			var actual = sut.QueryAsync(query);
@@ -474,6 +476,8 @@ namespace Payment.UnitTests
 					PaymentFlowState.Approved,
 					PaymentFlowState.Reject
 				},
+				null,
+				null,
 				null,
 				null,
 				null);
