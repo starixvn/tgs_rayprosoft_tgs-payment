@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
-using TGS.Paging;
 using Tgs.ServiceUtility;
+using TGS.Paging;
 
 namespace Tgs.Payment.Controllers
 {
@@ -104,7 +104,12 @@ namespace Tgs.Payment.Controllers
 					UserName = formData.UserName,
 					UserType = formData.UserType,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
-					OrderNo = formData.OrderNo
+					OrderNo = formData.OrderNo,
+					ReviewedOn = formData.ReviewedOn,
+					ReviewedUserName = formData.ReviewedUserName,
+					PaidUserName = formData.PaidUserName,
+					PaidUserId = formData.PaidUserId,
+					PaidOn = formData.PaidOn
 				}
 				: null;
 		}
