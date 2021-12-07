@@ -13,9 +13,9 @@ namespace Payment.IntegrationTests
 	[Scope(Scenario = "Save thirdparty order no to deposit form")]
 	public class DepositSaveThirdPartyOrderNoSteps
 	{
+		private Guid _formId;
 		private PaymentServiceClient _paymentServiceClient;
 		private IHost _testHost;
-		private Guid _formId;
 		private string _thirdPartyOrderNo;
 
 		public DepositSaveThirdPartyOrderNoSteps()
@@ -40,6 +40,16 @@ namespace Payment.IntegrationTests
 			_thirdPartyOrderNo = thirdPartyOrderNo;
 		}
 
+		[Then(@"form thirdparty_order_no should be ""(.*)""")]
+		public async Task ThenFormThirdparty_Order_NoShouldBe(string thirdPartyOrderNo)
+		{
+			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+			var formData = await dbContext.DepositForms.FindAsync(_formId);
+
+			Assert.AreEqual(thirdPartyOrderNo, formData.ThirdPartyOrderNo);
+		}
+
 		[When(@"I call save api")]
 		public async Task WhenICallSaveApi()
 		{
@@ -47,7 +57,13 @@ namespace Payment.IntegrationTests
 
 			await dbContext.Players.AddAsync(new Player
 			{
-				PlayerCode = "PlayerCode"
+				PlayerCode = "PlayerCode",
+				DefaultWalletCurrencyCode = "CNY",
+				Password = Array.Empty<byte>(),
+				Salt = Array.Empty<byte>(),
+				Username = "player",
+				WithdrawPassword = Array.Empty<byte>(),
+				WithdrawSalt = Array.Empty<byte>()
 			});
 
 			var pmc = new PaymentMethodChannel
@@ -63,7 +79,11 @@ namespace Payment.IntegrationTests
 			var bp = new BrandPayment
 			{
 				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id
+				PaymentMethodChannelId = pmc.Id,
+				ChannelName = "channel",
+				CreatedByUsername = "System",
+				ExtendedData = "{}",
+				UpdatedByUsername = "System"
 			};
 			await dbContext.BrandPayments.AddAsync(bp);
 
@@ -82,16 +102,6 @@ namespace Payment.IntegrationTests
 			await dbContext.SaveChangesAsync();
 
 			await _paymentServiceClient.SubmitDepositFormThirdPartyOrderNoAsync(_formId, _thirdPartyOrderNo);
-		}
-
-		[Then(@"form thirdparty_order_no should be ""(.*)""")]
-		public async Task ThenFormThirdparty_Order_NoShouldBe(string thirdPartyOrderNo)
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
-
-			var formData = await dbContext.DepositForms.FindAsync(_formId);
-
-			Assert.AreEqual(thirdPartyOrderNo, formData.ThirdPartyOrderNo);
 		}
 	}
 }

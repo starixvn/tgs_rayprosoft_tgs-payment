@@ -42,7 +42,13 @@ namespace Payment.IntegrationTests
 			var brand = new Brand
 			{
 				Id = Guid.NewGuid(),
-				Code = "GPI"
+				Code = "GPI",
+				ApiKey = "apikey",
+				ClientId = "clientId",
+				CreatedByUsername = "System",
+				Name = "test",
+				SecretKey = "secret",
+				UpdatedByUsername = "System"
 			};
 
 			await dbContext.Brands.AddAsync(brand);
@@ -60,7 +66,11 @@ namespace Payment.IntegrationTests
 			var bp = new BrandPayment
 			{
 				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id
+				PaymentMethodChannelId = pmc.Id,
+				ChannelName = "channel",
+				CreatedByUsername = "System",
+				ExtendedData = "{}",
+				UpdatedByUsername = "System"
 			};
 			await dbContext.BrandPayments.AddAsync(bp);
 
@@ -75,7 +85,8 @@ namespace Payment.IntegrationTests
 				Amount = 1000M,
 				Status = (int)PaymentFlowState.WaitApprove,
 				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
 			});
 
 			await dbContext.SaveChangesAsync();

@@ -24,6 +24,7 @@ namespace PaymentRepositories.UnitTests
 			var testFormData = new DepositForm
 			{
 				Id = Guid.NewGuid(),
+				PlayerCode = "Tester",
 				Status = 0,
 				PaymentReturn = "Test"
 			};
