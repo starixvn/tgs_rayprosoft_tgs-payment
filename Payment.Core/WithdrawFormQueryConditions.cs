@@ -15,5 +15,7 @@ namespace Tgs.Payment
 		Guid? PaymentMethodId,
 		IEnumerable<PaymentFlowState> Status,
 		(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
-		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange);
+		(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
+		(DateTimeOffset Begin, DateTimeOffset End)? ReviewOnRange,
+		(DateTimeOffset Begin, DateTimeOffset End)? PaidOnRange);
 }

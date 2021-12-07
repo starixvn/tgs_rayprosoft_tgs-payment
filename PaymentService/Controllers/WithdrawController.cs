@@ -48,6 +48,8 @@ namespace Tgs.Payment.Controllers
 				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
 				null,
 				(Begin: currentDate.AddDays(-1D), End: currentDate),
+				null,
+				null,
 				sourcePaging);
 
 			return countService.GetAsync(query);
@@ -160,12 +162,20 @@ namespace Tgs.Payment.Controllers
 
 			var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 			var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
+			var reviewOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
+			var paidOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 
 			if (formQuery.BeginCreatedOn != null && formQuery.EndCreatedOn != null)
 				createOnRange = (formQuery.BeginCreatedOn.Value, formQuery.EndCreatedOn.Value);
 
 			if (formQuery.BeginUpdateOn != null && formQuery.EndUpdatedOn != null)
 				updateOnRange = (formQuery.BeginUpdateOn.Value, formQuery.EndUpdatedOn.Value);
+
+			if (formQuery.BeginReviewOn != null && formQuery.EndReviewOn != null)
+				reviewOnRange = (formQuery.BeginReviewOn.Value, formQuery.EndReviewOn.Value);
+
+			if (formQuery.BeginPaidOn != null && formQuery.EndPaidOn != null)
+				paidOnRange = (formQuery.BeginPaidOn.Value, formQuery.EndPaidOn.Value);
 
 			var sourcePaging = new Paging<WithdrawFormInfo>();
 
@@ -194,6 +204,8 @@ namespace Tgs.Payment.Controllers
 				formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 				createOnRange,
 				updateOnRange,
+				paidOnRange,
+				reviewOnRange,
 				sourcePaging);
 
 			var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
