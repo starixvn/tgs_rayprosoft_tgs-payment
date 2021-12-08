@@ -24,9 +24,10 @@ namespace Tgs.Payment.Configuration
 			return this;
 		}
 
-		public PaymentConfiguration RegisterWithdrawProcessor<TProcessor>(string paymentCode) where TProcessor : class, IWithdrawProcessor
+		public PaymentConfiguration RegisterWithdrawProcessor<TProcessor>(string paymentCode, params object[] parameters) where TProcessor : class, IWithdrawProcessor
 		{
-			Services.AddSingleton<TProcessor>();
+			Services.AddSingleton(
+				sp => ActivatorUtilities.CreateInstance<TProcessor>(sp, parameters));
 
 			_processTypes[paymentCode] = typeof(TProcessor);
 

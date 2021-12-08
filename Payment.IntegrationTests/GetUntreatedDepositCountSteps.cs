@@ -51,7 +51,13 @@ namespace Payment.IntegrationTests
 
 			await dbContext.Players.AddAsync(new Player
 			{
-				PlayerCode = "PlayerCode"
+				PlayerCode = "PlayerCode",
+				DefaultWalletCurrencyCode = "CNY",
+				Password = Array.Empty<byte>(),
+				Salt = Array.Empty<byte>(),
+				Username = "player",
+				WithdrawPassword = Array.Empty<byte>(),
+				WithdrawSalt = Array.Empty<byte>()
 			});
 
 			var pmc = new PaymentMethodChannel
@@ -67,7 +73,11 @@ namespace Payment.IntegrationTests
 			var bp = new BrandPayment
 			{
 				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id
+				PaymentMethodChannelId = pmc.Id,
+				ChannelName = "channel",
+				CreatedByUsername = "System",
+				ExtendedData = "{}",
+				UpdatedByUsername = "System"
 			};
 			await dbContext.BrandPayments.AddAsync(bp);
 

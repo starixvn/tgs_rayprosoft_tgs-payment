@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.Clients;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws
 {
@@ -30,7 +30,9 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 					formData.Status,
 					null,
 					null,
-					command.ThirdPartyOrderNo)
+					command.ThirdPartyOrderNo,
+					null,
+					null)
 				.ConfigureAwait(false);
 		}
 	}

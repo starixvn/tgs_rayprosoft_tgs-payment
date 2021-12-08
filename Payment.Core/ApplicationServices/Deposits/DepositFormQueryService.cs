@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits
 {

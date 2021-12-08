@@ -43,7 +43,13 @@ namespace Payment.IntegrationTests
 				new Brand
 				{
 					Id = brandId,
-					Code = "GPI"
+					Code = "GPI",
+					ApiKey = "apikey",
+					ClientId = "clientId",
+					CreatedByUsername = "System",
+					Name = "test",
+					SecretKey = "secret",
+					UpdatedByUsername = "System"
 				});
 
 			await dbContext.SaveChangesAsync();

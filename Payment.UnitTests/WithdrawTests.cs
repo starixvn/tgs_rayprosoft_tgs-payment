@@ -33,6 +33,7 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  null,
 					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
@@ -173,12 +174,11 @@ namespace Payment.UnitTests
 					  PaymentFlowState.WaitApprove,
 					  null,
 					  null,
+					  null,
 					  "GPIW211028160001",
 					  Guid.NewGuid(),
 					  DateTimeOffset.Now,
 					  DateTimeOffset.Now,
-					  null,
-					  null,
 					  null,
 					  null,
 					  null));
@@ -206,6 +206,7 @@ namespace Payment.UnitTests
 					  Guid.NewGuid(),
 					  1000M,
 					  PaymentFlowState.WaitApprove,
+					  null,
 					  null,
 					  null,
 					  "GPIW211028160001",
@@ -246,6 +247,8 @@ namespace Payment.UnitTests
 					PaymentFlowState.Approved,
 					PaymentFlowState.Reject
 				},
+				null,
+				null,
 				null,
 				null,
 				new Paging<WithdrawFormInfo>());
@@ -289,10 +292,14 @@ namespace Payment.UnitTests
 					PaymentFlowState.WaitApprove,
 					null,
 					"reviewedUserName",
+					DateTime.Now,
 					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
-					DateTimeOffset.UtcNow));
+					DateTimeOffset.UtcNow,
+					null,
+					null,
+					null));
 
 			fakePaymentRepository
 				.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
@@ -357,17 +364,21 @@ namespace Payment.UnitTests
 				.Returns(new WithdrawFormInfo(
 					command.FormId,
 					"UserId",
-					  UserType.Player,
+					UserType.Player,
 					"UserName",
 					Guid.NewGuid(),
 					1000M,
 					PaymentFlowState.WaitPayment,
 					null,
 					null,
+					null,
 					"GPIW211028160001",
 					Guid.NewGuid(),
 					DateTimeOffset.UtcNow,
-					DateTimeOffset.UtcNow));
+					DateTimeOffset.UtcNow,
+					null,
+					null,
+					null));
 
 			await sut.ExecuteAsync(command);
 
@@ -377,6 +388,8 @@ namespace Payment.UnitTests
 					Arg.Is(PaymentFlowState.WaitPayment),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
+					Arg.Any<string>(),
+					Arg.Any<string>(),
 					Arg.Any<string>());
 		}
 
@@ -395,6 +408,8 @@ namespace Payment.UnitTests
 				PaymentFlowState.WaitApprove,
 				null,
 				null,
+				null,
+				null,
 				null);
 
 			fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
@@ -406,6 +421,7 @@ namespace Payment.UnitTests
 					Guid.NewGuid(),
 					1000M,
 					(int)PaymentFlowState.Init,
+					null,
 					null,
 					null,
 					"GPIW211028160001",
@@ -427,6 +443,8 @@ namespace Payment.UnitTests
 					Arg.Is(command.Status),
 					Arg.Any<string>(),
 					Arg.Any<decimal?>(),
+					Arg.Any<string>(),
+					Arg.Any<string>(),
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
@@ -458,6 +476,8 @@ namespace Payment.UnitTests
 					PaymentFlowState.Approved,
 					PaymentFlowState.Reject
 				},
+				null,
+				null,
 				null,
 				null,
 				null);
