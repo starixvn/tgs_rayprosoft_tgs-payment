@@ -200,7 +200,7 @@ namespace TGS.Payment.Repositories
 				.FindAsync(bankInfoId)
 				.ConfigureAwait(false);
 
-			if (bankInfo.AgentId == agentId)
+			if (bankInfo != null && bankInfo.AgentId == agentId)
 			{
 				_tgsContext.AgentBankInfoItems.Remove(bankInfo);
 
@@ -214,7 +214,7 @@ namespace TGS.Payment.Repositories
 				.FindAsync(bankInfoId)
 				.ConfigureAwait(false);
 
-			if (bankInfo.PlayerCode == playerCode)
+			if (bankInfo != null && bankInfo.PlayerCode == playerCode)
 			{
 				_tgsContext.PlayerBankInfos.Remove(bankInfo);
 
@@ -228,8 +228,8 @@ namespace TGS.Payment.Repositories
 				.FindAsync(id)
 				.ConfigureAwait(false);
 
-			return new Tgs.Payment.AgentBankInfo(
-				bankInfo.Id,
+			return new AgentBankInfo(
+				bankInfo!.Id,
 				bankInfo.AgentId,
 				bankInfo.BrandId,
 				bankInfo.PaymentChannelId,
@@ -275,7 +275,7 @@ namespace TGS.Payment.Repositories
 				.ConfigureAwait(false);
 
 			return new Tgs.Payment.PlayerBankInfo(
-				bankInfo.Id,
+				bankInfo!.Id,
 				bankInfo.PlayerCode,
 				bankInfo.BrandId,
 				bankInfo.PaymentChannelId,
@@ -300,7 +300,7 @@ namespace TGS.Payment.Repositories
 				.FindAsync(id)
 				.ConfigureAwait(false);
 
-			return new BrandInfo(brandInfo.Code);
+			return new BrandInfo(brandInfo!.Code);
 		}
 
 		public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode)
@@ -448,7 +448,7 @@ namespace TGS.Payment.Repositories
 				.ConfigureAwait(false);
 
 			return new PaymentInfo(
-				payment.Id,
+				payment!.Id,
 				payment.Code);
 		}
 
@@ -615,6 +615,9 @@ namespace TGS.Payment.Repositories
 				.FindAsync(formId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			formData.Status = reviewStatus.ToNumber();
 			formData.Remark = remark;
 			formData.UpdatedOn = DateTime.UtcNow;
@@ -641,6 +644,9 @@ namespace TGS.Payment.Repositories
 				.FindAsync(formId)
 				.ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			formData.BrandPaymentId = brandPaymentId;
 			formData.ApplyInfo = applyInfo;
 			formData.Status = reviewStatus.ToNumber();
@@ -664,6 +670,9 @@ namespace TGS.Payment.Repositories
 		{
 			var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
 
+			if (formData == null)
+				return;
+
 			formData.Status = status.HasValue ? (int)status.Value : formData.Status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
 			formData.ActualAmount = actualAmount ?? formData.ActualAmount;
@@ -686,6 +695,9 @@ namespace TGS.Payment.Repositories
 			var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
 
 			var currentTime = DateTime.UtcNow;
+
+			if (formData == null)
+				return;
 
 			formData.Status = status.HasValue ? (int)status.Value : formData.Status;
 			formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;

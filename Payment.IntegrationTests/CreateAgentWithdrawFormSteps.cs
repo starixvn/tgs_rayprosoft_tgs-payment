@@ -67,14 +67,22 @@ namespace Payment.IntegrationTests
 					AgentId = _agentId,
 					Detail = "{}",
 					CreatedOn = DateTime.Now,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					CreatedByUsername = "System",
+					UpdatedByUsername = "System",
 				});
 
 			await dbContext.Brands.AddAsync(
 				new Brand
 				{
 					Id = brandId,
-					Code = "GPI"
+					Code = "GPI",
+					ApiKey = "apikey",
+					ClientId = "clientId",
+					CreatedByUsername = "System",
+					Name = "test",
+					SecretKey = "secret",
+					UpdatedByUsername = "System"
 				});
 
 			await dbContext.SaveChangesAsync();

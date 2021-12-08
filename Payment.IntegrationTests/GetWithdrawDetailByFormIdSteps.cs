@@ -56,7 +56,11 @@ namespace Payment.IntegrationTests
 			var bp = new BrandPayment
 			{
 				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id
+				PaymentMethodChannelId = pmc.Id,
+				ChannelName = "channel",
+				CreatedByUsername = "System",
+				ExtendedData = "{}",
+				UpdatedByUsername = "System"
 			};
 			await dbContext.BrandPayments.AddAsync(bp);
 
@@ -70,7 +74,8 @@ namespace Payment.IntegrationTests
 				BrandPaymentId = bp.Id,
 				Amount = 1000M,
 				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
 			});
 
 			await dbContext.SaveChangesAsync();

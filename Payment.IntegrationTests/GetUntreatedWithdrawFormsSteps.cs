@@ -62,7 +62,11 @@ namespace Payment.IntegrationTests
 			var bp = new BrandPayment
 			{
 				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id
+				PaymentMethodChannelId = pmc.Id,
+				ChannelName = "channel",
+				CreatedByUsername = "System",
+				ExtendedData = "{}",
+				UpdatedByUsername = "System"
 			};
 			await dbContext.BrandPayments.AddAsync(bp);
 
@@ -71,31 +75,36 @@ namespace Payment.IntegrationTests
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Init,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					BankInfo = "{}"
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.WaitApprove,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					BankInfo = "{}"
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Approved,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					BankInfo = "{}"
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Reject,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					BankInfo = "{}"
 				},
 				new WithdrawForm{
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Paid,
-					UpdatedOn = DateTime.Now
+					UpdatedOn = DateTime.Now,
+					BankInfo = "{}"
 				}
 			});
 
