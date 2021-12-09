@@ -8,7 +8,7 @@ namespace Tgs.Payment.WithdrawProcessors
 {
 	internal class Help2PayProcessor : IWithdrawProcessor
 	{
-		private static readonly Dictionary<string, string> _BankMap = new()
+		private static readonly Dictionary<string, string> _BankMap = new(StringComparer.OrdinalIgnoreCase)
 		{
 			// Malaysia Bank
 			["Affin Bank"] = "AFF",
@@ -40,20 +40,35 @@ namespace Tgs.Payment.WithdrawProcessors
 			["Promptpay"] = "PPTP",
 
 			// Vietnam Bank
+			["ACBBank"] = "ACB",
 			["Asia Commercial Bank"] = "ACB",
+			["DongABank"] = "DAB",
 			["DongA Joint Stock Commercial Bank"] = "DAB",
+			["SacomBank"] = "SACOM",
 			["Sacom Bank"] = "SACOM",
+			["Techcombank"] = "TCB",
 			["Techcom Bank"] = "TCB",
+			["VietcomBank"] = "VCB",
 			["Vietcom Bank"] = "VCB",
+			["Vietinbank"] = "VTB",
 			["Vietin Bank"] = "VTB",
+			["EximBank"] = "EXIM",
 			["Eximbank Vietnam"] = "EXIM",
+			["BIDVBank"] = "BIDV",
 			["Bank for Investment and Development of Vietnam"] = "BIDV",
+			["SaigonBank"] = "SCMB",
 			["SAIGON Bank"] = "SCMB",
+			["VIBBank"] = "VIB",
 			["Vietnam International Bank"] = "VIB",
+			["AgriBank"] = "AGB",
 			["Agribank"] = "AGB",
+			["MBBank"] = "MB",
 			["Military Commercial Joint Stock Bank"] = "MB",
+			["MSBBank"] = "MTMB",
 			["Maritime Bank"] = "MTMB",
+			["TPBank"] = "TPB",
 			["Tien Phong Bank"] = "TPB",
+			["VPBank"] = "VPB",
 			["VP Bank"] = "VPB",
 
 			// Indonesia Bank
@@ -103,11 +118,20 @@ namespace Tgs.Payment.WithdrawProcessors
 			var withdrawBankInfo = JsonSerializer
 				.Deserialize<WithdrawBankInfo<Help2PayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
-			var bankName = withdrawBankInfo.Detail.BankName;
-			_BankMap.TryGetValue(bankName, out var bankCode);
-
 			var brandPaymentExtendedData = JsonSerializer
 				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+
+			var bankCode = default(string);
+			if (brandPaymentExtendedData.RootElement.TryGetProperty("bankCode", out var element))
+			{
+				bankCode = element.GetString();
+			}
+
+			if (string.IsNullOrEmpty(bankCode))
+			{
+				var bankName = withdrawBankInfo.Detail.BankName;
+				_BankMap.TryGetValue(bankName, out bankCode);
+			}
 
 			var settings = new Help2PayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("merchantId").GetString(),
