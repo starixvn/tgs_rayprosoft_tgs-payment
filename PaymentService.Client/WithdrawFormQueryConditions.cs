@@ -13,13 +13,17 @@ namespace Tgs.Payment.Clients
 
 		public Guid? FormId { get; init; }
 
+		public string? OrderNo { get; init; }
+
+		public (DateTimeOffset Begin, DateTimeOffset End)? PaidOnRange { get; init; }
+
 		public Guid? PaymentMethodId { get; init; }
+
+		public (DateTimeOffset Begin, DateTimeOffset End)? ReviewOnRange { get; init; }
 
 		public IEnumerable<PaymentFlowState> Status { get; init; } = Array.Empty<PaymentFlowState>();
 
 		public string? ThirdPartyOrderNo { get; init; }
-
-		public string? OrderNo { get; init; }
 
 		public (DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange { get; init; }
 

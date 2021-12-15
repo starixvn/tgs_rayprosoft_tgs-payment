@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
+using Tgs.ServiceUtility;
 using TGS.Paging;
-using TGS.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {
@@ -48,6 +48,8 @@ namespace Tgs.Payment.Controllers
 				new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
 				null,
 				(Begin: currentDate.AddDays(-1D), End: currentDate),
+				null,
+				null,
 				sourcePaging);
 
 			return countService.GetAsync(query);
@@ -102,7 +104,12 @@ namespace Tgs.Payment.Controllers
 					UserName = formData.UserName,
 					UserType = formData.UserType,
 					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
-					OrderNo = formData.OrderNo
+					OrderNo = formData.OrderNo,
+					ReviewedOn = formData.ReviewedOn,
+					ReviewedUserName = formData.ReviewedUserName,
+					PaidUserName = formData.PaidUserName,
+					PaidUserId = formData.PaidUserId,
+					PaidOn = formData.PaidOn
 				}
 				: null;
 		}
@@ -136,13 +143,19 @@ namespace Tgs.Payment.Controllers
 					UserId = formData.UserId,
 					UserName = formData.UserName,
 					UserType = formData.UserType,
-					ThirdPartyOrderNo = formData.ThirdPartyOrderNo
+					ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
+					ReviewedUserName = formData.ReviewedUserName,
+					ReviewedOn = formData.ReviewedOn,
+					OrderNo = formData.OrderNo,
+					PaidOn = formData.PaidOn,
+					PaidUserName = formData.PaidUserName,
+					PaidUserId = formData.PaidUserId
 				}
 				: null;
 		}
 
 		[HttpGet("{brandId}")]
-		public async Task<WithdrawViewModel> QueryWithdrawFormsAsync(
+		public async Task<PagingWithdrawFormViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
 			[FromServices] IGetService<WithdrawFormQuery, decimal> totalAmountService,
@@ -154,12 +167,20 @@ namespace Tgs.Payment.Controllers
 
 			var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 			var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
+			var reviewOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
+			var paidOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 
 			if (formQuery.BeginCreatedOn != null && formQuery.EndCreatedOn != null)
 				createOnRange = (formQuery.BeginCreatedOn.Value, formQuery.EndCreatedOn.Value);
 
 			if (formQuery.BeginUpdateOn != null && formQuery.EndUpdatedOn != null)
 				updateOnRange = (formQuery.BeginUpdateOn.Value, formQuery.EndUpdatedOn.Value);
+
+			if (formQuery.BeginReviewOn != null && formQuery.EndReviewOn != null)
+				reviewOnRange = (formQuery.BeginReviewOn.Value, formQuery.EndReviewOn.Value);
+
+			if (formQuery.BeginPaidOn != null && formQuery.EndPaidOn != null)
+				paidOnRange = (formQuery.BeginPaidOn.Value, formQuery.EndPaidOn.Value);
 
 			var sourcePaging = new Paging<WithdrawFormInfo>();
 
@@ -188,6 +209,8 @@ namespace Tgs.Payment.Controllers
 				formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 				createOnRange,
 				updateOnRange,
+				paidOnRange,
+				reviewOnRange,
 				sourcePaging);
 
 			var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
@@ -213,10 +236,14 @@ namespace Tgs.Payment.Controllers
 					UserName = row.UserName,
 					ThirdPartyOrderNo = row.ThirdPartyOrderNo,
 					ReviewedUserName = row.ReviewedUserName,
-					OrderNo = row.OrderNo
+					ReviewedOn = row.ReviewedOn,
+					OrderNo = row.OrderNo,
+					PaidUserId = row.PaidUserId,
+					PaidUserName = row.PaidUserName,
+					PaidOn = row.PaidOn
 				});
 
-			return new()
+			return new PagingWithdrawFormViewModel
 			{
 				TotalCount = totalCount,
 				Page = 1,
@@ -254,7 +281,9 @@ namespace Tgs.Payment.Controllers
 				request.Status,
 				request.PaymentReturn,
 				request.ActualAmount,
-				request.ThirdPartyOrderNo);
+				request.ThirdPartyOrderNo,
+				request.PaidUserId,
+				request.PaidUserName);
 
 			await submitService.ExecuteAsync(command).ConfigureAwait(false);
 		}

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws
 {
@@ -29,6 +29,8 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 						query.PaymentMethodId,
 						query.Status,
 						query.CreateOnRange,
-						query.UpdateOnRange));
+						query.UpdateOnRange,
+						query.ReviewOnRange,
+						query.PaidOnRange));
 	}
 }

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.Clients;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws
 {
@@ -36,7 +36,9 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 					command.Status,
 					command.PaymentReturn,
 					command.ActualAmount,
-					command.ThirdPartyOrderNo)
+					command.ThirdPartyOrderNo,
+					command.PaidUserId,
+					command.PaidUserName)
 				.ConfigureAwait(false);
 
 			if (originStatus != command.Status)

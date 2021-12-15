@@ -22,13 +22,27 @@ namespace Tgs.Payment.Clients
 
 		public Guid Id { get; init; }
 
+		public string? OrderNo { get; init; }
+
+		public DateTimeOffset? PaidOn { get; init; }
+
+		public string? PaidUserId { get; init; }
+
+		public string? PaidUserName { get; init; }
+
 		public Guid? PaymentMethodId { get; init; }
 
 		public string? PaymentReturn { get; init; }
 
 		public string? Remark { get; init; }
 
+		public DateTimeOffset? ReviewedOn { get; init; }
+
+		public string? ReviewedUserName { get; init; }
+
 		public PaymentFlowState Status { get; init; }
+
+		public string? ThirdPartyOrderNo { get; init; }
 
 		public DateTimeOffset UpdatedOn { get; init; }
 
@@ -37,11 +51,5 @@ namespace Tgs.Payment.Clients
 		public string? UserName { get; init; }
 
 		public UserType UserType { get; init; }
-
-		public string? ThirdPartyOrderNo { get; init; }
-
-		public string? OrderNo { get; init; }
-
-		public string? ReviewedUserName { get; init; }
 	}
 }

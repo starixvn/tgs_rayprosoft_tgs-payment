@@ -2,7 +2,7 @@
 
 namespace Tgs.Payment.Clients
 {
-	public class PagingResponse<TItem>
+    public class PagingResponse<TItem>
     {
         public IEnumerable<TItem> Items { get; set; } = default!;
 

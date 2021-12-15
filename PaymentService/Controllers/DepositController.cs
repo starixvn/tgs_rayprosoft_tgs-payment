@@ -6,7 +6,7 @@ using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using TGS.Paging;
-using TGS.ServiceUtility;
+using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Controllers
 {

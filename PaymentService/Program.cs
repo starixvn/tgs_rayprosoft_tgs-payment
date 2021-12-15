@@ -1,30 +1,16 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using PaymentService;
 
-namespace PaymentService
-{
-	public class Program
-	{
-		public static IHostBuilder CreateHostBuilder(string[] args) =>
-			Host.CreateDefaultBuilder(args)
-				.ConfigureAppConfiguration(builder =>
-				{
-					builder.AddJsonFile("/config/appsettings.json", true);
-				})
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder.UseStartup<Startup>();
-				})
-				.ConfigureLogging((ctx, builder) =>
-				{
-					builder.AddTgsLog();
-				});
+var builder = WebApplication.CreateBuilder(args);
 
-		public static void Main(string[] args)
-		{
-			CreateHostBuilder(args).Build().Run();
-		}
-	}
-}
+builder.Configuration.AddJsonFile("/config/appsettings.json", true);
+builder.Logging.AddTgsLog();
+
+var startup = new Startup();
+
+startup.ConfigureServices(builder.Services);
+
+var app = builder.Build();
+
+startup.Configure(app, app.Environment);
+
+app.Run();

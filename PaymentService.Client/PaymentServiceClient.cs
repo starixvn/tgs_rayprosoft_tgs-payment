@@ -556,6 +556,18 @@ namespace Tgs.Payment.Clients
 				queryStrings.Add("eu", conditions.UpdateOnRange.Value.End.ToString("o"));
 			}
 
+			if (conditions.ReviewOnRange != null)
+			{
+				queryStrings.Add("br", conditions.ReviewOnRange.Value.Begin.ToString("o"));
+				queryStrings.Add("er", conditions.ReviewOnRange.Value.End.ToString("o"));
+			}
+
+			if (conditions.PaidOnRange != null)
+			{
+				queryStrings.Add("bp", conditions.PaidOnRange.Value.Begin.ToString("o"));
+				queryStrings.Add("ep", conditions.PaidOnRange.Value.End.ToString("o"));
+			}
+
 			if (paging.ShowAll == true)
 				queryStrings.Add("all", "true");
 			else
@@ -695,17 +707,21 @@ namespace Tgs.Payment.Clients
 
 		public async ValueTask SubmitWithdrawFormStatusAsync(
 			Guid formId,
-			PaymentFlowState state,
+			PaymentFlowState? state,
 			string? paymentReturn = null,
 			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null)
+			string? thirdPartyOrderNo = null,
+			string? paidUserId = null,
+			string? paidUserName = null)
 		{
 			var request = new WithdrawFormStatus
 			{
 				Status = state,
 				PaymentReturn = paymentReturn,
 				ActualAmount = actualAmount,
-				ThirdPartyOrderNo = thirdPartyOrderNo
+				ThirdPartyOrderNo = thirdPartyOrderNo,
+				PaidUserId = paidUserId,
+				PaidUserName = paidUserName
 			};
 
 			var requestContent = new StringContent(

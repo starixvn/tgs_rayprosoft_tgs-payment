@@ -4,8 +4,10 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 {
 	public record SubmitWithdrawFormStatusCommand(
 		Guid FormId,
-		PaymentFlowState Status,
+		PaymentFlowState? Status,
 		string? PaymentReturn,
 		decimal? ActualAmount,
-		string? ThirdPartyOrderNo);
+		string? ThirdPartyOrderNo,
+		string? PaidUserId,
+		string? PaidUserName);
 }

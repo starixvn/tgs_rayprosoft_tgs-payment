@@ -64,7 +64,10 @@ namespace Payment.IntegrationTests
 				new AgentBankInfoItem
 				{
 					AgentId = _agentId,
-					Id = _bankInfoId
+					Id = _bankInfoId,
+					BankType = "Bank",
+					CreatedByUsername = "System",
+					UpdatedByUsername = "System"
 				});
 
 			await dbContext.SaveChangesAsync();
