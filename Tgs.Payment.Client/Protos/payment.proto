@@ -5,6 +5,7 @@ package payment;
 
 import "phoenix/protobuf/guid.proto";
 import "phoenix/protobuf/decimal.proto";
+import "google/protobuf/timestamp.proto";
 
 message DepositRequest {
 	string apply_info = 1;
@@ -50,4 +51,9 @@ message FormThirdNoRequest {
 
 message TagPaidRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
+}
+
+message ScheduleRequest{
+	phoenix.protobuf.GuidValue form_id = 1;
+	google.protobuf.Timestamp excute_time = 2;
 }
