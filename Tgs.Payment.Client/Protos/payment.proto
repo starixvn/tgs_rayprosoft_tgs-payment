@@ -43,6 +43,12 @@ message FormEvent {
 	string brand_id = 2;
 }
 
+message FormEventEx {
+	string form_id = 1;
+	string brand_id = 2;
+	string status = 3;
+}
+
 message FormThirdNoRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
 	string third_party_order_no = 2;

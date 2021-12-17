@@ -28,17 +28,22 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 			if (formData == null)
 				return;
 
-			var formStatus = (PaymentFlowState)formData.Status;
+			var formStatus = formData.Status;
 
 			if (formStatus == PaymentFlowState.Approved || formStatus == PaymentFlowState.Reject)
 				return;
 
 			await _paymentRepository
-				.SignOffDepositFormAsync(command.FormId, command.ReviewState, command.ReviewUserId, command.ReviewUserName, command.Remark)
+				.SignOffDepositFormAsync(
+					command.FormId,
+					command.ReviewState,
+					command.ReviewUserId,
+					command.ReviewUserName,
+					command.Remark)
 				.ConfigureAwait(false);
 
 			await _paymentClient
-				.EmitDepositFormStatusChangedEventAsync(formData.Id, formData.BrandId)
+				.EmitDepositFormStatusChangedEventAsync(formData.Id, formData.BrandId, formStatus.ToString())
 				.ConfigureAwait(false);
 		}
 	}

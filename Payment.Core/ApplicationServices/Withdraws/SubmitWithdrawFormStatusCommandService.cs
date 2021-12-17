@@ -43,7 +43,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 
 			if (originStatus != command.Status)
 				await _paymentClient
-					.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId)
+					.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
 					.ConfigureAwait(false);
 		}
 	}
