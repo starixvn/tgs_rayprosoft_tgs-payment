@@ -382,7 +382,10 @@ namespace Payment.UnitTests
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
-				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+				.EmitDepositFormStatusChangedEventAsync(
+					Arg.Is(command.FormId),
+					Arg.Any<Guid>(),
+					Arg.Any<string>());
 		}
 
 		[Test]
@@ -483,7 +486,10 @@ namespace Payment.UnitTests
 					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(0)
-				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+				.EmitDepositFormStatusChangedEventAsync(
+					Arg.Is(command.FormId),
+					Arg.Any<Guid>(),
+					Arg.Any<string>());
 		}
 
 		[Test]
@@ -568,7 +574,10 @@ namespace Payment.UnitTests
 					Arg.Any<int?>());
 
 			_ = fakePaymentClient.Received(1)
-				.EmitDepositFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+				.EmitDepositFormStatusChangedEventAsync(
+					Arg.Is(command.FormId),
+					Arg.Any<Guid>(),
+					Arg.Any<string>());
 		}
 	}
 }

@@ -31,7 +31,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 			if (formData == null)
 				return;
 
-			var formStatus = (PaymentFlowState)formData.Status;
+			var formStatus = formData.Status;
 
 			if (formStatus != PaymentFlowState.WaitApprove)
 				return;
@@ -84,7 +84,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws
 			}
 
 			await _paymentClient
-				.EmitWithdrawFormStatusChangedEventAsync(formData.Id, formData.BrandId)
+				.EmitWithdrawFormStatusChangedEventAsync(formData.Id, formData.BrandId, formStatus.ToString())
 				.ConfigureAwait(false);
 		}
 	}

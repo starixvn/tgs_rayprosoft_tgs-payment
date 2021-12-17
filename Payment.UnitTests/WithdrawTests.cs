@@ -349,7 +349,10 @@ namespace Payment.UnitTests
 					Arg.Any<string>());
 
 			_ = fakePaymentClient.Received(1)
-				.EmitWithdrawFormStatusChangedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
+				.EmitWithdrawFormStatusChangedEventAsync(
+					Arg.Is(command.FormId),
+					Arg.Any<Guid>(),
+					Arg.Any<string>());
 		}
 
 		[Test]
@@ -450,7 +453,8 @@ namespace Payment.UnitTests
 			_ = fakePaymentClient.Received(1)
 				.EmitWithdrawFormStatusChangedEventAsync(
 					Arg.Is(command.FormId),
-					Arg.Any<Guid>());
+					Arg.Any<Guid>(),
+					Arg.Any<string>());
 		}
 
 		[Test]
