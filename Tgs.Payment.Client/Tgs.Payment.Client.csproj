@@ -4,7 +4,7 @@
 		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
-		<Version>0.3.4</Version>
+		<Version>0.3.9</Version>
 		<Authors>Raypro</Authors>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
@@ -34,6 +34,10 @@
 
 	<ItemGroup>
 		<Protobuf Include="Protos\payment.proto" GrpcServices="None" Access="Public" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Properties\" />
 	</ItemGroup>
 
 </Project>
