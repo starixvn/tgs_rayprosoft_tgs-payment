@@ -133,6 +133,18 @@ namespace Tgs.Payment.Clients
 				.ConfigureAwait(false);
 		}
 
+		public ValueTask RejectDepositAsync(Guid formId, Guid brandId)
+		{
+			var request = new RejectDepositRequest
+			{
+				FormId = formId,
+				BrandId = brandId
+			};
+
+			return _messageSender
+				.SendAsync("tgs.payment.reject", request.ToByteArray());
+		}
+
 		public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
 		{
 			var request = new FormThirdNoRequest
@@ -144,13 +156,13 @@ namespace Tgs.Payment.Clients
 			return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
 		}
 
-		public ValueTask ScheduleAsync(string subject, Guid formId, DateTimeOffset scheduleTime)
+		public ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime)
 		{
 			var request = new ScheduleRequest
 			{
 				Subject = subject,
 				FormId = formId,
-				ScheduleTime = Timestamp.FromDateTimeOffset(scheduleTime)
+				ScheduleTime = Timestamp.FromDateTime(scheduleTime)
 			};
 
 			return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray());
