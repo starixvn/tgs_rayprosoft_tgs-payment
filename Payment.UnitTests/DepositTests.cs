@@ -583,53 +583,6 @@ namespace Payment.UnitTests
 					Arg.Is(command.FormId),
 					Arg.Any<Guid>(),
 					Arg.Any<string>());
-		}
-
-		[Test]
-		public async Task Test_Send_Auto_Reject()
-		{
-			var fakeLogger = new NullLogger<ReceiveSchedulerHandler>();
-			var fakeGetDepositFormService = Substitute.For<IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo>>();
-			var fakeSendRejectService = Substitute.For<ICommandService<RejectDepositFormCommand>>();
-
-			var sut = new ReceiveSchedulerHandler(fakeSendRejectService, fakeGetDepositFormService, fakeLogger);
-			var formId = Guid.NewGuid();
-
-			var depositFormInfo = new DepositFormInfo
-			(
-				Id: formId,
-				PlayerCode: "playerCode",
-				UserName: "userName",
-				BrandId: Guid.NewGuid(),
-				BrandPaymentId: Guid.NewGuid(),
-				ChannelName: "channelName",
-				PaymentMethodId: Guid.NewGuid(),
-				Amount: 100m,
-				Remark: "remark",
-				Status: PaymentFlowState.WaitPayment,
-				ApplyInfo: null,
-				PaymentReturn: null,
-				ThirdPartyOrderNo: null,
-				OrderNo: "",
-				ReviewedUserName: null,
-				PromotionId: null,
-				PromotionPlayerId: null,
-				CreatedOn: DateTimeOffset.Now,
-				UpdatedOn: DateTimeOffset.Now
-			);
-
-			fakeGetDepositFormService
-				.GetAsync(Arg.Any<GetDepositFormDetailByFormIdQuery>())
-				.Returns(depositFormInfo);
-
-			var request = new ScheduleRequest
-			{
-				FormId = formId
-			};
-
-			await sut.HandleAsync(request.ToByteArray()).ConfigureAwait(false);
-
-			_ = fakeSendRejectService.Received(1).ExecuteAsync(Arg.Any<RejectDepositFormCommand>());
-		}
+		}		
 	}
 }
