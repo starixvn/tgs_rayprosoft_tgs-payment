@@ -36,4 +36,8 @@
 		<Protobuf Include="Protos\payment.proto" GrpcServices="None" Access="Public" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Properties\" />
+	</ItemGroup>
+
 </Project>
