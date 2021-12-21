@@ -13,11 +13,11 @@ namespace Tgs.Payment.Clients
 
 		ValueTask EmitDepositFormCreatedEventAsync(Guid formId, Guid brandId);
 
-		ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId);
+		ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status);
 
 		ValueTask EmitWithdrawFormCreatedEventAsync(Guid fromId, Guid brandId);
 
-		ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId);
+		ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status);
 
 		ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
 
