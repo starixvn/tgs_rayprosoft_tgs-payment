@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
@@ -142,17 +141,6 @@ namespace Tgs.Payment.Clients
 			};
 
 			return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
-		}
-
-		public ValueTask ScheduleAsync(string subject, Guid formId, DateTimeOffset excuteTime)
-		{
-			var request = new ScheduleRequest
-			{
-				FormId = formId,
-				ExpireTime = Timestamp.FromDateTimeOffset(excuteTime)
-			};
-
-			return _messageSender.SendAsync("tgs.payment.scheduler", request.ToByteArray());
 		}
 
 		public ValueTask TagWithdrawFormPaidAsync(Guid formId)

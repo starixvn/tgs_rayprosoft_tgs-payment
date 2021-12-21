@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Google.Protobuf;
-using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
-using Tgs.Payment.MessageQueue;
-using Tgs.Payment.Protos;
-using Tgs.ServiceUtility;
 using TGS.Paging;
 
 namespace Payment.UnitTests
@@ -583,6 +578,6 @@ namespace Payment.UnitTests
 					Arg.Is(command.FormId),
 					Arg.Any<Guid>(),
 					Arg.Any<string>());
-		}		
+		}
 	}
 }
