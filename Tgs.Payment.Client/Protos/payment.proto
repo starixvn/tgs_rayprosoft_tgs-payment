@@ -62,7 +62,7 @@ message TagPaidRequest {
 message ScheduleRequest{
 	string subject = 1;
 	phoenix.protobuf.GuidValue form_id = 2;
-	google.protobuf.Timestamp expire_time = 3;
+	google.protobuf.Timestamp schedule_time = 3;
 }
 
 message RejectDepositRequest{

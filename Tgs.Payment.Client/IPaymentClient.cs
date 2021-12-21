@@ -21,6 +21,8 @@ namespace Tgs.Payment.Clients
 
 		ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
 
+		ValueTask ScheduleAsync(string subject, Guid formId, DateTimeOffset scheduleTime);
+
 		ValueTask TagWithdrawFormPaidAsync(Guid formId);
 
 		ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo);
