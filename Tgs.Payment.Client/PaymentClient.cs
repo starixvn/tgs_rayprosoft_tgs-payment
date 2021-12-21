@@ -129,7 +129,7 @@ namespace Tgs.Payment.Clients
 			var request = new ScheduleRequest
 			{
 				FormId = formId,
-				ExcuteTime = Timestamp.FromDateTimeOffset(excuteTime)
+				ExpireTime = Timestamp.FromDateTimeOffset(excuteTime)
 			};
 
 			return _messageSender.SendAsync("tgs.payment.scheduler", request.ToByteArray());

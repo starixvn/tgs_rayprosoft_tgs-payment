@@ -54,7 +54,12 @@ message TagPaidRequest {
 }
 
 message ScheduleRequest{
-	phoenix.protobuf.GuidValue form_id = 1;
-	google.protobuf.Timestamp excute_time = 2;
+	string subject = 1;
+	phoenix.protobuf.GuidValue form_id = 2;
+	google.protobuf.Timestamp expire_time = 3;
 }
 
+message RejectDepositRequest{
+	phoenix.protobuf.GuidValue form_id = 1;
+	phoenix.protobuf.GuidValue brand_id = 2;
+}
