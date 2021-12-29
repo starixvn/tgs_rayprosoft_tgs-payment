@@ -13,7 +13,7 @@ namespace Tgs.Payment.WithdrawProcessors
 
 		public string Subject { get; }
 
-		public SkyPayProcessor(string subjectFragment, IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+		public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
 		{
 			if (jsonOptionsAccessor is null)
 				throw new ArgumentNullException(nameof(jsonOptionsAccessor));
@@ -21,7 +21,7 @@ namespace Tgs.Payment.WithdrawProcessors
 			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 			_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
 
-			Subject = $"tgs.payment.skypay.{subjectFragment}.withdraw";
+			Subject = $"tgs.payment.skypay.cn.withdraw";
 		}
 
 		public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
@@ -36,12 +36,6 @@ namespace Tgs.Payment.WithdrawProcessors
 			{
 				case "Bank":
 					return MakeBankWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
-
-				case "Momo":
-					return MakeMomoWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
-
-				case "Zalo":
-					return MakeZaloWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
 
 				default:
 					throw new NotSupportedException();
@@ -60,34 +54,6 @@ namespace Tgs.Payment.WithdrawProcessors
 				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 				withdrawBankInfo.Detail.AccountNumber,
 				withdrawBankInfo.Detail.RealName);
-
-			return _skyPaySerializer.Serialize(settings);
-		}
-
-		private string MakeMomoWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
-		{
-			var withdrawBankInfo = JsonSerializer
-				.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, _jsonSerializerOptions);
-
-			var settings = new MomoWithdrawSettings(
-				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
-				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
-				formId,
-				withdrawBankInfo.Detail.QrCode);
-
-			return _skyPaySerializer.Serialize(settings);
-		}
-
-		private string MakeZaloWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
-		{
-			var withdrawBankInfo = JsonSerializer
-				.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
-
-			var settings = new ZaloWithdrawSettings(
-				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
-				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
-				formId,
-				withdrawBankInfo.Detail.QrCode);
 
 			return _skyPaySerializer.Serialize(settings);
 		}

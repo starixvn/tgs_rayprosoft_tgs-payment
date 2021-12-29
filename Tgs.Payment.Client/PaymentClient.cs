@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
@@ -79,7 +80,7 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray());
 		}
 
-		public ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId)
+		public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
 		{
 			var request = new FormEvent
 			{
@@ -87,7 +88,17 @@ namespace Tgs.Payment.Clients
 				BrandId = brandId.ToString()
 			};
 
-			return _messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray());
+			var requestEx = new FormEventEx
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString(),
+				Status = status
+			};
+
+			await Task.WhenAll(
+				_messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray()).AsTask(),
+				_messageSender.PublishAsync("tgs.payment.deposit.status_ex", requestEx.ToByteArray()).AsTask())
+				.ConfigureAwait(false);
 		}
 
 		public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId)
@@ -101,7 +112,7 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.withdraw.created", request.ToByteArray());
 		}
 
-		public ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId)
+		public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
 		{
 			var request = new FormEvent
 			{
@@ -109,7 +120,29 @@ namespace Tgs.Payment.Clients
 				BrandId = brandId.ToString()
 			};
 
-			return _messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray());
+			var requestEx = new FormEventEx
+			{
+				FormId = formId.ToString(),
+				BrandId = brandId.ToString(),
+				Status = status
+			};
+
+			await Task.WhenAll(
+				_messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray()).AsTask(),
+				_messageSender.PublishAsync("tgs.payment.withdraw.status_ex", requestEx.ToByteArray()).AsTask())
+				.ConfigureAwait(false);
+		}
+
+		public ValueTask RejectDepositAsync(Guid formId, Guid brandId)
+		{
+			var request = new RejectDepositRequest
+			{
+				FormId = formId,
+				BrandId = brandId
+			};
+
+			return _messageSender
+				.SendAsync("tgs.payment.reject", request.ToByteArray());
 		}
 
 		public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
@@ -121,6 +154,18 @@ namespace Tgs.Payment.Clients
 			};
 
 			return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
+		}
+
+		public ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime)
+		{
+			var request = new ScheduleRequest
+			{
+				Subject = subject,
+				FormId = formId,
+				ScheduleTime = Timestamp.FromDateTime(scheduleTime)
+			};
+
+			return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray());
 		}
 
 		public ValueTask TagWithdrawFormPaidAsync(Guid formId)

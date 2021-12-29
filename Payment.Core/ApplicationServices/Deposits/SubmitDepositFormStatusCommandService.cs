@@ -42,7 +42,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 
 			if (originStatus != command.Status)
 				await _paymentClient
-					.EmitDepositFormStatusChangedEventAsync(command.FormId, formData.BrandId)
+					.EmitDepositFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
 					.ConfigureAwait(false);
 		}
 	}

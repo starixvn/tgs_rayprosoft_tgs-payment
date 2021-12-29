@@ -5,6 +5,7 @@ package payment;
 
 import "phoenix/protobuf/guid.proto";
 import "phoenix/protobuf/decimal.proto";
+import "google/protobuf/timestamp.proto";
 
 message DepositRequest {
 	string apply_info = 1;
@@ -43,6 +44,12 @@ message FormEvent {
 	string brand_id = 2;
 }
 
+message FormEventEx {
+	string form_id = 1;
+	string brand_id = 2;
+	string status = 3;
+}
+
 message FormThirdNoRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
 	string third_party_order_no = 2;
@@ -50,4 +57,15 @@ message FormThirdNoRequest {
 
 message TagPaidRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
+}
+
+message ScheduleRequest{
+	string subject = 1;
+	phoenix.protobuf.GuidValue form_id = 2;
+	google.protobuf.Timestamp schedule_time = 3;
+}
+
+message RejectDepositRequest{
+	phoenix.protobuf.GuidValue form_id = 1;
+	phoenix.protobuf.GuidValue brand_id = 2;
 }
