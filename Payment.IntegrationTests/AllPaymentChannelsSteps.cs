@@ -11,13 +11,11 @@ namespace Payment.IntegrationTests
 	public class AllPaymentChannelsSteps
 	{
 		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		private TestPaymentApplication _testHost;
 
 		public AllPaymentChannelsSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-
-			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
@@ -25,7 +23,7 @@ namespace Payment.IntegrationTests
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I will list all payment channels")]

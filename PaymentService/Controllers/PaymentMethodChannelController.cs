@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
@@ -11,7 +9,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentMethodChannelController : ControllerBase
 	{
-		[HttpGet]
+		[HttpGet(Name = "GetAllPaymentMethodChannels")]
 		public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
 			[FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
 		{

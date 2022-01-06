@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -16,20 +13,19 @@ namespace Payment.IntegrationTests
 		private string _paymentCode;
 		private Guid _paymentId;
 		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		private TestPaymentApplication _testHost;
 
 		public GetOnePaymentSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
 
 		[AfterScenario]
-		public void CleanUp()
+		public async Task CleanUpAsync()
 		{
-			_testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I has a payment id \{(.*)}")]

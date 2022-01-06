@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -16,12 +13,11 @@ namespace Payment.IntegrationTests
 		private int _actual;
 		private Guid _brandId;
 		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		private TestPaymentApplication _testHost;
 
 		public GetUntreatedDepositCountSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
@@ -29,7 +25,7 @@ namespace Payment.IntegrationTests
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I will count untreated deposit form count")]

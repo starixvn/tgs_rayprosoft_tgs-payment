@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
@@ -23,7 +19,7 @@ namespace Tgs.Payment.Controllers
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		[HttpGet("untreated/{brandId}")]
+		[HttpGet("untreated/{brandId}", Name = "CountUntreatedWithdrawForms")]
 		public ValueTask<int> CountUntreatedWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			Guid brandId)
@@ -55,7 +51,7 @@ namespace Tgs.Payment.Controllers
 			return countService.GetAsync(query);
 		}
 
-		[HttpPut]
+		[HttpPut(Name = "CreateWithdrawForm")]
 		public async Task<Guid> CreateWithdrawFormAsync(
 			[FromServices] ICommandService<CreateWithdrawFormCommand> createService,
 			[FromBody] CreateWithdrawFormViewModel request)
@@ -73,7 +69,7 @@ namespace Tgs.Payment.Controllers
 			return await command.ReturnFormIdSource.Task.ConfigureAwait(false);
 		}
 
-		[HttpGet("{brandId}/{formId}")]
+		[HttpGet("{brandId}/{formId}", Name = "GetWithdrawFormWithBrandId")]
 		public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
 			[FromServices] IGetService<GetWithdrawFormDetailQuery, WithdrawFormInfo?> getService,
 			Guid brandId,
@@ -114,7 +110,7 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		[HttpGet("{formId}"), HttpHeaderConstraint("FormQuery")]
+		[HttpGet("{formId}", Name = "GetWithdrawForm"), HttpHeaderConstraint("FormQuery")]
 		public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
 			[FromServices] IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo?> getService,
 			Guid formId)
@@ -154,7 +150,7 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		[HttpGet("{brandId}")]
+		[HttpGet("{brandId}", Name = "QueryWithdrawForms")]
 		public async Task<PagingWithdrawFormViewModel> QueryWithdrawFormsAsync(
 			[FromServices] IGetService<WithdrawFormQuery, int> countService,
 			[FromServices] IQueryService<WithdrawFormQuery, WithdrawFormInfo> queryService,
@@ -253,7 +249,7 @@ namespace Tgs.Payment.Controllers
 			};
 		}
 
-		[HttpPost("{formId}")]
+		[HttpPost("{formId}", Name = "ReviewWithdrawForm")]
 		public async Task ReviewWithdrawFormAsync(
 			[FromServices] ICommandService<SignOffWithdrawFormCommand> signOffService,
 			Guid formId,
@@ -270,7 +266,7 @@ namespace Tgs.Payment.Controllers
 			await signOffService.ExecuteAsync(command).ConfigureAwait(false);
 		}
 
-		[HttpPatch("{formId}")]
+		[HttpPatch("{formId}", Name = "SubmitWithdrawFormStatus")]
 		public async Task SubmitWithdrawFormStatusAsync(
 			[FromServices] ICommandService<SubmitWithdrawFormStatusCommand> submitService,
 			Guid formId,

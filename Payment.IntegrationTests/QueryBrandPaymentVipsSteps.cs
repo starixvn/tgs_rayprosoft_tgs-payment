@@ -1,60 +1,55 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
 namespace Payment.IntegrationTests
 {
 	[Binding]
-    public class QueryBrandPaymentVipsSteps
-    {
-        private PaymentServiceClient _paymentServiceClient;
-        private IHost _testHost;
-        private Guid _brandPaymentId1;
-        private Guid _brandPaymentId2;
+	public class QueryBrandPaymentVipsSteps
+	{
+		private Guid _brandPaymentId1;
+		private Guid _brandPaymentId2;
+		private PaymentServiceClient _paymentServiceClient;
+		private TestPaymentApplication _testHost;
 
-        public QueryBrandPaymentVipsSteps()
-        {
-            _testHost = TestSiteHelper.GetPaymentServiceTestHost();
-            _ = _testHost.StartAsync();
+		public QueryBrandPaymentVipsSteps()
+		{
+			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-            _paymentServiceClient = _testHost.GetPaymentServiceClient();
-        }
+			_paymentServiceClient = _testHost.GetPaymentServiceClient();
+		}
 
-        [AfterScenario]
-        public async Task CleanUpAsync()
-        {
-            await _testHost.StopAsync();
-        }
+		[AfterScenario]
+		public async Task CleanUpAsync()
+		{
+			await _testHost.DisposeAsync();
+		}
 
-        [Given(@"brand payment id is \{(.*)}、\{(.*)}")]
-        public void GivenBrandPaymentIdIs(Guid brandPaymentId1, Guid brandPaymentId2)
-        {
-            _brandPaymentId1 = brandPaymentId1;
-            _brandPaymentId2 = brandPaymentId2;
-        }
+		[Given(@"brand payment id is \{(.*)}、\{(.*)}")]
+		public void GivenBrandPaymentIdIs(Guid brandPaymentId1, Guid brandPaymentId2)
+		{
+			_brandPaymentId1 = brandPaymentId1;
+			_brandPaymentId2 = brandPaymentId2;
+		}
 
-        [Given(@"I will get brand payment vip settings")]
-        public void GivenIWillGetBrandPaymentVipSettings()
-        {
-        }
+		[Given(@"I will get brand payment vip settings")]
+		public void GivenIWillGetBrandPaymentVipSettings()
+		{
+		}
 
-        [Then(@"return vip data")]
-        public void ThenReturnVipData()
-        {
-            Assert.Pass();
-        }
+		[Then(@"return vip data")]
+		public void ThenReturnVipData()
+		{
+			Assert.Pass();
+		}
 
-        [When(@"call get brand payment vip api")]
-        public async Task WhenCallGetBrandPaymentVipApiAsync()
-        {
-            var vips = _paymentServiceClient.GetBrandPaymentVipsAsync(
-                new[] { _brandPaymentId1, _brandPaymentId2 });
+		[When(@"call get brand payment vip api")]
+		public async Task WhenCallGetBrandPaymentVipApiAsync()
+		{
+			var vips = _paymentServiceClient.GetBrandPaymentVipsAsync(
+				new[] { _brandPaymentId1, _brandPaymentId2 });
 
-            await vips.ToArrayAsync();
-        }
-    }
+			await vips.ToArrayAsync();
+		}
+	}
 }

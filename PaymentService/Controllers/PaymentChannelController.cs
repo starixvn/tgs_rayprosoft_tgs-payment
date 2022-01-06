@@ -12,13 +12,13 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentChannelController : ControllerBase
 	{
-		[HttpPut]
+		[HttpPut(Name = "CreatePaymentChannel")]
 		public ValueTask CreatePaymentChannelAsync(
 			[FromServices] ICommandService<CreatePaymentChannelCommand> createService,
 			[FromBody] string code)
 			=> createService.ExecuteAsync(new CreatePaymentChannelCommand(code));
 
-		[HttpGet]
+		[HttpGet(Name = "GetAllPaymentChannels")]
 		public IAsyncEnumerable<PaymentChannelViewModel> GetAllPaymentChennelsAsync(
 			[FromServices] IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo> paymentChannelService)
 			=> paymentChannelService.QueryAsync(new AllPaymentChannelsQuery())

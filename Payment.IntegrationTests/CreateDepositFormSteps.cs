@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -13,7 +10,7 @@ namespace Payment.IntegrationTests
 	public class CreateDepositFormSteps
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
-		private readonly IHost _testHost;
+		private readonly TestPaymentApplication _testHost;
 		private Guid _createdFormId;
 		private DepositFormCreateInfo _depositForm;
 
@@ -21,15 +18,13 @@ namespace Payment.IntegrationTests
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-			_ = _testHost.StartAsync();
-
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
 
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I will create deposit form")]

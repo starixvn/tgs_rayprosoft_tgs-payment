@@ -7,6 +7,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using Stateless;
 
 namespace Tgs.Payment.Clients
 {
@@ -91,6 +92,44 @@ namespace Tgs.Payment.Clients
 				.ConfigureAwait(false);
 
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		}
+
+		public StateMachine<PaymentFlowState, PaymentTrigger> CreateDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
+		{
+			var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
+
+			fsm.Configure(PaymentFlowState.Init)
+				.Permit(PaymentTrigger.DepositCreate, PaymentFlowState.WaitPayment)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.WaitPayment)
+				.Permit(PaymentTrigger.PaymentDepositCompleted, PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			return fsm;
+		}
+
+		public StateMachine<PaymentFlowState, PaymentTrigger> CreateManualDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
+		{
+			var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
+
+			fsm.Configure(PaymentFlowState.Init)
+				.Permit(PaymentTrigger.DepositCreate, PaymentFlowState.WaitPayment)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.WaitPayment)
+				.Permit(PaymentTrigger.UploadPayCertificate, PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			return fsm;
 		}
 
 		public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
@@ -181,6 +220,25 @@ namespace Tgs.Payment.Clients
 				.ConfigureAwait(false);
 
 			return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		}
+
+		public StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
+		{
+			var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
+
+			fsm.Configure(PaymentFlowState.Init)
+				.Permit(PaymentTrigger.WithdrawCreate, PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.WaitApprove)
+				.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			fsm.Configure(PaymentFlowState.Approved)
+				.Permit(PaymentTrigger.PaymentWithdrawCompleted, PaymentFlowState.Paid)
+				.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
+
+			return fsm;
 		}
 
 		public async ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId)

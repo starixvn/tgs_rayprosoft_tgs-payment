@@ -1,8 +1,5 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -19,13 +16,11 @@ namespace Payment.IntegrationTests
 		private Guid _createdId;
 		private PaymentServiceClient _paymentServiceClient;
 		private string _playerCode;
-		private IHost _testHost;
+		private TestPaymentApplication _testHost;
 
 		public CreatePlayerBankInfoSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-
-			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
@@ -33,7 +28,7 @@ namespace Payment.IntegrationTests
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"brandId is \{(.*)}")]

@@ -15,7 +15,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentController : ControllerBase
 	{
-		[HttpPut]
+		[HttpPut(Name = "CreatePayment")]
 		public ValueTask CreatePaymentAsync(
 			[FromServices] ICommandService<CreatePaymentCommand> createService,
 			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
@@ -33,7 +33,7 @@ namespace Tgs.Payment.Controllers
 			return createService.ExecuteAsync(command);
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "GetAllPayments")]
 		public IAsyncEnumerable<PaymentViewModel> GetAllPaymentsAsync(
 			[FromServices] IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
 		{
@@ -46,7 +46,7 @@ namespace Tgs.Payment.Controllers
 			});
 		}
 
-		[HttpGet("{id}")]
+		[HttpGet("{id}", Name = "GetPaymentById")]
 		public async Task<PaymentViewModel> GetPaymentByIdAsync(
 			[FromServices] IGetService<GetPaymentQuery, PaymentInfo> getService,
 			Guid id)

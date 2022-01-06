@@ -13,7 +13,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class BrandPaymentController : ControllerBase
 	{
-		[HttpGet("acl/{playerCode}")]
+		[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 		public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 			[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
 			string playerCode,
@@ -27,7 +27,7 @@ namespace Tgs.Payment.Controllers
 					PlayerCode = acl.PlayerCode
 				});
 
-		[HttpGet("{id}")]
+		[HttpGet("{id}", Name = "GetBrandPayment")]
 		public async ValueTask<BrandPaymentViewModel> GetBrandPaymentAsync(
 			[FromServices] IGetService<GetBrandPaymentQuery, BrandPaymentInfo> getService,
 			Guid id)
@@ -57,7 +57,7 @@ namespace Tgs.Payment.Controllers
 			};
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "QueryBrandPayments")]
 		public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(
 			[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
 			[FromQuery(Name = "brand")] Guid brandId)
@@ -83,7 +83,7 @@ namespace Tgs.Payment.Controllers
 					DisplayOrder = brandPayment.DisplayOrder
 				});
 
-		[HttpGet("vip")]
+		[HttpGet("vip", Name = "QueryBrandPaymentVips")]
 		public IAsyncEnumerable<BrandPaymentVipViewModel> GetBrandPaymentVipsAsync(
 			[FromServices] IQueryService<BrandPaymentVipQuery, BrandPaymentVip> queryService,
 			[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -13,15 +10,14 @@ namespace Payment.IntegrationTests
 	[Scope(Scenario = "Get withdraw detail by form id")]
 	public class GetWithdrawDetailByFormIdSteps
 	{
-		private IHost _testHost;
-		private PaymentServiceClient _paymentServiceClient;
-		private Guid _formId;
 		private object _actual;
+		private Guid _formId;
+		private PaymentServiceClient _paymentServiceClient;
+		private TestPaymentApplication _testHost;
 
 		public GetWithdrawDetailByFormIdSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
@@ -29,13 +25,19 @@ namespace Payment.IntegrationTests
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I have a form id \{(.*)}")]
 		public void GivenIHaveAFormId(Guid formId)
 		{
 			_formId = formId;
+		}
+
+		[Then(@"return detail data")]
+		public void ThenReturnDetailData()
+		{
+			Assert.IsNotNull(_actual);
 		}
 
 		[When(@"call get withdraw form detail api")]
@@ -81,12 +83,6 @@ namespace Payment.IntegrationTests
 			await dbContext.SaveChangesAsync();
 
 			_actual = await _paymentServiceClient.GetWithdrawFormAsync(_formId);
-		}
-
-		[Then(@"return detail data")]
-		public void ThenReturnDetailData()
-		{
-			Assert.IsNotNull(_actual);
 		}
 	}
 }

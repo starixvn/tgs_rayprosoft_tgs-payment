@@ -12,7 +12,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PaymentMethodController : ControllerBase
 	{
-		[HttpPut]
+		[HttpPut(Name = "CreatePaymentMethod")]
 		public ValueTask CreatePaymentMethodAsync(
 			[FromServices] ICommandService<CreatePaymentMethodCommand> createService,
 			[FromBody] PaymentMethodCreateViewModel request)
@@ -24,7 +24,7 @@ namespace Tgs.Payment.Controllers
 			return createService.ExecuteAsync(command);
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "GetAllPaymentMethods")]
 		public IAsyncEnumerable<PaymentMethodViewModel> GetAllPaymentMethodsAsync(
 			[FromServices] IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> paymentMethodService)
 			=> paymentMethodService.QueryAsync(new AllPaymentMethodsQuery())

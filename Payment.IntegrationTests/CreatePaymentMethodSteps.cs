@@ -1,8 +1,5 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -15,13 +12,12 @@ namespace Payment.IntegrationTests
 	public class CreatePaymentMethodSteps
 	{
 		private readonly PaymentServiceClient _paymentServiceClient;
-		private readonly IHost _testHost;
+		private readonly TestPaymentApplication _testHost;
 		private PaymentMethodCreateInfo _createInfo;
 
 		public CreatePaymentMethodSteps()
 		{
 			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
 
 			_paymentServiceClient = _testHost.GetPaymentServiceClient();
 		}
@@ -29,7 +25,7 @@ namespace Payment.IntegrationTests
 		[AfterScenario]
 		public async Task CleanUpAsync()
 		{
-			await _testHost.StopAsync();
+			await _testHost.DisposeAsync();
 		}
 
 		[Given(@"I will create payment method info")]

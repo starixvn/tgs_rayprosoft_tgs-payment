@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
 using Tgs.Payment;
@@ -13,45 +14,41 @@ namespace Payment.IntegrationTests
 {
 	internal static class TestSiteHelper
 	{
-		public static IHost GetPaymentServiceTestHost()
+		public static TestPaymentApplication GetPaymentServiceTestHost()
 			=> GetPaymentServiceTestHost(services => { });
 
-		public static IHost GetPaymentServiceTestHost(Action<IServiceCollection> configureServices)
-			=> Host.CreateDefaultBuilder(Array.Empty<string>())
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder
-						.UseStartup<PaymentService.Startup>()
-						.ConfigureAppConfiguration((ctx, builder) =>
-						{
-							builder.Sources.Clear();
-						})
-						.UseTestServer()
-						.ConfigureTestServices(services =>
-						{
-							services
-								.AddFakeNatsMessageQueue()
-								.AddSingleton(sp =>
-								{
-									var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
-									dbContextOptionsBuilder
-										.UseInMemoryDatabase(Guid.NewGuid().ToString())
-										.ConfigureWarnings(x => x.Ignore(
-											InMemoryEventId.TransactionIgnoredWarning));
-
-									return new TgsContext(dbContextOptionsBuilder.Options);
-								});
-
-							services.AddSingleton(services =>
+		public static TestPaymentApplication GetPaymentServiceTestHost(Action<IServiceCollection> configureServices)
+			=> new TestPaymentApplication(webBuilder =>
+			{
+				webBuilder
+					.ConfigureAppConfiguration((ctx, builder) =>
+					{
+						builder.Sources.Clear();
+					})
+					.ConfigureServices(services =>
+					{
+						services
+							.AddFakeNatsMessageQueue()
+							.Replace(ServiceDescriptor.Singleton(sp =>
 							{
-								var fakeStore = Substitute.For<ITakeNumberStore>();								
+								var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+								dbContextOptionsBuilder
+									.UseInMemoryDatabase(Guid.NewGuid().ToString())
+									.ConfigureWarnings(x => x.Ignore(
+										InMemoryEventId.TransactionIgnoredWarning));
 
-								return fakeStore;
-							});
+								return new TgsContext(dbContextOptionsBuilder.Options);
+							}));
 
-							configureServices(services);
+						services.AddSingleton(services =>
+						{
+							var fakeStore = Substitute.For<ITakeNumberStore>();
+
+							return fakeStore;
 						});
-				})
-				.Build();
+
+						configureServices(services);
+					});
+			});
 	}
 }

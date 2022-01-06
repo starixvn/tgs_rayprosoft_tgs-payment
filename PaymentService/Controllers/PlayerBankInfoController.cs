@@ -15,7 +15,7 @@ namespace Tgs.Payment.Controllers
 	[ApiController]
 	public class PlayerBankInfoController : ControllerBase
 	{
-		[HttpPut("{brandId}/{playerCode}")]
+		[HttpPut("{brandId}/{playerCode}", Name = "CreatePlayerBankInfo")]
 		public async Task<Guid> CreatePlayerBankInfoAsync(
 			[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
 			[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
@@ -35,7 +35,7 @@ namespace Tgs.Payment.Controllers
 			return await command.TaskSource.Task.ConfigureAwait(false);
 		}
 
-		[HttpDelete("{playerCode}/{id}")]
+		[HttpDelete("{playerCode}/{id}", Name = "DeletePlayerBankInfo")]
 		public ValueTask DeletePlayerBankInfoAsync(
 			[FromServices] ICommandService<DeletePlayerBankInfoCommand> deleteService,
 			string playerCode,
@@ -43,7 +43,7 @@ namespace Tgs.Payment.Controllers
 			=> deleteService.ExecuteAsync(
 				new DeletePlayerBankInfoCommand(playerCode, id));
 
-		[HttpGet("{playerCode}")]
+		[HttpGet("{playerCode}", Name = "QueryPlayerBankInfos")]
 		public IAsyncEnumerable<PlayerBankInfoViewModel> GetPlayerBankInfosAsync(
 			[FromServices] IQueryService<GetPlayerBankInfosQuery, PlayerBankInfo> queryService,
 			string playerCode)

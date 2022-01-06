@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
-using TGS.Paging;
 using Tgs.ServiceUtility;
+using TGS.Paging;
 
 namespace Tgs.Payment.Controllers
 {
@@ -21,7 +18,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="createFormId">The create form identifier.</param>
 		/// <param name="request">The request.</param>
 		/// <returns></returns>
-		[HttpPut("{createFormId}")]
+		[HttpPut("{createFormId}", Name = "CreateDepositForm")]
 		public async Task<Guid> CreateDepositFormAsync(
 			[FromServices] ICommandService<CreateDepositFormCommand> createService,
 			Guid createFormId,
@@ -53,7 +50,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="brandId">Brand id.</param>
 		/// <param name="formId">Form id.</param>
 		/// <returns></returns>
-		[HttpGet("{brandId}/{formId}")]
+		[HttpGet("{brandId}/{formId}", Name = "GetDepositFormWithBrandId")]
 		public async Task<DepositFormViewModel?> GetDepositFormAsync(
 			[FromServices] IGetService<GetDepositFormDetailQuery, DepositFormInfo?> getService,
 			Guid brandId,
@@ -89,7 +86,7 @@ namespace Tgs.Payment.Controllers
 				: null;
 		}
 
-		[HttpGet("{formId}", Order = 1), HttpHeaderConstraint("FormQuery")]
+		[HttpGet("{formId}", Order = 1, Name = "GetDepositForm"), HttpHeaderConstraint("FormQuery")]
 		public async Task<DepositFormViewModel?> GetDepositFormAsync(
 			[FromServices] IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo?> getService,
 			Guid formId)
@@ -130,7 +127,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="countService">The count service.</param>
 		/// <param name="brandId">The brand identifier.</param>
 		/// <returns></returns>
-		[HttpGet("untreated/{brandId}")]
+		[HttpGet("untreated/{brandId}", Name = "CountUntreatedDepositForms")]
 		public ValueTask<int> GetUntreatedDepositFormCountAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			Guid brandId)
@@ -173,7 +170,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="formQuery">The form query.</param>
 		/// <param name="paging">The paging.</param>
 		/// <returns></returns>
-		[HttpGet("{brandId}", Order = 10)]
+		[HttpGet("{brandId}", Order = 10, Name = "QueryDepositForms")]
 		public async Task<DepositViewModel> QueryDepositFormsAsync(
 			[FromServices] IGetService<DepositFormQuery, int> countService,
 			[FromServices] IQueryService<DepositFormQuery, DepositFormInfo> queryService,
@@ -262,7 +259,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="signOffService">The signoff service.</param>
 		/// <param name="formId">Deposit form id.</param>
 		/// <param name="request">The request.</param>
-		[HttpPost("{formId}")]
+		[HttpPost("{formId}", Name = "ReviewDepositForm")]
 		public async Task ReviewDepositFormAsync(
 			[FromServices] ICommandService<SignOffDepositFormCommand> signOffService,
 			Guid formId,
@@ -284,7 +281,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="submitService">The submit service.</param>
 		/// <param name="formId">Deposit form id.</param>
 		/// <param name="request">The request.</param>
-		[HttpPatch("{formId}")]
+		[HttpPatch("{formId}", Name = "SubmitDepositFormStatus")]
 		public async Task SubmitDepositFormStatusAsync(
 			[FromServices] ICommandService<SubmitDepositFormStatusCommand> submitService,
 			Guid formId,
@@ -308,7 +305,7 @@ namespace Tgs.Payment.Controllers
 		/// <param name="formId">The form identifier.</param>
 		/// <param name="request">The request.</param>
 		/// <returns></returns>
-		[HttpPatch("thirdparty/{formId}")]
+		[HttpPatch("thirdparty/{formId}", Name = "SubmitDepositFormThirdPartyOrderNo")]
 		[Obsolete]
 		public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(
 			[FromServices] ICommandService<SubmitDepositFormThirdPartyOrderNoCommand> submitService,

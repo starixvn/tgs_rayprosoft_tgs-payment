@@ -80,7 +80,7 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray());
 		}
 
-		public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
+		public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status)
 		{
 			var request = new FormEvent
 			{
@@ -112,7 +112,7 @@ namespace Tgs.Payment.Clients
 			return _messageSender.PublishAsync("tgs.payment.withdraw.created", request.ToByteArray());
 		}
 
-		public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
+		public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status)
 		{
 			var request = new FormEvent
 			{
