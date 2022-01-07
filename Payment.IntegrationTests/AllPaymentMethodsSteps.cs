@@ -1,50 +1,44 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+public class AllPaymentMethodsSteps
 {
-	[Binding]
-	public class AllPaymentMethodsSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+
+	public AllPaymentMethodsSteps()
 	{
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public AllPaymentMethodsSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
 
-			_ = _testHost.StartAsync();
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[Given(@"I will list all payment methods")]
+	public void GivenIWillListAllPaymentMethods()
+	{
+	}
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
-		}
+	[Then(@"return all payment methods data")]
+	public void ThenReturnAllPaymentMethodsData()
+	{
+		Assert.Pass();
+	}
 
-		[Given(@"I will list all payment methods")]
-		public void GivenIWillListAllPaymentMethods()
-		{
-		}
+	[When(@"call get all payment methods api")]
+	public async Task WhenCallGetAllPaymentMethodsApiAsync()
+	{
+		var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
 
-		[Then(@"return all payment methods data")]
-		public void ThenReturnAllPaymentMethodsData()
-		{
-			Assert.Pass();
-		}
-
-		[When(@"call get all payment methods api")]
-		public async Task WhenCallGetAllPaymentMethodsApiAsync()
-		{
-			var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
-
-			await paymentMethods.ToArrayAsync();
-		}
+		_ = await paymentMethods.ToArrayAsync();
 	}
 }

@@ -6,32 +6,31 @@ using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Protos;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.MessageQueue
+namespace Tgs.Payment.MessageQueue;
+
+internal class TagWithdrawPaidHandler : IMessageHandler
 {
-	internal class TagWithdrawPaidHandler : IMessageHandler
+	private readonly ICommandService<SubmitWithdrawFormStatusCommand> _submitFormStatusService;
+
+	public TagWithdrawPaidHandler(
+		ICommandService<SubmitWithdrawFormStatusCommand> submitFormStatusService)
 	{
-		private readonly ICommandService<SubmitWithdrawFormStatusCommand> _submitFormStatusService;
+		_submitFormStatusService = submitFormStatusService ?? throw new ArgumentNullException(nameof(submitFormStatusService));
+	}
 
-		public TagWithdrawPaidHandler(
-			ICommandService<SubmitWithdrawFormStatusCommand> submitFormStatusService)
-		{
-			_submitFormStatusService = submitFormStatusService ?? throw new ArgumentNullException(nameof(submitFormStatusService));
-		}
+	public ValueTask HandleAsync(byte[] data, CancellationToken cancellationToken = default)
+	{
+		var request = TagPaidRequest.Parser.ParseFrom(data);
 
-		public ValueTask HandleAsync(byte[] data, CancellationToken cancellationToken = default)
-		{
-			var request = TagPaidRequest.Parser.ParseFrom(data);
+		var command = new SubmitWithdrawFormStatusCommand(
+			request.FormId,
+			PaymentFlowState.Paid,
+			null,
+			null,
+			null,
+			null,
+			null);
 
-			var command = new SubmitWithdrawFormStatusCommand(
-				request.FormId,
-				PaymentFlowState.Paid,
-				null,
-				null,
-				null,
-				null,
-				null);
-
-			return _submitFormStatusService.ExecuteAsync(command, cancellationToken);
-		}
+		return _submitFormStatusService.ExecuteAsync(command, cancellationToken);
 	}
 }

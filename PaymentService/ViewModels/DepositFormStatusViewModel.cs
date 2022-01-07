@@ -1,15 +1,14 @@
-﻿namespace Tgs.Payment.ViewModels
+﻿namespace Tgs.Payment.ViewModels;
+
+public class DepositFormStatusViewModel
 {
-	public class DepositFormStatusViewModel
-	{
-		public decimal? ActualAmount { get; set; }
+	public decimal? ActualAmount { get; set; }
 
-		public string? PaymentReturn { get; set; }
+	public string? PaymentReturn { get; set; }
 
-		public int? PromotionPlayerId { get; set; }
+	public int? PromotionPlayerId { get; set; }
 
-		public PaymentFlowState? Status { get; set; }
+	public PaymentFlowState? Status { get; set; }
 
-		public string? ThirdPartyOrderNo { get; set; }
-	}
+	public string? ThirdPartyOrderNo { get; set; }
 }

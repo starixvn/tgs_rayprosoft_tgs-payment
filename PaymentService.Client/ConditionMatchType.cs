@@ -1,8 +1,7 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public enum ConditionMatchType
 {
-	public enum ConditionMatchType
-    {
-        MatchAll,
-        MatchOne
-    }
+	MatchAll,
+	MatchOne
 }

@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace Tgs.Payment.Clients;
 
-namespace Tgs.Payment.Clients
+public class PaymentMethodChannelInfo
 {
-	public class PaymentMethodChannelInfo
-    {
-        public Guid ChannelId { get; init; }
+	public Guid ChannelId { get; init; }
 
-        public Guid Id { get; init; }
+	public Guid Id { get; init; }
 
-        public Guid MethodId { get; init; }
+	public Guid MethodId { get; init; }
 
-        public Guid PaymentId { get; init; }
-    }
+	public Guid PaymentId { get; init; }
 }

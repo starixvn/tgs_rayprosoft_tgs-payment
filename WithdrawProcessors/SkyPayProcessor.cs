@@ -4,58 +4,54 @@ using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplePay;
 using Tgs.Payment.SkyPay;
 
-namespace Tgs.Payment.WithdrawProcessors
+namespace Tgs.Payment.WithdrawProcessors;
+
+internal class SkyPayProcessor : IWithdrawProcessor
 {
-	internal class SkyPayProcessor : IWithdrawProcessor
+	private readonly JsonSerializerOptions _jsonSerializerOptions;
+	private readonly SkyPaySerializer _skyPaySerializer;
+
+	public string Subject { get; }
+
+	public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
 	{
-		private readonly JsonSerializerOptions _jsonSerializerOptions;
-		private readonly SkyPaySerializer _skyPaySerializer;
+		if (jsonOptionsAccessor is null)
+			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
 
-		public string Subject { get; }
+		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
+		_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
 
-		public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+		Subject = $"tgs.payment.skypay.cn.withdraw";
+	}
+
+	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
+	{
+		var withdrawBankInfo = JsonSerializer
+			.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+
+		var brandPaymentExtendedData = JsonSerializer
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+
+		return withdrawBankInfo.BankType switch
 		{
-			if (jsonOptionsAccessor is null)
-				throw new ArgumentNullException(nameof(jsonOptionsAccessor));
+			"Bank" => MakeBankWithdrawSettings(formId, bankInfo, brandPaymentExtendedData),
+			_ => throw new NotSupportedException(),
+		};
+	}
 
-			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
-			_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
+	private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
+	{
+		var withdrawBankInfo = JsonSerializer
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
-			Subject = $"tgs.payment.skypay.cn.withdraw";
-		}
+		var settings = new GatewayWithdrawSettings(
+			brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
+			formId,
+			brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
+			withdrawBankInfo.Detail.AccountNumber,
+			withdrawBankInfo.Detail.RealName);
 
-		public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
-		{
-			var withdrawBankInfo = JsonSerializer
-				.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo, _jsonSerializerOptions);
-
-			var brandPaymentExtendedData = JsonSerializer
-				.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
-
-			switch (withdrawBankInfo.BankType)
-			{
-				case "Bank":
-					return MakeBankWithdrawSettings(formId, bankInfo, brandPaymentExtendedData);
-
-				default:
-					throw new NotSupportedException();
-			}
-		}
-
-		private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
-		{
-			var withdrawBankInfo = JsonSerializer
-				.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
-
-			var settings = new GatewayWithdrawSettings(
-				brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
-				brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal(),
-				formId,
-				brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
-				withdrawBankInfo.Detail.AccountNumber,
-				withdrawBankInfo.Detail.RealName);
-
-			return _skyPaySerializer.Serialize(settings);
-		}
+		return _skyPaySerializer.Serialize(settings);
 	}
 }

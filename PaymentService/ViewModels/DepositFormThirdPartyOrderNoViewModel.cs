@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.ViewModels
+﻿namespace Tgs.Payment.ViewModels;
+
+public class DepositFormThirdPartyOrderNoViewModel
 {
-	public class DepositFormThirdPartyOrderNoViewModel
-	{
-		public string ThirdPartyOrderNo { get; set; } = default!;
-	}
+	public string ThirdPartyOrderNo { get; set; } = default!;
 }

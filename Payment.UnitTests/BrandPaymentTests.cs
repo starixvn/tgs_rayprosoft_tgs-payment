@@ -6,79 +6,78 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
 
-namespace Payment.UnitTests
+namespace Payment.UnitTests;
+
+[TestFixture]
+public class BrandPaymentTests
 {
-	[TestFixture]
-    public class BrandPaymentTests
-    {
-        [Test]
-        public async Task Can_Get_BrandPayment_By_Id()
-        {
-            var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+	[Test]
+	public async Task Can_Get_BrandPayment_By_Id()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-            var sut = new GetBrandPaymentQueryService(fakePaymentRepository);
+		var sut = new GetBrandPaymentQueryService(fakePaymentRepository);
 
-            var query = new GetBrandPaymentQuery(Guid.NewGuid());
+		var query = new GetBrandPaymentQuery(Guid.NewGuid());
 
-            _ = await sut.GetAsync(query);
+		_ = await sut.GetAsync(query);
 
-            _ = fakePaymentRepository.Received(1)
-                .GetBrandPaymentByIdAsync(Arg.Is(query.Id));
-        }
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentByIdAsync(Arg.Is(query.Id));
+	}
 
-        [Test]
-        public void Can_List_BrandPayment_By_BrandId()
-        {
-            var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+	[Test]
+	public void Can_List_BrandPayment_By_BrandId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-            var sut = new BrandPaymentQueryService(fakePaymentRepository);
+		var sut = new BrandPaymentQueryService(fakePaymentRepository);
 
-            var query = new BrandPaymentQuery(Guid.NewGuid());
+		var query = new BrandPaymentQuery(Guid.NewGuid());
 
-            _ = sut.QueryAsync(query);
+		_ = sut.QueryAsync(query);
 
-            _ = fakePaymentRepository.Received(1)
-                .GetBrandPaymentsAsync(Arg.Is(query.BrandId));
-        }
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentsAsync(Arg.Is(query.BrandId));
+	}
 
-        [Test]
-        public void Can_List_BrandPaymentAcl_By_PlayerCode_And_BrandPaymentIds()
-        {
-            var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+	[Test]
+	public void Can_List_BrandPaymentAcl_By_PlayerCode_And_BrandPaymentIds()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-            var sut = new BrandPaymentAclQueryService(fakePaymentRepository);
+		var sut = new BrandPaymentAclQueryService(fakePaymentRepository);
 
-            var query = new BrandPaymentAclQuery(
-                "ThisIsPlayerCode",
-                new[] {
-                    Guid.NewGuid()
-                });
+		var query = new BrandPaymentAclQuery(
+			"ThisIsPlayerCode",
+			new[] {
+					Guid.NewGuid()
+			});
 
-            _ = sut.QueryAsync(query);
+		_ = sut.QueryAsync(query);
 
-            _ = fakePaymentRepository.Received(1)
-                .GetBrandPaymentAclsAsync(
-                    Arg.Any<IEnumerable<Guid>>(),
-                    Arg.Is(query.PlayerCode));
-        }
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentAclsAsync(
+				Arg.Any<IEnumerable<Guid>>(),
+				Arg.Is(query.PlayerCode));
+	}
 
-        [Test]
-        public void Can_List_BrandPaymentVip_By_BrandPaymentIds()
-        {
-            var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+	[Test]
+	public void Can_List_BrandPaymentVip_By_BrandPaymentIds()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-            var sut = new BrandPaymentVipQueryService(fakePaymentRepository);
+		var sut = new BrandPaymentVipQueryService(fakePaymentRepository);
 
-            var query = new BrandPaymentVipQuery(
-                new[] {
-                    Guid.NewGuid()
-                });
+		var query = new BrandPaymentVipQuery(
+			new[] {
+					Guid.NewGuid()
+			});
 
-            _ = sut.QueryAsync(query);
+		_ = sut.QueryAsync(query);
 
-            _ = fakePaymentRepository.Received(1)
-                .GetBrandPaymentVipListAsync(
-                    Arg.Any<IEnumerable<Guid>>());
-        }
-    }
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentVipListAsync(
+				Arg.Any<IEnumerable<Guid>>());
+	}
 }

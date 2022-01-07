@@ -1,13 +1,12 @@
 ﻿using System.Text.Json;
 
-namespace Tgs.Payment.Clients
+namespace Tgs.Payment.Clients;
+
+public class PaymentCreateInfo
 {
-	public class PaymentCreateInfo
-    {
-        public string Code { get; init; } = default!;
+	public string Code { get; init; } = default!;
 
-        public string? Description { get; init; }
+	public string? Description { get; init; }
 
-        public JsonDocument? ExtendedData { get; init; }
-    }
+	public JsonDocument? ExtendedData { get; init; }
 }

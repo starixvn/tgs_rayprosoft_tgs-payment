@@ -8,30 +8,29 @@ using Tgs.Payment.SkyPay;
 using Tgs.Payment.WithdrawProcessors;
 using TGS.Payment.ManualDeposit;
 
-namespace Tgs.Payment.Configuration
-{
-	public static class PaymentConfigurationExtensions
-	{
-		public static PaymentConfiguration RegisterWithdrawProcessors(this PaymentConfiguration configuration)
-		{
-			configuration.Services
-				.AddSingleton<LeePaySerializer>()
-				.AddSingleton<PrimePaySerializer>()
-				.AddSingleton<ApplePaySerializer>()
-				.AddSingleton<ManualDepositSerializer>()
-				.AddSingleton<MaticPaySerializer>()
-				.AddSingleton<Help2PaySerializer>()
-				.AddSingleton<SkyPaySerializer>();
+namespace Tgs.Payment.Configuration;
 
-			return configuration
-				.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
-				.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-				.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
-				.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
-				.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
-				.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
-				.RegisterWithdrawProcessor<SkyPayVNProcessor>("SkyPay-VN")
-				.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-CN");
-		}
+public static class PaymentConfigurationExtensions
+{
+	public static PaymentConfiguration RegisterWithdrawProcessors(this PaymentConfiguration configuration)
+	{
+		_ = configuration.Services
+			.AddSingleton<LeePaySerializer>()
+			.AddSingleton<PrimePaySerializer>()
+			.AddSingleton<ApplePaySerializer>()
+			.AddSingleton<ManualDepositSerializer>()
+			.AddSingleton<MaticPaySerializer>()
+			.AddSingleton<Help2PaySerializer>()
+			.AddSingleton<SkyPaySerializer>();
+
+		return configuration
+			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
+			.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
+			.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
+			.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
+			.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
+			.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
+			.RegisterWithdrawProcessor<SkyPayVNProcessor>("SkyPay-VN")
+			.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-CN");
 	}
 }

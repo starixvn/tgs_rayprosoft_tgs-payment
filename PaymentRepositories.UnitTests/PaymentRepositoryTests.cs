@@ -6,44 +6,43 @@ using NUnit.Framework;
 using Tgs.Payment.Repositories.Entities;
 using TGS.Payment.Repositories;
 
-namespace PaymentRepositories.UnitTests
+namespace PaymentRepositories.UnitTests;
+
+public class PaymentRepositoryTests
 {
-	public class PaymentRepositoryTests
+	[Test]
+	public async Task Submit_DepositForm_Status_Without_PaymentReturn_The_Data_Will_Keep_Original()
 	{
-		[Test]
-		public async Task Submit_DepositForm_Status_Without_PaymentReturn_The_Data_Will_Keep_Original()
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var testFormData = new DepositForm
 		{
-			var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
-			dbContextOptionsBuilder
-				.UseInMemoryDatabase(Guid.NewGuid().ToString())
-				.ConfigureWarnings(x => x.Ignore(
-					InMemoryEventId.TransactionIgnoredWarning));
+			Id = Guid.NewGuid(),
+			PlayerCode = "Tester",
+			Status = 0,
+			PaymentReturn = "Test"
+		};
 
-			var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+		_ = await dbContext.DepositForms.AddAsync(testFormData);
 
-			var testFormData = new DepositForm
-			{
-				Id = Guid.NewGuid(),
-				PlayerCode = "Tester",
-				Status = 0,
-				PaymentReturn = "Test"
-			};
+		_ = await dbContext.SaveChangesAsync();
 
-			await dbContext.DepositForms.AddAsync(testFormData);
+		var sut = new PaymentRepository(dbContext);
 
-			await dbContext.SaveChangesAsync();
+		await sut.SubmitDepositFormStatusAsync(
+			testFormData.Id,
+			Tgs.Payment.PaymentFlowState.Paid,
+			null,
+			null,
+			null,
+			null);
 
-			var sut = new PaymentRepository(dbContext);
-
-			await sut.SubmitDepositFormStatusAsync(
-				testFormData.Id,
-				Tgs.Payment.PaymentFlowState.Paid,
-				null,
-				null,
-				null,
-				null);
-
-			Assert.AreEqual("Test", testFormData.PaymentReturn);
-		}
+		Assert.AreEqual("Test", testFormData.PaymentReturn);
 	}
 }

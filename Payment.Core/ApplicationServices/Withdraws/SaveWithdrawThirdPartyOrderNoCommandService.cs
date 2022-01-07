@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.ApplicationServices.Withdraws
+namespace Tgs.Payment.ApplicationServices.Withdraws;
+
+internal class SaveWithdrawThirdPartyOrderNoCommandService : ICommandService<SaveWithdrawThirdPartyOrderNoCommand>
 {
-	internal class SaveWithdrawThirdPartyOrderNoCommandService : ICommandService<SaveWithdrawThirdPartyOrderNoCommand>
+	private readonly IPaymentRepository _paymentRepository;
+
+	public SaveWithdrawThirdPartyOrderNoCommandService(IPaymentRepository paymentRepository)
 	{
-		private readonly IPaymentRepository _paymentRepository;
+		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+	}
 
-		public SaveWithdrawThirdPartyOrderNoCommandService(IPaymentRepository paymentRepository)
-		{
-			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		}
+	public async ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
+	{
+		var formData = await _paymentRepository
+			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
+			.ConfigureAwait(false);
 
-		public async ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
-		{
-			var formData = await _paymentRepository
-				.GetWithdrawFormByIdAsync(command.FormId)
-				.ConfigureAwait(false);
+		if (formData == null)
+			return;
 
-			if (formData == null)
-				return;
-
-			await _paymentRepository
-				.SubmitWithdrawFormStatusAsync(
-					command.FormId,
-					formData.Status,
-					null,
-					null,
-					command.ThirdPartyOrderNo,
-					null,
-					null)
-				.ConfigureAwait(false);
-		}
+		await _paymentRepository
+			.SubmitWithdrawFormStatusAsync(
+				command.FormId,
+				formData.Status,
+				null,
+				null,
+				command.ThirdPartyOrderNo,
+				null,
+				null, 
+				cancellationToken)
+			.ConfigureAwait(false);
 	}
 }

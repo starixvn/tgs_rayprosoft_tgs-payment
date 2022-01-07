@@ -1,15 +1,14 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public class Paging
 {
-	public class Paging
-    {
-        public bool? IsDesc { get; set; }
+	public bool? IsDesc { get; set; }
 
-        public int? Page { get; set; }
+	public int? Page { get; set; }
 
-        public int? Rows { get; set; }
+	public int? Rows { get; set; }
 
-        public bool? ShowAll { get; set; } = false;
+	public bool? ShowAll { get; set; } = false;
 
-        public string? SortBy { get; set; }
-    }
+	public string? SortBy { get; set; }
 }

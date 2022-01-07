@@ -1,17 +1,14 @@
-﻿using System;
+﻿namespace Tgs.Payment.Clients;
 
-namespace Tgs.Payment.Clients
+internal class SignOffForm
 {
-	internal class SignOffForm
-	{
-		public Guid? BrandPaymentId { get; set; }
+	public Guid? BrandPaymentId { get; set; }
 
-		public string? Remark { get; set; }
+	public string? Remark { get; set; }
 
-		public ReviewState ReviewState { get; set; }
+	public ReviewState ReviewState { get; set; }
 
-		public string? ReviewUserId { get; set; }
+	public string? ReviewUserId { get; set; }
 
-		public string? ReviewUserName { get; set; }
-	}
+	public string? ReviewUserName { get; set; }
 }
