@@ -3,25 +3,24 @@ using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Controllers
-{
-	[Route("payment/pmc")]
-	[ApiController]
-	public class PaymentMethodChannelController : ControllerBase
-	{
-		[HttpGet(Name = "GetAllPaymentMethodChannels")]
-		public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
-			[FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
-		{
-			var allPayments = queryService.QueryAsync(new AllPaymentMethodChannelsQuery());
+namespace Tgs.Payment.Controllers;
 
-			return allPayments.Select(pmc => new PaymentMethodChannelViewModel
-			{
-				Id = pmc.Id,
-				PaymentId = pmc.PaymentId,
-				MethodId = pmc.MethodId,
-				ChannelId = pmc.ChannelId
-			});
-		}
+[Route("payment/pmc")]
+[ApiController]
+public class PaymentMethodChannelController : ControllerBase
+{
+	[HttpGet(Name = "GetAllPaymentMethodChannels")]
+	public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
+		[FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
+	{
+		var allPayments = queryService.QueryAsync(new AllPaymentMethodChannelsQuery());
+
+		return allPayments.Select(pmc => new PaymentMethodChannelViewModel
+		{
+			Id = pmc.Id,
+			PaymentId = pmc.PaymentId,
+			MethodId = pmc.MethodId,
+			ChannelId = pmc.ChannelId
+		});
 	}
 }

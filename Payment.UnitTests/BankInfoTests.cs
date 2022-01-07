@@ -129,7 +129,7 @@ public class BankInfoTests
 
 		var query = new GetPlayerBankInfosQuery("ThisIsPlayerCode");
 
-		sut.QueryAsync(query);
+		_ = sut.QueryAsync(query);
 
 		_ = fakePaymentRepository.Received(1)
 			.GetBankInfosByPlayerCodeAsync(Arg.Is(query.PlayerCode));

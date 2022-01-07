@@ -43,7 +43,7 @@ builder.Services
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
 
-		builder.UseNpgsql(config.GetConnectionString("Tgs"));
+		_ = builder.UseNpgsql(config.GetConnectionString("Tgs"));
 	})
 	.ConfigureOptions((options, sp) =>
 	{

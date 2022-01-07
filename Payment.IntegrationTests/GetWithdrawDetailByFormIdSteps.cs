@@ -4,85 +4,84 @@ using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "Get withdraw detail by form id")]
+public class GetWithdrawDetailByFormIdSteps
 {
-	[Binding]
-	[Scope(Scenario = "Get withdraw detail by form id")]
-	public class GetWithdrawDetailByFormIdSteps
+	private object _actual;
+	private Guid _formId;
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+
+	public GetWithdrawDetailByFormIdSteps()
 	{
-		private object _actual;
-		private Guid _formId;
-		private PaymentServiceClient _paymentServiceClient;
-		private TestPaymentApplication _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public GetWithdrawDetailByFormIdSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I have a form id \{(.*)}")]
+	public void GivenIHaveAFormId(Guid formId)
+	{
+		_formId = formId;
+	}
+
+	[Then(@"return detail data")]
+	public void ThenReturnDetailData()
+	{
+		Assert.IsNotNull(_actual);
+	}
+
+	[When(@"call get withdraw form detail api")]
+	public async Task WhenCallGetWithdrawFormDetailApiAsync()
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+		var pmc = new PaymentMethodChannel
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+			Id = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			MethodId = Guid.NewGuid(),
+			ChannelId = Guid.NewGuid()
+		};
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+		_ = await dbContext.PaymentMethodChannels.AddAsync(pmc);
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
+		var bp = new BrandPayment
 		{
-			await _testHost.DisposeAsync();
-		}
+			Id = Guid.NewGuid(),
+			PaymentMethodChannelId = pmc.Id,
+			ChannelName = "channel",
+			CreatedByUsername = "System",
+			ExtendedData = "{}",
+			UpdatedByUsername = "System"
+		};
+		_ = await dbContext.BrandPayments.AddAsync(bp);
 
-		[Given(@"I have a form id \{(.*)}")]
-		public void GivenIHaveAFormId(Guid formId)
+		_ = await dbContext.WithdrawForms.AddAsync(new WithdrawForm
 		{
-			_formId = formId;
-		}
+			Id = _formId,
+			BrandId = Guid.NewGuid(),
+			UserId = "PlayerCode",
+			UserName = "UserName",
+			UserType = (int)UserType.Player,
+			BrandPaymentId = bp.Id,
+			Amount = 1000M,
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now,
+			BankInfo = "{}"
+		});
 
-		[Then(@"return detail data")]
-		public void ThenReturnDetailData()
-		{
-			Assert.IsNotNull(_actual);
-		}
+		_ = await dbContext.SaveChangesAsync();
 
-		[When(@"call get withdraw form detail api")]
-		public async Task WhenCallGetWithdrawFormDetailApiAsync()
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
-
-			var pmc = new PaymentMethodChannel
-			{
-				Id = Guid.NewGuid(),
-				PaymentId = Guid.NewGuid(),
-				MethodId = Guid.NewGuid(),
-				ChannelId = Guid.NewGuid()
-			};
-
-			await dbContext.PaymentMethodChannels.AddAsync(pmc);
-
-			var bp = new BrandPayment
-			{
-				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id,
-				ChannelName = "channel",
-				CreatedByUsername = "System",
-				ExtendedData = "{}",
-				UpdatedByUsername = "System"
-			};
-			await dbContext.BrandPayments.AddAsync(bp);
-
-			await dbContext.WithdrawForms.AddAsync(new WithdrawForm
-			{
-				Id = _formId,
-				BrandId = Guid.NewGuid(),
-				UserId = "PlayerCode",
-				UserName = "UserName",
-				UserType = (int)UserType.Player,
-				BrandPaymentId = bp.Id,
-				Amount = 1000M,
-				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now,
-				BankInfo = "{}"
-			});
-
-			await dbContext.SaveChangesAsync();
-
-			_actual = await _paymentServiceClient.GetWithdrawFormAsync(_formId);
-		}
+		_actual = await _paymentServiceClient.GetWithdrawFormAsync(_formId);
 	}
 }

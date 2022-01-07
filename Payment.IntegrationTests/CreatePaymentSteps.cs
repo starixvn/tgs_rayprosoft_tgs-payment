@@ -5,53 +5,52 @@ using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "Create a payment")]
+public class CreatePaymentSteps
 {
-	[Binding]
-	[Scope(Scenario = "Create a payment")]
-	public class CreatePaymentSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+	private PaymentCreateInfo _createInfo;
+
+	public CreatePaymentSteps()
 	{
-		private readonly PaymentServiceClient _paymentServiceClient;
-		private readonly TestPaymentApplication _testHost;
-		private PaymentCreateInfo _createInfo;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public CreatePaymentSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I will create payment info")]
+	public void GivenIWillCreatePaymentInfo()
+	{
+		_createInfo = new PaymentCreateInfo
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+			Code = "Test"
+		};
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[Then(@"the payment info created")]
+	public async Task ThenThePaymentInfoCreatedAsync()
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.DisposeAsync();
-		}
+		var paymentData = await dbContext.PaymentItems
+			.SingleAsync(p => p.Code == _createInfo.Code);
 
-		[Given(@"I will create payment info")]
-		public void GivenIWillCreatePaymentInfo()
-		{
-			_createInfo = new PaymentCreateInfo
-			{
-				Code = "Test"
-			};
-		}
+		Assert.IsNotNull(paymentData);
+	}
 
-		[Then(@"the payment info created")]
-		public async Task ThenThePaymentInfoCreatedAsync()
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
-
-			var paymentData = await dbContext.PaymentItems
-				.SingleAsync(p => p.Code == _createInfo.Code);
-
-			Assert.IsNotNull(paymentData);
-		}
-
-		[When(@"call create payment api")]
-		public async Task WhenCallCreatePaymentApiAsync()
-		{
-			await _paymentServiceClient.CreatePaymentAsync(_createInfo);
-		}
+	[When(@"call create payment api")]
+	public async Task WhenCallCreatePaymentApiAsync()
+	{
+		await _paymentServiceClient.CreatePaymentAsync(_createInfo);
 	}
 }

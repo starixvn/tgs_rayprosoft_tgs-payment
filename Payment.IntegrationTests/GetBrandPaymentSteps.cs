@@ -4,103 +4,102 @@ using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+public class GetBrandPaymentSteps
 {
-	[Binding]
-	public class GetBrandPaymentSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private BrandPaymentInfo _actual;
+	private Guid _brandPaymentId;
+	private readonly TestPaymentApplication _testHost;
+
+	public GetBrandPaymentSteps()
 	{
-		private BrandPaymentInfo _actual;
-		private Guid _brandPaymentId;
-		private PaymentServiceClient _paymentServiceClient;
-		private TestPaymentApplication _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public GetBrandPaymentSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I has a brand payment id \{(.*)}")]
+	public async Task GivenIHasABrandPaymentIdAsync(Guid brandPaymentId)
+	{
+		_brandPaymentId = brandPaymentId;
+
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+		var paymentInfo = new PaymentItem
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+			Id = Guid.NewGuid(),
+			Code = Guid.NewGuid().ToString(),
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now,
+			CreatedByUsername = "System",
+			UpdatedByUsername = "System"
+		};
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+		_ = await dbContext.PaymentItems.AddAsync(paymentInfo);
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
+		var paymentMethod = new PaymentMethod
 		{
-			await _testHost.DisposeAsync();
-		}
+			Id = Guid.NewGuid(),
+			Code = "TestMethod",
+			BankType = "Bank",
+		};
 
-		[Given(@"I has a brand payment id \{(.*)}")]
-		public async Task GivenIHasABrandPaymentIdAsync(Guid brandPaymentId)
+		_ = await dbContext.PaymentMethods.AddAsync(paymentMethod);
+
+		var paymentChannel = new PaymentChannel
 		{
-			_brandPaymentId = brandPaymentId;
+			Id = Guid.NewGuid(),
+			Code = "TestChannel"
+		};
 
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+		_ = await dbContext.PaymentChannels.AddAsync(paymentChannel);
 
-			var paymentInfo = new PaymentItem
-			{
-				Id = Guid.NewGuid(),
-				Code = Guid.NewGuid().ToString(),
-				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now,
-				CreatedByUsername = "System",
-				UpdatedByUsername = "System"
-			};
-
-			await dbContext.PaymentItems.AddAsync(paymentInfo);
-
-			var paymentMethod = new PaymentMethod
-			{
-				Id = Guid.NewGuid(),
-				Code = "TestMethod",
-				BankType = "Bank",
-			};
-
-			await dbContext.PaymentMethods.AddAsync(paymentMethod);
-
-			var paymentChannel = new PaymentChannel
-			{
-				Id = Guid.NewGuid(),
-				Code = "TestChannel"
-			};
-
-			await dbContext.PaymentChannels.AddAsync(paymentChannel);
-
-			var pmc = new PaymentMethodChannel
-			{
-				Id = Guid.NewGuid(),
-				PaymentId = paymentInfo.Id,
-				MethodId = paymentMethod.Id,
-				ChannelId = paymentChannel.Id
-			};
-
-			await dbContext.PaymentMethodChannels.AddAsync(pmc);
-
-			var brandPayment = new BrandPayment
-			{
-				Id = _brandPaymentId,
-				BrandId = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id,
-				ChannelName = "ChannelName",
-				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now,
-				CreatedByUsername = "System",
-				UpdatedByUsername = "System",
-				ExtendedData = "{}"
-			};
-
-			await dbContext.BrandPayments.AddAsync(brandPayment);
-
-			await dbContext.SaveChangesAsync();
-		}
-
-		[Then(@"return brand payment data")]
-		public void ThenReturnBrandPaymentData()
+		var pmc = new PaymentMethodChannel
 		{
-			Assert.NotNull(_actual);
-		}
+			Id = Guid.NewGuid(),
+			PaymentId = paymentInfo.Id,
+			MethodId = paymentMethod.Id,
+			ChannelId = paymentChannel.Id
+		};
 
-		[When(@"call get brand payment api")]
-		public async Task WhenCallGetBrandPaymentApiAsync()
+		_ = await dbContext.PaymentMethodChannels.AddAsync(pmc);
+
+		var brandPayment = new BrandPayment
 		{
-			_actual = await _paymentServiceClient.GetBrandPaymentByIdAsync(_brandPaymentId);
-		}
+			Id = _brandPaymentId,
+			BrandId = Guid.NewGuid(),
+			PaymentMethodChannelId = pmc.Id,
+			ChannelName = "ChannelName",
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now,
+			CreatedByUsername = "System",
+			UpdatedByUsername = "System",
+			ExtendedData = "{}"
+		};
+
+		_ = await dbContext.BrandPayments.AddAsync(brandPayment);
+
+		_ = await dbContext.SaveChangesAsync();
+	}
+
+	[Then(@"return brand payment data")]
+	public void ThenReturnBrandPaymentData()
+	{
+		Assert.NotNull(_actual);
+	}
+
+	[When(@"call get brand payment api")]
+	public async Task WhenCallGetBrandPaymentApiAsync()
+	{
+		_actual = await _paymentServiceClient.GetBrandPaymentByIdAsync(_brandPaymentId);
 	}
 }

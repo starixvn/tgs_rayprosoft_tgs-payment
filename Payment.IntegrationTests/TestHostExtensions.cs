@@ -2,19 +2,18 @@
 using System.Text.Json.Serialization;
 using Tgs.Payment.Clients;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+internal static class TestHostExtensions
 {
-	internal static class TestHostExtensions
-	{
-		public static PaymentServiceClient GetPaymentServiceClient(this TestPaymentApplication web)
-			=> new PaymentServiceClient(
-				web.CreateClient(),
-				new JsonSerializerOptions
-				{
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-					Converters = {
+	public static PaymentServiceClient GetPaymentServiceClient(this TestPaymentApplication web)
+		=> new(
+			web.CreateClient(),
+			new JsonSerializerOptions
+			{
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+				Converters = {
 						new JsonStringEnumConverter()
-					}
-				});
-	}
+				}
+			});
 }

@@ -5,55 +5,54 @@ using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "Create a payment method")]
+public class CreatePaymentMethodSteps
 {
-	[Binding]
-	[Scope(Scenario = "Create a payment method")]
-	public class CreatePaymentMethodSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+	private PaymentMethodCreateInfo _createInfo;
+
+	public CreatePaymentMethodSteps()
 	{
-		private readonly PaymentServiceClient _paymentServiceClient;
-		private readonly TestPaymentApplication _testHost;
-		private PaymentMethodCreateInfo _createInfo;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public CreatePaymentMethodSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I will create payment method info")]
+	public void GivenIWillCreatePaymentMethodInfo()
+	{
+		_createInfo = new PaymentMethodCreateInfo
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+			Code = "MethodCode",
+			BankType = "Bank"
+		};
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[Then(@"the payment channel created")]
+	public async Task ThenThePaymentChannelCreatedAsync()
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.DisposeAsync();
-		}
+		var methodData = await dbContext.PaymentMethods
+			.SingleAsync(m => m.Code == _createInfo.Code);
 
-		[Given(@"I will create payment method info")]
-		public void GivenIWillCreatePaymentMethodInfo()
-		{
-			_createInfo = new PaymentMethodCreateInfo
-			{
-				Code = "MethodCode",
-				BankType = "Bank"
-			};
-		}
+		Assert.IsNotNull(methodData);
+		Assert.AreEqual(_createInfo.BankType, methodData.BankType);
+	}
 
-		[Then(@"the payment channel created")]
-		public async Task ThenThePaymentChannelCreatedAsync()
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
-
-			var methodData = await dbContext.PaymentMethods
-				.SingleAsync(m => m.Code == _createInfo.Code);
-
-			Assert.IsNotNull(methodData);
-			Assert.AreEqual(_createInfo.BankType, methodData.BankType);
-		}
-
-		[When(@"call create payment method api")]
-		public async Task WhenCallCreatePaymentMethodApiAsync()
-		{
-			await _paymentServiceClient.CreatePaymentMethodAsync(_createInfo);
-		}
+	[When(@"call create payment method api")]
+	public async Task WhenCallCreatePaymentMethodApiAsync()
+	{
+		await _paymentServiceClient.CreatePaymentMethodAsync(_createInfo);
 	}
 }

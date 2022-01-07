@@ -2,47 +2,46 @@
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "List player bank infos")]
+public class GetPlayerBankInfosSteps
 {
-	[Binding]
-	[Scope(Scenario = "List player bank infos")]
-	public class GetPlayerBankInfosSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+	private string _playerCode;
+
+	public GetPlayerBankInfosSteps()
 	{
-		private PaymentServiceClient _paymentServiceClient;
-		private string _playerCode;
-		private TestPaymentApplication _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public GetPlayerBankInfosSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.DisposeAsync();
-		}
+	[Given(@"I has a playerCode ""(.*)""")]
+	public void GivenIHasAPlayerCode(string playerCode)
+	{
+		_playerCode = playerCode;
+	}
 
-		[Given(@"I has a playerCode ""(.*)""")]
-		public void GivenIHasAPlayerCode(string playerCode)
-		{
-			_playerCode = playerCode;
-		}
+	[Then(@"return bank info data by player")]
+	public void ThenReturnBankInfoDataByPlayer()
+	{
+		Assert.Pass();
+	}
 
-		[Then(@"return bank info data by player")]
-		public void ThenReturnBankInfoDataByPlayer()
-		{
-			Assert.Pass();
-		}
+	[When(@"call get bank infos api")]
+	public async Task WhenCallGetBankInfosApiAsync()
+	{
+		var bankInfos = _paymentServiceClient.GetPlayerBankInfosAsync(_playerCode);
 
-		[When(@"call get bank infos api")]
-		public async Task WhenCallGetBankInfosApiAsync()
-		{
-			var bankInfos = _paymentServiceClient.GetPlayerBankInfosAsync(_playerCode);
-
-			await bankInfos.ToArrayAsync();
-		}
+		_ = await bankInfos.ToArrayAsync();
 	}
 }

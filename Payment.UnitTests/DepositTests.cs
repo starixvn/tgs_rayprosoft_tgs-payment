@@ -21,7 +21,7 @@ public class DepositTests
 
 		var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
 				query.FormId,
 				  "PlayerCode",
@@ -102,7 +102,7 @@ public class DepositTests
 				ApplyInfo = null
 			});
 
-		fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
 			.Returns(new BrandInfo("GPI"));
 
 		await sut.ExecuteAsync(command);
@@ -135,7 +135,7 @@ public class DepositTests
 
 		var query = new GetDepositFormDetailQuery(Guid.NewGuid(), Guid.NewGuid());
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(query.FormId))
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(query.FormId))
 			.Returns(new DepositFormInfo(
 				query.FormId,
 				  "PlayerCode",
@@ -171,7 +171,7 @@ public class DepositTests
 
 		var query = new GetDepositFormDetailByFormIdQuery(Guid.NewGuid());
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(query.FormId))
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(query.FormId))
 			.Returns(new DepositFormInfo(
 				query.FormId,
 				  "PlayerCode",
@@ -327,7 +327,7 @@ public class DepositTests
 				RowCount = -1
 			});
 
-		var actual = sut.QueryAsync(query);
+		_ = sut.QueryAsync(query);
 
 		_ = fakePaymentRepository.Received(1)
 			.QueryDepositFormsAsync(
@@ -350,7 +350,7 @@ public class DepositTests
 			"reviewedUserName",
 			null);
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
 				command.FormId,
 				"PlayerCode",
@@ -401,7 +401,7 @@ public class DepositTests
 			Guid.NewGuid(),
 			"ThirdPartyOrderNo");
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(command.FormId))
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(command.FormId))
 			.Returns(new DepositFormInfo(
 				command.FormId,
 				"PlayerCode",
@@ -451,7 +451,7 @@ public class DepositTests
 			null,
 			null);
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
 				command.FormId,
 				"PlayerCode",
@@ -517,9 +517,9 @@ public class DepositTests
 			null,
 			null);
 
-		var actual = sut.GetAsync(query);
+		_ = sut.GetAsync(query);
 
-		fakePaymentRepository.Received(1)
+		_ = fakePaymentRepository.Received(1)
 			.CalculateDepositTotalAmountAsync(Arg.Any<DepositFormQueryConditions>());
 	}
 
@@ -539,7 +539,7 @@ public class DepositTests
 			null,
 			null);
 
-		fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
 				command.FormId,
 				"PlayerCode",

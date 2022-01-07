@@ -2,44 +2,43 @@
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace Tgs.Payment.Repositories
+namespace Tgs.Payment.Repositories;
+
+internal class RedisConnectionFactory : IDisposable
 {
-	internal class RedisConnectionFactory : IDisposable
+	private readonly ConnectionMultiplexer _connectionMultiplexer;
+
+	private bool _disposedValue;
+	public IDatabase Database { get; }
+
+	public RedisConnectionFactory(IOptions<RedisOptions> optionsAccessor)
 	{
-		private readonly ConnectionMultiplexer _connectionMultiplexer;
+		var options = optionsAccessor.Value;
 
-		private bool _disposedValue;
-		public IDatabase Database { get; }
+		var configurationOptions = ConfigurationOptions.Parse(options.ConnectionString);
 
-		public RedisConnectionFactory(IOptions<RedisOptions> optionsAccessor)
+		_connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions);
+
+		Database = _connectionMultiplexer.GetDatabase();
+	}
+
+	public void Dispose()
+	{
+		// 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (!_disposedValue)
 		{
-			var options = optionsAccessor.Value;
-
-			var configurationOptions = ConfigurationOptions.Parse(options.ConnectionString);
-
-			_connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions);
-
-			Database = _connectionMultiplexer.GetDatabase();
-		}
-
-		public void Dispose()
-		{
-			// 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!_disposedValue)
+			if (disposing)
 			{
-				if (disposing)
-				{
-					_connectionMultiplexer?.Dispose();
-				}
-
-				_disposedValue = true;
+				_connectionMultiplexer?.Dispose();
 			}
+
+			_disposedValue = true;
 		}
 	}
 }

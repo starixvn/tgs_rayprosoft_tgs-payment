@@ -1,48 +1,44 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+public class AllPaymentMethodsSteps
 {
-	[Binding]
-	public class AllPaymentMethodsSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+
+	public AllPaymentMethodsSteps()
 	{
-		private PaymentServiceClient _paymentServiceClient;
-		private TestPaymentApplication _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public AllPaymentMethodsSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.DisposeAsync();
-		}
+	[Given(@"I will list all payment methods")]
+	public void GivenIWillListAllPaymentMethods()
+	{
+	}
 
-		[Given(@"I will list all payment methods")]
-		public void GivenIWillListAllPaymentMethods()
-		{
-		}
+	[Then(@"return all payment methods data")]
+	public void ThenReturnAllPaymentMethodsData()
+	{
+		Assert.Pass();
+	}
 
-		[Then(@"return all payment methods data")]
-		public void ThenReturnAllPaymentMethodsData()
-		{
-			Assert.Pass();
-		}
+	[When(@"call get all payment methods api")]
+	public async Task WhenCallGetAllPaymentMethodsApiAsync()
+	{
+		var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
 
-		[When(@"call get all payment methods api")]
-		public async Task WhenCallGetAllPaymentMethodsApiAsync()
-		{
-			var paymentMethods = _paymentServiceClient.GetAllPaymentMethodsAsync();
-
-			await paymentMethods.ToArrayAsync();
-		}
+		_ = await paymentMethods.ToArrayAsync();
 	}
 }

@@ -1,42 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Controllers
+namespace Tgs.Payment.Controllers;
+
+[Route("brand/payment")]
+[ApiController]
+public class BrandPaymentController : ControllerBase
 {
-	[Route("brand/payment")]
-	[ApiController]
-	public class BrandPaymentController : ControllerBase
+	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
+	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
+		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
+		string playerCode,
+		[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)
+		=> queryService
+			.QueryAsync(new BrandPaymentAclQuery(playerCode, brandPaymentIds))
+			.Select(acl => new BrandPaymentAclViewModel
+			{
+				BrandPaymentId = acl.BrandPaymentId,
+				IsBlock = acl.IsBlock,
+				PlayerCode = acl.PlayerCode
+			});
+
+	[HttpGet("{id}", Name = "GetBrandPayment")]
+	public async ValueTask<BrandPaymentViewModel> GetBrandPaymentAsync(
+		[FromServices] IGetService<GetBrandPaymentQuery, BrandPaymentInfo> getService,
+		Guid id)
 	{
-		[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
-		public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
-			[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
-			string playerCode,
-			[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)
-			=> queryService
-				.QueryAsync(new BrandPaymentAclQuery(playerCode, brandPaymentIds))
-				.Select(acl => new BrandPaymentAclViewModel
-				{
-					BrandPaymentId = acl.BrandPaymentId,
-					IsBlock = acl.IsBlock,
-					PlayerCode = acl.PlayerCode
-				});
+		var brandPayment = await getService
+			.GetAsync(new GetBrandPaymentQuery(id))
+			.ConfigureAwait(false);
 
-		[HttpGet("{id}", Name = "GetBrandPayment")]
-		public async ValueTask<BrandPaymentViewModel> GetBrandPaymentAsync(
-			[FromServices] IGetService<GetBrandPaymentQuery, BrandPaymentInfo> getService,
-			Guid id)
+		return new BrandPaymentViewModel
 		{
-			var brandPayment = await getService
-				.GetAsync(new GetBrandPaymentQuery(id))
-				.ConfigureAwait(false);
+			Id = brandPayment.Id,
+			AuthenticateIdentity = brandPayment.AuthenticateIdentity,
+			AuthenticatePhone = brandPayment.AuthenticatePhone,
+			ChannelCode = brandPayment.ChannelCode,
+			ChannelId = brandPayment.ChannelId,
+			ChannelName = brandPayment.ChannelName,
+			ConditionMatchType = brandPayment.ConditionMatchType,
+			DepositedAmountLimit = brandPayment.DepositedAmountLimit,
+			Enabled = brandPayment.Enabled,
+			ExtendedData = brandPayment.ExtendedData,
+			IsAllPlayers = brandPayment.IsAllPlayers,
+			MethodId = brandPayment.MethodId,
+			PaymentId = brandPayment.PaymentId,
+			PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
+			TransferLimit = brandPayment.TransferLimit,
+			TransferType = brandPayment.TransferType
+		};
+	}
 
-			return new BrandPaymentViewModel
+	[HttpGet(Name = "QueryBrandPayments")]
+	public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(
+		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
+		[FromQuery(Name = "brand")] Guid brandId)
+		=> queryService.QueryAsync(new BrandPaymentQuery(brandId))
+			.Select(brandPayment => new BrandPaymentViewModel
 			{
 				Id = brandPayment.Id,
 				AuthenticateIdentity = brandPayment.AuthenticateIdentity,
@@ -53,45 +75,18 @@ namespace Tgs.Payment.Controllers
 				PaymentId = brandPayment.PaymentId,
 				PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 				TransferLimit = brandPayment.TransferLimit,
-				TransferType = brandPayment.TransferType
-			};
-		}
+				TransferType = brandPayment.TransferType,
+				DisplayOrder = brandPayment.DisplayOrder
+			});
 
-		[HttpGet(Name = "QueryBrandPayments")]
-		public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(
-			[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
-			[FromQuery(Name = "brand")] Guid brandId)
-			=> queryService.QueryAsync(new BrandPaymentQuery(brandId))
-				.Select(brandPayment => new BrandPaymentViewModel
-				{
-					Id = brandPayment.Id,
-					AuthenticateIdentity = brandPayment.AuthenticateIdentity,
-					AuthenticatePhone = brandPayment.AuthenticatePhone,
-					ChannelCode = brandPayment.ChannelCode,
-					ChannelId = brandPayment.ChannelId,
-					ChannelName = brandPayment.ChannelName,
-					ConditionMatchType = brandPayment.ConditionMatchType,
-					DepositedAmountLimit = brandPayment.DepositedAmountLimit,
-					Enabled = brandPayment.Enabled,
-					ExtendedData = brandPayment.ExtendedData,
-					IsAllPlayers = brandPayment.IsAllPlayers,
-					MethodId = brandPayment.MethodId,
-					PaymentId = brandPayment.PaymentId,
-					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
-					TransferLimit = brandPayment.TransferLimit,
-					TransferType = brandPayment.TransferType,
-					DisplayOrder = brandPayment.DisplayOrder
-				});
-
-		[HttpGet("vip", Name = "QueryBrandPaymentVips")]
-		public IAsyncEnumerable<BrandPaymentVipViewModel> GetBrandPaymentVipsAsync(
-			[FromServices] IQueryService<BrandPaymentVipQuery, BrandPaymentVip> queryService,
-			[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)
-			=> queryService.QueryAsync(new BrandPaymentVipQuery(brandPaymentIds))
-				.Select(vip => new BrandPaymentVipViewModel
-				{
-					BrandPaymentId = vip.BrandPaymentId,
-					VipLevelId = vip.VipLevelId
-				});
-	}
+	[HttpGet("vip", Name = "QueryBrandPaymentVips")]
+	public IAsyncEnumerable<BrandPaymentVipViewModel> GetBrandPaymentVipsAsync(
+		[FromServices] IQueryService<BrandPaymentVipQuery, BrandPaymentVip> queryService,
+		[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)
+		=> queryService.QueryAsync(new BrandPaymentVipQuery(brandPaymentIds))
+			.Select(vip => new BrandPaymentVipViewModel
+			{
+				BrandPaymentId = vip.BrandPaymentId,
+				VipLevelId = vip.VipLevelId
+			});
 }
