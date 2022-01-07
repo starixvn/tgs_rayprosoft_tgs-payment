@@ -12,6 +12,8 @@
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tgs payment</PackageTags>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>10.0</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

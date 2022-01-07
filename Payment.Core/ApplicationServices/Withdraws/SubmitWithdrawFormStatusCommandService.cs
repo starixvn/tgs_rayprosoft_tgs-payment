@@ -4,47 +4,46 @@ using System.Threading.Tasks;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.ApplicationServices.Withdraws
+namespace Tgs.Payment.ApplicationServices.Withdraws;
+
+internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWithdrawFormStatusCommand>
 {
-	internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWithdrawFormStatusCommand>
+	private readonly IPaymentClient _paymentClient;
+	private readonly IPaymentRepository _paymentRepository;
+
+	public SubmitWithdrawFormStatusCommandService(
+		IPaymentRepository paymentRepository,
+		IPaymentClient paymentClient)
 	{
-		private readonly IPaymentClient _paymentClient;
-		private readonly IPaymentRepository _paymentRepository;
+		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+	}
 
-		public SubmitWithdrawFormStatusCommandService(
-			IPaymentRepository paymentRepository,
-			IPaymentClient paymentClient)
-		{
-			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-			_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		}
+	public async ValueTask ExecuteAsync(SubmitWithdrawFormStatusCommand command, CancellationToken cancellationToken = default)
+	{
+		var formData = await _paymentRepository
+			.GetWithdrawFormByIdAsync(command.FormId)
+			.ConfigureAwait(false);
 
-		public async ValueTask ExecuteAsync(SubmitWithdrawFormStatusCommand command, CancellationToken cancellationToken = default)
-		{
-			var formData = await _paymentRepository
-				.GetWithdrawFormByIdAsync(command.FormId)
+		if (formData == null)
+			return;
+
+		var originStatus = formData.Status;
+
+		await _paymentRepository
+			.SubmitWithdrawFormStatusAsync(
+				command.FormId,
+				command.Status,
+				command.PaymentReturn,
+				command.ActualAmount,
+				command.ThirdPartyOrderNo,
+				command.PaidUserId,
+				command.PaidUserName)
+			.ConfigureAwait(false);
+
+		if (originStatus != command.Status)
+			await _paymentClient
+				.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
 				.ConfigureAwait(false);
-
-			if (formData == null)
-				return;
-
-			var originStatus = formData.Status;
-
-			await _paymentRepository
-				.SubmitWithdrawFormStatusAsync(
-					command.FormId,
-					command.Status,
-					command.PaymentReturn,
-					command.ActualAmount,
-					command.ThirdPartyOrderNo,
-					command.PaidUserId,
-					command.PaidUserName)
-				.ConfigureAwait(false);
-
-			if (originStatus != command.Status)
-				await _paymentClient
-					.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
-					.ConfigureAwait(false);
-		}
 	}
 }

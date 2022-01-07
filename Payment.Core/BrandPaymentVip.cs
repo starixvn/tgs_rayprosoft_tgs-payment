@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace Tgs.Payment
-{
-	public record BrandPaymentVip(
-        Guid BrandPaymentId,
-        Guid VipLevelId);
-}
+namespace Tgs.Payment;
+
+public record BrandPaymentVip(
+	Guid BrandPaymentId,
+	Guid VipLevelId);

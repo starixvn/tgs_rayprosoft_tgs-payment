@@ -1,13 +1,12 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public enum PaymentTrigger
 {
-	public enum PaymentTrigger
-	{
-		Approve,
-		Reject,
-		DepositCreate,
-		WithdrawCreate,
-		UploadPayCertificate,
-		PaymentDepositCompleted,
-		PaymentWithdrawCompleted
-	}
+	Approve,
+	Reject,
+	DepositCreate,
+	WithdrawCreate,
+	UploadPayCertificate,
+	PaymentDepositCompleted,
+	PaymentWithdrawCompleted
 }

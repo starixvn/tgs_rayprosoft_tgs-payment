@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.Threading;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.ApplicationServices.BrandPayments
+namespace Tgs.Payment.ApplicationServices.BrandPayments;
+
+internal class BrandPaymentVipQueryService : IQueryService<BrandPaymentVipQuery, BrandPaymentVip>
 {
-	internal class BrandPaymentVipQueryService : IQueryService<BrandPaymentVipQuery, BrandPaymentVip>
-    {
-        private readonly IPaymentRepository _paymentRepository;
+	private readonly IPaymentRepository _paymentRepository;
 
-        public BrandPaymentVipQueryService(IPaymentRepository paymentRepository)
-        {
-            _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-        }
+	public BrandPaymentVipQueryService(IPaymentRepository paymentRepository)
+	{
+		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+	}
 
-        public IAsyncEnumerable<BrandPaymentVip> QueryAsync(
-            BrandPaymentVipQuery query,
-            CancellationToken cancellationToken = default)
-            => _paymentRepository.GetBrandPaymentVipListAsync(query.BrandPaymentIds);
-    }
+	public IAsyncEnumerable<BrandPaymentVip> QueryAsync(
+		BrandPaymentVipQuery query,
+		CancellationToken cancellationToken = default)
+		=> _paymentRepository.GetBrandPaymentVipListAsync(query.BrandPaymentIds);
 }

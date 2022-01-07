@@ -14,13 +14,9 @@
 		<Product>Tgs.Payment.Client</Product>
 		<RootNamespace>Tgs.Payment.Clients</RootNamespace>
 		<AssemblyName>Tgs.Payment.Client</AssemblyName>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>10.0</LangVersion>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <Compile Remove="Properties\**" />
-	  <EmbeddedResource Remove="Properties\**" />
-	  <None Remove="Properties\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Protos\payment.proto" />

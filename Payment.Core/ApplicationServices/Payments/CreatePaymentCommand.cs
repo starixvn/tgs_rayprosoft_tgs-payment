@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.ApplicationServices.Payments
-{
-	public record CreatePaymentCommand(
-        string Code,
-        string? Description,
-        string? ExtendedData);
-}
+﻿namespace Tgs.Payment.ApplicationServices.Payments;
+
+public record CreatePaymentCommand(
+	string Code,
+	string? Description,
+	string? ExtendedData);

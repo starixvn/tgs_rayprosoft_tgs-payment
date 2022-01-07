@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace Tgs.Payment.Clients;
 
-namespace Tgs.Payment.Clients
+public class BrandPaymentAcl
 {
-	public class BrandPaymentAcl
-    {
-        public Guid BrandPaymentId { get; init; }
+	public Guid BrandPaymentId { get; init; }
 
-        public bool IsBlock { get; init; }
+	public bool IsBlock { get; init; }
 
-        public string PlayerCode { get; init; } = default!;
-    }
+	public string PlayerCode { get; init; } = default!;
 }

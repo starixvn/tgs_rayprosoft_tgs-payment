@@ -1,8 +1,7 @@
-﻿namespace Tgs.Payment
+﻿namespace Tgs.Payment;
+
+public enum ReviewState
 {
-	public enum ReviewState
-	{
-		Approve,
-		Reject
-	}
+	Approve,
+	Reject
 }

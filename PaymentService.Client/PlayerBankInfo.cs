@@ -1,20 +1,18 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace Tgs.Payment.Clients
+namespace Tgs.Payment.Clients;
+
+public class PlayerBankInfo
 {
-	public class PlayerBankInfo
-    {
-        public string BankType { get; init; } = default!;
+	public string BankType { get; init; } = default!;
 
-        public Guid BrandId { get; init; }
+	public Guid BrandId { get; init; }
 
-        public JsonDocument Detail { get; init; } = default!;
+	public JsonDocument Detail { get; init; } = default!;
 
-        public Guid Id { get; init; }
+	public Guid Id { get; init; }
 
-        public Guid PaymentChannelId { get; init; }
+	public Guid PaymentChannelId { get; init; }
 
-        public string PlayerCode { get; init; } = default!;
-    }
+	public string PlayerCode { get; init; } = default!;
 }
