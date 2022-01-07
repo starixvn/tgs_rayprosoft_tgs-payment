@@ -24,13 +24,15 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 
 	public async ValueTask ExecuteAsync(CreateDepositFormCommand command, CancellationToken cancellationToken = default)
 	{
-		var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.CreateInfo.BrandId);
+		var brandInfo = await _paymentRepository
+			.GetBrandInfoByIdAsync(command.CreateInfo.BrandId, cancellationToken)
+			.ConfigureAwait(false);
 
 		var orderNo = await _takeNumberStore.GetDepositFormOrderNoAsync(brandInfo.Code);
 		command.CreateInfo.OrderNo = orderNo;
 
 		await _paymentRepository
-			.CreateDepositFormAsync(command.FormId, command.CreateInfo)
+			.CreateDepositFormAsync(command.FormId, command.CreateInfo, cancellationToken)
 			.ConfigureAwait(false);
 
 		await _paymentRepository
@@ -40,7 +42,8 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 				null,
 				null,
 				null,
-				null)
+				null,
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		await _paymentClient

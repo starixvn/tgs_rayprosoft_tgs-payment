@@ -25,7 +25,7 @@ internal class CreateAgentBankInfoCommandService : ICommandService<CreateAgentBa
 			command.Detail);
 
 		await _paymentRepository
-			.CreateAgentBankInfoAsync(bankInfo, command.AgentName)
+			.CreateAgentBankInfoAsync(bankInfo, command.AgentName, cancellationToken)
 			.ConfigureAwait(false);
 
 		command.TaskSource.SetResult(bankInfo.Id);

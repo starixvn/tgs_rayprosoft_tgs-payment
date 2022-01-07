@@ -32,7 +32,7 @@ internal class WithdrawFormQueryService
 				query.CreateOnRange,
 				query.UpdateOnRange,
 				query.ReviewOnRange,
-				query.PaidOnRange));
+				query.PaidOnRange), cancellationToken);
 
 	public IAsyncEnumerable<WithdrawFormInfo> QueryAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
 		=> _paymentRepository.QueryWithdrawFormsAsync(
@@ -51,5 +51,6 @@ internal class WithdrawFormQueryService
 				query.UpdateOnRange,
 				query.ReviewOnRange,
 				 query.PaidOnRange),
-			query.Paging);
+			query.Paging, 
+			cancellationToken);
 }

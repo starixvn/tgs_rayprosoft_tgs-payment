@@ -25,7 +25,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 	public async ValueTask ExecuteAsync(SignOffWithdrawFormCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetWithdrawFormByIdAsync(command.FormId)
+			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -39,11 +39,11 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		if (command.Status == ReviewState.Approve)
 		{
 			var brandPayment = await _paymentRepository
-				.GetBrandPaymentByIdAsync(command.BrandPaymentId!.Value)
+				.GetBrandPaymentByIdAsync(command.BrandPaymentId!.Value, cancellationToken)
 				.ConfigureAwait(false);
 
 			var payment = await _paymentRepository
-				.GetPaymentAsync(brandPayment.PaymentId)
+				.GetPaymentAsync(brandPayment.PaymentId, cancellationToken)
 				.ConfigureAwait(false);
 
 			var processor = _withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
@@ -66,7 +66,8 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					command.Status,
 					command.ReviewUserId,
 					command.ReviewUserName,
-					command.Remark)
+					command.Remark, 
+					cancellationToken)
 				.ConfigureAwait(false);
 		}
 		else
@@ -79,7 +80,8 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					command.Status,
 					command.ReviewUserId,
 					command.ReviewUserName,
-					command.Remark)
+					command.Remark, 
+					cancellationToken)
 				.ConfigureAwait(false);
 		}
 

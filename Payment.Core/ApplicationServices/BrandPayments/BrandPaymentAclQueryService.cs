@@ -17,5 +17,5 @@ internal class BrandPaymentAclQueryService : IQueryService<BrandPaymentAclQuery,
 	public IAsyncEnumerable<BrandPaymentAcl> QueryAsync(
 		BrandPaymentAclQuery query,
 		CancellationToken cancellationToken = default)
-		=> _paymentRepository.GetBrandPaymentAclsAsync(query.BrandPaymentIds, query.PlayerCode);
+		=> _paymentRepository.GetBrandPaymentAclsAsync(query.BrandPaymentIds, query.PlayerCode, cancellationToken);
 }

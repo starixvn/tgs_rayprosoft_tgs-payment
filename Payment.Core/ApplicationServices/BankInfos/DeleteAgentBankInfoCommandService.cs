@@ -15,5 +15,5 @@ internal class DeleteAgentBankInfoCommandService : ICommandService<DeleteAgentBa
 	}
 
 	public ValueTask ExecuteAsync(DeleteAgentBankInfoCommand command, CancellationToken cancellationToken = default)
-		=> _paymentRepository.DeleteAgentBankInfoAsync(command.AgentId, command.BankInfoId);
+		=> _paymentRepository.DeleteAgentBankInfoAsync(command.AgentId, command.BankInfoId, cancellationToken);
 }

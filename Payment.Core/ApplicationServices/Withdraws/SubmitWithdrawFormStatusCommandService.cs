@@ -22,7 +22,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 	public async ValueTask ExecuteAsync(SubmitWithdrawFormStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetWithdrawFormByIdAsync(command.FormId)
+			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -38,7 +38,8 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 				command.ActualAmount,
 				command.ThirdPartyOrderNo,
 				command.PaidUserId,
-				command.PaidUserName)
+				command.PaidUserName, 
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		if (originStatus != command.Status)

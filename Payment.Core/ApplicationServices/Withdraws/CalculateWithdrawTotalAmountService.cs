@@ -31,5 +31,5 @@ internal class CalculateWithdrawTotalAmountService
 					query.CreateOnRange,
 					query.UpdateOnRange,
 					query.ReviewOnRange,
-					query.PaidOnRange));
+					query.PaidOnRange), cancellationToken);
 }

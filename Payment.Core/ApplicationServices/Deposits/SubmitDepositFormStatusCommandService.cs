@@ -22,7 +22,7 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 	public async ValueTask ExecuteAsync(SubmitDepositFormStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetDepositFormByIdAsync(command.FormId)
+			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -37,7 +37,8 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 				command.PaymentReturn,
 				command.ActualAmount,
 				command.ThirdPartyOrderNo,
-				command.PromotionPlayerId)
+				command.PromotionPlayerId,
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		if (originStatus != command.Status)

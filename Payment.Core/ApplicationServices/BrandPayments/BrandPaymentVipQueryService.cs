@@ -17,5 +17,5 @@ internal class BrandPaymentVipQueryService : IQueryService<BrandPaymentVipQuery,
 	public IAsyncEnumerable<BrandPaymentVip> QueryAsync(
 		BrandPaymentVipQuery query,
 		CancellationToken cancellationToken = default)
-		=> _paymentRepository.GetBrandPaymentVipListAsync(query.BrandPaymentIds);
+		=> _paymentRepository.GetBrandPaymentVipListAsync(query.BrandPaymentIds, cancellationToken);
 }

@@ -15,5 +15,5 @@ internal class DeletePlayerBankInfoCommandService : ICommandService<DeletePlayer
 	}
 
 	public ValueTask ExecuteAsync(DeletePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
-		=> _paymentRepository.DeleteBankInfoAsync(command.PlayerCode, command.BankInfoId);
+		=> _paymentRepository.DeleteBankInfoAsync(command.PlayerCode, command.BankInfoId, cancellationToken);
 }

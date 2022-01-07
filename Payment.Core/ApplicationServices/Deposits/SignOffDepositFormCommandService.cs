@@ -22,7 +22,7 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 	public async ValueTask ExecuteAsync(SignOffDepositFormCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetDepositFormByIdAsync(command.FormId)
+			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -39,7 +39,8 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 				command.ReviewState,
 				command.ReviewUserId,
 				command.ReviewUserName,
-				command.Remark)
+				command.Remark, 
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		await _paymentClient

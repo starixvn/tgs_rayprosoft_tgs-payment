@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Tgs.Payment;
@@ -18,35 +19,35 @@ internal class PaymentRepository : IPaymentRepository
 		_tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
 	}
 
-	public ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions)
+	public ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQueryAsync(conditions);
 
-		return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount, cancellationToken);
 	}
 
-	public ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions)
+	public ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeWithdrawFormQueryAsync(conditions);
 
-		return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount);
+		return dataQuery.SumAsync(x => x.ActualAmount ?? x.Amount, cancellationToken);
 	}
 
-	public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions)
+	public ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQueryAsync(conditions);
 
-		return dataQuery.CountAsync();
+		return dataQuery.CountAsync(cancellationToken);
 	}
 
-	public ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+	public ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeWithdrawFormQueryAsync(conditions);
 
-		return dataQuery.CountAsync();
+		return dataQuery.CountAsync(cancellationToken);
 	}
 
-	public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser)
+	public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser, CancellationToken cancellationToken = default)
 	{
 		var createTime = DateTimeOffset.UtcNow;
 
@@ -63,12 +64,12 @@ internal class PaymentRepository : IPaymentRepository
 				CreatedOn = createTime.UtcDateTime,
 				UpdatedByUsername = modifyUser,
 				UpdatedOn = createTime.UtcDateTime
-			}).ConfigureAwait(false);
+			}, cancellationToken).ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser)
+	public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default)
 	{
 		var createTime = DateTime.UtcNow;
 
@@ -85,13 +86,13 @@ internal class PaymentRepository : IPaymentRepository
 				CreatedOn = createTime,
 				UpdatedByUsername = modifyUser,
 				UpdatedOn = createTime
-			})
+			}, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form)
+	public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, CancellationToken cancellationToken = default)
 	{
 		var currentDate = DateTime.UtcNow;
 
@@ -109,13 +110,13 @@ internal class PaymentRepository : IPaymentRepository
 				CreatedOn = currentDate,
 				UpdatedOn = currentDate,
 				OrderNo = form.OrderNo
-			})
+			}, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo)
+	public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var createPayment = new PaymentItem
 		{
@@ -129,13 +130,13 @@ internal class PaymentRepository : IPaymentRepository
 		};
 
 		_ = await _tgsContext.PaymentItems
-			.AddAsync(createPayment)
+			.AddAsync(createPayment, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreatePaymentChannelAsync(string channelCode)
+	public async ValueTask CreatePaymentChannelAsync(string channelCode, CancellationToken cancellationToken = default)
 	{
 		var createChannel = new PaymentChannel
 		{
@@ -144,13 +145,13 @@ internal class PaymentRepository : IPaymentRepository
 		};
 
 		_ = await _tgsContext.PaymentChannels
-			.AddAsync(createChannel)
+			.AddAsync(createChannel, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreatePaymentMethodAsync(string methodCode, string bankType)
+	public async ValueTask CreatePaymentMethodAsync(string methodCode, string bankType, CancellationToken cancellationToken = default)
 	{
 		var createMethod = new PaymentMethod
 		{
@@ -160,13 +161,13 @@ internal class PaymentRepository : IPaymentRepository
 		};
 
 		_ = await _tgsContext.PaymentMethods
-			.AddAsync(createMethod)
+			.AddAsync(createMethod, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form)
+	public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form, CancellationToken cancellationToken = default)
 	{
 		var currentDate = DateTime.UtcNow;
 
@@ -188,44 +189,44 @@ internal class PaymentRepository : IPaymentRepository
 				CreatedOn = currentDate,
 				UpdatedOn = currentDate,
 				OrderNo = form.OrderNo
-			})
+			}, cancellationToken)
 			.ConfigureAwait(false);
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId)
+	public async ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = await _tgsContext.AgentBankInfoItems
-			.FindAsync(bankInfoId)
+			.FindAsync(new object?[] { bankInfoId }, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (bankInfo != null && bankInfo.AgentId == agentId)
 		{
 			_ = _tgsContext.AgentBankInfoItems.Remove(bankInfo);
 
-			_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+			_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 
-	public async ValueTask DeleteBankInfoAsync(string playerCode, Guid bankInfoId)
+	public async ValueTask DeleteBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = await _tgsContext.PlayerBankInfos
-			.FindAsync(bankInfoId)
+			.FindAsync(new object?[] { bankInfoId }, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (bankInfo != null && bankInfo.PlayerCode == playerCode)
 		{
 			_ = _tgsContext.PlayerBankInfos.Remove(bankInfo);
 
-			_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+			_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 
-	public async ValueTask<Tgs.Payment.AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id)
+	public async ValueTask<Tgs.Payment.AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = await _tgsContext.AgentBankInfoItems
-			.FindAsync(id)
+			.FindAsync(new object?[] { id }, cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
 		return new AgentBankInfo(
@@ -237,7 +238,7 @@ internal class PaymentRepository : IPaymentRepository
 			bankInfo.Detail!);
 	}
 
-	public IAsyncEnumerable<Tgs.Payment.AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId)
+	public IAsyncEnumerable<Tgs.Payment.AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default)
 		=> _tgsContext.AgentBankInfoItems.AsAsyncEnumerable()
 			.Where(info => info.AgentId == agentId)
 			.Select(info => new AgentBankInfo(
@@ -248,11 +249,11 @@ internal class PaymentRepository : IPaymentRepository
 				info.BankType,
 				info.Detail!));
 
-	public IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync()
+	public IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default)
 		=> _tgsContext.PaymentChannels.AsAsyncEnumerable()
 			.Select(row => new PaymentChannelInfo(row.Id, row.Code));
 
-	public IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync()
+	public IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync(CancellationToken cancellationToken = default)
 		=> _tgsContext.PaymentMethodChannels.AsAsyncEnumerable()
 			.Select(row => new PaymentMethodChannelInfo(
 				row.Id,
@@ -260,18 +261,18 @@ internal class PaymentRepository : IPaymentRepository
 				row.MethodId,
 				row.ChannelId));
 
-	public IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync()
+	public IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync(CancellationToken cancellationToken = default)
 		=> _tgsContext.PaymentMethods.AsAsyncEnumerable()
 			.Select(row => new PaymentMethodInfo(row.Id, row.Code, row.BankType));
 
-	public IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync()
+	public IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default)
 		=> _tgsContext.PaymentItems.AsAsyncEnumerable()
 			.Select(row => new PaymentInfo(row.Id, row.Code));
 
-	public async ValueTask<Tgs.Payment.PlayerBankInfo> GetBankInfoByIdAsync(Guid id)
+	public async ValueTask<Tgs.Payment.PlayerBankInfo> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = await _tgsContext.PlayerBankInfos
-			.FindAsync(id)
+			.FindAsync(new object?[] { id }, cancellationToken)
 			.ConfigureAwait(false);
 
 		return new Tgs.Payment.PlayerBankInfo(
@@ -283,7 +284,7 @@ internal class PaymentRepository : IPaymentRepository
 			bankInfo.Detail!);
 	}
 
-	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode)
+	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
 		=> _tgsContext.PlayerBankInfos.AsAsyncEnumerable()
 			.Where(info => info.PlayerCode == playerCode)
 			.Select(info => new Tgs.Payment.PlayerBankInfo(
@@ -294,16 +295,16 @@ internal class PaymentRepository : IPaymentRepository
 				info.BankType,
 				info.Detail!));
 
-	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id)
+	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var brandInfo = await _tgsContext.Brands
-			.FindAsync(id)
+			.FindAsync(new object?[] { id }, cancellationToken)
 			.ConfigureAwait(false);
 
 		return new BrandInfo(brandInfo!.Code);
 	}
 
-	public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode)
+	public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode, CancellationToken cancellationToken = default)
 	{
 		var ids = brandPaymentIds.ToArray();
 
@@ -318,13 +319,13 @@ internal class PaymentRepository : IPaymentRepository
 			acl.ListType == 1));
 	}
 
-	public async ValueTask<BrandPaymentInfo> GetBrandPaymentByIdAsync(Guid id)
+	public async ValueTask<BrandPaymentInfo> GetBrandPaymentByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var row = await _tgsContext.BrandPayments
 			.Include(bp => bp.PaymentMethodChannel)
 			.ThenInclude(pmc => pmc.Channel)
 			.Where(bp => bp.Id == id)
-			.SingleAsync()
+			.SingleAsync(cancellationToken)
 			.ConfigureAwait(false);
 
 		return new BrandPaymentInfo(
@@ -359,7 +360,7 @@ internal class PaymentRepository : IPaymentRepository
 			row.DisplayOrder);
 	}
 
-	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId)
+	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var query = from bp in _tgsContext.BrandPayments
 						.Include(bp => bp.PaymentMethodChannel)
@@ -400,7 +401,7 @@ internal class PaymentRepository : IPaymentRepository
 			bp.DisplayOrder));
 	}
 
-	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds)
+	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
 	{
 		var ids = brandPaymentIds.ToArray();
 
@@ -409,7 +410,7 @@ internal class PaymentRepository : IPaymentRepository
 			.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId));
 	}
 
-	public ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id)
+	public ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var query = from df in _tgsContext.DepositForms
 						.Include(f => f.PlayerCodeNavigation)
@@ -438,13 +439,13 @@ internal class PaymentRepository : IPaymentRepository
 						df.CreatedOn,
 						df.UpdatedOn);
 
-		return query.SingleOrDefaultAsync();
+		return query.SingleOrDefaultAsync(cancellationToken);
 	}
 
-	public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id)
+	public async ValueTask<PaymentInfo> GetPaymentAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var payment = await _tgsContext.PaymentItems
-			.FindAsync(id)
+			.FindAsync(new object?[] { id }, cancellationToken)
 			.ConfigureAwait(false);
 
 		return new PaymentInfo(
@@ -452,7 +453,7 @@ internal class PaymentRepository : IPaymentRepository
 			payment.Code);
 	}
 
-	public IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync()
+	public IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync(CancellationToken cancellationToken = default)
 	{
 		return _tgsContext.PaymentMethodChannels.ToAsyncEnumerable()
 			.Select(pmc => new PaymentMethodChannelInfo(
@@ -462,7 +463,7 @@ internal class PaymentRepository : IPaymentRepository
 				pmc.ChannelId));
 	}
 
-	public ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId)
+	public ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var query = from df in _tgsContext.WithdrawForms
 						.Include(f => f.BrandPayment!)
@@ -495,12 +496,13 @@ internal class PaymentRepository : IPaymentRepository
 						df.PaymentReturn,
 						df.ThirdPartyOrderNo);
 
-		return query.SingleOrDefaultAsync();
+		return query.SingleOrDefaultAsync(cancellationToken);
 	}
 
 	public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 		DepositFormQueryConditions conditions,
-		Paging<DepositFormInfo> paging)
+		Paging<DepositFormInfo> paging,
+		CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQueryAsync(conditions)
 			.Select(form => new DepositFormInfo(
@@ -536,7 +538,8 @@ internal class PaymentRepository : IPaymentRepository
 
 	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
 		WithdrawFormQueryConditions conditions,
-		Paging<WithdrawFormInfo> paging)
+		Paging<WithdrawFormInfo> paging,
+		CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeWithdrawFormQueryAsync(conditions)
 			.Select(form => new WithdrawFormInfo(
@@ -575,7 +578,7 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions)
+	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeWithdrawFormQueryAsync(conditions);
 
@@ -609,10 +612,16 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public async ValueTask SignOffDepositFormAsync(Guid formId, ReviewState reviewStatus, string? reviewedUserId, string? reviewedUserName, string? remark = null)
+	public async ValueTask SignOffDepositFormAsync(
+		Guid formId,
+		ReviewState reviewStatus,
+		string? reviewedUserId,
+		string? reviewedUserName,
+		string? remark = null,
+		CancellationToken cancellationToken = default)
 	{
 		var formData = await _tgsContext.DepositForms
-			.FindAsync(formId)
+			.FindAsync(new object?[] { formId }, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -628,7 +637,7 @@ internal class PaymentRepository : IPaymentRepository
 			formData.ReviewedOn = DateTime.UtcNow;
 		}
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask SignOffWithdrawFormAsync(
@@ -638,10 +647,11 @@ internal class PaymentRepository : IPaymentRepository
 		ReviewState reviewStatus,
 		string? reviewedUserId,
 		string? reviewedUserName,
-		string? remark)
+		string? remark,
+		CancellationToken cancellationToken = default)
 	{
 		var formData = await _tgsContext.WithdrawForms
-			.FindAsync(formId)
+			.FindAsync(new object?[] { formId }, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -657,7 +667,7 @@ internal class PaymentRepository : IPaymentRepository
 		if (reviewedUserId != null)
 			formData.ReviewedOn = DateTime.UtcNow;
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask SubmitDepositFormStatusAsync(
@@ -666,9 +676,12 @@ internal class PaymentRepository : IPaymentRepository
 		string? paymentReturn,
 		decimal? actualAmount,
 		string? thirdPartyOrderNo,
-		int? promotionPlayerId)
+		int? promotionPlayerId,
+		CancellationToken cancellationToken = default)
 	{
-		var formData = await _tgsContext.DepositForms.FindAsync(formId).ConfigureAwait(false);
+		var formData = await _tgsContext.DepositForms
+			.FindAsync(new object?[] { formId }, cancellationToken)
+			.ConfigureAwait(false);
 
 		if (formData == null)
 			return;
@@ -680,7 +693,7 @@ internal class PaymentRepository : IPaymentRepository
 		formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
 		formData.UpdatedOn = DateTime.UtcNow;
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask SubmitWithdrawFormStatusAsync(
@@ -690,9 +703,12 @@ internal class PaymentRepository : IPaymentRepository
 		decimal? actualAmount,
 		string? thirdPartyOrderNo,
 		string? paidUserId,
-		string? paidUserName)
+		string? paidUserName,
+		CancellationToken cancellationToken = default)
 	{
-		var formData = await _tgsContext.WithdrawForms.FindAsync(formId).ConfigureAwait(false);
+		var formData = await _tgsContext.WithdrawForms
+			.FindAsync(new object?[] { formId }, cancellationToken)
+			.ConfigureAwait(false);
 
 		var currentTime = DateTime.UtcNow;
 
@@ -709,7 +725,7 @@ internal class PaymentRepository : IPaymentRepository
 		if (status == PaymentFlowState.Paid)
 			formData.PaidOn = currentTime;
 
-		_ = await _tgsContext.SaveChangesAsync().ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	private IAsyncEnumerable<DepositForm> MakeDepositFormQueryAsync(DepositFormQueryConditions conditions)

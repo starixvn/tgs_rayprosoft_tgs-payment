@@ -17,7 +17,7 @@ internal class SubmitDepositFormThirdPartyOrderNoCommandService : ICommandServic
 	public async ValueTask ExecuteAsync(SubmitDepositFormThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetDepositFormByIdAsync(command.FormId)
+			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -30,7 +30,8 @@ internal class SubmitDepositFormThirdPartyOrderNoCommandService : ICommandServic
 				null,
 				null,
 				command.ThirdPartyOrderNo,
-				null)
+				null, 
+				cancellationToken)
 			.ConfigureAwait(false);
 	}
 }

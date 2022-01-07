@@ -25,7 +25,7 @@ internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayer
 			command.Detail);
 
 		await _paymentRepository
-			.CreateBankInfoAsync(bankInfo, command.PlayerCode)
+			.CreateBankInfoAsync(bankInfo, command.PlayerCode, cancellationToken)
 			.ConfigureAwait(false);
 
 		command.TaskSource.SetResult(bankInfo.Id);

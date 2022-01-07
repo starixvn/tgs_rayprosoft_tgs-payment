@@ -20,5 +20,5 @@ internal class CreatePaymentCommandService : ICommandService<CreatePaymentComman
 		=> _paymentRepository.CreatePaymentAsync(new PaymentCreateInfo(
 			command.Code,
 			command.Description,
-			command.ExtendedData));
+			command.ExtendedData), cancellationToken);
 }

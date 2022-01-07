@@ -17,7 +17,7 @@ internal class SaveWithdrawThirdPartyOrderNoCommandService : ICommandService<Sav
 	public async ValueTask ExecuteAsync(SaveWithdrawThirdPartyOrderNoCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetWithdrawFormByIdAsync(command.FormId)
+			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -31,7 +31,8 @@ internal class SaveWithdrawThirdPartyOrderNoCommandService : ICommandService<Sav
 				null,
 				command.ThirdPartyOrderNo,
 				null,
-				null)
+				null, 
+				cancellationToken)
 			.ConfigureAwait(false);
 	}
 }

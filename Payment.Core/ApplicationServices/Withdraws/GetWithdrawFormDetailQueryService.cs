@@ -19,7 +19,7 @@ internal class GetWithdrawFormDetailQueryService : IGetService<GetWithdrawFormDe
 		CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetWithdrawFormByIdAsync(query.FormId)
+			.GetWithdrawFormByIdAsync(query.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		return formData?.BrandId != query.BrandId ? null : formData;

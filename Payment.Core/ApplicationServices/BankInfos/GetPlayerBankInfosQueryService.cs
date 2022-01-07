@@ -15,5 +15,5 @@ internal class GetPlayerBankInfosQueryService : IQueryService<GetPlayerBankInfos
 	}
 
 	public IAsyncEnumerable<PlayerBankInfo> QueryAsync(GetPlayerBankInfosQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.GetBankInfosByPlayerCodeAsync(query.PlayerCode);
+		=> _paymentRepository.GetBankInfosByPlayerCodeAsync(query.PlayerCode, cancellationToken);
 }

@@ -17,5 +17,5 @@ internal class GetAgentBankInfosQueryService : IQueryService<GetAgentBankInfosQu
 	public IAsyncEnumerable<AgentBankInfo> QueryAsync(
 		GetAgentBankInfosQuery query,
 		CancellationToken cancellationToken = default)
-		=> _paymentRepository.GetAgentBankInfosByAgentIdAsync(query.AgentId);
+		=> _paymentRepository.GetAgentBankInfosByAgentIdAsync(query.AgentId, cancellationToken);
 }

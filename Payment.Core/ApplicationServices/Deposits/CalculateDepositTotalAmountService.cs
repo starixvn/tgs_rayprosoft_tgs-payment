@@ -27,5 +27,5 @@ internal class CalculateDepositTotalAmountService
 			query.PaymentMethodId,
 			query.Status,
 			query.CreateOnRange,
-			query.UpdateOnRange));
+			query.UpdateOnRange), cancellationToken);
 }

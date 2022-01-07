@@ -29,7 +29,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 
 	public async ValueTask ExecuteAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
 	{
-		var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.BrandId);
+		var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.BrandId, cancellationToken);
 
 		var orderNo = await _takeNumberStore.GetWithdrawFormOrderNoAsync(brandInfo.Code);
 
@@ -58,7 +58,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 		var agentId = Guid.Parse(command.UserId!);
 
 		var agentBankInfo = await _paymentRepository
-			.GetAgentBankInfoByIdAsync(command.BankInfoId)
+			.GetAgentBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (agentBankInfo.AgentId != agentId)
@@ -83,7 +83,8 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 					null,
 					command.BankInfoId,
 					BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
-					OrderNo: orderNo))
+					OrderNo: orderNo), 
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		await _paymentClient
@@ -101,7 +102,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 		var createFormId = Guid.NewGuid();
 
 		var playerBankInfo = await _paymentRepository
-				.GetBankInfoByIdAsync(command.BankInfoId)
+				.GetBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 				.ConfigureAwait(false);
 
 		if (playerBankInfo.PlayerCode != command.UserId)
@@ -126,7 +127,8 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 					null,
 					command.BankInfoId,
 					BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
-					OrderNo: orderNo))
+					OrderNo: orderNo), 
+				cancellationToken)
 			.ConfigureAwait(false);
 
 		await _paymentClient

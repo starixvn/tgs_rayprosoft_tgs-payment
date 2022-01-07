@@ -28,7 +28,7 @@ internal class DepositFormQueryService
 			query.PaymentMethodId,
 			query.Status,
 			query.CreateOnRange,
-			query.UpdateOnRange));
+			query.UpdateOnRange), cancellationToken);
 
 	public IAsyncEnumerable<DepositFormInfo> QueryAsync(DepositFormQuery query, CancellationToken cancellationToken = default)
 		=> _paymentRepository.QueryDepositFormsAsync(
@@ -44,5 +44,6 @@ internal class DepositFormQueryService
 				query.Status,
 				query.CreateOnRange,
 				query.UpdateOnRange),
-			query.Paging);
+			query.Paging,
+			cancellationToken);
 }
