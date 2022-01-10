@@ -13,6 +13,7 @@ namespace: dev
 
 imagePullSecrets:
   - name: registry-credentials
+  - name: secret-tgs-harbor
 
 nameOverride: "payment-api"
 fullnameOverride: "payment-api"
