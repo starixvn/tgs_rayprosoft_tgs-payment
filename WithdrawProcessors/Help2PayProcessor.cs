@@ -14,7 +14,7 @@ internal class Help2PayProcessor : IWithdrawProcessor
 		["Affin Bank"] = "AFF",
 		["Alliance Bank"] = "ALB",
 		["AM Bank"] = " AMB",
-		["Bank Simpanan National"] = "BSN",
+		["Bank Simpanan Nasional"] = "BSN",
 		["CIMB Bank"] = "CIMB",
 		["Citi bank"] = "CITI",
 		["Hong Leong Bank"] = "HLB",
@@ -78,6 +78,7 @@ internal class Help2PayProcessor : IWithdrawProcessor
 		["Bank Rakyat Indonesia"] = "BRI",
 		["CIMB Niaga"] = "CIMBN",
 		["Bank Maybank Indonesia"] = "MBBI",
+		["Bank Danamon Indonesia"] = "BDI",
 
 		// Philippine Bank
 		["Banco De Oro"] = "BDO",
