@@ -143,6 +143,18 @@ internal class PaymentClient : IPaymentClient
 			.SendAsync("tgs.payment.reject", request.ToByteArray());
 	}
 
+	public ValueTask RejectWithdrawAsync(Guid formId, Guid brandId)
+	{
+		var request = new RejectWithdrawRequest
+		{
+			FormId = formId,
+			BrandId = brandId
+		};
+
+		return _messageSender
+			.SendAsync("tgs.payment.withdraw.reject", request.ToByteArray());
+	}
+
 	public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
 	{
 		var request = new FormThirdNoRequest
