@@ -18,6 +18,8 @@ public interface IPaymentClient
 
 	ValueTask RejectDepositAsync(Guid formId, Guid brandId);
 
+	ValueTask RejectWithdrawAsync(Guid formId, Guid brandId);
+
 	ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo);
 
 	ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime);

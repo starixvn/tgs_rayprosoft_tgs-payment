@@ -59,13 +59,18 @@ message TagPaidRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
 }
 
-message ScheduleRequest{
+message ScheduleRequest {
 	string subject = 1;
 	phoenix.protobuf.GuidValue form_id = 2;
 	google.protobuf.Timestamp schedule_time = 3;
 }
 
-message RejectDepositRequest{
+message RejectDepositRequest {
+	phoenix.protobuf.GuidValue form_id = 1;
+	phoenix.protobuf.GuidValue brand_id = 2;
+}
+
+message RejectWithdrawRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
 	phoenix.protobuf.GuidValue brand_id = 2;
 }
