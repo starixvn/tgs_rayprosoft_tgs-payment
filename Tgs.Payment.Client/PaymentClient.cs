@@ -27,7 +27,7 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		return _messageSender
-			.SendAsync("tgs.payment.approve", request.ToByteArray());
+			.SendAsync("tgs.payment.deposit.approve", request.ToByteArray());
 	}
 
 	public async ValueTask<string> AskAsync(string subject, string requestInfo)
@@ -140,7 +140,7 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		return _messageSender
-			.SendAsync("tgs.payment.reject", request.ToByteArray());
+			.SendAsync("tgs.payment.deposit.reject", request.ToByteArray());
 	}
 
 	public ValueTask RejectWithdrawAsync(Guid formId, Guid brandId)

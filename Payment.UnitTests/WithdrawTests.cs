@@ -343,7 +343,195 @@ public class WithdrawTests
 				Arg.Is(command.FormId),
 				Arg.Is(command.BrandPaymentId),
 				Arg.Any<string>(),
-				Arg.Is(command.Status),
+				Arg.Is(PaymentFlowState.Approved),
+				Arg.Is(command.ReviewUserId),
+				Arg.Is(command.ReviewUserName),
+				Arg.Any<string>());
+
+		_ = fakePaymentClient.Received(1)
+			.EmitWithdrawFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task Can_Reject_Form_In_WaitApprove()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new SignOffWithdrawFormCommandService(
+			fakePaymentRepository,
+			fakeWithdrawProcessorFactory,
+			fakePaymentClient);
+
+		var command = new SignOffWithdrawFormCommand(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			ReviewState.Reject,
+			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+			"reviewedUserName",
+			null);
+
+		_ = fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+			.Returns(new WithdrawFormInfo(
+				command.FormId,
+				"ThisIsPlayerCode",
+				UserType.Player,
+				"UserName",
+				Guid.NewGuid(),
+				1000M,
+				PaymentFlowState.WaitApprove,
+				null,
+				"reviewedUserName",
+				DateTime.Now,
+				"GPIW211028160001",
+				Guid.NewGuid(),
+				DateTimeOffset.UtcNow,
+				DateTimeOffset.UtcNow,
+				null,
+				null,
+				null));
+
+		_ = fakePaymentRepository
+			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
+			.Returns(new BrandPaymentInfo(
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"TestChannel",
+				"TestChannelCode",
+				"{}",
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = 1000M
+				},
+				true,
+				false,
+				false,
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = decimal.MaxValue
+				},
+				ConditionMatchType.MatchOne,
+				TransferType.Withdraw,
+				true,
+				0));
+
+		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
+			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
+
+		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
+			.Returns(Substitute.For<IWithdrawProcessor>());
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.SignOffWithdrawFormAsync(
+				Arg.Is(command.FormId),
+				Arg.Is(default(Guid?)),
+				Arg.Any<string>(),
+				Arg.Is(PaymentFlowState.Reject),
+				Arg.Is(command.ReviewUserId),
+				Arg.Is(command.ReviewUserName),
+				Arg.Any<string>());
+
+		_ = fakePaymentClient.Received(1)
+			.EmitWithdrawFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task Can_Reject_Form_In_WaitPaid()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new SignOffWithdrawFormCommandService(
+			fakePaymentRepository,
+			fakeWithdrawProcessorFactory,
+			fakePaymentClient);
+
+		var command = new SignOffWithdrawFormCommand(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			ReviewState.Reject,
+			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+			"reviewedUserName",
+			null);
+
+		_ = fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Any<Guid>())
+			.Returns(new WithdrawFormInfo(
+				command.FormId,
+				"ThisIsPlayerCode",
+				UserType.Player,
+				"UserName",
+				Guid.NewGuid(),
+				1000M,
+				PaymentFlowState.Approved,
+				null,
+				"reviewedUserName",
+				DateTime.Now,
+				"GPIW211028160001",
+				Guid.NewGuid(),
+				DateTimeOffset.UtcNow,
+				DateTimeOffset.UtcNow,
+				null,
+				null,
+				null));
+
+		_ = fakePaymentRepository
+			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
+			.Returns(new BrandPaymentInfo(
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"TestChannel",
+				"TestChannelCode",
+				"{}",
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = 1000M
+				},
+				true,
+				false,
+				false,
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = decimal.MaxValue
+				},
+				ConditionMatchType.MatchOne,
+				TransferType.Withdraw,
+				true,
+				0));
+
+		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
+			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
+
+		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
+			.Returns(Substitute.For<IWithdrawProcessor>());
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.SignOffWithdrawFormAsync(
+				Arg.Is(command.FormId),
+				Arg.Is(default(Guid?)),
+				Arg.Any<string>(),
+				Arg.Is(PaymentFlowState.Reject),
 				Arg.Is(command.ReviewUserId),
 				Arg.Is(command.ReviewUserName),
 				Arg.Any<string>());
