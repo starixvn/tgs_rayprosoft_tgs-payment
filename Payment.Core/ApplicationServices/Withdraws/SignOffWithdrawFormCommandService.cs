@@ -31,13 +31,17 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		if (formData == null)
 			return;
 
-		var formStatus = formData.Status;
+		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
 
-		if (formStatus != PaymentFlowState.WaitApprove)
-			return;
+		var formStatus = formData.Status;
 
 		if (command.Status == ReviewState.Approve)
 		{
+			if (!fsm.CanFire(PaymentTrigger.Approve))
+				return;
+
+			await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
+
 			var brandPayment = await _paymentRepository
 				.GetBrandPaymentByIdAsync(command.BrandPaymentId!.Value, cancellationToken)
 				.ConfigureAwait(false);
@@ -63,24 +67,29 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					command.FormId,
 					command.BrandPaymentId.Value,
 					applyInfo,
-					command.Status,
+					fsm.State,
 					command.ReviewUserId,
 					command.ReviewUserName,
-					command.Remark, 
+					command.Remark,
 					cancellationToken)
 				.ConfigureAwait(false);
 		}
 		else
 		{
+			if (!fsm.CanFire(PaymentTrigger.Reject))
+				return;
+
+			await fsm.FireAsync(PaymentTrigger.Reject).ConfigureAwait(false);
+
 			await _paymentRepository
 				.SignOffWithdrawFormAsync(
 					command.FormId,
 					null,
 					null,
-					command.Status,
+					fsm.State,
 					command.ReviewUserId,
 					command.ReviewUserName,
-					command.Remark, 
+					command.Remark,
 					cancellationToken)
 				.ConfigureAwait(false);
 		}

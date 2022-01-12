@@ -644,7 +644,7 @@ internal class PaymentRepository : IPaymentRepository
 		Guid formId,
 		Guid? brandPaymentId,
 		string? applyInfo,
-		ReviewState reviewStatus,
+		PaymentFlowState afterState,
 		string? reviewedUserId,
 		string? reviewedUserName,
 		string? remark,
@@ -659,7 +659,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		formData.BrandPaymentId = brandPaymentId;
 		formData.ApplyInfo = applyInfo;
-		formData.Status = reviewStatus.ToNumber();
+		formData.Status = (int)afterState;
 		formData.Remark = remark;
 		formData.UpdatedOn = DateTime.UtcNow;
 		formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;

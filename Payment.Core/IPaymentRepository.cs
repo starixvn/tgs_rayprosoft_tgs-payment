@@ -97,7 +97,7 @@ public interface IPaymentRepository
 		Guid formId,
 		Guid? brandPaymentId,
 		string? applyInfo,
-		ReviewState reviewStatus,
+		PaymentFlowState reviewStatus,
 		string? reviewedUserId,
 		string? reviewedUserName,
 		string? remark = null,
