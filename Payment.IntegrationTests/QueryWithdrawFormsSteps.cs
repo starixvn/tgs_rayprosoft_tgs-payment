@@ -1,61 +1,56 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+public class QueryWithdrawFormsSteps
 {
-	[Binding]
-	public class QueryWithdrawFormsSteps
+	private WithdrawForms _actual;
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+
+	public QueryWithdrawFormsSteps()
 	{
-		private WithdrawForms _actual;
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public QueryWithdrawFormsSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I Query withdraw forms")]
+	public void GivenIQueryWithdrawForms()
+	{
+	}
+
+	[Then(@"return withdraw forms list")]
+	public void ThenReturnWithdrawFormsList()
+	{
+		Assert.AreEqual(0, _actual.TotalCount);
+		Assert.AreEqual(-1, _actual.Rows);
+		Assert.NotNull(_actual.Items);
+		Assert.AreEqual(0, _actual.Sum);
+	}
+
+	[When(@"call get withdraw forms api")]
+	public async Task WhenCallGetWithdrawFormsApiAsync()
+	{
+		var conditions = new WithdrawFormQueryConditions
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
+			BrandId = Guid.NewGuid()
+		};
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
-
-		[AfterScenario]
-		public async Task CleanUpAsync()
+		var paging = new Paging
 		{
-			await _testHost.StopAsync();
-		}
+			ShowAll = true
+		};
 
-		[Given(@"I Query withdraw forms")]
-		public void GivenIQueryWithdrawForms()
-		{
-		}
-
-		[Then(@"return withdraw forms list")]
-		public void ThenReturnWithdrawFormsList()
-		{
-			Assert.AreEqual(0, _actual.TotalCount);
-			Assert.AreEqual(-1, _actual.Rows);
-			Assert.NotNull(_actual.Items);
-			Assert.AreEqual(0, _actual.Sum);
-		}
-
-		[When(@"call get withdraw forms api")]
-		public async Task WhenCallGetWithdrawFormsApiAsync()
-		{
-			var conditions = new WithdrawFormQueryConditions
-			{
-				BrandId = Guid.NewGuid()
-			};
-
-			var paging = new Paging
-			{
-				ShowAll = true
-			};
-
-			_actual = await _paymentServiceClient.QueryWithdrawFormsAsync(conditions, paging);
-		}
+		_actual = await _paymentServiceClient.QueryWithdrawFormsAsync(conditions, paging);
 	}
 }

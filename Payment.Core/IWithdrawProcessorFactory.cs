@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment
+﻿namespace Tgs.Payment;
+
+public interface IWithdrawProcessorFactory
 {
-	public interface IWithdrawProcessorFactory
-    {
-        IWithdrawProcessor GetWithdrawProcessor(string paymentCode);
-    }
+	IWithdrawProcessor GetWithdrawProcessor(string paymentCode);
 }

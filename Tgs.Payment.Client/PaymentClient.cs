@@ -1,200 +1,209 @@
-﻿using System;
-using System.Threading.Tasks;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Tgs.MessageQueue;
 using Tgs.Payment.Protos;
 
-namespace Tgs.Payment.Clients
+namespace Tgs.Payment.Clients;
+
+internal class PaymentClient : IPaymentClient
 {
-	internal class PaymentClient : IPaymentClient
+	private readonly ILogger<PaymentClient> _logger;
+	private readonly IMessageSender _messageSender;
+
+	public PaymentClient(IMessageSender messageSender, ILogger<PaymentClient> logger)
 	{
-		private readonly ILogger<PaymentClient> _logger;
-		private readonly IMessageSender _messageSender;
+		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+	}
 
-		public PaymentClient(IMessageSender messageSender, ILogger<PaymentClient> logger)
+	public ValueTask ApproveDepositAsync(Guid formId, Guid brandId, decimal? actualAmount)
+	{
+		var request = new ApproveDepositRequest
 		{
-			_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		}
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString(),
+			ActualAmount = actualAmount
+		};
 
-		public ValueTask ApproveDepositAsync(Guid formId, Guid brandId, decimal? actualAmount)
+		return _messageSender
+			.SendAsync("tgs.payment.deposit.approve", request.ToByteArray());
+	}
+
+	public async ValueTask<string> AskAsync(string subject, string requestInfo)
+	{
+		var request = new GeneralRequest
 		{
-			var request = new ApproveDepositRequest
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString(),
-				ActualAmount = actualAmount
-			};
+			Content = requestInfo
+		};
 
-			return _messageSender
-				.SendAsync("tgs.payment.approve", request.ToByteArray());
-		}
+		var result = await _messageSender
+			.RequestAsync(subject, request.ToByteArray())
+			.ConfigureAwait(false);
 
-		public async ValueTask<string> AskAsync(string subject, string requestInfo)
+		var response = GeneralResponse.Parser.ParseFrom(result);
+
+		_logger.LogInformation(response.Result);
+
+		return response.Result;
+	}
+
+	public async ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo)
+	{
+		var request = new DepositRequest
 		{
-			var request = new GeneralRequest
-			{
-				Content = requestInfo
-			};
+			ApplyInfo = applyInfo ?? string.Empty,
+			Amount = amount.ToString()
+		};
 
-			var result = await _messageSender
-				.RequestAsync(subject, request.ToByteArray())
-				.ConfigureAwait(false);
+		var result = await _messageSender
+			.RequestAsync(subject, request.ToByteArray())
+			.ConfigureAwait(false);
 
-			var response = GeneralResponse.Parser.ParseFrom(result);
+		var response = DepositResponse.Parser.ParseFrom(result);
 
-			_logger.LogInformation(response.Result);
+		_logger.LogInformation(response.Result);
 
-			return response.Result;
-		}
+		return response.Result;
+	}
 
-		public async ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo)
+	public ValueTask EmitDepositFormCreatedEventAsync(Guid formId, Guid brandId)
+	{
+		var request = new FormEvent
 		{
-			var request = new DepositRequest
-			{
-				ApplyInfo = applyInfo ?? string.Empty,
-				Amount = amount.ToString()
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString()
+		};
 
-			var result = await _messageSender
-				.RequestAsync(subject, request.ToByteArray())
-				.ConfigureAwait(false);
+		return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray());
+	}
 
-			var response = DepositResponse.Parser.ParseFrom(result);
-
-			_logger.LogInformation(response.Result);
-
-			return response.Result;
-		}
-
-		public ValueTask EmitDepositFormCreatedEventAsync(Guid formId, Guid brandId)
+	public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status)
+	{
+		var request = new FormEvent
 		{
-			var request = new FormEvent
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString()
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString()
+		};
 
-			return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray());
-		}
-
-		public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
+		var requestEx = new FormEventEx
 		{
-			var request = new FormEvent
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString()
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString(),
+			Status = status
+		};
 
-			var requestEx = new FormEventEx
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString(),
-				Status = status
-			};
+		await Task.WhenAll(
+			_messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray()).AsTask(),
+			_messageSender.PublishAsync("tgs.payment.deposit.status_ex", requestEx.ToByteArray()).AsTask())
+			.ConfigureAwait(false);
+	}
 
-			await Task.WhenAll(
-				_messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray()).AsTask(),
-				_messageSender.PublishAsync("tgs.payment.deposit.status_ex", requestEx.ToByteArray()).AsTask())
-				.ConfigureAwait(false);
-		}
-
-		public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId)
+	public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId)
+	{
+		var request = new FormEvent
 		{
-			var request = new FormEvent
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString()
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString()
+		};
 
-			return _messageSender.PublishAsync("tgs.payment.withdraw.created", request.ToByteArray());
-		}
+		return _messageSender.PublishAsync("tgs.payment.withdraw.created", request.ToByteArray());
+	}
 
-		public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string status)
+	public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status)
+	{
+		var request = new FormEvent
 		{
-			var request = new FormEvent
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString()
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString()
+		};
 
-			var requestEx = new FormEventEx
-			{
-				FormId = formId.ToString(),
-				BrandId = brandId.ToString(),
-				Status = status
-			};
-
-			await Task.WhenAll(
-				_messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray()).AsTask(),
-				_messageSender.PublishAsync("tgs.payment.withdraw.status_ex", requestEx.ToByteArray()).AsTask())
-				.ConfigureAwait(false);
-		}
-
-		public ValueTask RejectDepositAsync(Guid formId, Guid brandId)
+		var requestEx = new FormEventEx
 		{
-			var request = new RejectDepositRequest
-			{
-				FormId = formId,
-				BrandId = brandId
-			};
+			FormId = formId.ToString(),
+			BrandId = brandId.ToString(),
+			Status = status
+		};
 
-			return _messageSender
-				.SendAsync("tgs.payment.reject", request.ToByteArray());
-		}
+		await Task.WhenAll(
+			_messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray()).AsTask(),
+			_messageSender.PublishAsync("tgs.payment.withdraw.status_ex", requestEx.ToByteArray()).AsTask())
+			.ConfigureAwait(false);
+	}
 
-		public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
+	public ValueTask RejectDepositAsync(Guid formId, Guid brandId)
+	{
+		var request = new RejectDepositRequest
 		{
-			var request = new FormThirdNoRequest
-			{
-				FormId = formId,
-				ThirdPartyOrderNo = thirdPartyOrderNo
-			};
+			FormId = formId,
+			BrandId = brandId
+		};
 
-			return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
-		}
+		return _messageSender
+			.SendAsync("tgs.payment.deposit.reject", request.ToByteArray());
+	}
 
-		public ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime)
+	public ValueTask RejectWithdrawAsync(Guid formId, Guid brandId)
+	{
+		var request = new RejectWithdrawRequest
 		{
-			var request = new ScheduleRequest
-			{
-				Subject = subject,
-				FormId = formId,
-				ScheduleTime = Timestamp.FromDateTime(scheduleTime)
-			};
+			FormId = formId,
+			BrandId = brandId
+		};
 
-			return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray());
-		}
+		return _messageSender
+			.SendAsync("tgs.payment.withdraw.reject", request.ToByteArray());
+	}
 
-		public ValueTask TagWithdrawFormPaidAsync(Guid formId)
+	public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo)
+	{
+		var request = new FormThirdNoRequest
 		{
-			var request = new TagPaidRequest
-			{
-				FormId = formId
-			};
+			FormId = formId,
+			ThirdPartyOrderNo = thirdPartyOrderNo
+		};
 
-			return _messageSender.SendAsync("tgs.payment.withdraw.paid", request.ToByteArray());
-		}
+		return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray());
+	}
 
-		public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)
+	public ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime)
+	{
+		var request = new ScheduleRequest
 		{
-			var request = new WithdrawRequest
-			{
-				ApplyInfo = applyInfo ?? string.Empty,
-				Amount = amount.ToString()
-			};
+			Subject = subject,
+			FormId = formId,
+			ScheduleTime = Timestamp.FromDateTime(scheduleTime)
+		};
 
-			var result = await _messageSender
-				.RequestAsync(subject, request.ToByteArray())
-				.ConfigureAwait(false);
+		return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray());
+	}
 
-			var response = WithdrawResponse.Parser.ParseFrom(result);
+	public ValueTask TagWithdrawFormPaidAsync(Guid formId)
+	{
+		var request = new TagPaidRequest
+		{
+			FormId = formId
+		};
 
-			_logger.LogInformation(response.Result);
+		return _messageSender.SendAsync("tgs.payment.withdraw.paid", request.ToByteArray());
+	}
 
-			return response.Result;
-		}
+	public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo)
+	{
+		var request = new WithdrawRequest
+		{
+			ApplyInfo = applyInfo ?? string.Empty,
+			Amount = amount.ToString()
+		};
+
+		var result = await _messageSender
+			.RequestAsync(subject, request.ToByteArray())
+			.ConfigureAwait(false);
+
+		var response = WithdrawResponse.Parser.ParseFrom(result);
+
+		_logger.LogInformation(response.Result);
+
+		return response.Result;
 	}
 }

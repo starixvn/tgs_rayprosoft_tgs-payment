@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using PaymentService;
 
 #nullable enable
 
 namespace Payment.IntegrationTests;
 
-internal class TestPaymentApplication : WebApplicationFactory<Startup>
+internal class TestPaymentApplication : WebApplicationFactory<Program>
 {
 	private readonly Action<IWebHostBuilder>? _webHostConfigure;
 

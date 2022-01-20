@@ -1,102 +1,105 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Stateless;
 
-namespace Tgs.Payment.Clients
+namespace Tgs.Payment.Clients;
+
+public interface IPaymentServiceClient
 {
-	public interface IPaymentServiceClient
-	{
-		ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId);
+	ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId);
 
-		ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId);
+	ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId);
 
-		ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
+	ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
 
-		ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
+	ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
 
-		ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
+	StateMachine<PaymentFlowState, PaymentTrigger> CreateDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
-		ValueTask CreatePaymentChannelAsync(string channelCode);
+	StateMachine<PaymentFlowState, PaymentTrigger> CreateManualDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
-		ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo);
+	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
 
-		ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
+	ValueTask CreatePaymentChannelAsync(string channelCode);
 
-		ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo);
+	ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo);
 
-		ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
+	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
 
-		ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId);
+	ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo);
 
-		IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId);
+	StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
-		IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
+	ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
 
-		IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync();
+	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId);
 
-		IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
+	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId);
 
-		IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
+	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
 
-		IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
-			string playerCode,
-			IEnumerable<Guid> brandPaymentIds);
+	IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync();
 
-		ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId);
+	IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
 
-		IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId);
+	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
 
-		IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds);
+	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
+		string playerCode,
+		IEnumerable<Guid> brandPaymentIds);
 
-		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
+	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId);
 
-		ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId);
+	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId);
 
-		ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
+	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds);
 
-		IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
+	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
 
-		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId);
+	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId);
 
-		ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId);
+	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
 
-		ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
+	IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
 
-		ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
+	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId);
 
-		ValueTask ReviewDepositFormAsync(
-			Guid formId,
-			ReviewState state,
-			string? reviewUserId,
-			string? reviewUserName,
-			string? remark = null);
+	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId);
 
-		ValueTask ReviewWithdrawFormAsync(
-			Guid formId,
-			Guid? brandPaymentId,
-			ReviewState state,
-			string? reviewUserId,
-			string? reviewUserName,
-			string? remark = null);
+	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
 
-		ValueTask SubmitDepositFormStatusAsync(
-			Guid formId,
-			PaymentFlowState? state = null,
-			string? paymentReturn = null,
-			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null,
-			int? promotionPlayerId = null);
+	ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
 
-		[Obsolete]
-		ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+	ValueTask ReviewDepositFormAsync(
+		Guid formId,
+		ReviewState state,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark = null);
 
-		ValueTask SubmitWithdrawFormStatusAsync(
-			Guid formId,
-			PaymentFlowState? state = null,
-			string? paymentReturn = null,
-			decimal? actualAmount = null,
-			string? thirdPartyOrderNo = null,
-			string? paidUserId = null,
-			string? paidUserName = null);
-	}
+	ValueTask ReviewWithdrawFormAsync(
+		Guid formId,
+		Guid? brandPaymentId,
+		ReviewState state,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark = null);
+
+	ValueTask SubmitDepositFormStatusAsync(
+		Guid formId,
+		PaymentFlowState? state = null,
+		string? paymentReturn = null,
+		decimal? actualAmount = null,
+		string? thirdPartyOrderNo = null,
+		int? promotionPlayerId = null);
+
+	[Obsolete("This method already obsolete, alternative use SubmitDepositFormStatusAsync")]
+	ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+
+	ValueTask SubmitWithdrawFormStatusAsync(
+		Guid formId,
+		PaymentFlowState? state = null,
+		string? paymentReturn = null,
+		decimal? actualAmount = null,
+		string? thirdPartyOrderNo = null,
+		string? paidUserId = null,
+		string? paidUserName = null);
 }

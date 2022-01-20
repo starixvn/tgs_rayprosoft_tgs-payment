@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public class DepositFormThirdPartyOrderNo
 {
-	public class DepositFormThirdPartyOrderNo
-	{
-		public string? ThirdPartyOrderNo { get; set; }
-	}
+	public string? ThirdPartyOrderNo { get; set; }
 }

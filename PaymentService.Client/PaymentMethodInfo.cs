@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace Tgs.Payment.Clients;
 
-namespace Tgs.Payment.Clients
+public class PaymentMethodInfo
 {
-	public class PaymentMethodInfo
-    {
-        public string BankType { get; init; } = default!;
+	public string BankType { get; init; } = default!;
 
-        public Guid Id { get; init; }
+	public Guid Id { get; init; }
 
-        public string Name { get; init; } = default!;
-    }
+	public string Name { get; init; } = default!;
 }

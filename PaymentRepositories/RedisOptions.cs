@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.Repositories
+﻿namespace Tgs.Payment.Repositories;
+
+public class RedisOptions
 {
-	public class RedisOptions
-	{
-		public string ConnectionString { get; set; } = "localhost";
-	}
+	public string ConnectionString { get; set; } = "localhost";
 }

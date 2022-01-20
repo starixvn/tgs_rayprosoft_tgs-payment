@@ -1,4 +1,3 @@
-﻿namespace Tgs.Payment.ApplicationServices.Payments
-{
-	public record AllPaymentMethodsQuery();
-}
+﻿namespace Tgs.Payment.ApplicationServices.Payments;
+
+public record AllPaymentMethodsQuery();
