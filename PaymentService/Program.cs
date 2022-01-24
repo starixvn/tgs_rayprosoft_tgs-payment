@@ -94,7 +94,7 @@ var app = builder.Build();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentService v1"));
 
 app.MapControllers();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/healthz");
 app.MapSwagger();
 app.MapProfileViewer();
 

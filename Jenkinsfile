@@ -16,14 +16,20 @@ pipeline {
                         case ['origin/main','main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
+                            env.node_selector = 'prod';
+                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "prod"}';
                             break;
                         case ['origin/release','release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
+                            env.node_selector = 'nonprod';
+                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "noprod"}';
                             break;
                         default:
                             env.kube_ns = "dev";
                             env.k8s_config = 'k8s-kube-config' 
+                            env.node_selector = '{}';
+                            env.dedicated = '';
                             break;
                     }
                 }
@@ -101,18 +107,23 @@ pipeline {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "conn")]) {
                         sh '''
-                            helm template deployment/k8s/payment-api \
+                            cat << EOF | helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
                                 --set image.tag=${TAG} \
-                                --set namespace=${kube_ns} \
                                 --set connectionStrings.tgs="${conn}" \
                                 --set connectionStrings.redis="$tgs_redis" \
-                                --set connectionStrings.nats="$tgs_nats
-                                --set nodeSelector.dedicated=" 
+                                --set connectionStrings.nats="$tgs_nats"
+                                -f -
+                            {
+                                "nodeSelector": "$node_selector",
+                                "tolerations": [$dedicated]
+                            }
+                            EOF
                         '''
                         sh '''
                             helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
                                 --set image.tag=${TAG} \
-                                --set namespace=${kube_ns} \
                                 --set connectionStrings.tgs="${conn}" \
                                 --set connectionStrings.redis="$tgs_redis" \
                                 --set connectionStrings.nats="$tgs_nats" \

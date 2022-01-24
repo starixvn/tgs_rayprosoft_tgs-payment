@@ -9,8 +9,6 @@ image:
   pullPolicy: IfNotPresent
   tag: "latest"
 
-namespace: dev
-
 imagePullSecrets:
   - name: registry-credentials
   - name: secret-tgs-harbor
