@@ -32,7 +32,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: OTEL_SERVICE_NAME
-              value: Payment-Api({{ .Values.namespace }})
+              value: Payment-Api({{ .Release.Namespace }})
             - name: NODE_IP
               valueFrom:
                 fieldRef:
