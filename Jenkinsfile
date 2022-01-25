@@ -107,7 +107,7 @@ pipeline {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "conn")]) {
                         sh '''
-                            cat << EOF | helm template deployment/k8s/payment-api \
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
                                 -n ${kube_ns} \
                                 --set image.tag=${TAG} \
                                 --set connectionStrings.tgs="${conn}" \
@@ -120,7 +120,7 @@ pipeline {
                             }
                         '''
                         sh '''
-                            cat << EOF | helm template deployment/k8s/payment-api \
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
                                 -n ${kube_ns} \
                                 --set image.tag=${TAG} \
                                 --set connectionStrings.tgs="${conn}" \
