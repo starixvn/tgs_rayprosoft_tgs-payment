@@ -1,100 +1,95 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "Get deposit detail by form id")]
+public class GetDepositDetailByFormIdSteps
 {
-	[Binding]
-	[Scope(Scenario = "Get deposit detail by form id")]
-	public class GetDepositDetailByFormIdSteps
+	private DepositFormInfo _actual;
+	private Guid _formId;
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+
+	public GetDepositDetailByFormIdSteps()
 	{
-		private DepositFormInfo _actual;
-		private Guid _formId;
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public GetDepositDetailByFormIdSteps()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I have a form id \{(.*)}")]
+	public void GivenIHaveAFormIdDCAA_ADBB(Guid formId)
+	{
+		_formId = formId;
+	}
+
+	[Then(@"return detail data")]
+	public void ThenReturnDetailData()
+	{
+		Assert.IsNotNull(_actual);
+	}
+
+	[When(@"call get deposit form detail api")]
+	public async Task WhenCallGetDepositFormDetailApiAsync()
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.Players.AddAsync(new Player
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
+			PlayerCode = "PlayerCode",
+			DefaultWalletCurrencyCode = "CNY",
+			Password = Array.Empty<byte>(),
+			Salt = Array.Empty<byte>(),
+			Username = "player",
+			WithdrawPassword = Array.Empty<byte>(),
+			WithdrawSalt = Array.Empty<byte>()
+		});
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
-
-		[AfterScenario]
-		public async Task CleanUpAsync()
+		var pmc = new PaymentMethodChannel
 		{
-			await _testHost.StopAsync();
-		}
+			Id = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			MethodId = Guid.NewGuid(),
+			ChannelId = Guid.NewGuid()
+		};
 
-		[Given(@"I have a form id \{(.*)}")]
-		public void GivenIHaveAFormIdDCAA_ADBB(Guid formId)
+		_ = await dbContext.PaymentMethodChannels.AddAsync(pmc);
+
+		var bp = new BrandPayment
 		{
-			_formId = formId;
-		}
+			Id = Guid.NewGuid(),
+			PaymentMethodChannelId = pmc.Id,
+			ChannelName = "channel",
+			CreatedByUsername = "System",
+			ExtendedData = "{}",
+			UpdatedByUsername = "System"
+		};
+		_ = await dbContext.BrandPayments.AddAsync(bp);
 
-		[Then(@"return detail data")]
-		public void ThenReturnDetailData()
+		_ = await dbContext.DepositForms.AddAsync(new DepositForm
 		{
-			Assert.IsNotNull(_actual);
-		}
+			Id = _formId,
+			BrandId = Guid.NewGuid(),
+			PlayerCode = "PlayerCode",
+			BrandPaymentId = bp.Id,
+			Amount = 1000M,
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now
+		});
 
-		[When(@"call get deposit form detail api")]
-		public async Task WhenCallGetDepositFormDetailApiAsync()
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+		_ = await dbContext.SaveChangesAsync();
 
-			await dbContext.Players.AddAsync(new Player
-			{
-				PlayerCode = "PlayerCode",
-				DefaultWalletCurrencyCode = "CNY",
-				Password = Array.Empty<byte>(),
-				Salt = Array.Empty<byte>(),
-				Username = "player",
-				WithdrawPassword = Array.Empty<byte>(),
-				WithdrawSalt = Array.Empty<byte>()
-			});
-
-			var pmc = new PaymentMethodChannel
-			{
-				Id = Guid.NewGuid(),
-				PaymentId = Guid.NewGuid(),
-				MethodId = Guid.NewGuid(),
-				ChannelId = Guid.NewGuid()
-			};
-
-			await dbContext.PaymentMethodChannels.AddAsync(pmc);
-
-			var bp = new BrandPayment
-			{
-				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id,
-				ChannelName = "channel",
-				CreatedByUsername = "System",
-				ExtendedData = "{}",
-				UpdatedByUsername = "System"
-			};
-			await dbContext.BrandPayments.AddAsync(bp);
-
-			await dbContext.DepositForms.AddAsync(new DepositForm
-			{
-				Id = _formId,
-				BrandId = Guid.NewGuid(),
-				PlayerCode = "PlayerCode",
-				BrandPaymentId = bp.Id,
-				Amount = 1000M,
-				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now
-			});
-
-			await dbContext.SaveChangesAsync();
-
-			_actual = await _paymentServiceClient.GetDepositFormAsync(_formId);
-		}
+		_actual = await _paymentServiceClient.GetDepositFormAsync(_formId);
 	}
 }

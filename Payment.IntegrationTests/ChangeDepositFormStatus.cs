@@ -1,107 +1,101 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Scenario = "Change a deposit form status")]
+public class ChangeDepositFormStatus
 {
-	[Binding]
-	[Scope(Scenario = "Change a deposit form status")]
-	public class ChangeDepositFormStatus
+	private readonly TestPaymentApplication _testHost;
+	private Guid _formId;
+	private readonly PaymentServiceClient _paymentServiceClient;
+
+	public ChangeDepositFormStatus()
 	{
-		private Guid _formId;
-		private PaymentServiceClient _paymentServiceClient;
-		private IHost _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public ChangeDepositFormStatus()
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
+
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
+
+	[Given(@"I have a deposit form")]
+	public async Task GivenIHaveADepositFormAsync()
+	{
+		_formId = Guid.NewGuid();
+
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.Players.AddAsync(new Player
 		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
-			_ = _testHost.StartAsync();
+			PlayerCode = "PlayerCode",
+			DefaultWalletCurrencyCode = "CNY",
+			Password = Array.Empty<byte>(),
+			Salt = Array.Empty<byte>(),
+			Username = "player",
+			WithdrawPassword = Array.Empty<byte>(),
+			WithdrawSalt = Array.Empty<byte>()
+		});
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
-
-		[AfterScenario]
-		public async Task CleanUpAsync()
+		var pmc = new PaymentMethodChannel
 		{
-			await _testHost.StopAsync();
-		}
+			Id = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			MethodId = Guid.NewGuid(),
+			ChannelId = Guid.NewGuid()
+		};
 
-		[Given(@"I have a deposit form")]
-		public async Task GivenIHaveADepositFormAsync()
+		_ = await dbContext.PaymentMethodChannels.AddAsync(pmc);
+
+		var bp = new BrandPayment
 		{
-			_formId = Guid.NewGuid();
+			Id = Guid.NewGuid(),
+			PaymentMethodChannelId = pmc.Id,
+			ExtendedData = "{}",
+			CreatedByUsername = "System",
+			UpdatedByUsername = "System",
+			ChannelName = "TestChannel"
+		};
+		_ = await dbContext.BrandPayments.AddAsync(bp);
 
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
-
-			await dbContext.Players.AddAsync(new Player
-			{
-				PlayerCode = "PlayerCode",
-				DefaultWalletCurrencyCode = "CNY",
-				Password = Array.Empty<byte>(),
-				Salt = Array.Empty<byte>(),
-				Username = "player",
-				WithdrawPassword = Array.Empty<byte>(),
-				WithdrawSalt = Array.Empty<byte>()
-			});
-
-			var pmc = new PaymentMethodChannel
-			{
-				Id = Guid.NewGuid(),
-				PaymentId = Guid.NewGuid(),
-				MethodId = Guid.NewGuid(),
-				ChannelId = Guid.NewGuid()
-			};
-
-			await dbContext.PaymentMethodChannels.AddAsync(pmc);
-
-			var bp = new BrandPayment
-			{
-				Id = Guid.NewGuid(),
-				PaymentMethodChannelId = pmc.Id,
-				ExtendedData = "{}",
-				CreatedByUsername = "System",
-				UpdatedByUsername = "System",
-				ChannelName = "TestChannel"
-			};
-			await dbContext.BrandPayments.AddAsync(bp);
-
-			await dbContext.DepositForms.AddAsync(new DepositForm
-			{
-				Id = _formId,
-				BrandId = Guid.NewGuid(),
-				PlayerCode = "PlayerCode",
-				BrandPaymentId = bp.Id,
-				Amount = 1000M,
-				Status = (int)PaymentFlowState.WaitApprove,
-				CreatedOn = DateTime.Now,
-				UpdatedOn = DateTime.Now
-			});
-
-
-			await dbContext.SaveChangesAsync();
-		}
-
-		[Then(@"form status change to ""(.*)""")]
-		public async Task ThenFormStatusChangeToAsync(PaymentFlowState expectedState)
+		_ = await dbContext.DepositForms.AddAsync(new DepositForm
 		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+			Id = _formId,
+			BrandId = Guid.NewGuid(),
+			PlayerCode = "PlayerCode",
+			BrandPaymentId = bp.Id,
+			Amount = 1000M,
+			Status = (int)PaymentFlowState.WaitApprove,
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now
+		});
 
-			var formData = await dbContext.DepositForms.FindAsync(_formId);
+		_ = await dbContext.SaveChangesAsync();
+	}
 
-			var formStatus = (PaymentFlowState)formData.Status;
+	[Then(@"form status change to ""(.*)""")]
+	public async Task ThenFormStatusChangeToAsync(PaymentFlowState expectedState)
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-			Assert.AreEqual(expectedState, formStatus);
-		}
+		var formData = await dbContext.DepositForms.FindAsync(_formId);
 
-		[When(@"I change status to ""(.*)""")]
-		public async Task WhenIChangeStatusToAsync(PaymentFlowState state)
-		{
-			await _paymentServiceClient.SubmitDepositFormStatusAsync(_formId, state);
-		}
+		var formStatus = (PaymentFlowState)formData.Status;
+
+		Assert.AreEqual(expectedState, formStatus);
+	}
+
+	[When(@"I change status to ""(.*)""")]
+	public async Task WhenIChangeStatusToAsync(PaymentFlowState state)
+	{
+		await _paymentServiceClient.SubmitDepositFormStatusAsync(_formId, state);
 	}
 }

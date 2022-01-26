@@ -4,8 +4,7 @@ pipeline {
     agent any
     environment {
         BuildConfiguration='Debug'
-        ImageName="registry.gitlab.com/rayprosoft/turnkey-gaming-system/payment-api"
-        ImageTagUrl = "https://gitlab.com/api/v4/projects/20478010/registry/repositories/2154508/tags"
+        ImageName="harbor.rpgp.cc/tgs/payment-api"
     }
     stages {
         stage('Prepare') {
@@ -107,7 +106,8 @@ pipeline {
                                 --set namespace=${kube_ns} \
                                 --set connectionStrings.tgs="${conn}" \
                                 --set connectionStrings.redis="$tgs_redis" \
-                                --set connectionStrings.nats="$tgs_nats" 
+                                --set connectionStrings.nats="$tgs_nats
+                                --set nodeSelector.dedicated=" 
                         '''
                         sh '''
                             helm template deployment/k8s/payment-api \
@@ -133,13 +133,6 @@ pipeline {
                 sshagent(['ssh-jenkins']) {
                     sh "git tag -a ${TAG} -m ${TAG}"
                     sh "git push ${GIT_URL} ${TAG} HEAD:${GIT_BRANCH}"
-                }
-            }
-        }
-        stage('Remove Image Tags') {					
-            steps {	
-                withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
-                    sh "curl --request DELETE --data \'name_regex_delete=.*\' --data \'keep_n=10\' --header \'PRIVATE-TOKEN: ${GitLabToken}\' ${ImageTagUrl}"
                 }
             }
         }

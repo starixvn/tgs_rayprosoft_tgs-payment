@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public class WithdrawForms : PagingResponse<WithdrawFormInfo>
 {
-	public class WithdrawForms : PagingResponse<WithdrawFormInfo>
-	{
-		public decimal Sum { get; init; }
-	}
+	public decimal Sum { get; init; }
 }

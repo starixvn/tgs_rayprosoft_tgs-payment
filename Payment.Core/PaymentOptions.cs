@@ -1,9 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Tgs.Payment
+namespace Tgs.Payment;
+
+public class PaymentOptions
 {
-	public class PaymentOptions
-    {
-        public JsonSerializerOptions? JsonSerializerOptions { get; set; }
-    }
+	public JsonSerializerOptions? JsonSerializerOptions { get; set; }
 }

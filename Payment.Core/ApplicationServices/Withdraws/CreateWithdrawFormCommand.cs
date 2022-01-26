@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Tgs.Payment.ApplicationServices.Withdraws
+namespace Tgs.Payment.ApplicationServices.Withdraws;
+
+public record CreateWithdrawFormCommand(
+	string? UserId,
+	string? UserName,
+	UserType UserType,
+	Guid BrandId,
+	Guid BankInfoId,
+	decimal Amount)
 {
-	public record CreateWithdrawFormCommand(
-        string? UserId,
-        string? UserName,
-        UserType UserType,
-        Guid BrandId,
-        Guid BankInfoId,
-        decimal Amount)
-    {
-        public TaskCompletionSource<Guid> ReturnFormIdSource { get; } = new TaskCompletionSource<Guid>();
-    }
+	public TaskCompletionSource<Guid> ReturnFormIdSource { get; } = new TaskCompletionSource<Guid>();
 }

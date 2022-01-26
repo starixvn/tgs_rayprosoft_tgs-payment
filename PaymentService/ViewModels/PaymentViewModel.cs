@@ -1,11 +1,8 @@
-﻿using System;
+﻿namespace Tgs.Payment.ViewModels;
 
-namespace Tgs.Payment.ViewModels
+public class PaymentViewModel
 {
-	public class PaymentViewModel
-	{
-		public string Code { get; set; } = default!;
+	public string Code { get; set; } = default!;
 
-		public Guid Id { get; set; }
-	}
+	public Guid Id { get; set; }
 }

@@ -1,11 +1,8 @@
-﻿using System;
+﻿namespace Tgs.Payment.Clients;
 
-namespace Tgs.Payment.Clients
+public class BrandPaymentVip
 {
-	public class BrandPaymentVip
-    {
-        public Guid BrandPaymentId { get; init; }
+	public Guid BrandPaymentId { get; init; }
 
-        public Guid VipLevelId { get; init; }
-    }
+	public Guid VipLevelId { get; init; }
 }

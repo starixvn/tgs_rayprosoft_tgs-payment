@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.ViewModels
+﻿namespace Tgs.Payment.ViewModels;
+
+public class PagingWithdrawFormViewModel : PagingResponseViewModel<WithdrawFormViewModel>
 {
-	public class PagingWithdrawFormViewModel : PagingResponseViewModel<WithdrawFormViewModel>
-	{
-		public decimal Sum { get; init; }
-	}
+	public decimal Sum { get; init; }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Tgs.Payment
-{
-	public interface IWithdrawProcessor
-    {
-        string Subject { get; }
+namespace Tgs.Payment;
 
-        string? MakeWithdrawSettings(
-            Guid formId,
-            decimal amount,
-            string? bankInfo,
-            BrandPaymentInfo brandPayment);
-    }
+public interface IWithdrawProcessor
+{
+	string Subject { get; }
+
+	string? MakeWithdrawSettings(
+		Guid formId,
+		decimal amount,
+		string? bankInfo,
+		BrandPaymentInfo brandPayment);
 }

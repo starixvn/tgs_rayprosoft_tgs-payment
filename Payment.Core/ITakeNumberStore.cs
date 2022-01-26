@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace Tgs.Payment
+namespace Tgs.Payment;
+
+public interface ITakeNumberStore
 {
-	public interface ITakeNumberStore
-	{
-		ValueTask<string> GetDepositFormOrderNoAsync(string BrandCode);
-		ValueTask<string> GetWithdrawFormOrderNoAsync(string BrandCode);
-	}
+	ValueTask<string> GetDepositFormOrderNoAsync(string BrandCode);
+
+	ValueTask<string> GetWithdrawFormOrderNoAsync(string BrandCode);
 }

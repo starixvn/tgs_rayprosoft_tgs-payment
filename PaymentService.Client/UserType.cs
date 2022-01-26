@@ -1,9 +1,8 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public enum UserType
 {
-	public enum UserType
-    {
-        None = 0,
-        Player = 1,
-        Agent = 2
-    }
+	None = 0,
+	Player = 1,
+	Agent = 2
 }

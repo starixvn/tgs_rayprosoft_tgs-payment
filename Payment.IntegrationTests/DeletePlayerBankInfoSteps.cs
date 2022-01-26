@@ -1,80 +1,74 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-namespace Payment.IntegrationTests
+namespace Payment.IntegrationTests;
+
+[Binding]
+[Scope(Tag = "DeleteBankInfo")]
+public class DeletePlayerBankInfoSteps
 {
-	[Binding]
-	[Scope(Tag = "DeleteBankInfo")]
-	public class DeletePlayerBankInfoSteps
+	private readonly PaymentServiceClient _paymentServiceClient;
+	private readonly TestPaymentApplication _testHost;
+	private Guid _bankInfoId;
+	private string _playerCode;
+
+	public DeletePlayerBankInfoSteps()
 	{
-		private Guid _bankInfoId;
-		private PaymentServiceClient _paymentServiceClient;
-		private string _playerCode;
-		private IHost _testHost;
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
 
-		public DeletePlayerBankInfoSteps()
-		{
-			_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		_paymentServiceClient = _testHost.GetPaymentServiceClient();
+	}
 
-			_ = _testHost.StartAsync();
+	[AfterScenario]
+	public async Task CleanUpAsync()
+	{
+		await _testHost.DisposeAsync();
+	}
 
-			_paymentServiceClient = _testHost.GetPaymentServiceClient();
-		}
+	[Given(@"bank info id is \{(.*)}")]
+	public void GivenBankInfoIdIs(Guid bankInfoId)
+	{
+		_bankInfoId = bankInfoId;
+	}
 
-		[AfterScenario]
-		public async Task CleanUpAsync()
-		{
-			await _testHost.StopAsync();
-		}
+	[Given(@"I will delete bank info")]
+	public void GivenIWillDeleteBankInfo()
+	{
+	}
 
-		[Given(@"bank info id is \{(.*)}")]
-		public void GivenBankInfoIdIs(Guid bankInfoId)
-		{
-			_bankInfoId = bankInfoId;
-		}
+	[Given(@"playerCode is ""(.*)""")]
+	public void GivenPlayerCodeIs(string playerCode)
+	{
+		_playerCode = playerCode;
+	}
 
-		[Given(@"I will delete bank info")]
-		public void GivenIWillDeleteBankInfo()
-		{
-		}
+	[Then(@"the bank info deleted")]
+	public void ThenTheBankInfoDeleted()
+	{
+		Assert.Pass();
+	}
 
-		[Given(@"playerCode is ""(.*)""")]
-		public void GivenPlayerCodeIs(string playerCode)
-		{
-			_playerCode = playerCode;
-		}
+	[When(@"call delete bank info api")]
+	public async Task WhenCallDeleteBankInfoApiAsync()
+	{
+		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
-		[Then(@"the bank info deleted")]
-		public void ThenTheBankInfoDeleted()
-		{
-			Assert.Pass();
-		}
+		_ = await dbContext.PlayerBankInfos.AddAsync(
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				PlayerCode = _playerCode,
+				Id = _bankInfoId,
+				BankType = "Bank",
+				CreatedByUsername = "System",
+				UpdatedByUsername = "System"
+			});
 
-		[When(@"call delete bank info api")]
-		public async Task WhenCallDeleteBankInfoApiAsync()
-		{
-			var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
+		_ = await dbContext.SaveChangesAsync();
 
-			await dbContext.PlayerBankInfos.AddAsync(
-				new Tgs.Payment.Repositories.Entities.PlayerBankInfo
-				{
-					PlayerCode = _playerCode,
-					Id = _bankInfoId,
-					BankType = "Bank",
-					CreatedByUsername = "System",
-					UpdatedByUsername = "System"
-				});
-
-			await dbContext.SaveChangesAsync();
-
-			await _paymentServiceClient
-				.DeletePlayerBankInfoAsync(_playerCode, _bankInfoId);
-		}
+		await _paymentServiceClient
+			.DeletePlayerBankInfoAsync(_playerCode, _bankInfoId);
 	}
 }

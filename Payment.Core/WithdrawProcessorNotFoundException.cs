@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Tgs.Payment
+namespace Tgs.Payment;
+
+public class WithdrawProcessorNotFoundException : Exception
 {
-	public class WithdrawProcessorNotFoundException : Exception
-    {
-        public WithdrawProcessorNotFoundException()
-        {
-        }
-    }
+	public WithdrawProcessorNotFoundException()
+	{
+	}
 }
