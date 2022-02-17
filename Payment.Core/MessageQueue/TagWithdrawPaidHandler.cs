@@ -18,9 +18,9 @@ internal class TagWithdrawPaidHandler : IMessageHandler
 		_submitFormStatusService = submitFormStatusService ?? throw new ArgumentNullException(nameof(submitFormStatusService));
 	}
 
-	public ValueTask HandleAsync(byte[] data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
-		var request = TagPaidRequest.Parser.ParseFrom(data);
+		var request = TagPaidRequest.Parser.ParseFrom(data.Span);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			request.FormId,

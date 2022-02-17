@@ -41,7 +41,7 @@ internal class PaymentClient : IPaymentClient
 			.RequestAsync(subject, request.ToByteArray())
 			.ConfigureAwait(false);
 
-		var response = GeneralResponse.Parser.ParseFrom(result);
+		var response = GeneralResponse.Parser.ParseFrom(result.Span);
 
 		_logger.LogInformation(response.Result);
 
@@ -60,7 +60,7 @@ internal class PaymentClient : IPaymentClient
 			.RequestAsync(subject, request.ToByteArray())
 			.ConfigureAwait(false);
 
-		var response = DepositResponse.Parser.ParseFrom(result);
+		var response = DepositResponse.Parser.ParseFrom(result.Span);
 
 		_logger.LogInformation(response.Result);
 
@@ -200,7 +200,7 @@ internal class PaymentClient : IPaymentClient
 			.RequestAsync(subject, request.ToByteArray())
 			.ConfigureAwait(false);
 
-		var response = WithdrawResponse.Parser.ParseFrom(result);
+		var response = WithdrawResponse.Parser.ParseFrom(result.Span);
 
 		_logger.LogInformation(response.Result);
 
