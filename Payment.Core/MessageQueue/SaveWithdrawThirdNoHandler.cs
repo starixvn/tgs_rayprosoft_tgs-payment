@@ -22,11 +22,11 @@ internal class SaveWithdrawThirdNoHandler : IMessageHandler
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
-	async ValueTask IMessageHandler.HandleAsync(byte[] data, CancellationToken cancellationToken)
+	async ValueTask IMessageHandler.HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
 	{
 		_logger.LogInformation("Receive SaveWithdrawThirdNo request.");
 
-		var request = FormThirdNoRequest.Parser.ParseFrom(data);
+		var request = FormThirdNoRequest.Parser.ParseFrom(data.Span);
 
 		var formId = (Guid)request.FormId;
 

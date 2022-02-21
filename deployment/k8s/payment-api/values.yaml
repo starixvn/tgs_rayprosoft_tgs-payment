@@ -9,8 +9,6 @@ image:
   pullPolicy: IfNotPresent
   tag: "latest"
 
-namespace: dev
-
 imagePullSecrets:
   - name: registry-credentials
   - name: secret-tgs-harbor
@@ -48,7 +46,7 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 750m
+    cpu: 1
     memory: 256Mi
   requests:
     cpu: 100m

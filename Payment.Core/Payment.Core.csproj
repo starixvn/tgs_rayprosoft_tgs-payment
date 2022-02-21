@@ -19,10 +19,10 @@
 		</PackageReference>
 		<PackageReference Include="PagingUtility" Version="0.0.3" />
 		<PackageReference Include="PagingUtility.AsyncEnumerable" Version="0.0.3" />
-		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.3" />
+		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.4" />
 		<PackageReference Include="stateless" Version="5.11.0" />
-		<PackageReference Include="System.Linq.Async" Version="5.1.0" />
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="1.2.0" />
+		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.0.2" />
 		<PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
 	</ItemGroup>
 

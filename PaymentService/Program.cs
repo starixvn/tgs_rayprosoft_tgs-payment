@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Exporter.ProfileViewer.Filters;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Tgs.Payment.Configuration;
 using Tgs.Payment.Swagger;
 
@@ -55,12 +59,43 @@ builder.Services
 
 builder.Services.AddHealthChecks();
 
+builder.Services
+	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
+		sp => new ConfigureNamedOptions<OtlpExporterOptions>(
+			Microsoft.Extensions.Options.Options.DefaultName,
+			exporterOptions =>
+			{
+				var config = sp.GetRequiredService<IConfiguration>();
+				var nodeIp = config.GetValue<string>("NODE_IP");
+
+				if (!string.IsNullOrWhiteSpace(nodeIp))
+					exporterOptions.Endpoint = new Uri($"http://{nodeIp}:4317");
+
+				config.GetSection("Opentelemetry:Tracing").Bind(exporterOptions);
+			}))
+	.AddOpenTelemetryTracing(
+		tracingBuilder => tracingBuilder
+			.SetResourceBuilder(ResourceBuilder.CreateDefault()
+				.AddEnvironmentVariableDetector())
+			.AddSource("Tgs.*")
+			.AddSource("TGS.*")
+			.AddAspNetCoreInstrumentation()
+			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+			.AddHttpClientInstrumentation()
+			.AddProfileViewExporter(expoterBuiler => expoterBuiler
+				.AddFilter(new FileExtensionFilter("html", "ico", "png", "jpg"))
+				.AddFilter(new UrlPathFilter("/swagger"))
+				.AddFilter(new UrlPathFilter("/health")))
+			.AddOtlpExporter())
+	.AddProfileViewer();
+
 var app = builder.Build();
 
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentService v1"));
 
 app.MapControllers();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/healthz");
 app.MapSwagger();
+app.MapProfileViewer();
 
 app.Run();
