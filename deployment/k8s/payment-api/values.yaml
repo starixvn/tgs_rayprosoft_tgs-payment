@@ -16,11 +16,6 @@ imagePullSecrets:
 nameOverride: "payment-api"
 fullnameOverride: "payment-api"
 
-connectionStrings:
-  tgs: Server=localhost;Database=tgs;User Id=tgs;Password=1qaz2wsx!@
-  redis: localhost,abortConnect=false,connectTimeout=3000
-  nats: nats://localhost:4222
-
 podAnnotations: {}
 
 podSecurityContext:

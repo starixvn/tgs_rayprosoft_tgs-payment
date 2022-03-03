@@ -106,37 +106,29 @@ pipeline {
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
 
-                        withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "conn")]) {
-                            sh """
-                                cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
-                                    -n ${kube_ns} \
-                                    --set image.tag=${TAG} \
-                                    --set connectionStrings.tgs="${conn}" \
-                                    --set connectionStrings.redis="$tgs_redis" \
-                                    --set connectionStrings.nats="$tgs_nats" \
-                                    -f -
-                                {
-                                    "nodeSelector": $node_selector,
-                                    "tolerations": [$dedicated],
-                                    "resources": $resources
-                                }
-                            """
-                            sh """
-                                cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
-                                    -n ${kube_ns} \
-                                    --set image.tag=${TAG} \
-                                    --set connectionStrings.tgs="${conn}" \
-                                    --set connectionStrings.redis="$tgs_redis" \
-                                    --set connectionStrings.nats="$tgs_nats" \
-                                    -f -
-                                    | kubectl -n ${kube_ns} apply -f -
-                                {
-                                    "nodeSelector": $node_selector,
-                                    "tolerations": [$dedicated],
-                                    "resources": $resources
-                                }
-                            """
-                        }
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
+                                --set image.tag=${TAG} \
+                                -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
+                                --set image.tag=${TAG} \
+                                -f - \
+                                | kubectl -n ${kube_ns} apply -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
                     }
                 }
             }
@@ -167,19 +159,5 @@ pipeline {
         failure {
             sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
-    }
-}
-
-def sendTelegram(message) {
-    def encodedMessage = URLEncoder.encode(message, "UTF-8")
-
-    withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
-
-        response = httpRequest (consoleLogResponseBody: true,
-                contentType: 'APPLICATION_JSON',
-                httpMode: 'GET',
-                url: "https://api.telegram.org/bot${TOKEN}/sendMessage?text=${encodedMessage}&chat_id=${CHAT_ID}",
-                validResponseCodes: '200')
-        return response
     }
 }
