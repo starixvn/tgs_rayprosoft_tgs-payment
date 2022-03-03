@@ -12,7 +12,10 @@ using Tgs.Payment.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("/config/appsettings.json", true);
+builder.Configuration
+	.AddJsonFile("/config/appsettings.json", true)
+	.AddEnvironmentVariables();
+
 builder.Logging.AddTgsLog();
 
 builder.Services
