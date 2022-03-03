@@ -541,15 +541,15 @@ internal class PaymentRepository : IPaymentRepository
 				form.PromotionId,
 				form.PromotionPlayerId,
 				form.CreatedOn,
-				form.UpdatedOn));
+				form.UpdatedOn))
+			.ToAsyncEnumerable();
 
 		dataQuery = dataQuery.ApplyOrderBy(paging);
 
 		if (paging.RowCount > 0)
 			dataQuery = dataQuery.ApplyPaging(paging);
 
-		return dataQuery
-			.ToAsyncEnumerable();
+		return dataQuery;
 	}
 
 	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
@@ -582,15 +582,15 @@ internal class PaymentRepository : IPaymentRepository
 				form.BankInfo,
 				form.ApplyInfo,
 				form.PaymentReturn,
-				form.ThirdPartyOrderNo));
+				form.ThirdPartyOrderNo))
+			.ToAsyncEnumerable();
 
 		dataQuery = dataQuery.ApplyOrderBy(paging);
 
 		if (paging.RowCount > 0)
 			dataQuery = dataQuery.ApplyPaging(paging);
 
-		return dataQuery
-			.ToAsyncEnumerable();
+		return dataQuery;
 	}
 
 	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
