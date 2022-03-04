@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
+using OpenTelemetry.Exporter;
 using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
 
@@ -42,6 +44,14 @@ internal static class TestSiteHelper
 
 						  return fakeStore;
 					  });
+
+					_ = services.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
+						sp => new ConfigureNamedOptions<OtlpExporterOptions>(
+							Options.DefaultName,
+							exporterOptions =>
+							{
+								exporterOptions.Endpoint = null;
+							}));
 
 					configureServices(services);
 				});

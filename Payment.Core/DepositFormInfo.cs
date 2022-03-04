@@ -11,6 +11,7 @@ public record DepositFormInfo(
 	string ChannelName,
 	Guid PaymentMethodId,
 	decimal Amount,
+	decimal? ActualAmount,
 	string? Remark,
 	PaymentFlowState Status,
 	string? ApplyInfo,

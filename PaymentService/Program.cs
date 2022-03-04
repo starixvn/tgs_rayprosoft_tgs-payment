@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Exporter;
-using OpenTelemetry.Exporter.ProfileViewer.Filters;
+using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.Configuration;
@@ -12,7 +12,10 @@ using Tgs.Payment.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("/config/appsettings.json", true);
+builder.Configuration
+	.AddJsonFile("/config/appsettings.json", true)
+	.AddEnvironmentVariables();
+
 builder.Logging.AddTgsLog();
 
 builder.Services
@@ -82,11 +85,15 @@ builder.Services
 			.AddAspNetCoreInstrumentation()
 			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
 			.AddHttpClientInstrumentation()
-			.AddProfileViewExporter(expoterBuiler => expoterBuiler
-				.AddFilter(new FileExtensionFilter("html", "ico", "png", "jpg"))
-				.AddFilter(new UrlPathFilter("/swagger"))
-				.AddFilter(new UrlPathFilter("/health")))
+			.AddProfileViewExporter()
 			.AddOtlpExporter())
+	.Configure<AspNetCoreInstrumentationOptions>(
+		options => options.Filter = httpContext => !httpContext.Request.Path.HasValue
+			|| !httpContext.Request.Path.StartsWithSegments("/swagger")
+			&& !httpContext.Request.Path.StartsWithSegments("/healthz")
+			&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
+			&& !new[] { "html", "ico", "png", "jpg" }.Any(
+				ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
 	.AddProfileViewer();
 
 var app = builder.Build();
