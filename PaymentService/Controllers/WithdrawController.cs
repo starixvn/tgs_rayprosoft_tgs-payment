@@ -85,6 +85,7 @@ public class WithdrawController : ControllerBase
 			{
 				Id = formData.Id,
 				Amount = formData.Amount,
+				ActualAmount = formData.ActualAmount,
 				ApplyInfo = formData.ApplyInfo,
 				BankInfo = formData.BankInfo,
 				BankInfoId = formData.BankInfoId,
