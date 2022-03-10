@@ -1,3 +1,4 @@
+@Library('global-shared-library') _
 def message = "";
 
 pipeline {
@@ -23,7 +24,7 @@ pipeline {
                             break;
                         default:
                             env.kube_ns = "dev";
-                            env.k8s_config = 'k8s-kube-config' 
+                            env.k8s_config = 'k8s-kube-config';
                             break;
                     }
                 }
@@ -34,13 +35,13 @@ pipeline {
                             envItems.each { key, value -> env."tgs_${key}" = value;
                         }
                         env.TAG = sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim() + '-' + env.kube_ns;
-                        message += "\nBranch: ${env.GIT_BRANCH}" 
-                        message += "\nTag: ${env.TAG}"
-                        message += "\nEnv: ${env.kube_ns}"
+                        message += "\nBranch: ${env.GIT_BRANCH}"; 
+                        message += "\nTag: ${env.TAG}";
+                        message += "\nEnv: ${env.kube_ns}";
                         env.commit_url = "${env.GIT_URL}"
                             .replace("git@gitlab.com:", "https://gitlab.com/")
-                            .replace(".git","/-/commit/") + "${env.GIT_COMMIT}"
-                        message += "\n Commit: ${env.commit_url}"
+                            .replace(".git","/-/commit/") + "${env.GIT_COMMIT}";
+                        message += "\n Commit: ${env.commit_url}";
                     }
                 }
                 sh "echo tag: $TAG"
@@ -98,26 +99,36 @@ pipeline {
 
         stage('Deploy to k8s') {
             steps {
-                withKubeConfig([credentialsId: env.k8s_config]) {
-                    withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "conn")]) {
-                        sh '''
-                            helm template deployment/k8s/payment-api \
+                script {
+                    withKubeConfig([credentialsId: env.k8s_config]) {
+                        
+                        def resources = getResources(env.k8s_config, env.kube_ns, "payment-api")
+                        def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+                        def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
+
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
                                 --set image.tag=${TAG} \
-                                --set namespace=${kube_ns} \
-                                --set connectionStrings.tgs="${conn}" \
-                                --set connectionStrings.redis="$tgs_redis" \
-                                --set connectionStrings.nats="$tgs_nats
-                                --set nodeSelector.dedicated=" 
-                        '''
-                        sh '''
-                            helm template deployment/k8s/payment-api \
+                                -f -
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
+                        sh """
+                            cat << EOF | yq e -P | helm template deployment/k8s/payment-api \
+                                -n ${kube_ns} \
                                 --set image.tag=${TAG} \
-                                --set namespace=${kube_ns} \
-                                --set connectionStrings.tgs="${conn}" \
-                                --set connectionStrings.redis="$tgs_redis" \
-                                --set connectionStrings.nats="$tgs_nats" \
+                                -f - \
                                 | kubectl -n ${kube_ns} apply -f -
-                        '''
+                            {
+                                "nodeSelector": $node_selector,
+                                "tolerations": [$dedicated],
+                                "resources": $resources
+                            }
+                        """
                     }
                 }
             }
@@ -148,19 +159,5 @@ pipeline {
         failure {
             sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
-    }
-}
-
-def sendTelegram(message) {
-    def encodedMessage = URLEncoder.encode(message, "UTF-8")
-
-    withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
-
-        response = httpRequest (consoleLogResponseBody: true,
-                contentType: 'APPLICATION_JSON',
-                httpMode: 'GET',
-                url: "https://api.telegram.org/bot${TOKEN}/sendMessage?text=${encodedMessage}&chat_id=${CHAT_ID}",
-                validResponseCodes: '200')
-        return response
     }
 }

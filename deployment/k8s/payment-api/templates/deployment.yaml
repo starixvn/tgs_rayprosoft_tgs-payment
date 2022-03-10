@@ -30,6 +30,28 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: Payment-Api({{ .Release.Namespace }})
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: ConnectionStrings__Tgs
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: tgs
+            - name: ConnectionStrings__RedisConfigurationString
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: redis
+            - name: ConnectionStrings__Nats
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: nats
           ports:
             - name: http
               containerPort: 80
@@ -40,40 +62,31 @@ spec:
               readOnly: true
               subPath: appsettings.json
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /healthz
               port: 80
-            initialDelaySeconds: 30
             periodSeconds: 5
-          readinessProbe:
-            tcpSocket:
+          startupProbe:
+            httpGet:
+              path: /healthz
               port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 5
+            periodSeconds: 2
+            failureThreshold: 30
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: appsettings
           configMap:
             name: configmap-{{ include "payment.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if eq .Values.namespace "staging" }}
-      nodeSelector:
-        dedicated: nonprod
+      {{- with .Values.tolerations }}
       tolerations:
-      - effect: NoSchedule
-        key: dedicated
-        operator: Equal
-        value: nonprod
-      {{- end }}
-      {{- if eq .Values.namespace "prod" }}
-      nodeSelector:
-        dedicated: prod
-      tolerations:
-      - effect: NoSchedule
-        key: dedicated
-        operator: Equal
-        value: prod
+        {{- toYaml . | nindent 8 }}
       {{- end }}

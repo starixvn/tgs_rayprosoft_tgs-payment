@@ -9,19 +9,12 @@ image:
   pullPolicy: IfNotPresent
   tag: "latest"
 
-namespace: dev
-
 imagePullSecrets:
   - name: registry-credentials
   - name: secret-tgs-harbor
 
 nameOverride: "payment-api"
 fullnameOverride: "payment-api"
-
-connectionStrings:
-  tgs: Server=localhost;Database=tgs;User Id=tgs;Password=1qaz2wsx!@
-  redis: localhost,abortConnect=false,connectTimeout=3000
-  nats: nats://localhost:4222
 
 podAnnotations: {}
 
@@ -48,7 +41,7 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 750m
+    cpu: 1
     memory: 256Mi
   requests:
     cpu: 100m
