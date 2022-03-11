@@ -15,5 +15,12 @@ internal class TestPaymentApplication : WebApplicationFactory<Program>
 	}
 
 	protected override void ConfigureWebHost(IWebHostBuilder builder)
-		=> _webHostConfigure?.Invoke(builder);
+	{
+		builder.ConfigureAppConfiguration(builder =>
+		{
+			builder.Sources.Clear();
+		});
+
+		_webHostConfigure?.Invoke(builder);
+	}
 }

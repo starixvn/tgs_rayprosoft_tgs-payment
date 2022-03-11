@@ -2,6 +2,8 @@
 
 public class DepositFormInfo
 {
+	public decimal? ActualAmount { get; init; }
+
 	public decimal Amount { get; init; }
 
 	public string? ApplyInfo { get; init; }

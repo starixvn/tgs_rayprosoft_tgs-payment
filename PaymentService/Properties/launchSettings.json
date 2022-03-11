@@ -9,7 +9,6 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OTEL_SERVICE_NAME": "Payment-API(local)",
         "NODE_IP": "192.168.50.112"
-
       },
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5010"
