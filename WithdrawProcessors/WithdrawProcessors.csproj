@@ -13,6 +13,7 @@
     <PackageReference Include="Tgs.Payment.ManualDeposit" Version="0.1.0" />
     <PackageReference Include="Tgs.Payment.PrimePay.Client" Version="0.0.6" />
     <PackageReference Include="Tgs.Payment.SkyPay.Client" Version="0.0.6" />
+    <PackageReference Include="Tgs.Payment.ZeroNineNinePay.Client" Version="0.0.3" />
   </ItemGroup>
 
   <ItemGroup>
