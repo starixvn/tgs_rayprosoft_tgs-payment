@@ -31,6 +31,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
 			.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
 			.RegisterWithdrawProcessor<SkyPayVNProcessor>("SkyPay-VN")
-			.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-CN");
+			.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-CN")
+			.RegisterWithdrawProcessor<ZeroNineNinePayProcessor>("ZeroNineNinePay");
 	}
 }
