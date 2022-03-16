@@ -18,13 +18,15 @@ namespace Tgs.Payment.WithdrawProcessors
 
 		public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 		{
+
 			var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<ZeroNineNinePayBankInfo>>(bankInfo);
+			
 
 			var brandPaymentExtendedData = JsonSerializer
 				.Deserialize<JsonDocument>(brandPayment.ExtendedData);
 
-			_logger.LogInformation($"{brandPayment.ExtendedData}");
+			_logger.LogInformation($"ZeroNineNinePayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}");
 
 			var settings = new ZeroNineNinePayWithdrawSettings(
 				brandPaymentExtendedData.RootElement.GetProperty("merchantId").GetInt32(),
