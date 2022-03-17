@@ -6,6 +6,7 @@ using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
 using Tgs.Payment.SkyPay;
 using Tgs.Payment.WithdrawProcessors;
+using Tgs.Payment.ZeroNineNinePay;
 using TGS.Payment.ManualDeposit;
 
 namespace Tgs.Payment.Configuration;
@@ -21,7 +22,8 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<ManualDepositSerializer>()
 			.AddSingleton<MaticPaySerializer>()
 			.AddSingleton<Help2PaySerializer>()
-			.AddSingleton<SkyPaySerializer>();
+			.AddSingleton<SkyPaySerializer>()
+			.AddSingleton<ZeroNineNinePaySerializer>();
 
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
