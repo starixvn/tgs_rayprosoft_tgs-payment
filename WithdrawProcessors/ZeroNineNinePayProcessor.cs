@@ -10,17 +10,19 @@ namespace Tgs.Payment.WithdrawProcessors
 	{
 		private readonly JsonSerializerOptions _jsonSerializerOptions;
 		private readonly ILogger<ZeroNineNinePayProcessor> _logger;
-
+		private readonly ZeroNineNinePaySerializer _zeroNineNinePaySerializer;
 		public string Subject => "tgs.payment.zeronineninepay.withdraw";
 
 		public ZeroNineNinePayProcessor(
 			IOptions<PaymentOptions> jsonOptionsAccessor,
+			ZeroNineNinePaySerializer zeroNineNinePaySerializer,
 			ILogger<ZeroNineNinePayProcessor> logger)
 		{
 			if (jsonOptionsAccessor is null)
 				throw new ArgumentNullException(nameof(jsonOptionsAccessor));
 
 			_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
+			_zeroNineNinePaySerializer = zeroNineNinePaySerializer;
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -43,7 +45,7 @@ namespace Tgs.Payment.WithdrawProcessors
 				withdrawBankInfo.Detail.BankBranch,
 				formId);
 
-			return JsonSerializer.Serialize(settings);
+			return _zeroNineNinePaySerializer.Serialize(settings);
 		}
 	}
 }
