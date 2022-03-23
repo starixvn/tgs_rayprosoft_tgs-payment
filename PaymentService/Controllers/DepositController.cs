@@ -64,7 +64,8 @@ public class DepositController : ControllerBase
 			? new DepositFormViewModel
 			{
 				Id = formData.Id,
-				Amount = formData.ActualAmount ?? formData.Amount,
+				ActualAmount = formData.ActualAmount,
+				Amount = formData.Amount,
 				ApplyInfo = formData.ApplyInfo,
 				BrandId = formData.BrandId,
 				BrandPaymentId = formData.BrandPaymentId,
@@ -99,7 +100,8 @@ public class DepositController : ControllerBase
 			? new DepositFormViewModel
 			{
 				Id = formData.Id,
-				Amount = formData.ActualAmount ?? formData.Amount,
+				Amount = formData.Amount,
+				ActualAmount = formData.ActualAmount,
 				ApplyInfo = formData.ApplyInfo,
 				BrandId = formData.BrandId,
 				BrandPaymentId = formData.BrandPaymentId,
@@ -225,7 +227,8 @@ public class DepositController : ControllerBase
 			.Select(row => new DepositFormViewModel
 			{
 				Id = row.Id,
-				Amount = row.ActualAmount ?? row.Amount,
+				Amount = row.Amount,
+				ActualAmount = row.ActualAmount,
 				ApplyInfo = row.ApplyInfo,
 				BrandId = row.BrandId,
 				BrandPaymentId = row.BrandPaymentId,

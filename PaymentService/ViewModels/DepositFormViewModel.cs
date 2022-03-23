@@ -2,6 +2,8 @@
 
 public class DepositFormViewModel
 {
+	public decimal? ActualAmount { get; set; }
+
 	public decimal Amount { get; set; }
 
 	public string? ApplyInfo { get; set; }

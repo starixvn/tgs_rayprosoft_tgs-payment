@@ -9,6 +9,7 @@ public record WithdrawFormInfo(
 	string? UserName,
 	Guid BrandId,
 	decimal Amount,
+	decimal? ActualAmount,
 	PaymentFlowState Status,
 	string? Remark,
 	string? ReviewedUserName,

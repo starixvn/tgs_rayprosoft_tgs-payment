@@ -6,6 +6,7 @@ pipeline {
     environment {
         BuildConfiguration='Debug'
         ImageName="harbor.rpgp.cc/tgs/payment-api"
+        DOTNET_USE_POLLING_FILE_WATCHER="true"
     }
     stages {
         stage('Prepare') {
