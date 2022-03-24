@@ -43,7 +43,7 @@ internal class PaymentClient : IPaymentClient
 
 		var response = GeneralResponse.Parser.ParseFrom(result.Span);
 
-		_logger.LogInformation(response.Result);
+		_logger.LogInformation("{response.Result}", response.Result);
 
 		return response.Result;
 	}
@@ -62,7 +62,7 @@ internal class PaymentClient : IPaymentClient
 
 		var response = DepositResponse.Parser.ParseFrom(result.Span);
 
-		_logger.LogInformation(response.Result);
+		_logger.LogInformation("{response.Result}", response.Result);
 
 		return response.Result;
 	}
@@ -202,7 +202,7 @@ internal class PaymentClient : IPaymentClient
 
 		var response = WithdrawResponse.Parser.ParseFrom(result.Span);
 
-		_logger.LogInformation(response.Result);
+		_logger.LogInformation("{response.Result}", response.Result);
 
 		return response.Result;
 	}
