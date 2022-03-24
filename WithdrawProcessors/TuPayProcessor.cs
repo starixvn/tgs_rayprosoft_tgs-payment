@@ -39,12 +39,16 @@ internal class TuPayProcessor : IWithdrawProcessor
 		var settings = new TuPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("merchant").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("secret").GetString(),
-			withdrawBankInfo.Detail.BankName,
+			brandPaymentExtendedData.RootElement.TryGetProperty("bankName", out var bankElement)
+				? bankElement.GetString()
+				: withdrawBankInfo.Detail.BankName,
 			withdrawBankInfo.Detail.SubBankName,
 			withdrawBankInfo.Detail.CardNo,
 			withdrawBankInfo.Detail.CardName,
 			formId,
-			brandPaymentExtendedData.RootElement.GetProperty("remark").GetString());
+			brandPaymentExtendedData.RootElement.TryGetProperty("remark", out var jsonElement)
+				? jsonElement.GetString()
+				: null);
 
 		return _tuPaySerializer.Serialize(settings);
 	}
