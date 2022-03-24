@@ -5,7 +5,7 @@ using Tgs.Payment.LeePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-public class LeePayProcessor : IWithdrawProcessor
+internal class LeePayProcessor : IWithdrawProcessor
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly LeePaySerializer _leePaySerializer;

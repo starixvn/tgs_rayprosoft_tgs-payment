@@ -104,6 +104,7 @@ builder.Services
 		options => options.Filter = httpContext => !httpContext.Request.Path.HasValue
 			|| !httpContext.Request.Path.StartsWithSegments("/swagger")
 			&& !httpContext.Request.Path.StartsWithSegments("/healthz")
+			&& !httpContext.Request.Path.StartsWithSegments("/metrics")
 			&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
 			&& !new[] { "html", "ico", "png", "jpg" }.Any(
 				ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))

@@ -5,7 +5,7 @@ using Tgs.Payment.ApplePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-public class ApplePayProcessor : IWithdrawProcessor
+internal class ApplePayProcessor : IWithdrawProcessor
 {
 	private readonly ApplePaySerializer _applePaySerializer;
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
