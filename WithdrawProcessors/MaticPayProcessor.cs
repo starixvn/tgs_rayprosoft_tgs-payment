@@ -6,7 +6,7 @@ using Tgs.Payment.MaticPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-public class MaticPayProcessor : IWithdrawProcessor
+internal class MaticPayProcessor : IWithdrawProcessor
 {
 	private static readonly Dictionary<string, string> _BankMapping = new()
 	{

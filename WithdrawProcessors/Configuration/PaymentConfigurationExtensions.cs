@@ -5,6 +5,7 @@ using Tgs.Payment.LeePay;
 using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
 using Tgs.Payment.SkyPay;
+using Tgs.Payment.TuPay;
 using Tgs.Payment.WithdrawProcessors;
 using Tgs.Payment.ZeroNineNinePay;
 using TGS.Payment.ManualDeposit;
@@ -23,7 +24,8 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<MaticPaySerializer>()
 			.AddSingleton<Help2PaySerializer>()
 			.AddSingleton<SkyPaySerializer>()
-			.AddSingleton<ZeroNineNinePaySerializer>();
+			.AddSingleton<ZeroNineNinePaySerializer>()
+			.AddSingleton<TuPaySerializer>();
 
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
@@ -34,6 +36,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")
 			.RegisterWithdrawProcessor<SkyPayVNProcessor>("SkyPay-VN")
 			.RegisterWithdrawProcessor<SkyPayProcessor>("SkyPay-CN")
-			.RegisterWithdrawProcessor<ZeroNineNinePayProcessor>("ZeroNineNinePay");
+			.RegisterWithdrawProcessor<ZeroNineNinePayProcessor>("ZeroNineNinePay")
+			.RegisterWithdrawProcessor<TuPayProcessor>("TuPay");
 	}
 }

@@ -6,7 +6,7 @@ using Tgs.Payment.ZeroNineNinePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-public class ZeroNineNinePayProcessor : IWithdrawProcessor
+internal class ZeroNineNinePayProcessor : IWithdrawProcessor
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly ILogger<ZeroNineNinePayProcessor> _logger;
@@ -29,7 +29,7 @@ public class ZeroNineNinePayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-		.Deserialize<WithdrawBankInfo<ZeroNineNinePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<ZeroNineNinePayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
