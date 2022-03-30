@@ -16,7 +16,10 @@ imagePullSecrets:
 nameOverride: "payment-api"
 fullnameOverride: "payment-api"
 
-podAnnotations: {}
+podAnnotations:
+  prometheus.io/path: /metrics
+  prometheus.io/port: "52325"
+  prometheus.io/scrape: "true"
 
 podSecurityContext:
   {}
