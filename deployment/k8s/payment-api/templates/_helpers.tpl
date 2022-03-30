@@ -41,7 +41,9 @@ Common labels
 Selector labels
 */}}
 {{- define "payment.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "payment.name" . }}
 app: {{ include "payment.name" . }}
+tgs.kind: payment
 {{- end }}
 
 {{/*
