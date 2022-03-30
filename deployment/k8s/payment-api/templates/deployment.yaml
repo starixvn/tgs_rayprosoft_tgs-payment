@@ -92,12 +92,18 @@ spec:
             - name: DOTNETMONITOR_Storage__DumpTempFolder
               value: /dumps
             - name: DOTNETMONITOR_Urls
-              value: http://*:52323
+              value: http://+:52325
+            - name: XDG_CONFIG_HOME
+              value: /config
           volumeMounts:
             - mountPath: /diag
               name: diagvol
             - mountPath: /dumps
               name: dumpsvol
+            - mountPath: /config/dotnet-monitor/settings.json
+              name: appsettings
+              readOnly: true
+              subPath: settings.json
           resources:
             requests:
               cpu: 50m
