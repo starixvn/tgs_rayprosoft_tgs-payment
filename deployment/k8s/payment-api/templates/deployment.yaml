@@ -92,6 +92,8 @@ spec:
             - name: DOTNETMONITOR_Storage__DumpTempFolder
               value: /dumps
             - name: DOTNETMONITOR_Urls
+              value: http://+:52324
+            - name: DOTNETMONITOR_Metrics__Endpoints
               value: http://+:52325
             - name: XDG_CONFIG_HOME
               value: /config
@@ -103,7 +105,7 @@ spec:
             - mountPath: /config/dotnet-monitor/settings.json
               name: appsettings
               readOnly: true
-              subPath: settings.json
+              subPath: monitor.settings.json
           resources:
             requests:
               cpu: 50m
