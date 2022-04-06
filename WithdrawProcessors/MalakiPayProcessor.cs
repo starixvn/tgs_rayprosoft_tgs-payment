@@ -32,7 +32,8 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
 
 		_logger.LogInformation(
-			"TuPayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
+			"{nameof(MalakiPayProcessor)} formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
+			nameof(MalakiPayProcessor),
 			formId,
 			bankInfo,
 			brandPayment.ExtendedData);
