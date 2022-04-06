@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Tgs.Payment.MalakiPay;
 using Tgs.Payment.TuPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -9,24 +10,24 @@ namespace Tgs.Payment.WithdrawProcessors;
 internal class MalakiPayProcessor : IWithdrawProcessor
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
-	private readonly ILogger<TuPayProcessor> _logger;
-	private readonly TuPaySerializer _tuPaySerializer;
+	private readonly ILogger<MalakiPayProcessor> _logger;
+	private readonly MalakiPaySerializer _malakiPaySerializer;
 	public string Subject => "tgs.payment.malakipay.withdraw";
 
-	public MalakiPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, TuPaySerializer tuPaySerializer, ILogger<TuPayProcessor> logger)
+	public MalakiPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, MalakiPaySerializer malakiPaySerializer, ILogger<MalakiPayProcessor> logger)
 	{
 		if (jsonOptionsAccessor is null)
 			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
 
 		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
-		_tuPaySerializer = tuPaySerializer ?? throw new ArgumentNullException(nameof(tuPaySerializer));
+		_malakiPaySerializer = malakiPaySerializer ?? throw new ArgumentNullException(nameof(malakiPaySerializer));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<TuPayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<MalakiPayBankInfo>>(bankInfo, _jsonSerializerOptions);
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
 
@@ -36,12 +37,10 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 			bankInfo,
 			brandPayment.ExtendedData);
 
-		var settings = new TuPayWithdrawSettings(
+		var settings = new MalakiPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("merchant").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("secret").GetString(),
-			brandPaymentExtendedData.RootElement.TryGetProperty("bankName", out var bankElement)
-				? bankElement.GetString()
-				: withdrawBankInfo.Detail.BankName,
+			brandPaymentExtendedData.RootElement.GetProperty("bankName").GetString(),
 			withdrawBankInfo.Detail.SubBankName,
 			withdrawBankInfo.Detail.CardNo,
 			withdrawBankInfo.Detail.CardName,
@@ -50,6 +49,6 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 				? jsonElement.GetString()
 				: null);
 
-		return _tuPaySerializer.Serialize(settings);
+		return _malakiPaySerializer.Serialize(settings);
 	}
 }
