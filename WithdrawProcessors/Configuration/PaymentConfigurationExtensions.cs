@@ -2,6 +2,7 @@
 using Tgs.Payment.ApplePay;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.LeePay;
+using Tgs.Payment.MalakiPay;
 using Tgs.Payment.MaticPay;
 using Tgs.Payment.PrimePay;
 using Tgs.Payment.SkyPay;
@@ -25,7 +26,8 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<Help2PaySerializer>()
 			.AddSingleton<SkyPaySerializer>()
 			.AddSingleton<ZeroNineNinePaySerializer>()
-			.AddSingleton<TuPaySerializer>();
+			.AddSingleton<TuPaySerializer>()
+			.AddSingleton<MalakiPaySerializer>();
 
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
