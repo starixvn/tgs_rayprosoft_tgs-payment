@@ -161,7 +161,7 @@ public class WithdrawController : ControllerBase
 		[FromQuery] WithdrawFormQueryViewModel formQuery,
 		[FromQuery] PagingViewModel paging)
 	{
-		_logger.LogInformation($"Query WithdrawForms Request => {JsonSerializer.Serialize(formQuery)}");
+		_logger.LogInformation("Query WithdrawForms Request => {JsonSerializer.Serialize(formQuery)}", JsonSerializer.Serialize(formQuery));
 
 		var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 		var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;

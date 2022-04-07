@@ -5,7 +5,7 @@ using Tgs.Payment.PrimePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-public class PrimePayProcessor : IWithdrawProcessor
+internal class PrimePayProcessor : IWithdrawProcessor
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly PrimePaySerializer _primePaySerializer;

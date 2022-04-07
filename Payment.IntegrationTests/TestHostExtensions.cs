@@ -13,7 +13,7 @@ internal static class TestHostExtensions
 			{
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 				Converters = {
-						new JsonStringEnumConverter()
+					new JsonStringEnumConverter()
 				}
 			});
 }
