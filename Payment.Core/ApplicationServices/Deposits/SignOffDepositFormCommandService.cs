@@ -39,7 +39,7 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 				command.ReviewState,
 				command.ReviewUserId,
 				command.ReviewUserName,
-				command.Remark, 
+				command.Remark,
 				cancellationToken)
 			.ConfigureAwait(false);
 
