@@ -19,6 +19,7 @@ public record DepositFormInfo(
 	string? ThirdPartyOrderNo,
 	string? OrderNo,
 	string? ReviewedUserName,
+	DateTimeOffset? ReviewedOn,
 	Guid? PromotionId,
 	int? PromotionPlayerId,
 	DateTimeOffset CreatedOn,
