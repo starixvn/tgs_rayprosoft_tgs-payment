@@ -88,8 +88,8 @@ internal class PaymentClient : IPaymentClient
 
 		var requestEx = new FormEventEx
 		{
-			FormId = formId.ToString(),
-			BrandId = brandId.ToString(),
+			FormId = formId,
+			BrandId = brandId,
 			Status = status
 		};
 
@@ -120,9 +120,9 @@ internal class PaymentClient : IPaymentClient
 
 		var requestEx = new FormEventEx
 		{
-			FormId = formId.ToString(),
-			BrandId = brandId.ToString(),
-			Status = status
+			FormId = formId,
+			BrandId = brandId,
+			Status = status ?? string.Empty
 		};
 
 		await Task.WhenAll(
