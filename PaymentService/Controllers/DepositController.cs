@@ -82,7 +82,8 @@ public class DepositController : ControllerBase
 				ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
 				OrderNo = formData.OrderNo,
 				PromotionPlayerId = formData.PromotionPlayerId,
-				ReviewedUserName = formData.ReviewedUserName
+				ReviewedUserName = formData.ReviewedUserName,
+				ReviewedOn = formData.ReviewedOn
 			}
 			: null;
 	}
@@ -118,7 +119,8 @@ public class DepositController : ControllerBase
 				ThirdPartyOrderNo = formData.ThirdPartyOrderNo,
 				OrderNo = formData.OrderNo,
 				PromotionPlayerId = formData.PromotionPlayerId,
-				ReviewedUserName = formData.ReviewedUserName
+				ReviewedUserName = formData.ReviewedUserName,
+				ReviewedOn = formData.ReviewedOn
 			}
 			: null;
 	}
@@ -152,9 +154,9 @@ public class DepositController : ControllerBase
 			null,
 			null,
 			new[] {
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Init,
-					PaymentFlowState.WaitPayment
+				PaymentFlowState.WaitApprove,
+				PaymentFlowState.Init,
+				PaymentFlowState.WaitPayment
 			},
 			null,
 			(Begin: currentDate.AddDays(-1D), End: currentDate),
@@ -245,6 +247,7 @@ public class DepositController : ControllerBase
 				ThirdPartyOrderNo = row.ThirdPartyOrderNo,
 				OrderNo = row.OrderNo,
 				ReviewedUserName = row.ReviewedUserName,
+				ReviewedOn = row.ReviewedOn,
 				PromotionPlayerId = row.PromotionPlayerId
 			});
 

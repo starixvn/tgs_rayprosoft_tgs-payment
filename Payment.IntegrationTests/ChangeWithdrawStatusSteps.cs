@@ -22,10 +22,7 @@ public class ChangeWithdrawStatusSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"I have a withdraw form")]
 	public async Task GivenIHaveAWithdrawFormAsync()

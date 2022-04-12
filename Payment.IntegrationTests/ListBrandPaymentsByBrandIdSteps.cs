@@ -19,10 +19,7 @@ public class ListBrandPaymentsByBrandIdSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"brand id is \{(.*)}")]
 	public void GivenBrandIdIs(Guid brandId)

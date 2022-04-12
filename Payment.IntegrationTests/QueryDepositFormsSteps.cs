@@ -19,10 +19,7 @@ public class QueryDepositFormsSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"I Query deposit forms")]
 	public void GivenIQueryDepositForms()
