@@ -44,7 +44,11 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 			.ConfigureAwait(false);
 
 		await _paymentClient
-			.EmitDepositFormStatusChangedEventAsync(formData.Id, formData.BrandId, formStatus.ToString())
+			.EmitDepositFormStatusChangedEventAsync(
+				formData.Id,
+				formData.BrandId,
+				formStatus.ToString(),
+				cancellationToken)
 			.ConfigureAwait(false);
 	}
 }
