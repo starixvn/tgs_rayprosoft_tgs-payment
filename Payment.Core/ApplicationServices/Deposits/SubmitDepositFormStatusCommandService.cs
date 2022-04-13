@@ -43,7 +43,11 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 
 		if (originStatus != command.Status)
 			await _paymentClient
-				.EmitDepositFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
+				.EmitDepositFormStatusChangedEventAsync(
+					command.FormId,
+					formData.BrandId,
+					originStatus.ToString(),
+					cancellationToken)
 				.ConfigureAwait(false);
 	}
 }

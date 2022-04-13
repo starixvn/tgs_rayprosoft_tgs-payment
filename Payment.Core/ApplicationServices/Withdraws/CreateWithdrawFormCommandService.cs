@@ -88,7 +88,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 			.ConfigureAwait(false);
 
 		await _paymentClient
-			.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
+			.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
 		return createFormId;
@@ -132,7 +132,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 			.ConfigureAwait(false);
 
 		await _paymentClient
-			.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId)
+			.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
 		return createFormId;
