@@ -9,7 +9,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_Create_Form_Should_Transit_To_WaitPayment()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine();
 
@@ -21,7 +21,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_State_Is_Init_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine(PaymentFlowState.Init);
 
@@ -33,7 +33,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_State_Is_WaitApprove_When_Approve_Should_Transit_To_Approved()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine(PaymentFlowState.WaitApprove);
 
@@ -45,7 +45,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_State_Is_WaitApprove_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine(PaymentFlowState.WaitApprove);
 
@@ -57,7 +57,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_State_Is_WaitPayment_When_Payment_Callback_Should_Transit_To_WaitApprove()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine(PaymentFlowState.WaitPayment);
 
@@ -69,7 +69,7 @@ public class DepositStateMachineTests
 	[Test]
 	public void Deposit_State_Is_WaitPayment_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateDepositStateMachine(PaymentFlowState.WaitPayment);
 

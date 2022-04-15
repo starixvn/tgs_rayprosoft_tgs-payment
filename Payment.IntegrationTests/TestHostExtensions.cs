@@ -8,12 +8,5 @@ internal static class TestHostExtensions
 {
 	public static PaymentServiceClient GetPaymentServiceClient(this TestPaymentApplication web)
 		=> new(
-			web.CreateClient(),
-			new JsonSerializerOptions
-			{
-				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-				Converters = {
-					new JsonStringEnumConverter()
-				}
-			});
+			web.CreateClient());
 }

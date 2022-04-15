@@ -9,7 +9,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_Create_Form_Should_Transit_To_WaitApprove()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine();
 
@@ -21,7 +21,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_State_Is_Init_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine();
 
@@ -33,7 +33,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_State_Is_WaitApprove_When_Approve_Should_Transit_To_Approved()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine(PaymentFlowState.WaitApprove);
 
@@ -45,7 +45,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_State_Is_WaitApprove_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine(PaymentFlowState.WaitApprove);
 
@@ -57,7 +57,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_State_Is_Approved_When_Payment_Callback_Should_Transit_To_Paid()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine(PaymentFlowState.Approved);
 
@@ -69,7 +69,7 @@ public class WithdrawStateMachineTests
 	[Test]
 	public void Withdraw_State_Is_Approved_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateWithdrawStateMachine(PaymentFlowState.Approved);
 

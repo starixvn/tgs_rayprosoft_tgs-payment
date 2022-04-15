@@ -9,7 +9,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_Create_Form_Should_Transit_To_WaitPayment()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine();
 
@@ -21,7 +21,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_Init_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine(PaymentFlowState.Init);
 
@@ -33,7 +33,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_WaitApprove_When_Approve_Should_Transit_To_Approved()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine(PaymentFlowState.WaitApprove);
 
@@ -45,7 +45,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_WaitApprove_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine(PaymentFlowState.WaitApprove);
 
@@ -57,7 +57,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_WaitPayment_Can_Not_Approve()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine();
 
@@ -67,7 +67,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_WaitPayment_Upload_CertificateFile_Should_Transit_To_WaitApprove()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine(PaymentFlowState.WaitPayment);
 
@@ -79,7 +79,7 @@ public class ManualDepositStateMachineTests
 	[Test]
 	public void ManualDeposit_State_Is_WaitPayment_When_Reject_Should_Transit_To_Reject()
 	{
-		var client = new PaymentServiceClient(new HttpClient(), null);
+		var client = new PaymentServiceClient(new HttpClient());
 
 		var sut = client.CreateManualDepositStateMachine(PaymentFlowState.WaitPayment);
 
