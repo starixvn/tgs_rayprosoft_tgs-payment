@@ -45,8 +45,8 @@ message FormEvent {
 }
 
 message FormEventEx {
-	string form_id = 1;
-	string brand_id = 2;
+	phoenix.protobuf.GuidValue form_id = 1;
+	phoenix.protobuf.GuidValue brand_id = 2;
 	string status = 3;
 }
 

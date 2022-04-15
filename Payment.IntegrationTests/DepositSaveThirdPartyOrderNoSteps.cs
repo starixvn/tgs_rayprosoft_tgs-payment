@@ -10,9 +10,9 @@ namespace Payment.IntegrationTests;
 [Scope(Scenario = "Save thirdparty order no to deposit form")]
 public class DepositSaveThirdPartyOrderNoSteps
 {
-	private Guid _formId;
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
+	private Guid _formId;
 	private string _thirdPartyOrderNo;
 
 	public DepositSaveThirdPartyOrderNoSteps()
@@ -23,10 +23,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"I get thirdparty order no ""(.*)""")]
 	public void GivenIGetThirdpartyOrderNo(string thirdPartyOrderNo)
@@ -96,6 +93,8 @@ public class DepositSaveThirdPartyOrderNoSteps
 
 		_ = await dbContext.SaveChangesAsync();
 
-		await _paymentServiceClient.SubmitDepositFormThirdPartyOrderNoAsync(_formId, _thirdPartyOrderNo);
+		var form = await _paymentServiceClient.GetDepositFormAsync(_formId);
+
+		await _paymentServiceClient.SubmitDepositFormStatusAsync(_formId, form.Status, thirdPartyOrderNo: _thirdPartyOrderNo);
 	}
 }

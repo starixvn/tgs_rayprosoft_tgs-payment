@@ -44,7 +44,11 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 
 		if (originStatus != command.Status)
 			await _paymentClient
-				.EmitWithdrawFormStatusChangedEventAsync(command.FormId, formData.BrandId, originStatus.ToString())
+				.EmitWithdrawFormStatusChangedEventAsync(
+					command.FormId,
+					formData.BrandId,
+					originStatus.ToString(),
+					cancellationToken)
 				.ConfigureAwait(false);
 	}
 }

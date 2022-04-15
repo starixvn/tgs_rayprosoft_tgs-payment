@@ -23,10 +23,7 @@ public class DeleteAgentBankInfoSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"agentId is \{(.*)}")]
 	public void GivenAgentIdIs(Guid agentId)
