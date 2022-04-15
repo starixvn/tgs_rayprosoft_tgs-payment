@@ -2,6 +2,7 @@
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Web;
 using Stateless;
 
@@ -9,13 +10,20 @@ namespace Tgs.Payment.Clients;
 
 internal class PaymentServiceClient : IPaymentServiceClient
 {
-	private readonly HttpClient _httpClient;
-	private readonly JsonSerializerOptions? _serializerOptions;
+	private static readonly JsonSerializerOptions _SerializerOptions = new()
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+		WriteIndented = true,
+		Converters = {
+			new JsonStringEnumConverter()
+		}
+	};
 
-	public PaymentServiceClient(HttpClient httpClient, JsonSerializerOptions? serializerOptions)
+	private readonly HttpClient _httpClient;
+
+	public PaymentServiceClient(HttpClient httpClient)
 	{
 		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-		_serializerOptions = serializerOptions;
 	}
 
 	public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -30,7 +38,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<int>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<int>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -45,7 +53,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<int>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<int>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<Guid> CreateAgentBankInfoAsync(
@@ -56,7 +64,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(info, _serializerOptions));
+			JsonSerializer.Serialize(info, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -73,13 +81,13 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(createInfo, _serializerOptions));
+			JsonSerializer.Serialize(createInfo, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -93,7 +101,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
 	}
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
@@ -137,7 +145,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(createInfo, _serializerOptions));
+			JsonSerializer.Serialize(createInfo, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -151,7 +159,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	public async ValueTask CreatePaymentChannelAsync(string channelCode, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(channelCode, _serializerOptions));
+			JsonSerializer.Serialize(channelCode, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -165,7 +173,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	public async ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(createInfo, _serializerOptions));
+			JsonSerializer.Serialize(createInfo, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -183,7 +191,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(info, _serializerOptions));
+			JsonSerializer.Serialize(info, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -197,13 +205,13 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(createInfo, _serializerOptions));
+			JsonSerializer.Serialize(createInfo, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -217,7 +225,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<Guid>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
 	}
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
@@ -271,7 +279,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var bankInfos = JsonSerializer.Deserialize<AgentBankInfo[]>(contentJson, _serializerOptions);
+		var bankInfos = JsonSerializer.Deserialize<AgentBankInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var bankInfo in bankInfos!)
 			yield return bankInfo;
@@ -290,7 +298,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var paymentChannels = JsonSerializer.Deserialize<PaymentChannelInfo[]>(contentJson, _serializerOptions);
+		var paymentChannels = JsonSerializer.Deserialize<PaymentChannelInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var pc in paymentChannels!)
 			yield return pc;
@@ -309,7 +317,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var pmcs = JsonSerializer.Deserialize<PaymentMethodChannelInfo[]>(contentJson, _serializerOptions);
+		var pmcs = JsonSerializer.Deserialize<PaymentMethodChannelInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var pmc in pmcs!)
 			yield return pmc;
@@ -330,7 +338,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		var paymentMethods = JsonSerializer.Deserialize<PaymentMethodInfo[]>(
 			  contentJson,
-			  _serializerOptions);
+			  _SerializerOptions);
 
 		foreach (var pm in paymentMethods!)
 			yield return pm;
@@ -349,7 +357,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var payments = JsonSerializer.Deserialize<PaymentInfo[]>(contentJson, _serializerOptions);
+		var payments = JsonSerializer.Deserialize<PaymentInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var payment in payments!)
 			yield return payment;
@@ -373,7 +381,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var acls = JsonSerializer.Deserialize<BrandPaymentAcl[]>(contentJson, _serializerOptions);
+		var acls = JsonSerializer.Deserialize<BrandPaymentAcl[]>(contentJson, _SerializerOptions);
 
 		foreach (var acl in acls!)
 			yield return acl;
@@ -391,7 +399,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(
@@ -408,7 +416,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _serializerOptions);
+		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var bp in brandPayments!)
 			yield return bp;
@@ -431,7 +439,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var vips = JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _serializerOptions);
+		var vips = JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _SerializerOptions);
 
 		foreach (var vip in vips!)
 			yield return vip;
@@ -449,7 +457,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default)
@@ -467,7 +475,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default)
@@ -482,7 +490,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<PaymentInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<PaymentInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(
@@ -497,7 +505,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-		var bankInfos = JsonSerializer.Deserialize<PlayerBankInfo[]>(contentJson, _serializerOptions);
+		var bankInfos = JsonSerializer.Deserialize<PlayerBankInfo[]>(contentJson, _SerializerOptions);
 
 		foreach (var bankInfo in bankInfos!)
 			yield return bankInfo;
@@ -515,7 +523,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default)
@@ -533,7 +541,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _serializerOptions);
+		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
@@ -608,7 +616,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<DepositForms>(contentJson, _serializerOptions)!;
+		return JsonSerializer.Deserialize<DepositForms>(contentJson, _SerializerOptions)!;
 	}
 
 	public async ValueTask<WithdrawForms> QueryWithdrawFormsAsync(
@@ -698,7 +706,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _serializerOptions)!;
+		return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _SerializerOptions)!;
 	}
 
 	public async ValueTask ReviewDepositFormAsync(
@@ -718,7 +726,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		};
 
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(request, _serializerOptions));
+			JsonSerializer.Serialize(request, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -748,7 +756,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		};
 
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(request, _serializerOptions));
+			JsonSerializer.Serialize(request, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -778,7 +786,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		};
 
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(request, _serializerOptions));
+			JsonSerializer.Serialize(request, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
@@ -810,7 +818,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		};
 
 		var requestContent = new StringContent(
-			JsonSerializer.Serialize(request, _serializerOptions));
+			JsonSerializer.Serialize(request, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
