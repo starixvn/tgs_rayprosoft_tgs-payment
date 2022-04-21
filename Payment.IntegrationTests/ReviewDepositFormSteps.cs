@@ -22,10 +22,7 @@ public class ReviewDepositFormSteps
 	}
 
 	[AfterScenario]
-	public async Task CleanUpAsync()
-	{
-		await _testHost.DisposeAsync();
-	}
+	public void CleanUpAsync() => _testHost.DisposeAsync();
 
 	[Given(@"I review a deposit form")]
 	public async Task GivenIReviewADepositFormAsync()

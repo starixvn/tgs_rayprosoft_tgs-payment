@@ -12,11 +12,7 @@ public static class ServiceCollectionExtensions
 			.AddOptions<PaymentServiceClientOptions>()
 			.Configure(configure)
 			.Services
-			.AddHttpClient<PaymentServiceClient, PaymentServiceClient>(
-				(httpClient, sp) => ActivatorUtilities.CreateInstance<PaymentServiceClient>(
-					sp,
-					httpClient,
-					sp.GetRequiredService<IOptions<PaymentServiceClientOptions>>().Value.JsonSerializerOptions!))
+			.AddHttpClient<PaymentServiceClient>()
 			.ConfigureHttpClient((sp, httpClient) =>
 			{
 				var options = sp.GetRequiredService<IOptions<PaymentServiceClientOptions>>().Value;

@@ -47,7 +47,7 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 			.ConfigureAwait(false);
 
 		await _paymentClient
-			.EmitDepositFormCreatedEventAsync(command.FormId, command.CreateInfo.BrandId)
+			.EmitDepositFormCreatedEventAsync(command.FormId, command.CreateInfo.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 	}
 }

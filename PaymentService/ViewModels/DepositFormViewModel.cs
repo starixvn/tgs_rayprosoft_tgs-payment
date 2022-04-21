@@ -32,6 +32,8 @@ public class DepositFormViewModel
 
 	public string? Remark { get; set; }
 
+	public DateTimeOffset? ReviewedOn { get; set; }
+
 	public string? ReviewedUserName { get; set; }
 
 	public PaymentFlowState Status { get; set; }

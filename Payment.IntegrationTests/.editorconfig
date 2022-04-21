@@ -3,3 +3,6 @@
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 [*.cs]
 dotnet_diagnostic.CA1822.severity=silent
+
+# CA2012: ¥¿½T¨Ï¥Î ValueTasks
+dotnet_diagnostic.CA2012.severity = silent

@@ -4,76 +4,83 @@ namespace Tgs.Payment.Clients;
 
 public interface IPaymentServiceClient
 {
-	ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId);
+	ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId);
+	ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	ValueTask<Guid> CreateAgentBankInfoAsync(Guid brandId, Guid agentId, string agentName, BankCreateInfo info);
+	ValueTask<Guid> CreateAgentBankInfoAsync(
+		Guid brandId,
+		Guid agentId,
+		string agentName,
+		BankCreateInfo info,
+		CancellationToken cancellationToken = default);
 
-	ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo);
+	ValueTask<Guid> CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo createInfo, CancellationToken cancellationToken = default);
 
 	StateMachine<PaymentFlowState, PaymentTrigger> CreateDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
 	StateMachine<PaymentFlowState, PaymentTrigger> CreateManualDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
-	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo);
+	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default);
 
-	ValueTask CreatePaymentChannelAsync(string channelCode);
+	ValueTask CreatePaymentChannelAsync(string channelCode, CancellationToken cancellationToken = default);
 
-	ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo);
+	ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo, CancellationToken cancellationToken = default);
 
-	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info);
+	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info, CancellationToken cancellationToken = default);
 
-	ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo);
+	ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default);
 
 	StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);
 
-	ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId);
+	ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId, CancellationToken cancellationToken = default);
 
-	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId);
+	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId);
+	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync();
+	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync();
+	IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync(CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync();
+	IAsyncEnumerable<PaymentMethodInfo> GetAllPaymentMethodsAsync(CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync();
+	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
 		string playerCode,
-		IEnumerable<Guid> brandPaymentIds);
+		IEnumerable<Guid> brandPaymentIds,
+		CancellationToken cancellationToken = default);
 
-	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId);
+	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId);
+	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds);
+	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId);
+	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId);
+	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default);
 
-	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId);
+	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode);
+	IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode, CancellationToken cancellationToken = default);
 
-	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId);
+	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
-	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId);
+	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging);
+	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 
-	ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging);
+	ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 
 	ValueTask ReviewDepositFormAsync(
 		Guid formId,
 		ReviewState state,
 		string? reviewUserId,
 		string? reviewUserName,
-		string? remark = null);
+		string? remark = null,
+		CancellationToken cancellationToken = default);
 
 	ValueTask ReviewWithdrawFormAsync(
 		Guid formId,
@@ -81,7 +88,8 @@ public interface IPaymentServiceClient
 		ReviewState state,
 		string? reviewUserId,
 		string? reviewUserName,
-		string? remark = null);
+		string? remark = null,
+		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitDepositFormStatusAsync(
 		Guid formId,
@@ -89,10 +97,8 @@ public interface IPaymentServiceClient
 		string? paymentReturn = null,
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
-		int? promotionPlayerId = null);
-
-	[Obsolete("This method already obsolete, alternative use SubmitDepositFormStatusAsync")]
-	ValueTask SubmitDepositFormThirdPartyOrderNoAsync(Guid formId, string? ThirdPartyOrderNo);
+		int? promotionPlayerId = null,
+		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitWithdrawFormStatusAsync(
 		Guid formId,
@@ -101,5 +107,6 @@ public interface IPaymentServiceClient
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
 		string? paidUserId = null,
-		string? paidUserName = null);
+		string? paidUserName = null,
+		CancellationToken cancellationToken = default);
 }

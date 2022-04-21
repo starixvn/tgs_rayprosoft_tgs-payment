@@ -59,7 +59,11 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 				brandPayment);
 
 			var applyInfo = await _paymentClient
-				.WithdrawAsync(processor.Subject, formData.Amount, withdrawSettings)
+				.WithdrawAsync(
+					processor.Subject,
+					formData.Amount,
+					withdrawSettings,
+					cancellationToken)
 				.ConfigureAwait(false);
 
 			await _paymentRepository
@@ -95,7 +99,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		}
 
 		await _paymentClient
-			.EmitWithdrawFormStatusChangedEventAsync(formData.Id, formData.BrandId, formStatus.ToString())
+			.EmitWithdrawFormStatusChangedEventAsync(formData.Id, formData.BrandId, formStatus.ToString(), cancellationToken)
 			.ConfigureAwait(false);
 	}
 }
