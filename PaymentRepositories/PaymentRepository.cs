@@ -677,7 +677,8 @@ internal class PaymentRepository : IPaymentRepository
 			return;
 
 		formData.BrandPaymentId = brandPaymentId;
-		formData.ApplyInfo = applyInfo;
+		if (!string.IsNullOrEmpty(applyInfo))
+			formData.ApplyInfo = applyInfo;
 		formData.Status = (int)afterState;
 		formData.Remark = remark;
 		formData.UpdatedOn = DateTime.UtcNow;
