@@ -22,6 +22,8 @@ public class WithdrawFormInfo
 
 	public Guid Id { get; init; }
 
+	public string? Note { get; init; }
+
 	public string? OrderNo { get; init; }
 
 	public DateTimeOffset? PaidOn { get; init; }
