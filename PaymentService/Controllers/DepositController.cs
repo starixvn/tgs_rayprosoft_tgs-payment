@@ -155,7 +155,6 @@ public class DepositController : ControllerBase
 			null,
 			new[] {
 				PaymentFlowState.WaitApprove,
-				PaymentFlowState.Init,
 				PaymentFlowState.WaitPayment
 			},
 			null,

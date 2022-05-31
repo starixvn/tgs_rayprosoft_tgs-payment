@@ -42,7 +42,7 @@ public class WithdrawController : ControllerBase
 			null,
 			null,
 			null,
-			new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
+			new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Approved },
 			null,
 			(Begin: currentDate.AddDays(-1D), End: currentDate),
 			null,
