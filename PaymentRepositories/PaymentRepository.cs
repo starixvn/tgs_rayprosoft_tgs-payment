@@ -196,7 +196,8 @@ internal class PaymentRepository : IPaymentRepository
 				Status = (int)form.Status,
 				CreatedOn = currentDate,
 				UpdatedOn = currentDate,
-				OrderNo = form.OrderNo
+				OrderNo = form.OrderNo,
+				Note = form.Note,
 			}, cancellationToken)
 			.ConfigureAwait(false);
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Tgs.Payment.Repositories.Entities.Configurations;
+#nullable enable
 
 #nullable disable
 
@@ -35,7 +36,8 @@ namespace Tgs.Payment.Repositories.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresExtension("pg_trgm")
+            modelBuilder.HasPostgresExtension("ltree")
+                .HasPostgresExtension("pg_trgm")
                 .HasAnnotation("Relational:Collation", "en_US.utf8");
 
             modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
