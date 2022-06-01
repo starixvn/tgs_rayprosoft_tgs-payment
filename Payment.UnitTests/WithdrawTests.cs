@@ -127,7 +127,7 @@ public class WithdrawTests
 			brandId,
 			Guid.NewGuid(),
 			1000M,
-			null);
+			"ThisIsPlayerNote");
 
 		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
 			.Returns(new BrandInfo("GPI"));
@@ -185,11 +185,20 @@ public class WithdrawTests
 				  DateTimeOffset.Now,
 				  null,
 				  null,
-				  null));
+				  null,
+				  Guid.NewGuid(),
+				  "ChannelName",
+				  Guid.NewGuid(),
+				  "BankInfo",
+				  null,
+				  null,
+				  null,
+				  "PlayerNote"));
 
 		var actual = await sut.GetAsync(query);
 
 		Assert.IsNotNull(actual);
+		Assert.AreEqual("PlayerNote", actual.Note);
 	}
 
 	[Test]
@@ -221,12 +230,19 @@ public class WithdrawTests
 				  null,
 				  null,
 				  null,
+				  Guid.NewGuid(),
+				  "ChannelName",
+				  Guid.NewGuid(),
+				  "BankInfo",
 				  null,
-				  null));
+				  null,
+				  null,
+				  "PlayerNote"));
 
 		var actual = await sut.GetAsync(query);
 
 		Assert.IsNotNull(actual);
+		Assert.AreEqual("PlayerNote", actual.Note);
 	}
 
 	[Test]
