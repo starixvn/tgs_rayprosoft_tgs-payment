@@ -63,7 +63,8 @@ public class WithdrawController : ControllerBase
 			request.UserType,
 			request.BrandId,
 			request.BankInfoId,
-			request.Amount);
+			request.Amount,
+			request.Note);
 
 		await createService.ExecuteAsync(command).ConfigureAwait(false);
 
