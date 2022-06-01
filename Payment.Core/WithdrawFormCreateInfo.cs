@@ -15,4 +15,5 @@ public record WithdrawFormCreateInfo(
 	Guid? BrandPaymentId = null,
 	string? ApplyInfo = null,
 	string? PaymentReturn = null,
-	string? OrderNo = null);
+	string? OrderNo = null,
+	string? Note = null);

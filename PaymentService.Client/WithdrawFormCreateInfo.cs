@@ -8,6 +8,8 @@ public class WithdrawFormCreateInfo
 
 	public Guid BrandId { get; init; }
 
+	public string? Note { get; init; }
+
 	public string? UserId { get; init; }
 
 	public string? UserName { get; init; }

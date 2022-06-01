@@ -13,4 +13,6 @@ public class CreateWithdrawFormViewModel
 	public string? UserName { get; set; }
 
 	public UserType UserType { get; set; }
+
+	public string? Note { get; set; }
 }

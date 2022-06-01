@@ -27,4 +27,5 @@ public record WithdrawFormInfo(
 	string? BankInfo = null,
 	string? ApplyInfo = null,
 	string? PaymentReturn = null,
-	string? ThirdPartyOrderNo = null);
+	string? ThirdPartyOrderNo = null,
+	string? Note = null);

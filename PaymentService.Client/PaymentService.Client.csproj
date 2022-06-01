@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 		<RootNamespace>Tgs.Payment.Clients</RootNamespace>
 		<Nullable>enable</Nullable>
 		<PackageId>Tgs.PaymentService.Client</PackageId>
 		<Product>Tgs.PaymentService.Client</Product>
 		<Authors>Raypro</Authors>
-		<Version>0.4.0</Version>
+		<Version>0.4.1</Version>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
