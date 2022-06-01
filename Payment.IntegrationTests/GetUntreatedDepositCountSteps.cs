@@ -34,7 +34,7 @@ public class GetUntreatedDepositCountSteps
 	[Then(@"return form count")]
 	public void ThenReturnFormCount()
 	{
-		Assert.AreEqual(3, _actual);
+		Assert.AreEqual(2, _actual);
 	}
 
 	[When(@"call api")]
