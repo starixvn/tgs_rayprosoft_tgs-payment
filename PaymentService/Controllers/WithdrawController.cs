@@ -108,7 +108,8 @@ public class WithdrawController : ControllerBase
 				ReviewedUserName = formData.ReviewedUserName,
 				PaidUserName = formData.PaidUserName,
 				PaidUserId = formData.PaidUserId,
-				PaidOn = formData.PaidOn
+				PaidOn = formData.PaidOn,
+				Note = formData.Note
 			}
 			: null;
 	}
@@ -148,7 +149,8 @@ public class WithdrawController : ControllerBase
 				OrderNo = formData.OrderNo,
 				PaidOn = formData.PaidOn,
 				PaidUserName = formData.PaidUserName,
-				PaidUserId = formData.PaidUserId
+				PaidUserId = formData.PaidUserId,
+				Note = formData.Note
 			}
 			: null;
 	}
