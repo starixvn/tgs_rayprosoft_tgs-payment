@@ -9,7 +9,8 @@ public record CreateWithdrawFormCommand(
 	UserType UserType,
 	Guid BrandId,
 	Guid BankInfoId,
-	decimal Amount)
+	decimal Amount,
+	string? Note)
 {
 	public TaskCompletionSource<Guid> ReturnFormIdSource { get; } = new TaskCompletionSource<Guid>();
 }

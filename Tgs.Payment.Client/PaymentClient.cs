@@ -134,6 +134,20 @@ internal class PaymentClient : IPaymentClient
 			.ConfigureAwait(false);
 	}
 
+	public ValueTask PaidWithdrawAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var request = new PaidWithdrawRequest
+		{
+			FormId = formId,
+			BrandId = brandId
+		};
+
+		return _messageSender.SendAsync(
+			"tgs.payment.withdraw.paid_ex",
+			request.ToByteArray(),
+			cancellationToken: cancellationToken);
+	}
+
 	public ValueTask RejectDepositAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var request = new RejectDepositRequest

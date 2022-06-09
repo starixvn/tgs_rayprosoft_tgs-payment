@@ -42,11 +42,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.players",
+         "Name": "dbo.brand_payment_vip_levels",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.brand_payment_vip_levels",
+         "Name": "dbo.players",
          "ObjectType": 0
       },
       {
@@ -70,14 +70,16 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": ".tgs",
+   "UiHint": "LocalDB",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
    "UseFluentApiOnly": true,
    "UseHandleBars": false,
+   "UseHierarchyId": false,
    "UseInflector": true,
    "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
    "UseNoConstructor": false,
    "UseNoDefaultConstructor": false,
    "UseNoNavigations": false,

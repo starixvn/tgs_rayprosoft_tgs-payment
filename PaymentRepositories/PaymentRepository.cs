@@ -196,7 +196,8 @@ internal class PaymentRepository : IPaymentRepository
 				Status = (int)form.Status,
 				CreatedOn = currentDate,
 				UpdatedOn = currentDate,
-				OrderNo = form.OrderNo
+				OrderNo = form.OrderNo,
+				Note = form.Note,
 			}, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -482,37 +483,38 @@ internal class PaymentRepository : IPaymentRepository
 
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
-		var query = from df in _tgsContext.WithdrawForms
+		var query = from wf in _tgsContext.WithdrawForms
 						.Include(f => f.BrandPayment!)
 						.ThenInclude(bp => bp.PaymentMethodChannel)
 						.AsQueryable()
-					where df.Id == formId
+					where wf.Id == formId
 					select new WithdrawFormInfo(
-						df.Id,
-						df.UserId,
-						(UserType)df.UserType,
-						df.UserName,
-						df.BrandId,
-						df.Amount,
-						df.ActualAmount,
-						(PaymentFlowState)df.Status,
-						df.Remark,
-						df.ReviewedUserName,
-						df.ReviewedOn,
-						df.OrderNo,
-						df.BankInfoId,
-						df.CreatedOn,
-						df.UpdatedOn,
-						df.PaidUserId,
-						df.PaidUserName,
-						df.PaidOn,
-						df.BrandPaymentId,
-						df.BrandPayment!.ChannelName,
-						df.BrandPayment.PaymentMethodChannel.MethodId,
-						df.BankInfo,
-						df.ApplyInfo,
-						df.PaymentReturn,
-						df.ThirdPartyOrderNo);
+						wf.Id,
+						wf.UserId,
+						(UserType)wf.UserType,
+						wf.UserName,
+						wf.BrandId,
+						wf.Amount,
+						wf.ActualAmount,
+						(PaymentFlowState)wf.Status,
+						wf.Remark,
+						wf.ReviewedUserName,
+						wf.ReviewedOn,
+						wf.OrderNo,
+						wf.BankInfoId,
+						wf.CreatedOn,
+						wf.UpdatedOn,
+						wf.PaidUserId,
+						wf.PaidUserName,
+						wf.PaidOn,
+						wf.BrandPaymentId,
+						wf.BrandPayment!.ChannelName,
+						wf.BrandPayment.PaymentMethodChannel.MethodId,
+						wf.BankInfo,
+						wf.ApplyInfo,
+						wf.PaymentReturn,
+						wf.ThirdPartyOrderNo,
+						wf.Note);
 
 		return await query.SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 	}
@@ -586,7 +588,8 @@ internal class PaymentRepository : IPaymentRepository
 				form.BankInfo,
 				form.ApplyInfo,
 				form.PaymentReturn,
-				form.ThirdPartyOrderNo))
+				form.ThirdPartyOrderNo,
+				form.Note))
 			.ToAsyncEnumerable();
 
 		dataQuery = dataQuery.ApplyOrderBy(paging);
@@ -627,7 +630,8 @@ internal class PaymentRepository : IPaymentRepository
 				form.BankInfo,
 				form.ApplyInfo,
 				form.PaymentReturn,
-				form.ThirdPartyOrderNo))
+				form.ThirdPartyOrderNo,
+				form.Note))
 			.ToAsyncEnumerable();
 	}
 

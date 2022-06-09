@@ -42,7 +42,7 @@ public class WithdrawController : ControllerBase
 			null,
 			null,
 			null,
-			new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Init, PaymentFlowState.Approved },
+			new[] { PaymentFlowState.WaitApprove, PaymentFlowState.Approved },
 			null,
 			(Begin: currentDate.AddDays(-1D), End: currentDate),
 			null,
@@ -63,7 +63,8 @@ public class WithdrawController : ControllerBase
 			request.UserType,
 			request.BrandId,
 			request.BankInfoId,
-			request.Amount);
+			request.Amount,
+			request.Note);
 
 		await createService.ExecuteAsync(command).ConfigureAwait(false);
 
@@ -107,7 +108,8 @@ public class WithdrawController : ControllerBase
 				ReviewedUserName = formData.ReviewedUserName,
 				PaidUserName = formData.PaidUserName,
 				PaidUserId = formData.PaidUserId,
-				PaidOn = formData.PaidOn
+				PaidOn = formData.PaidOn,
+				Note = formData.Note
 			}
 			: null;
 	}
@@ -147,7 +149,8 @@ public class WithdrawController : ControllerBase
 				OrderNo = formData.OrderNo,
 				PaidOn = formData.PaidOn,
 				PaidUserName = formData.PaidUserName,
-				PaidUserId = formData.PaidUserId
+				PaidUserId = formData.PaidUserId,
+				Note = formData.Note
 			}
 			: null;
 	}
