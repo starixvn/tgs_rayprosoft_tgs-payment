@@ -90,6 +90,7 @@ internal class PaymentRepository : IPaymentRepository
 				PaymentChannelId = bankInfo.PaymentChannelId,
 				BankType = bankInfo.BankType,
 				Detail = bankInfo.Detail,
+				Default = bankInfo.IsDefault,
 				CreatedByUsername = modifyUser,
 				CreatedOn = createTime,
 				UpdatedByUsername = modifyUser,
@@ -295,7 +296,8 @@ internal class PaymentRepository : IPaymentRepository
 			bankInfo.BrandId,
 			bankInfo.PaymentChannelId,
 			bankInfo.BankType,
-			bankInfo.Detail!);
+			bankInfo.Detail!,
+			bankInfo.Default);
 	}
 
 	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
@@ -307,7 +309,8 @@ internal class PaymentRepository : IPaymentRepository
 				info.BrandId,
 				info.PaymentChannelId,
 				info.BankType,
-				info.Detail!))
+				info.Detail!,
+				info.Default))
 			.ToAsyncEnumerable();
 
 	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)

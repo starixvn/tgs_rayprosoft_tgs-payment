@@ -54,7 +54,8 @@ public class PlayerBankInfoController : ControllerBase
 				BankType = bankInfo.BankType,
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
-				Detail = JsonDocument.Parse(bankInfo.Detail)
+				Detail = JsonDocument.Parse(bankInfo.Detail),
+				IsDefault = bankInfo.IsDefault
 			});
 	}
 }
