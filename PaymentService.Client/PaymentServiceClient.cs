@@ -188,6 +188,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
+		string? modifyUser = null,
 		CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -195,31 +196,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
-		var response = await _httpClient
-			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
-	}
-
-	public async ValueTask<Guid> CreatePlayerBankInfoAsync(
-		Guid brandId,
-		string playerCode,
-		BankCreateInfo info,
-		string modifyUser,
-		CancellationToken cancellationToken = default)
-	{
-		var requestContent = new StringContent(
-			JsonSerializer.Serialize(info, _SerializerOptions));
-
-		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
-		requestContent.Headers.Add("ModifyUser", modifyUser);
+		if (!string.IsNullOrWhiteSpace(modifyUser))
+			requestContent.Headers.Add("ModifyUser", modifyUser);
 
 		var response = await _httpClient
 			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
