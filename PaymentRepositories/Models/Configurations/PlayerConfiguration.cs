@@ -49,6 +49,15 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.BetLimitId).HasColumnName("bet_limit_id");
 
+            entity.Property(e => e.Birthdate)
+                .HasColumnType("date")
+                .HasColumnName("birthdate");
+
+            entity.Property(e => e.Birthday)
+                .HasMaxLength(4)
+                .HasColumnName("birthday")
+                .HasComputedColumnSql("(lpad((EXTRACT(month FROM birthdate))::text, 2, '0'::text) || lpad((EXTRACT(day FROM birthdate))::text, 2, '0'::text))", true);
+
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
 
             entity.Property(e => e.DefaultWalletCurrencyCode)
@@ -65,6 +74,10 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.FirstDepositOn)
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("first_deposit_on");
+
+            entity.Property(e => e.FirstPromotionOn)
+                .HasColumnType("timestamp with time zone")
+                .HasColumnName("first_promotion_on");
 
             entity.Property(e => e.IdNumber)
                 .HasMaxLength(50)
@@ -97,6 +110,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.RegisteredOn)
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("registered_on");
+
+            entity.Property(e => e.Remark).HasColumnName("remark");
 
             entity.Property(e => e.Salt)
                 .IsRequired()

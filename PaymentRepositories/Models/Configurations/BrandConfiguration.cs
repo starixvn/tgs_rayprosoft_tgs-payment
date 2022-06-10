@@ -27,10 +27,18 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .ValueGeneratedNever()
                 .HasColumnName("id");
 
+            entity.Property(e => e.AgentDividendType).HasColumnName("agent_dividend_type");
+
             entity.Property(e => e.ApiKey)
                 .IsRequired()
                 .HasMaxLength(64)
                 .HasColumnName("api_key");
+
+            entity.Property(e => e.AutoClearWageringRequirement).HasColumnName("auto_clear_wagering_requirement");
+
+            entity.Property(e => e.AutoClearWageringRequirementBalance)
+                .HasPrecision(18, 6)
+                .HasColumnName("auto_clear_wagering_requirement_balance");
 
             entity.Property(e => e.AutoSentAgentBonus).HasColumnName("auto_sent_agent_bonus");
 
@@ -67,11 +75,21 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnName("current_settlement_to")
                 .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone");
 
+            entity.Property(e => e.DepositHandlingFeeRateTenPercentile).HasColumnName("deposit_handling_fee_rate_ten_percentile");
+
             entity.Property(e => e.Description)
                 .HasMaxLength(256)
                 .HasColumnName("description");
 
+            entity.Property(e => e.EnableAgentSms).HasColumnName("enable_agent_sms");
+
+            entity.Property(e => e.EnableEmailRegisterFlow).HasColumnName("enable_email_register_flow");
+
+            entity.Property(e => e.EnablePlayerIdentity).HasColumnName("enable_player_identity");
+
             entity.Property(e => e.EnableSms).HasColumnName("enable_sms");
+
+            entity.Property(e => e.EnableSmsRegisterFlow).HasColumnName("enable_sms_register_flow");
 
             entity.Property(e => e.LicenseeId).HasColumnName("licensee_id");
 
@@ -141,6 +159,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.UpdatedOn)
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_on");
+
+            entity.Property(e => e.WithdrawHandlingFeeRateTenPercentile).HasColumnName("withdraw_handling_fee_rate_ten_percentile");
 
             OnConfigurePartial(entity);
         }
