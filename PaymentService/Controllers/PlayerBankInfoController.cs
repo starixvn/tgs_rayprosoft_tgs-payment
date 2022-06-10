@@ -60,4 +60,13 @@ public class PlayerBankInfoController : ControllerBase
 				IsDefault = bankInfo.IsDefault
 			});
 	}
+
+	[HttpPatch("{playerCode}/{id}/default", Name = "SetDefaultPlayerBankInfo")]
+	public ValueTask SetDefaultPlayerBankInfoAsync(
+		[FromServices] ICommandService<SetDefaultPlayerBankInfoCommand> setService,
+		string playerCode,
+		Guid id,
+		[FromHeader(Name = "ModifyUser")] string modifyUser)
+		=> setService.ExecuteAsync(
+			new SetDefaultPlayerBankInfoCommand(playerCode, id, modifyUser));
 }

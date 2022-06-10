@@ -793,6 +793,22 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default)
+	{
+		var requestMessage = new HttpRequestMessage(HttpMethod.Patch, $"/bankinfo/player/{playerCode}/{bankInfoId}/default");
+		requestMessage.Headers.Add("ModifyUser", modifyUser);
+
+		var response = await _httpClient
+			.SendAsync(requestMessage, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	public async ValueTask SubmitDepositFormStatusAsync(
 		Guid formId,
 		PaymentFlowState? state,

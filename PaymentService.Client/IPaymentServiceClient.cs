@@ -93,6 +93,12 @@ public interface IPaymentServiceClient
 		string? remark = null,
 		CancellationToken cancellationToken = default);
 
+	ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default);
+
 	ValueTask SubmitDepositFormStatusAsync(
 		Guid formId,
 		PaymentFlowState? state = null,

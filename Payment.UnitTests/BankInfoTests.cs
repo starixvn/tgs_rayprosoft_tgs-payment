@@ -169,4 +169,26 @@ public class BankInfoTests
 		_ = fakePaymentRepository.Received(1)
 			.GetBankInfosByPlayerCodeAsync(Arg.Is(query.PlayerCode));
 	}
+
+	[Test]
+	public async Task Can_Set_Player_BankInfo_To_Default()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new SetDefaultPlayerBankInfoCommandService(fakePaymentRepository);
+
+		var command = new SetDefaultPlayerBankInfoCommand(
+			"ThisIsPlayerCode",
+			Guid.NewGuid(),
+			"ThisIsModifyUser");
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.SetDefaultPlayerBankInfoAsync(
+				Arg.Is(command.PlayerCode),
+				Arg.Is(command.BankInfoId),
+				Arg.Is(command.ModifyUser));
+	}
 }

@@ -638,6 +638,41 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
+	public async ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default)
+	{
+		var bankInfos = await _tgsContext.PlayerBankInfos
+			.Where(b => b.PlayerCode == playerCode)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var bankInfo = bankInfos.FirstOrDefault(b => b.Id == bankInfoId);
+		if (bankInfo == null || bankInfo.Default)
+			return;
+
+		var updateTime = DateTime.UtcNow;
+
+		var modifiedBankInfos = new List<Tgs.Payment.Repositories.Entities.PlayerBankInfo>();
+
+		foreach (var info in bankInfos)
+		{
+			if (info.Id != bankInfoId && !info.Default)
+				continue;
+
+			info.Default = info.Id == bankInfoId;
+			info.UpdatedOn = updateTime;
+			info.UpdatedByUsername = modifyUser;
+
+			modifiedBankInfos.Add(info);
+		}
+
+		_tgsContext.PlayerBankInfos.UpdateRange(modifiedBankInfos);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
 	public async ValueTask SignOffDepositFormAsync(
 		Guid formId,
 		ReviewState reviewStatus,
