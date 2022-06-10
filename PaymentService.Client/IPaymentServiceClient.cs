@@ -29,6 +29,8 @@ public interface IPaymentServiceClient
 
 	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info, CancellationToken cancellationToken = default);
 
+	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info, string modifyUser, CancellationToken cancellationToken = default);
+
 	ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default);
 
 	StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init);

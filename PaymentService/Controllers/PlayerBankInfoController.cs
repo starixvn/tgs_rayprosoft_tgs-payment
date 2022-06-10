@@ -17,14 +17,16 @@ public class PlayerBankInfoController : ControllerBase
 		[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
 		Guid brandId,
 		string playerCode,
-		[FromBody] CreateBankInfoViewModel request)
+		[FromBody] CreateBankInfoViewModel request,
+		[FromHeader(Name = "ModifyUser")] string? modifyUser)
 	{
 		var command = new CreatePlayerBankInfoCommand(
 			brandId,
 			playerCode,
 			request.PaymentChannelId,
 			request.BankType,
-			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions));
+			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions),
+			modifyUser ?? playerCode);
 
 		await createService.ExecuteAsync(command).ConfigureAwait(false);
 

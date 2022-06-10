@@ -13,6 +13,15 @@ Scenario: Create player bank info
 	When call create bank info api
 	Then the bank info created
 
+@CreateBankInfo
+Scenario: Create player bank info with modify user
+	Given I will create bank info
+	And playerCode is "4ucmqplxb029"
+	And modifyUser is "bo_admin"
+	And brandId is {07FF2BF7-49DC-4FEC-A776-A5F63B0FE992}
+	When call create bank info api with modify user
+	Then the bank info created
+
 @DeleteBankInfo
 Scenario: Delete player bank info
 	Given I will delete bank info

@@ -59,7 +59,8 @@ public class BankInfoTests
 			playerCode,
 			paymentChannelId,
 			bankType,
-			JsonSerializer.Serialize(detail));
+			JsonSerializer.Serialize(detail),
+			playerCode);
 
 		await sut.ExecuteAsync(command);
 
@@ -67,6 +68,40 @@ public class BankInfoTests
 			.CreateBankInfoAsync(
 				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
 				Arg.Is(playerCode));
+	}
+
+	[Test]
+	public async Task Can_Create_Player_BankInfo_With_Specified_ModifyUser()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository);
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "ThisIsPlayerCode";
+		var paymentChannelId = Guid.NewGuid();
+		var bankType = "Bank";
+		var detail = new
+		{
+			bankAccount = "1234567890"
+		};
+
+		var modifyUser = "ThisIsModifyUser";
+
+		var command = new CreatePlayerBankInfoCommand(
+			brandId,
+			playerCode,
+			paymentChannelId,
+			bankType,
+			JsonSerializer.Serialize(detail),
+			modifyUser);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateBankInfoAsync(
+				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
+				Arg.Is(modifyUser));
 	}
 
 	[Test]
