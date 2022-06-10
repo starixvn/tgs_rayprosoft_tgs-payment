@@ -15,6 +15,7 @@ public class PlayerBankInfoController : ControllerBase
 	public async Task<Guid> CreatePlayerBankInfoAsync(
 		[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
 		[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+		[FromHeader(Name = "ModifyUser")] string? modifyUser,
 		Guid brandId,
 		string playerCode,
 		[FromBody] CreateBankInfoViewModel request)
@@ -24,7 +25,9 @@ public class PlayerBankInfoController : ControllerBase
 			playerCode,
 			request.PaymentChannelId,
 			request.BankType,
-			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions));
+			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions),
+			request.IsDefault ?? false,
+			modifyUser ?? playerCode);
 
 		await createService.ExecuteAsync(command).ConfigureAwait(false);
 
@@ -54,7 +57,17 @@ public class PlayerBankInfoController : ControllerBase
 				BankType = bankInfo.BankType,
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
-				Detail = JsonDocument.Parse(bankInfo.Detail)
+				Detail = JsonDocument.Parse(bankInfo.Detail),
+				IsDefault = bankInfo.IsDefault
 			});
 	}
+
+	[HttpPatch("{playerCode}/{id}/default", Name = "SetDefaultPlayerBankInfo")]
+	public ValueTask SetDefaultPlayerBankInfoAsync(
+		[FromServices] ICommandService<SetDefaultPlayerBankInfoCommand> setService,
+		[FromHeader(Name = "ModifyUser")] string modifyUser,
+		string playerCode,
+		Guid id)
+		=> setService.ExecuteAsync(
+			new SetDefaultPlayerBankInfoCommand(playerCode, id, modifyUser));
 }

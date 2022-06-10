@@ -16,6 +16,7 @@ public class CreatePlayerBankInfoSteps
 	private BankCreateInfo _bankInfo;
 	private Guid _brandId;
 	private Guid _createdId;
+	private string _modifyUser;
 	private string _playerCode;
 
 	public CreatePlayerBankInfoSteps()
@@ -48,6 +49,12 @@ public class CreatePlayerBankInfoSteps
 		};
 	}
 
+	[Given(@"modifyUser is ""([^""]*)""")]
+	public void GivenModifyUserIs(string modifyUser)
+	{
+		_modifyUser = modifyUser;
+	}
+
 	[Given(@"playerCode is ""(.*)""")]
 	public void GivenPlayerCodeIs(string playerCode)
 	{
@@ -70,5 +77,12 @@ public class CreatePlayerBankInfoSteps
 	{
 		_createdId = await _paymentServiceClient
 			.CreatePlayerBankInfoAsync(_brandId, _playerCode, _bankInfo);
+	}
+
+	[When(@"call create bank info api with modify user")]
+	public async Task WhenCallCreateBankInfoApiWithModifyUser()
+	{
+		_createdId = await _paymentServiceClient
+			.CreatePlayerBankInfoAsync(_brandId, _playerCode, _bankInfo, _modifyUser);
 	}
 }

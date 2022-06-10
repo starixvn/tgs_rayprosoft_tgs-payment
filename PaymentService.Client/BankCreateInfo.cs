@@ -8,5 +8,7 @@ public class BankCreateInfo
 
 	public JsonDocument Detail { get; init; } = default!;
 
+	public bool? IsDefault { get; init; }
+
 	public Guid PaymentChannelId { get; init; }
 }

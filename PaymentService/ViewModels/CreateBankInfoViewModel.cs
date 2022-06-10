@@ -8,5 +8,7 @@ public class CreateBankInfoViewModel
 
 	public JsonDocument Detail { get; set; } = default!;
 
+	public bool? IsDefault { get; set; }
+
 	public Guid PaymentChannelId { get; set; }
 }

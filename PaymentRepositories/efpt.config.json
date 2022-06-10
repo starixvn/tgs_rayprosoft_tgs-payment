@@ -50,11 +50,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.brand_payment_players",
+         "Name": "dbo.player_bank_infos",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.player_bank_infos",
+         "Name": "dbo.brand_payment_players",
          "ObjectType": 0
       },
       {
@@ -70,7 +70,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "LocalDB",
+   "UiHint": "Tgs",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
