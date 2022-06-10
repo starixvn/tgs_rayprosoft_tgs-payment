@@ -60,6 +60,7 @@ public class BankInfoTests
 			paymentChannelId,
 			bankType,
 			JsonSerializer.Serialize(detail),
+			false,
 			playerCode);
 
 		await sut.ExecuteAsync(command);
@@ -94,6 +95,7 @@ public class BankInfoTests
 			paymentChannelId,
 			bankType,
 			JsonSerializer.Serialize(detail),
+			false,
 			modifyUser);
 
 		await sut.ExecuteAsync(command);

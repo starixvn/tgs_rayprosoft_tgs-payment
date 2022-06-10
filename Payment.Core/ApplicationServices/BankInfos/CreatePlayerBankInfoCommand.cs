@@ -9,6 +9,7 @@ public record CreatePlayerBankInfoCommand(
 	Guid PaymentChannelId,
 	string BankType,
 	string Detail,
+	bool IsDefault,
 	string ModifyUser)
 {
 	public TaskCompletionSource<Guid> TaskSource { get; } = new TaskCompletionSource<Guid>();

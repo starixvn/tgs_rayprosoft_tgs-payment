@@ -26,6 +26,7 @@ public class PlayerBankInfoController : ControllerBase
 			request.PaymentChannelId,
 			request.BankType,
 			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions),
+			request.IsDefault ?? false,
 			modifyUser ?? playerCode);
 
 		await createService.ExecuteAsync(command).ConfigureAwait(false);
