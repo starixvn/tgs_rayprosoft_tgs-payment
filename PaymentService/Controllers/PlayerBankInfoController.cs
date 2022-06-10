@@ -15,10 +15,10 @@ public class PlayerBankInfoController : ControllerBase
 	public async Task<Guid> CreatePlayerBankInfoAsync(
 		[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
 		[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+		[FromHeader(Name = "ModifyUser")] string? modifyUser,
 		Guid brandId,
 		string playerCode,
-		[FromBody] CreateBankInfoViewModel request,
-		[FromHeader(Name = "ModifyUser")] string? modifyUser)
+		[FromBody] CreateBankInfoViewModel request)
 	{
 		var command = new CreatePlayerBankInfoCommand(
 			brandId,
@@ -65,9 +65,9 @@ public class PlayerBankInfoController : ControllerBase
 	[HttpPatch("{playerCode}/{id}/default", Name = "SetDefaultPlayerBankInfo")]
 	public ValueTask SetDefaultPlayerBankInfoAsync(
 		[FromServices] ICommandService<SetDefaultPlayerBankInfoCommand> setService,
+		[FromHeader(Name = "ModifyUser")] string modifyUser,
 		string playerCode,
-		Guid id,
-		[FromHeader(Name = "ModifyUser")] string modifyUser)
+		Guid id)
 		=> setService.ExecuteAsync(
 			new SetDefaultPlayerBankInfoCommand(playerCode, id, modifyUser));
 }
