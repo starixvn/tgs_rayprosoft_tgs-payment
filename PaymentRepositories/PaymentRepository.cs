@@ -655,8 +655,6 @@ internal class PaymentRepository : IPaymentRepository
 
 		var updateTime = DateTime.UtcNow;
 
-		var modifiedBankInfos = new List<Tgs.Payment.Repositories.Entities.PlayerBankInfo>();
-
 		foreach (var info in bankInfos)
 		{
 			if (info.Id != bankInfoId && !info.Default)
@@ -665,11 +663,8 @@ internal class PaymentRepository : IPaymentRepository
 			info.Default = info.Id == bankInfoId;
 			info.UpdatedOn = updateTime;
 			info.UpdatedByUsername = modifyUser;
-
-			modifiedBankInfos.Add(info);
 		}
 
-		_tgsContext.PlayerBankInfos.UpdateRange(modifiedBankInfos);
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
