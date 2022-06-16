@@ -68,19 +68,84 @@ public class PaymentRepositoryTests
 
 		await sut.SetDefaultPlayerBankInfoAsync(playerCode, newDefaultBankInfo.Id, modifyUser);
 
-		var bankInfos = await dbContext.PlayerBankInfos
-			.Where(x => x.PlayerCode == playerCode)
-			.ToArrayAsync();
+		Assert.IsFalse(defaultBankInfo.Default);
+		Assert.IsTrue(newDefaultBankInfo.Default);
+	}
 
-		var actual1 = bankInfos.FirstOrDefault(x => x.Id == defaultBankInfo.Id);
+	[Test]
+	public async Task Can_Only_Set_One_Player_BankInfo_To_Default_With_Two_No_Default_Records()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
 
-		Assert.IsNotNull(actual1);
-		Assert.IsFalse(actual1.Default);
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
 
-		var actual2 = bankInfos.FirstOrDefault(x => x.Id == newDefaultBankInfo.Id);
+		var brandId = Guid.NewGuid();
+		var playerCode = "4ucmqplxb029";
+		var bankType = "Bank";
+		var modifyUser = "bo_admin";
 
-		Assert.IsNotNull(actual2);
-		Assert.IsTrue(actual2.Default);
+		var defaultBankInfo = new PlayerBankInfo
+		{
+			Id = Guid.NewGuid(),
+			PlayerCode = playerCode,
+			BrandId = brandId,
+			BankType = bankType,
+			PaymentChannelId = Guid.NewGuid(),
+			Default = true,
+			Detail = JsonSerializer.Serialize(new { bankAccount = "1234567890" }),
+			CreatedByUsername = playerCode,
+			CreatedOn = DateTime.UtcNow,
+			UpdatedByUsername = playerCode,
+			UpdatedOn = DateTime.UtcNow
+		};
+
+		var noneDefaultBankInfo = new PlayerBankInfo
+		{
+			Id = Guid.NewGuid(),
+			PlayerCode = playerCode,
+			BrandId = brandId,
+			BankType = bankType,
+			PaymentChannelId = Guid.NewGuid(),
+			Default = false,
+			Detail = JsonSerializer.Serialize(new { bankAccount = "8765432109" }),
+			CreatedByUsername = playerCode,
+			CreatedOn = DateTime.UtcNow,
+			UpdatedByUsername = playerCode,
+			UpdatedOn = DateTime.UtcNow
+		};
+
+		var newDefaultBankInfo = new PlayerBankInfo
+		{
+			Id = Guid.NewGuid(),
+			PlayerCode = playerCode,
+			BrandId = brandId,
+			BankType = bankType,
+			PaymentChannelId = Guid.NewGuid(),
+			Default = false,
+			Detail = JsonSerializer.Serialize(new { bankAccount = "0987654321" }),
+			CreatedByUsername = playerCode,
+			CreatedOn = DateTime.UtcNow,
+			UpdatedByUsername = playerCode,
+			UpdatedOn = DateTime.UtcNow
+		};
+
+		var testBankInfoData = new[] { defaultBankInfo, noneDefaultBankInfo, newDefaultBankInfo };
+
+		await dbContext.PlayerBankInfos.AddRangeAsync(testBankInfoData);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		await sut.SetDefaultPlayerBankInfoAsync(playerCode, newDefaultBankInfo.Id, modifyUser);
+
+		Assert.IsFalse(defaultBankInfo.Default);
+		Assert.IsFalse(noneDefaultBankInfo.Default);
+		Assert.IsTrue(newDefaultBankInfo.Default);
 	}
 
 	[Test]
