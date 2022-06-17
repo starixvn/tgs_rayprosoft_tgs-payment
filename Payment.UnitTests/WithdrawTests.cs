@@ -139,7 +139,8 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}"));
+				"{}",
+				false));
 
 		await sut.ExecuteAsync(command);
 
@@ -783,7 +784,8 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}"));
+				"{}",
+				false));
 
 		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
 	}
@@ -856,7 +858,8 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}"));
+				"{}",
+				false));
 
 		fakePaymentRepository
 			.When(fake => fake.CreateWithdrawFormAsync(

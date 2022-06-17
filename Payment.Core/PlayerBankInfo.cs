@@ -8,4 +8,5 @@ public record PlayerBankInfo(
 	Guid BrandId,
 	Guid PaymentChannelId,
 	string BankType,
-	string Detail);
+	string Detail,
+	bool IsDefault);

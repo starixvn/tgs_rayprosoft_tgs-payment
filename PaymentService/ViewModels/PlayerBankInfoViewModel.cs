@@ -12,6 +12,8 @@ public class PlayerBankInfoViewModel
 
 	public Guid Id { get; set; }
 
+	public bool IsDefault { get; set; }
+
 	public Guid PaymentChannelId { get; set; }
 
 	public string PlayerCode { get; set; } = default!;

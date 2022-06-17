@@ -90,6 +90,7 @@ internal class PaymentRepository : IPaymentRepository
 				PaymentChannelId = bankInfo.PaymentChannelId,
 				BankType = bankInfo.BankType,
 				Detail = bankInfo.Detail,
+				Default = bankInfo.IsDefault,
 				CreatedByUsername = modifyUser,
 				CreatedOn = createTime,
 				UpdatedByUsername = modifyUser,
@@ -295,7 +296,8 @@ internal class PaymentRepository : IPaymentRepository
 			bankInfo.BrandId,
 			bankInfo.PaymentChannelId,
 			bankInfo.BankType,
-			bankInfo.Detail!);
+			bankInfo.Detail!,
+			bankInfo.Default);
 	}
 
 	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
@@ -307,7 +309,8 @@ internal class PaymentRepository : IPaymentRepository
 				info.BrandId,
 				info.PaymentChannelId,
 				info.BankType,
-				info.Detail!))
+				info.Detail!,
+				info.Default))
 			.ToAsyncEnumerable();
 
 	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -633,6 +636,36 @@ internal class PaymentRepository : IPaymentRepository
 				form.ThirdPartyOrderNo,
 				form.Note))
 			.ToAsyncEnumerable();
+	}
+
+	public async ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default)
+	{
+		var bankInfos = await _tgsContext.PlayerBankInfos
+			.Where(b => b.PlayerCode == playerCode)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var bankInfo = bankInfos.FirstOrDefault(b => b.Id == bankInfoId);
+		if (bankInfo == null || bankInfo.Default)
+			return;
+
+		var updateTime = DateTime.UtcNow;
+
+		foreach (var info in bankInfos)
+		{
+			if (info.Id != bankInfoId && !info.Default)
+				continue;
+
+			info.Default = info.Id == bankInfoId;
+			info.UpdatedOn = updateTime;
+			info.UpdatedByUsername = modifyUser;
+		}
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask SignOffDepositFormAsync(

@@ -40,6 +40,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_on");
 
+            entity.Property(e => e.Default).HasColumnName("default");
+
             entity.Property(e => e.Detail)
                 .HasColumnType("jsonb")
                 .HasColumnName("detail");

@@ -85,6 +85,12 @@ public interface IPaymentRepository
 		WithdrawFormQueryConditions conditions,
 		CancellationToken cancellationToken = default);
 
+	ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default);
+
 	ValueTask SignOffDepositFormAsync(
 		Guid formId,
 		ReviewState reviewStatus,
