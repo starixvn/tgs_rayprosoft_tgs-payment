@@ -188,12 +188,16 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
+		string? modifyUser = null,
 		CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
 			JsonSerializer.Serialize(info, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		if (!string.IsNullOrWhiteSpace(modifyUser))
+			requestContent.Headers.Add("ModifyUser", modifyUser);
 
 		var response = await _httpClient
 			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
@@ -762,6 +766,22 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		var response = await _httpClient
 			.PostAsync($"/withdraw/{formId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
+	public async ValueTask SetDefaultPlayerBankInfoAsync(
+		string playerCode,
+		Guid bankInfoId,
+		string modifyUser,
+		CancellationToken cancellationToken = default)
+	{
+		var requestMessage = new HttpRequestMessage(HttpMethod.Patch, $"/bankinfo/player/{playerCode}/{bankInfoId}/default");
+		requestMessage.Headers.Add("ModifyUser", modifyUser);
+
+		var response = await _httpClient
+			.SendAsync(requestMessage, cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();

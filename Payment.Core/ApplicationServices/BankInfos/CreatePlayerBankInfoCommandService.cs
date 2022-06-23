@@ -22,10 +22,11 @@ internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayer
 			command.BrandId,
 			command.PaymentChannelId,
 			command.BankType,
-			command.Detail);
+			command.Detail,
+			command.IsDefault);
 
 		await _paymentRepository
-			.CreateBankInfoAsync(bankInfo, command.PlayerCode, cancellationToken)
+			.CreateBankInfoAsync(bankInfo, command.ModifyUser, cancellationToken)
 			.ConfigureAwait(false);
 
 		command.TaskSource.SetResult(bankInfo.Id);

@@ -76,7 +76,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.HasOne(d => d.PlayerCodeNavigation)
                 .WithMany(p => p.AgentBankInfoItems)
                 .HasForeignKey(d => d.PlayerCode)
-                .HasConstraintName("fk_agent_bank_infos_players_player_code");
+                .HasConstraintName("fk_agent_bank_infos_players_player_temp_id");
 
             OnConfigurePartial(entity);
         }
