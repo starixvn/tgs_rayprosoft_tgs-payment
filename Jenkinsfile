@@ -5,7 +5,7 @@ pipeline {
     agent any
     environment {
         BuildConfiguration='Debug'
-        ImageName="harbor.rpgp.cc/tgs/payment-api"
+        ImageName="pgtgs/payment-api"
         DOTNET_USE_POLLING_FILE_WATCHER="true"
     }
     stages {
