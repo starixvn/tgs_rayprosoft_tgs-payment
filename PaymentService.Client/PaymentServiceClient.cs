@@ -848,4 +848,6 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		_ = response.EnsureSuccessStatusCode();
 	}
+
+	public ValueTask<Guid> LockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

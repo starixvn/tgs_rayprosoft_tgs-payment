@@ -165,6 +165,25 @@ public class DepositController : ControllerBase
 	}
 
 	/// <summary>
+	/// Locks the payment asynchronous.
+	/// </summary>
+	/// <param name="lockService">The lock service.</param>
+	/// <param name="viewModel">The view model.</param>
+	/// <returns></returns>
+	[HttpPut("mutex", Name = "LockDepositPayment")]
+	public ValueTask<Guid> LockPaymentAsync(
+			[FromServices] IGetService<LockPaymentCommand, Guid> lockService,
+			[FromBody] LockDepositPaymentViewModel viewModel)
+	{
+		var command = new LockPaymentCommand(
+			viewModel.FormId,
+			viewModel.PaymentCode,
+			viewModel.PlayerCode);
+
+		return lockService.GetAsync(command, HttpContext.RequestAborted);
+	}
+
+	/// <summary>
 	/// Queries the deposit forms asynchronous.
 	/// </summary>
 	/// <param name="countService">The count service.</param>
