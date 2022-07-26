@@ -7,7 +7,7 @@
 		<PackageId>Tgs.PaymentService.Client</PackageId>
 		<Product>Tgs.PaymentService.Client</Product>
 		<Authors>Raypro</Authors>
-		<Version>0.5.0</Version>
+		<Version>0.5.1</Version>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -21,13 +21,13 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" Condition="'$(TargetFramework)' == 'net5.0'" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
-		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.1.46">
+		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="stateless" Version="5.11.0" />
 		<PackageReference Include="System.Text.Json" Version="5.0.0" Condition="'$(TargetFramework)' == 'net5.0'" />
-		<PackageReference Include="System.Text.Json" Version="6.0.2" Condition="'$(TargetFramework)' == 'net6.0'" />
+		<PackageReference Include="System.Text.Json" Version="6.0.5" Condition="'$(TargetFramework)' == 'net6.0'" />
 	</ItemGroup>
 
 </Project>

@@ -70,6 +70,12 @@ public interface IPaymentServiceClient
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default);
 
+	ValueTask<Guid> LockDepositPaymentAsync(
+		Guid formId,
+		string paymentCode,
+		string playerCode,
+		CancellationToken cancellationToken = default);
+
 	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 
 	ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);

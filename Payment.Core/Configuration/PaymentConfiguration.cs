@@ -34,9 +34,17 @@ public class PaymentConfiguration
 		return this;
 	}
 
-	public PaymentConfiguration UsePaymentRepository<TPaymentRepository>() where TPaymentRepository : class, IPaymentRepository
+	public PaymentConfiguration UsePaymentRepository<TPaymentRepository>()
+		where TPaymentRepository : class, IPaymentRepository
 	{
 		_ = Services.AddTransient<IPaymentRepository, TPaymentRepository>();
+		return this;
+	}
+
+	public PaymentConfiguration UseRateLimitRepository<TPaymentRateLimitRepository>()
+		where TPaymentRateLimitRepository : class, IPaymentRateLimitRepository
+	{
+		_ = Services.AddTransient<IPaymentRateLimitRepository, TPaymentRateLimitRepository>();
 		return this;
 	}
 

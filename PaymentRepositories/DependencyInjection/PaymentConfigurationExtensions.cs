@@ -20,7 +20,8 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<RedisConnectionFactory>();
 
 		return paymentConfiguration
-			.UseRepository<RedisTakeNumberStore>();
+			.UseRepository<RedisTakeNumberStore>()
+			.UseRateLimitRepository<PaymentRateLimitRepository>();
 	}
 
 	public static PaymentConfiguration UseTgsPaymentRepository(
