@@ -541,91 +541,6 @@ public class DepositTests
 	}
 
 	[Test]
-	public async Task Submit_DepositForm_With_New_Status_Will_Emit_StatusChangedEvent()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-
-		var sut = new SubmitDepositFormStatusCommandService(fakePaymentRepository, fakePaymentClient);
-
-		var command = new SubmitDepositFormStatusCommand(
-			Guid.NewGuid(),
-			PaymentFlowState.Approved,
-			null,
-			null,
-			null,
-			null);
-
-		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
-			.Returns(new DepositFormInfo(
-				command.FormId,
-				"PlayerCode",
-				"UserName",
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"ChannelName",
-				Guid.NewGuid(),
-				1000M,
-				null,
-				null,
-				PaymentFlowState.WaitApprove,
-				"{}",
-				null,
-				null,
-				"GPIT211028150001",
-				null,
-				null,
-				null,
-				null,
-				DateTimeOffset.Now,
-				DateTimeOffset.Now));
-
-		await sut.ExecuteAsync(command);
-
-		_ = fakePaymentRepository.Received(1)
-			.SubmitDepositFormStatusAsync(
-				Arg.Is(command.FormId),
-				Arg.Is(command.Status),
-				Arg.Any<string>(),
-				Arg.Any<decimal?>(),
-				Arg.Any<string>(),
-				Arg.Any<int?>());
-
-		_ = fakePaymentClient.Received(1)
-			.EmitDepositFormStatusChangedEventAsync(
-				Arg.Is(command.FormId),
-				Arg.Any<Guid>(),
-				Arg.Any<string>());
-	}
-
-	[Test]
-	public async Task LockPayment_When_Deposit()
-	{
-		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
-		var fakeGetFormService = Substitute.For<IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo>>();
-
-		var sut = new LockPaymentCommandService(
-			fakePaymentRateLimitRepository,
-			fakeGetFormService);
-
-		var command = new LockPaymentCommand(
-			Guid.NewGuid(),
-			"TestPayment",
-			"TestPlayerCode");
-
-		_ = fakePaymentRateLimitRepository
-			.LockPaymentAsync(
-				Arg.Is(command.FormId),
-				Arg.Is(command.PaymentCode),
-				Arg.Is(command.PlayerCode))
-			.Returns(command.FormId);
-
-		var actual = await sut.GetAsync(command);
-
-		Assert.AreEqual(command.FormId, actual);
-	}
-
-	[Test]
 	public async Task LockPayment_But_Has_Previous_Form()
 	{
 		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
@@ -649,7 +564,7 @@ public class DepositTests
 				Arg.Is(command.PlayerCode))
 			.Returns(previousFormId);
 
-		fakeGetFormService.GetAsync(Arg.Any<GetDepositFormDetailByFormIdQuery>())
+		_ = fakeGetFormService.GetAsync(Arg.Any<GetDepositFormDetailByFormIdQuery>())
 			.Returns(new DepositFormInfo(
 				previousFormId,
 				command.PlayerCode,
@@ -672,35 +587,6 @@ public class DepositTests
 				null,
 				DateTimeOffset.Now,
 				DateTimeOffset.Now));
-
-		var actual = await sut.GetAsync(command);
-
-		Assert.AreEqual(previousFormId, actual);
-	}
-
-	[Test]
-	public async Task LockPayment_Has_Previous_Id_Form_Creating()
-	{
-		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
-		var fakeGetFormService = Substitute.For<IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo>>();
-
-		var sut = new LockPaymentCommandService(
-			fakePaymentRateLimitRepository,
-			fakeGetFormService);
-
-		var command = new LockPaymentCommand(
-			Guid.NewGuid(),
-			"TestPayment",
-			"TestPlayerCode");
-
-		var previousFormId = Guid.NewGuid();
-
-		_ = fakePaymentRateLimitRepository
-			.LockPaymentAsync(
-				Arg.Is(command.FormId),
-				Arg.Is(command.PaymentCode),
-				Arg.Is(command.PlayerCode))
-			.Returns(previousFormId);
 
 		var actual = await sut.GetAsync(command);
 
@@ -767,9 +653,122 @@ public class DepositTests
 					Arg.Is(command.PlayerCode))
 				.Returns(command.FormId));
 
+		var actual = await sut.GetAsync(command);
+
+		Assert.AreEqual(command.FormId, actual);
+	}
+
+	[Test]
+	public async Task LockPayment_Has_Previous_Id_Form_Creating()
+	{
+		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
+		var fakeGetFormService = Substitute.For<IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo>>();
+
+		var sut = new LockPaymentCommandService(
+			fakePaymentRateLimitRepository,
+			fakeGetFormService);
+
+		var command = new LockPaymentCommand(
+			Guid.NewGuid(),
+			"TestPayment",
+			"TestPlayerCode");
+
+		var previousFormId = Guid.NewGuid();
+
+		_ = fakePaymentRateLimitRepository
+			.LockPaymentAsync(
+				Arg.Is(command.FormId),
+				Arg.Is(command.PaymentCode),
+				Arg.Is(command.PlayerCode))
+			.Returns(previousFormId);
+
+		var actual = await sut.GetAsync(command);
+
+		Assert.AreEqual(previousFormId, actual);
+	}
+
+	[Test]
+	public async Task LockPayment_When_Deposit()
+	{
+		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
+		var fakeGetFormService = Substitute.For<IGetService<GetDepositFormDetailByFormIdQuery, DepositFormInfo>>();
+
+		var sut = new LockPaymentCommandService(
+			fakePaymentRateLimitRepository,
+			fakeGetFormService);
+
+		var command = new LockPaymentCommand(
+			Guid.NewGuid(),
+			"TestPayment",
+			"TestPlayerCode");
+
+		_ = fakePaymentRateLimitRepository
+			.LockPaymentAsync(
+				Arg.Is(command.FormId),
+				Arg.Is(command.PaymentCode),
+				Arg.Is(command.PlayerCode))
+			.Returns(command.FormId);
 
 		var actual = await sut.GetAsync(command);
 
 		Assert.AreEqual(command.FormId, actual);
+	}
+
+	[Test]
+	public async Task Submit_DepositForm_With_New_Status_Will_Emit_StatusChangedEvent()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new SubmitDepositFormStatusCommandService(fakePaymentRepository, fakePaymentClient);
+
+		var command = new SubmitDepositFormStatusCommand(
+			Guid.NewGuid(),
+			PaymentFlowState.Approved,
+			null,
+			null,
+			null,
+			null);
+
+		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
+			.Returns(new DepositFormInfo(
+				command.FormId,
+				"PlayerCode",
+				"UserName",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"ChannelName",
+				Guid.NewGuid(),
+				1000M,
+				null,
+				null,
+				PaymentFlowState.WaitApprove,
+				"{}",
+				null,
+				null,
+				"GPIT211028150001",
+				null,
+				null,
+				null,
+				null,
+				DateTimeOffset.Now,
+				DateTimeOffset.Now));
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.SubmitDepositFormStatusAsync(
+				Arg.Is(command.FormId),
+				Arg.Is(command.Status),
+				Arg.Any<string>(),
+				Arg.Any<decimal?>(),
+				Arg.Any<string>(),
+				Arg.Any<int?>());
+
+		_ = fakePaymentClient.Received(1)
+			.EmitDepositFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
 	}
 }

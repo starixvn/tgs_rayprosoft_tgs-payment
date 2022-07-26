@@ -36,9 +36,9 @@ internal class PaymentRateLimitRepository : IPaymentRateLimitRepository
 		if (isLockSuccess)
 			return formId;
 
-		var existsFormId = (string)await _database.StringGetAsync(key).ConfigureAwait(false);
+		var existsFormId = await _database.StringGetAsync(key).ConfigureAwait(false);
 
-		return Guid.Parse(existsFormId);
+		return Guid.Parse(existsFormId.ToString());
 	}
 
 	public async ValueTask UnlockPaymentAsync(string paymentCode, string playerCode, CancellationToken cancellationToken = default)
@@ -53,9 +53,9 @@ internal class PaymentRateLimitRepository : IPaymentRateLimitRepository
 
 		if (hasMutex)
 		{
-			await _database.KeyDeleteAsync(key).ConfigureAwait(false);
+			_ = await _database.KeyDeleteAsync(key).ConfigureAwait(false);
 
-			await _database.KeyDeleteAsync($"{key}:Delete").ConfigureAwait(false);
+			_ = await _database.KeyDeleteAsync($"{key}:Delete").ConfigureAwait(false);
 		}
 	}
 }

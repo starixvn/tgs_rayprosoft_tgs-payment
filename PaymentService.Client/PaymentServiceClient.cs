@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -548,8 +549,32 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<Guid> LockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			FormId = formId,
+			PaymentCode = paymentCode,
+			PlayerCode = playerCode
+		};
+
+		var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PutAsync("/deposit/mutex", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		return await response.Content
+			.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
-		DepositFormQueryConditions conditions,
+			DepositFormQueryConditions conditions,
 		Paging paging,
 		CancellationToken cancellationToken = default)
 	{
@@ -848,6 +873,4 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		_ = response.EnsureSuccessStatusCode();
 	}
-
-	public ValueTask<Guid> LockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }
