@@ -873,4 +873,27 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		_ = response.EnsureSuccessStatusCode();
 	}
+
+	public async ValueTask UnlockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			FormId = formId,
+			PaymentCode = paymentCode,
+			PlayerCode = playerCode
+		};
+
+		var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.SendAsync(new HttpRequestMessage(HttpMethod.Delete, "/deposit/mutex")
+			{
+				Content = requestContent
+			}, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
 }

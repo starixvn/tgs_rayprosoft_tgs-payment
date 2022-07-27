@@ -121,4 +121,10 @@ public interface IPaymentServiceClient
 		string? paidUserId = null,
 		string? paidUserName = null,
 		CancellationToken cancellationToken = default);
+
+	ValueTask UnlockDepositPaymentAsync(
+		Guid formId,
+		string paymentCode,
+		string playerCode,
+		CancellationToken cancellationToken = default);
 }
