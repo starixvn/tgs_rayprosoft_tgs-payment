@@ -38,4 +38,23 @@ public class PaymentLockTests
 
 		Assert.AreEqual(expected, actual);
 	}
+
+	[Test]
+	public async Task UnLockPayment()
+	{
+		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRateLimitRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var formId = Guid.NewGuid();
+		var paymentCode = "Test";
+		var playerCode = "tester1";
+
+		await sut.UnlockDepositPaymentAsync(formId, paymentCode, playerCode);
+	}
 }

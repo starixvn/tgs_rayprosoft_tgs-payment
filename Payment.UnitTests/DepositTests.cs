@@ -771,4 +771,21 @@ public class DepositTests
 				Arg.Any<Guid>(),
 				Arg.Any<string>());
 	}
+
+	[Test]
+	public async Task UnlockPayment()
+	{
+		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
+
+		var sut = new UnlockPaymentCommandService(fakePaymentRateLimitRepository);
+
+		var command = new UnlockPaymentCommand(
+			"TestPayment",
+			"player1");
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRateLimitRepository.Received(1)
+			.UnlockPaymentAsync(Arg.Is(command.PaymentCode), Arg.Is(command.PlayerCode));
+	}
 }
