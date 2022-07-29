@@ -71,7 +71,32 @@ builder.Services
 
 		options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
 	})
-	.RegisterWithdrawProcessors();
+	.RegisterWithdrawProcessors()
+	.Services
+	.AddMemoryCache()
+	.AddPaymentCache();
+
+builder.Services
+	.AddMessageQueue()
+	.AddNatsMessageQueue(config => config
+		.ConfigQueueOptions((options, sp) =>
+		{
+			var config = sp.GetRequiredService<IConfiguration>();
+
+			options.Url = config.GetConnectionString("Nats");
+		})
+		.AddReplyHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.SaveWithdrawThirdNoHandlerType,
+			"tgs.payment.withdraw.external_id",
+			"tgs.payment.withdraw.external_id")
+		.AddReplyHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.TagWithdrawPaidHandlerType,
+			"tgs.payment.withdraw.paid",
+			"tgs.payment.withdraw.paid")
+		.AddHandler(
+			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentCreatedEventHandlerType,
+			"tgs.payment.created"))
+	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();
 

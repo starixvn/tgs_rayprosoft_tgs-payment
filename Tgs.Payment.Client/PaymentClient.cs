@@ -99,6 +99,16 @@ internal class PaymentClient : IPaymentClient
 			.ConfigureAwait(false);
 	}
 
+	public ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentChangedEvent
+		{
+			Code = paymentCode
+		};
+
+		return _messageSender.PublishAsync("tgs.payment.created", request.ToByteArray(), cancellationToken);
+	}
+
 	public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var request = new FormEvent
@@ -193,16 +203,6 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray(), cancellationToken: cancellationToken);
-	}
-
-	public ValueTask TagWithdrawFormPaidAsync(Guid formId, CancellationToken cancellationToken = default)
-	{
-		var request = new TagPaidRequest
-		{
-			FormId = formId
-		};
-
-		return _messageSender.SendAsync("tgs.payment.withdraw.paid", request.ToByteArray(), cancellationToken: cancellationToken);
 	}
 
 	public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default)
