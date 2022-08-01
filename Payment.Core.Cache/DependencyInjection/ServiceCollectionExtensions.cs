@@ -10,5 +10,7 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddPaymentCache(this IServiceCollection services)
 		=> services
 			.Decorate<IQueryService<GetAllPaymentsQuery, PaymentInfo>, GetAllCachedPaymentsQueryService>()
-			.AddTransient<IPaymentCacheCleaner, GetAllCachedPaymentsQueryService>();
+			.AddTransient<IPaymentCacheCleaner, GetAllCachedPaymentsQueryService>()
+			.Decorate<IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo>, AllCachedPaymentMethodsQueryService>()
+			.AddTransient<IPaymentMethodCacheCleaner, AllCachedPaymentMethodsQueryService>();
 }

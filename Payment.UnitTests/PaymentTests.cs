@@ -50,8 +50,9 @@ public class PaymentTests
 	public async Task Can_Create_PaymentMethod()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentMethodCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentMethodCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentMethodCommand("MethodCode", "Bank");
 
@@ -59,6 +60,8 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentMethodAsync(Arg.Is(command.Code), Arg.Is(command.BankType));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodCreatedEventAsync(Arg.Is(command.Code));
 	}
 
 	[Test]

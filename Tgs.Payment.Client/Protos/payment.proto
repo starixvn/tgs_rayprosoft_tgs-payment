@@ -83,3 +83,7 @@ message PaidWithdrawRequest {
 message PaymentChangedEvent {
 	string code = 1;
 }
+
+message PaymentMethodChangedEvent {
+	string name = 1;
+}
