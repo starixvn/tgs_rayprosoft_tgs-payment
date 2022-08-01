@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
@@ -458,6 +459,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		_ = response.EnsureSuccessStatusCode();
 
+		if (response.StatusCode == HttpStatusCode.NoContent)
+			return null;
+
 		var contentJson = await response.Content
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -475,6 +479,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
+
+		if (response.StatusCode == HttpStatusCode.NoContent)
+			return null;
 
 		var contentJson = await response.Content
 			.ReadAsStringAsync(cancellationToken)
