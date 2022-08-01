@@ -99,6 +99,16 @@ internal class PaymentClient : IPaymentClient
 			.ConfigureAwait(false);
 	}
 
+	public ValueTask EmitPaymentChannelCreatedEventAsync(string paymentChannelName, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentChannelChangedEvent
+		{
+			Name = paymentChannelName
+		};
+
+		return _messageSender.PublishAsync("tgs.payment-channel.created", request.ToByteArray(), cancellationToken);
+	}
+
 	public ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default)
 	{
 		var request = new PaymentChangedEvent

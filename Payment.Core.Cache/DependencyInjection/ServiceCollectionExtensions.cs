@@ -1,7 +1,7 @@
 ﻿using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Payments;
-using Tgs.ServiceUtility;
 using Tgs.Payment.Cache;
+using Tgs.ServiceUtility;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -12,5 +12,7 @@ public static class ServiceCollectionExtensions
 			.Decorate<IQueryService<GetAllPaymentsQuery, PaymentInfo>, GetAllCachedPaymentsQueryService>()
 			.AddTransient<IPaymentCacheCleaner, GetAllCachedPaymentsQueryService>()
 			.Decorate<IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo>, AllCachedPaymentMethodsQueryService>()
-			.AddTransient<IPaymentMethodCacheCleaner, AllCachedPaymentMethodsQueryService>();
+			.AddTransient<IPaymentMethodCacheCleaner, AllCachedPaymentMethodsQueryService>()
+			.Decorate<IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo>, AllCachedPaymentChannelsQueryService>()
+			.AddTransient<IPaymentChannelCacheCleaner, AllCachedPaymentChannelsQueryService>();
 }

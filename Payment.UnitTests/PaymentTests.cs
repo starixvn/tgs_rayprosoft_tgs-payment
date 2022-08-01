@@ -35,8 +35,9 @@ public class PaymentTests
 	public async Task Can_Create_PaymentChannel()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentChannelCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentChannelCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentChannelCommand("ChannelCode");
 
@@ -44,6 +45,8 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentChannelAsync(Arg.Is(command.ChannelCode));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentChannelCreatedEventAsync(Arg.Is(command.ChannelCode));
 	}
 
 	[Test]

@@ -87,3 +87,7 @@ message PaymentChangedEvent {
 message PaymentMethodChangedEvent {
 	string name = 1;
 }
+
+message PaymentChannelChangedEvent {
+	string name = 1;
+}
