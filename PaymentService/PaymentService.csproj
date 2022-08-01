@@ -36,9 +36,11 @@
 		<PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.2.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="Tgs.Logging" Version="0.0.19" />
+		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Payment.Core.Cache\Payment.Core.Cache.csproj" />
 		<ProjectReference Include="..\Payment.Core\Payment.Core.csproj" />
 		<ProjectReference Include="..\PaymentRepositories\PaymentRepositories.csproj" />
 		<ProjectReference Include="..\WithdrawProcessors\WithdrawProcessors.csproj" />
