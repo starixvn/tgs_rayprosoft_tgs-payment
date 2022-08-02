@@ -887,4 +887,25 @@ internal class PaymentRepository : IPaymentRepository
 
 		return dataQuery;
 	}
+
+	public async ValueTask<Guid> CreatePaymentMethodChannelAsync(Guid paymentId, Guid methodId, Guid channelId, CancellationToken cancellationToken = default)
+	{
+		var pmc = new PaymentMethodChannel
+		{
+			Id = Guid.NewGuid(),
+			PaymentId = paymentId,
+			MethodId = methodId,
+			ChannelId = channelId
+		};
+
+		_ = await _tgsContext.PaymentMethodChannels
+			.AddAsync(pmc, cancellationToken)
+			.ConfigureAwait(false);
+
+		await _tgsContext
+			.SaveChangesAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return pmc.Id;
+	}
 }

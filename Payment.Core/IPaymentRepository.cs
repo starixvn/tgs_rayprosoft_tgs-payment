@@ -28,6 +28,8 @@ public interface IPaymentRepository
 
 	ValueTask CreatePaymentMethodAsync(string methodCode, string bankType, CancellationToken cancellationToken = default);
 
+	ValueTask<Guid> CreatePaymentMethodChannelAsync(Guid paymentId, Guid methodId, Guid channelId, CancellationToken cancellationToken = default);
+
 	ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form, CancellationToken cancellationToken = default);
 
 	ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId, CancellationToken cancellationToken = default);

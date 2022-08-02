@@ -68,6 +68,27 @@ public class PaymentTests
 	}
 
 	[Test]
+	public async Task Can_Create_PaymentMethodChannel()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CreatePaymentMethodChannelCommandService(fakePaymentRepository);
+
+		var command = new CreatePaymentMethodChannelCommand(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			Guid.NewGuid());
+
+		await sut.GetAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreatePaymentMethodChannelAsync(
+				Arg.Is(command.PaymentId),
+				Arg.Is(command.MethodId),
+				Arg.Is(command.ChannelId));
+	}
+
+	[Test]
 	public void User_Can_Get_All_PaymentChannelInfos()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
