@@ -71,8 +71,9 @@ public class PaymentTests
 	public async Task Can_Create_PaymentMethodChannel()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentMethodChannelCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentMethodChannelCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentMethodChannelCommand(
 			Guid.NewGuid(),
@@ -86,14 +87,17 @@ public class PaymentTests
 				Arg.Is(command.PaymentId),
 				Arg.Is(command.MethodId),
 				Arg.Is(command.ChannelId));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodChannelChangedEventAsync(Arg.Any<Guid>());
 	}
 
 	[Test]
 	public async Task Can_Delete_PaymentMethodChannel()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new DeletePaymentMethodChannelCommandService(fakePaymentRepository);
+		var sut = new DeletePaymentMethodChannelCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new DeletePaymentMethodChannelCommand(Guid.NewGuid());
 
@@ -101,6 +105,8 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.DeletePaymentMethodChannelAsync(Arg.Is(command.PaymentMethodChannelId));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodChannelChangedEventAsync(Arg.Is(command.PaymentMethodChannelId));
 	}
 
 	[Test]

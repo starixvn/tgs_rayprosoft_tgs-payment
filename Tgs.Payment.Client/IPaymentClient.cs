@@ -16,6 +16,8 @@ public interface IPaymentClient
 
 	ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default);
 
+	ValueTask EmitPaymentMethodChannelChangedEventAsync(Guid pmcId, CancellationToken cancellationToken = default);
+
 	ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default);
 
 	ValueTask EmitWithdrawFormCreatedEventAsync(Guid fromId, Guid brandId, CancellationToken cancellationToken = default);

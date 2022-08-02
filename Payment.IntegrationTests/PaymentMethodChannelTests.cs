@@ -178,6 +178,23 @@ public class PaymentMethodChannelTests
 
 		var sut = new PaymentServiceClient(httpClient);
 
+		fakeMessageSender
+			.When(fake => fake.PublishAsync(
+				Arg.Is("tgs.payment-method-channel.changed"),
+				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<IEnumerable<MessageHeaderValue>>(),
+				Arg.Any<CancellationToken>()))
+			.Do(callInfo =>
+			{
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+
+				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+					web.Services,
+					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType);
+
+				handler.HandleAsync(data).GetAwaiter().GetResult();
+			});
+
 		_ = await sut.GetAllPaymentMethodChannelsAsync().ToArrayAsync();
 
 		var paymentId = Guid.NewGuid();
@@ -251,6 +268,23 @@ public class PaymentMethodChannelTests
 		await dbContext.SaveChangesAsync();
 
 		dbContext.ChangeTracker.Clear();
+
+		fakeMessageSender
+			.When(fake => fake.PublishAsync(
+				Arg.Is("tgs.payment-method-channel.changed"),
+				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<IEnumerable<MessageHeaderValue>>(),
+				Arg.Any<CancellationToken>()))
+			.Do(callInfo =>
+			{
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+
+				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+					web.Services,
+					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType);
+
+				handler.HandleAsync(data).GetAwaiter().GetResult();
+			});
 
 		_ = await sut.GetAllPaymentMethodChannelsAsync().ToArrayAsync();
 

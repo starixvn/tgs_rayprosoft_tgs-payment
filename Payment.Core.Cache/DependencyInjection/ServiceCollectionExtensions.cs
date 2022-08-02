@@ -14,5 +14,7 @@ public static class ServiceCollectionExtensions
 			.Decorate<IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo>, AllCachedPaymentMethodsQueryService>()
 			.AddTransient<IPaymentMethodCacheCleaner, AllCachedPaymentMethodsQueryService>()
 			.Decorate<IQueryService<AllPaymentChannelsQuery, PaymentChannelInfo>, AllCachedPaymentChannelsQueryService>()
-			.AddTransient<IPaymentChannelCacheCleaner, AllCachedPaymentChannelsQueryService>();
+			.AddTransient<IPaymentChannelCacheCleaner, AllCachedPaymentChannelsQueryService>()
+			.Decorate<IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo>, AllCachedPaymentMethodChannelsQueryService>()
+			.AddTransient<IPaymentMethodChannelCacheCleaner, AllCachedPaymentMethodChannelsQueryService>();
 }

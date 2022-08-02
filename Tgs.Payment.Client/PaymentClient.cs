@@ -119,6 +119,16 @@ internal class PaymentClient : IPaymentClient
 		return _messageSender.PublishAsync("tgs.payment.created", request.ToByteArray(), cancellationToken);
 	}
 
+	public ValueTask EmitPaymentMethodChannelChangedEventAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentMethodChannelChangedEvent
+		{
+			Id = pmcId
+		};
+
+		return _messageSender.PublishAsync("tgs.payment-method-channel.changed", request.ToByteArray(), cancellationToken);
+	}
+
 	public ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default)
 	{
 		var request = new PaymentMethodChangedEvent

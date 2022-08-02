@@ -101,7 +101,10 @@ builder.Services
 			"tgs.payment-method.created")
 		.AddHandler(
 			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentChannelCreatedEventHandlerType,
-			"tgs.payment-channel.created"))
+			"tgs.payment-channel.created")
+		.AddHandler(
+			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType,
+			"tgs.payment-method-channel.changed"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();

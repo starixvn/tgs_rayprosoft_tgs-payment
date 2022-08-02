@@ -91,3 +91,7 @@ message PaymentMethodChangedEvent {
 message PaymentChannelChangedEvent {
 	string name = 1;
 }
+
+message PaymentMethodChannelChangedEvent {
+	phoenix.protobuf.GuidValue id = 1;
+}
