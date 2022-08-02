@@ -36,4 +36,14 @@ public class PaymentMethodChannelController : ControllerBase
 			ChannelId = pmc.ChannelId
 		});
 	}
+
+	[HttpDelete("{pmcId}", Name = "DeletePaymentMethodChannel")]
+	public ValueTask DeletePaymentMethodChannelAsync(
+		[FromServices] ICommandService<DeletePaymentMethodChannelCommand> deleteService,
+		Guid pmcId)
+	{
+		var command = new DeletePaymentMethodChannelCommand(pmcId);
+
+		return deleteService.ExecuteAsync(command, HttpContext.RequestAborted);
+	}
 }

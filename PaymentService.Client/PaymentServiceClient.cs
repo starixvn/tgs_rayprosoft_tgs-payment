@@ -291,6 +291,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask DeletePaymentMethodChannelAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.DeleteAsync($"/payment/pmc/{pmcId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	public async ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

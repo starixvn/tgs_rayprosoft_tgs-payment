@@ -195,4 +195,71 @@ public class PaymentMethodChannelTests
 		Assert.AreEqual(methodId, actual.MethodId);
 		Assert.AreEqual(channelId, actual.ChannelId);
 	}
+
+	[Test]
+	public async Task Delete_PaymentMethodChannel()
+	{
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var pmcId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
+		{
+			Id = pmcId,
+			MethodId = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			ChannelId = Guid.NewGuid()
+		});
+
+		await dbContext.SaveChangesAsync();
+
+		dbContext.ChangeTracker.Clear();
+
+		await sut.DeletePaymentMethodChannelAsync(pmcId);
+	}
+
+	[Test]
+	public async Task DeletePaymentMethodChannel_GetPaymentMethodChannel_Should_Success()
+	{
+		var fakeMessageSender = Substitute.For<IMessageSender>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeMessageSender));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var pmcId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
+		{
+			Id = pmcId,
+			MethodId = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			ChannelId = Guid.NewGuid()
+		});
+
+		await dbContext.SaveChangesAsync();
+
+		dbContext.ChangeTracker.Clear();
+
+		_ = await sut.GetAllPaymentMethodChannelsAsync().ToArrayAsync();
+
+		await sut.DeletePaymentMethodChannelAsync(pmcId);
+
+		var actual = await sut.GetAllPaymentMethodChannelsAsync()
+			.Where(pmc => pmc.Id == pmcId)
+			.FirstOrDefaultAsync();
+
+		Assert.IsNull(actual);
+	}
 }

@@ -89,6 +89,21 @@ public class PaymentTests
 	}
 
 	[Test]
+	public async Task Can_Delete_PaymentMethodChannel()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new DeletePaymentMethodChannelCommandService(fakePaymentRepository);
+
+		var command = new DeletePaymentMethodChannelCommand(Guid.NewGuid());
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.DeletePaymentMethodChannelAsync(Arg.Is(command.PaymentMethodChannelId));
+	}
+
+	[Test]
 	public void User_Can_Get_All_PaymentChannelInfos()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
