@@ -26,7 +26,7 @@ internal class GetAllCachedPaymentsQueryService : IQueryService<GetAllPaymentsQu
 	}
 
 	public async IAsyncEnumerable<PaymentInfo> QueryAsync(
-			GetAllPaymentsQuery query,
+		GetAllPaymentsQuery query,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var key = "Tgs:AllPayments";

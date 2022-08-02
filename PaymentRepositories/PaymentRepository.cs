@@ -176,6 +176,27 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
+	public async ValueTask<Guid> CreatePaymentMethodChannelAsync(Guid paymentId, Guid methodId, Guid channelId, CancellationToken cancellationToken = default)
+	{
+		var pmc = new PaymentMethodChannel
+		{
+			Id = Guid.NewGuid(),
+			PaymentId = paymentId,
+			MethodId = methodId,
+			ChannelId = channelId
+		};
+
+		_ = await _tgsContext.PaymentMethodChannels
+			.AddAsync(pmc, cancellationToken)
+			.ConfigureAwait(false);
+
+		await _tgsContext
+			.SaveChangesAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return pmc.Id;
+	}
+
 	public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form, CancellationToken cancellationToken = default)
 	{
 		var currentDate = DateTime.UtcNow;
@@ -231,6 +252,18 @@ internal class PaymentRepository : IPaymentRepository
 
 			_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 		}
+	}
+
+	public async ValueTask DeletePaymentMethodChannelAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var deletePmc = new PaymentMethodChannel
+		{
+			Id = pmcId
+		};
+
+		_tgsContext.Entry(deletePmc).State = EntityState.Deleted;
+
+		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask<AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)

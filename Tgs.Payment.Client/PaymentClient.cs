@@ -99,6 +99,16 @@ internal class PaymentClient : IPaymentClient
 			.ConfigureAwait(false);
 	}
 
+	public ValueTask EmitPaymentChannelCreatedEventAsync(string paymentChannelName, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentChannelChangedEvent
+		{
+			Name = paymentChannelName
+		};
+
+		return _messageSender.PublishAsync("tgs.payment-channel.created", request.ToByteArray(), cancellationToken);
+	}
+
 	public ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default)
 	{
 		var request = new PaymentChangedEvent
@@ -107,6 +117,26 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		return _messageSender.PublishAsync("tgs.payment.created", request.ToByteArray(), cancellationToken);
+	}
+
+	public ValueTask EmitPaymentMethodChannelChangedEventAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentMethodChannelChangedEvent
+		{
+			Id = pmcId
+		};
+
+		return _messageSender.PublishAsync("tgs.payment-method-channel.changed", request.ToByteArray(), cancellationToken);
+	}
+
+	public ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default)
+	{
+		var request = new PaymentMethodChangedEvent
+		{
+			Name = paymentMethodName
+		};
+
+		return _messageSender.PublishAsync("tgs.payment-method.created", request.ToByteArray(), cancellationToken);
 	}
 
 	public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
@@ -202,7 +232,7 @@ internal class PaymentClient : IPaymentClient
 			ScheduleTime = Timestamp.FromDateTime(scheduleTime)
 		};
 
-		return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray(), cancellationToken);
 	}
 
 	public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default)

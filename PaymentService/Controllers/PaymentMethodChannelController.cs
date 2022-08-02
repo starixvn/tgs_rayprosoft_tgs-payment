@@ -9,6 +9,19 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class PaymentMethodChannelController : ControllerBase
 {
+	[HttpPut(Name = "CreatePaymentMethodChannel")]
+	public ValueTask<Guid> CreatePaymentMethodChannelAsync(
+		[FromServices] IGetService<CreatePaymentMethodChannelCommand, Guid> createService,
+		[FromBody] CreatePaymentMethodChannelViewModel viewModel)
+	{
+		var command = new CreatePaymentMethodChannelCommand(
+			viewModel.PaymentId,
+			viewModel.MethodId,
+			viewModel.ChannelId);
+
+		return createService.GetAsync(command, HttpContext.RequestAborted);
+	}
+
 	[HttpGet(Name = "GetAllPaymentMethodChannels")]
 	public IAsyncEnumerable<PaymentMethodChannelViewModel> GetAllPaymentMethodChannelsAsync(
 		[FromServices] IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> queryService)
@@ -22,5 +35,15 @@ public class PaymentMethodChannelController : ControllerBase
 			MethodId = pmc.MethodId,
 			ChannelId = pmc.ChannelId
 		});
+	}
+
+	[HttpDelete("{pmcId}", Name = "DeletePaymentMethodChannel")]
+	public ValueTask DeletePaymentMethodChannelAsync(
+		[FromServices] ICommandService<DeletePaymentMethodChannelCommand> deleteService,
+		Guid pmcId)
+	{
+		var command = new DeletePaymentMethodChannelCommand(pmcId);
+
+		return deleteService.ExecuteAsync(command, HttpContext.RequestAborted);
 	}
 }

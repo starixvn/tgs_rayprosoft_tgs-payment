@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Payment.Cache;
 
-public interface IPaymentCacheCleaner
+internal interface IPaymentCacheCleaner
 {
 	void Clean(string paymentCode);
 }

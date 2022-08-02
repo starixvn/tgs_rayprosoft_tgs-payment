@@ -186,8 +186,37 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask<Guid> CreatePaymentMethodChannelAsync(
+		Guid paymentId,
+		Guid methodId,
+		Guid channelId,
+		CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			PaymentId = paymentId,
+			MethodId = methodId,
+			ChannelId = channelId
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PutAsync("/payment/pmc", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		return await response.Content
+			.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask<Guid> CreatePlayerBankInfoAsync(
-		Guid brandId,
+			Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
 		string? modifyUser = null,
@@ -257,6 +286,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	{
 		var response = await _httpClient
 			.DeleteAsync($"/bankinfo/agent/{agentId}/{bankInfoId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
+	public async ValueTask DeletePaymentMethodChannelAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.DeleteAsync($"/payment/pmc/{pmcId}", cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();

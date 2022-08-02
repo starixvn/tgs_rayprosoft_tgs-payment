@@ -95,7 +95,16 @@ builder.Services
 			"tgs.payment.withdraw.paid")
 		.AddHandler(
 			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentCreatedEventHandlerType,
-			"tgs.payment.created"))
+			"tgs.payment.created")
+		.AddHandler(
+			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodCreatedEventHandlerType,
+			"tgs.payment-method.created")
+		.AddHandler(
+			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentChannelCreatedEventHandlerType,
+			"tgs.payment-channel.created")
+		.AddHandler(
+			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType,
+			"tgs.payment-method-channel.changed"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();
