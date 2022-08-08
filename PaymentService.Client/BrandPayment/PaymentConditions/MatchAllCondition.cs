@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Tgs.Payment.BrandPayment.PaymentConditions;
+﻿namespace Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 internal class MatchAllCondition : IBrandPaymentCondition
 {
@@ -11,9 +9,8 @@ internal class MatchAllCondition : IBrandPaymentCondition
 		_brandPaymentConditions = brandPaymentConditions;
 	}
 
-	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player, decimal depositedAmount)
+	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
 		=> _brandPaymentConditions.All(condition => condition.IsValid(
 			brandPayment,
-			player,
-			depositedAmount));
+			player));
 }

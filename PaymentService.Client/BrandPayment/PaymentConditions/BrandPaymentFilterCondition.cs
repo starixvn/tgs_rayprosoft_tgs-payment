@@ -1,4 +1,4 @@
-﻿namespace Tgs.Payment.BrandPayment.PaymentConditions;
+﻿namespace Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 internal class BrandPaymentFilterCondition : IBrandPaymentCondition
 {
@@ -19,17 +19,17 @@ internal class BrandPaymentFilterCondition : IBrandPaymentCondition
 		_brandPaymentCondition = brandPaymentCondition;
 	}
 
-	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player, decimal depositedAmount)
+	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
 	{
-		if (!_blockListCondition.IsValid(brandPayment, player, depositedAmount))
+		if (!_blockListCondition.IsValid(brandPayment, player))
 			return false;
 
-		if (_whiteListCondition.IsValid(brandPayment, player, depositedAmount))
+		if (_whiteListCondition.IsValid(brandPayment, player))
 			return true;
 
-		if (!_showOnAllPlayersCondition.IsValid(brandPayment, player, depositedAmount))
+		if (!_showOnAllPlayersCondition.IsValid(brandPayment, player))
 			return false;
 
-		return _brandPaymentCondition.IsValid(brandPayment, player, depositedAmount);
+		return _brandPaymentCondition.IsValid(brandPayment, player);
 	}
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Tgs.Payment.BrandPayment.PaymentConditions;
+﻿namespace Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 internal class VipCondition : IBrandPaymentCondition
 {
@@ -13,7 +9,7 @@ internal class VipCondition : IBrandPaymentCondition
 		_allowVips = allowVips.ToArray();
 	}
 
-	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player, decimal depositedAmount)
+	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
 	{
 		if (player.VipLevelId == null)
 			return false;

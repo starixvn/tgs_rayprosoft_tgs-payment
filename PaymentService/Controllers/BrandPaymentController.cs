@@ -1,9 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.BrandPayments;
-using Tgs.Payment.ApplicationServices.Payments;
-using Tgs.Payment.Extensions;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
 
@@ -56,76 +52,6 @@ public class BrandPaymentController : ControllerBase
 			TransferType = brandPayment.TransferType
 		};
 	}
-
-	[HttpGet("player", Name = "GetBrandPaymentsByPlayerInfo")]
-	public async IAsyncEnumerable<BrandPaymentResponse> GetBrandPaymentsByPlayerInfoAsync(
-		[FromServices] IQueryService<BrandPaymentsQuery, BrandPaymentInfo> brandPaymentsQueryService,		
-		[FromServices] IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> paymentMethodService,
-		[FromServices] IGetService<GetPaymentQuery, PaymentInfo> getPaymentService,
-		[FromQuery(Name = "brandId")] Guid brandId,
-		[FromQuery(Name = "playerCode")] string playerCode,
-		[FromQuery(Name = "phoneAuthentication")] bool phoneAuthentication,
-		[FromQuery(Name = "identityAuthentication")] bool identityAuthentication,
-		[FromQuery(Name = "depositedAmount")] decimal depositedAmount,
-		[FromQuery(Name = "vipLevelId")] Guid? vipLevelId)		
-	{		
-		var paymentMethods = new ReadOnlyDictionary<Guid, PaymentMethodInfo>(
-			await paymentMethodService.QueryAsync(new AllPaymentMethodsQuery())
-			.ToDictionaryAsync(method => method.Id)
-			.ConfigureAwait(false));
-		
-
-		var query = new BrandPaymentsQuery(brandId, playerCode,identityAuthentication,phoneAuthentication,vipLevelId,depositedAmount);
-
-		var brandPayments = await brandPaymentsQueryService.QueryAsync(query)
-			.ToArrayAsync()
-			.ConfigureAwait(false);
-
-		var brandPaymentQuery = await brandPayments
-			.Where(bp => bp.TransferType == TransferType.Deposit)
-			.AsParallel()
-			.WithCancellation(HttpContext.RequestAborted)
-			.Select(async bp =>
-			{
-				var getPaymentQuery = new GetPaymentQuery(bp.PaymentId);
-
-				var paymentInfo = await getPaymentService
-					.GetAsync(getPaymentQuery)
-					.ConfigureAwait(false);
-
-				var paymentMethod = paymentMethods[bp.MethodId];
-
-				return new BrandPaymentResponse
-				{
-					Id = bp.Id,
-					ChannelId = bp.ChannelId,
-					ChannelName = bp.ChannelName,
-					ChannelCode = bp.ChannelCode,
-					TransferLimit = new ValueRange<decimal>
-					{
-						From = bp.TransferLimit.From,
-						To = bp.TransferLimit.To
-					},
-					ExtendedData = paymentInfo.Code == "Manual"
-						? JsonDocument.Parse(bp.ExtendedData)
-						: JsonDocument.Parse("{}"),
-					PaymentId = bp.PaymentId,
-					PaymentCode = paymentInfo.Code,
-					MethodId = bp.MethodId,
-					MethodCode = paymentMethod.Name,
-					BankType = paymentMethod.BankType,
-					DisplayOrder = bp.DisplayOrder
-				};
-			})
-			.WhenAll()
-			.ConfigureAwait(false);
-
-		foreach (var bp in brandPaymentQuery)
-		{
-			yield return bp;
-		}
-	}
-	
 
 	[HttpGet(Name = "QueryBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(

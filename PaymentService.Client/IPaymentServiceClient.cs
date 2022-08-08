@@ -41,6 +41,8 @@ public interface IPaymentServiceClient
 
 	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default);
@@ -59,8 +61,6 @@ public interface IPaymentServiceClient
 	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
-
-	IAsyncEnumerable<BrandPaymentResponse> GetBrandPaymentsByPlayerInfoAsync(PlayerInfo playerInfo, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 

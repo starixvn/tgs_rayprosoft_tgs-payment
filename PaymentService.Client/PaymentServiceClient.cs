@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using Stateless;
+using Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 namespace Tgs.Payment.Clients;
 
@@ -309,6 +310,45 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default)
+	{
+		var blockListCondition = new BlockListCondition(blockList);
+		var whiteListCondition = new WhiteListCondition(whiteList);
+		var showOnAllPlayerCondition = new ShowOnAllPlayersCondition();
+
+		foreach (var bp in brandPaymentInfos)
+		{
+			if (!bp.Enabled)
+				continue;
+
+			var depositedAmountCondition = new DepositedAmountCondition(bp.DepositedAmountLimit);
+			var identityCondition = new IdentityCondition(bp.AuthenticateIdentity);
+			var phoneCondition = new PhoneCondition(bp.AuthenticatePhone);
+			var vipCondition = new VipCondition(brandPaymentVipLevels.Contains(bp.Id)
+					? brandPaymentVipLevels[bp.Id]
+					: Array.Empty<Guid>());
+
+			var filterCondition = new BrandPaymentFilterCondition(
+				blockListCondition,
+				whiteListCondition,
+				showOnAllPlayerCondition,
+				bp.ConditionMatchType == ConditionMatchType.MatchAll
+					? new MatchAllCondition(
+						depositedAmountCondition,
+						identityCondition,
+						phoneCondition,
+						vipCondition)
+					: new MatchOneCondition(
+						depositedAmountCondition,
+						identityCondition,
+						phoneCondition,
+						vipCondition));
+
+			if (filterCondition.IsValid(bp, playerInfo!))
+				yield return bp;
+		}
+	}
+
 	public async IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(
 		Guid agentId,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -461,38 +501,6 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _SerializerOptions);
-
-		foreach (var bp in brandPayments!)
-			yield return bp;
-	}
-
-	public async IAsyncEnumerable<BrandPaymentResponse> GetBrandPaymentsByPlayerInfoAsync(
-		PlayerInfo playerInfo,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default) 
-	{
-		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
-
-		queryStrings.Add("brandId", playerInfo.BrandId.ToString());
-		queryStrings.Add("playerCode", playerInfo.PlayerCode);
-		queryStrings.Add("phoneAuthentication", playerInfo.PhoneAuthentication.ToString());
-		queryStrings.Add("identityAuthentication", playerInfo.IdentityAuthentication.ToString());
-		queryStrings.Add("depositedAmount", playerInfo.DepositedAmount.ToString());
-
-		if(playerInfo.VipLevelId != null)
-			queryStrings.Add("vipLevelId", playerInfo.VipLevelId.ToString());
-
-
-		var response = await _httpClient
-			.GetAsync($"/brand/payment/player?{queryStrings}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		var brandPayments = JsonSerializer.Deserialize<BrandPaymentResponse[]>(contentJson, _SerializerOptions);
 
 		foreach (var bp in brandPayments!)
 			yield return bp;

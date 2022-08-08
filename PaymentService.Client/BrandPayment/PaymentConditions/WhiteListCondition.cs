@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Tgs.Payment.BrandPayment.PaymentConditions;
+﻿namespace Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 internal class WhiteListCondition : IBrandPaymentCondition
 {
@@ -13,6 +9,6 @@ internal class WhiteListCondition : IBrandPaymentCondition
 		_whiteList = playerAllowBrandPaymentIds.ToArray();
 	}
 
-	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player, decimal depositedAmount)
+	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
 		=> _whiteList.Contains(brandPayment.Id);
 }
