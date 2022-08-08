@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Payment.Clients
 {
-	public class PlayerInfo
+	public record PlayerInfo
 	{
 		public Guid BrandId { get; init; }
 
