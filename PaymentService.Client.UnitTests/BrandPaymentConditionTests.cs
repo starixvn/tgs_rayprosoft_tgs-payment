@@ -12,12 +12,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void AllMatchCondition_Should_All_SubConditions_Pass()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -83,12 +84,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void AllPlayers_Is_False_Will_Ignore_After_Conditions()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -139,12 +141,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Authenticate_Identity_Should_Always_Valid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -183,13 +186,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Authenticate_Identity_Should_Invalid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
-
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 			var brandPayment = new BrandPaymentInfo
 			{
 				Id = Guid.NewGuid(),
@@ -227,12 +230,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Authenticate_Identity_Should_Success()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -271,12 +275,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Authenticate_Phone_Should_Always_Valid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -315,12 +320,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Authenticate_Phone_Should_Success()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -359,12 +365,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void BlockList_Is_First_Check()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -409,12 +416,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void BrandPayment_Set_AllPlayers_False_Will_Invalid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -453,12 +461,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void DepositedAmountCondition_Should_Success()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 50M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 50M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -497,12 +506,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Player_In_BlockList_Should_Invalid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -541,12 +551,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Player_In_WhiteList_Should_Pass()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -585,12 +596,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void Player_In_WhiteList_Will_Ignore_After_Conditions()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -635,12 +647,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void SomeOneCondition_Should_Any_One_SubCondition_Pass()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -706,12 +719,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void VipCondition_Is_Empty_Should_Invalid()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: null);
 
 			var brandPayment = new BrandPaymentInfo
 			{
@@ -750,13 +764,13 @@ namespace PaymentService.Client.UnitTests
 		[Test]
 		public void VipCondition_Should_Success()
 		{
-			var playerInfo = new PlayerInfo
-			{
-				PlayerCode = "ThisIsPlayerCode",
-				BrandId = Guid.NewGuid(),
-				VipLevelId = Guid.NewGuid(),
-				DepositedAmount = 0M
-			};
+			var playerInfo = new PlayerInfo(
+				BrandId: Guid.NewGuid(),
+				DepositedAmount: 0M,
+				IdentityAuthentication: false,
+				PhoneAuthentication: false,
+				PlayerCode: "ThisIsPlayerCode",
+				VipLevelId: Guid.NewGuid());
 
 			var brandPayment = new BrandPaymentInfo
 			{

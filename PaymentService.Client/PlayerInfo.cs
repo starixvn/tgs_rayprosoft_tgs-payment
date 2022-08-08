@@ -1,17 +1,4 @@
 ﻿namespace Tgs.Payment.Clients
 {
-	public record PlayerInfo
-	{
-		public Guid BrandId { get; init; }
-
-		public decimal DepositedAmount { get; init; }
-
-		public bool IdentityAuthentication { get; init; }
-
-		public bool PhoneAuthentication { get; init; }
-
-		public string PlayerCode { get; init; } = default!;
-
-		public Guid? VipLevelId { get; init; }
-	}
+	public record PlayerInfo(Guid BrandId, decimal DepositedAmount, bool IdentityAuthentication, bool PhoneAuthentication, string PlayerCode, Guid? VipLevelId);
 }
