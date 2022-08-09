@@ -51,6 +51,7 @@ internal static class TestSiteHelper
 							exporterOptions =>
 							{
 								exporterOptions.Endpoint = null;
+								exporterOptions.TimeoutMilliseconds = 0;
 							}));
 
 					configureServices(services);

@@ -79,3 +79,19 @@ message PaidWithdrawRequest {
 	phoenix.protobuf.GuidValue form_id = 1;
 	phoenix.protobuf.GuidValue brand_id = 2;
 }
+
+message PaymentChangedEvent {
+	string code = 1;
+}
+
+message PaymentMethodChangedEvent {
+	string name = 1;
+}
+
+message PaymentChannelChangedEvent {
+	string name = 1;
+}
+
+message PaymentMethodChannelChangedEvent {
+	phoenix.protobuf.GuidValue id = 1;
+}

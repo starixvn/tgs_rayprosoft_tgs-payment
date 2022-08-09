@@ -83,7 +83,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 					null,
 					command.BankInfoId,
 					BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
-					OrderNo: orderNo), 
+					OrderNo: orderNo),
 				cancellationToken)
 			.ConfigureAwait(false);
 
@@ -128,7 +128,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 					command.BankInfoId,
 					BankInfo: JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions),
 					OrderNo: orderNo,
-					Note: command.Note), 
+					Note: command.Note),
 				cancellationToken)
 			.ConfigureAwait(false);
 

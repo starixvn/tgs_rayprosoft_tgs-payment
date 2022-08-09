@@ -12,6 +12,14 @@ public interface IPaymentClient
 
 	ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string status, CancellationToken cancellationToken = default);
 
+	ValueTask EmitPaymentChannelCreatedEventAsync(string paymentChannelName, CancellationToken cancellationToken = default);
+
+	ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default);
+
+	ValueTask EmitPaymentMethodChannelChangedEventAsync(Guid pmcId, CancellationToken cancellationToken = default);
+
+	ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default);
+
 	ValueTask EmitWithdrawFormCreatedEventAsync(Guid fromId, Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string status, CancellationToken cancellationToken = default);
@@ -25,9 +33,6 @@ public interface IPaymentClient
 	ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo, CancellationToken cancellationToken = default);
 
 	ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime, CancellationToken cancellationToken = default);
-
-	[Obsolete("過時，不合用")]
-	ValueTask TagWithdrawFormPaidAsync(Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default);
 }

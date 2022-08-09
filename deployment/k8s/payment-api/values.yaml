@@ -5,13 +5,13 @@
 replicaCount: 1
 
 image:
-  repository: harbor.rpgp.cc/tgs/payment-api
+  repository: pgtgs/payment-api
   pullPolicy: IfNotPresent
   tag: "latest"
 
 imagePullSecrets:
   - name: registry-credentials
-  - name: secret-tgs-harbor
+  - name: dockerhub
 
 nameOverride: "payment-api"
 fullnameOverride: "payment-api"
