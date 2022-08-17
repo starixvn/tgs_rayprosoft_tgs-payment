@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Payments;
+using Tgs.Payment.Clients;
+using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
 
@@ -14,8 +17,9 @@ public class PaymentTests
 	public async Task Can_Create_Payment()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentCommand("PaymentCode", null, null);
 
@@ -23,14 +27,17 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentAsync(Arg.Any<PaymentCreateInfo>());
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentCreatedEventAsync(Arg.Is(command.Code));
 	}
 
 	[Test]
 	public async Task Can_Create_PaymentChannel()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentChannelCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentChannelCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentChannelCommand("ChannelCode");
 
@@ -38,14 +45,17 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentChannelAsync(Arg.Is(command.ChannelCode));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentChannelCreatedEventAsync(Arg.Is(command.ChannelCode));
 	}
 
 	[Test]
 	public async Task Can_Create_PaymentMethod()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePaymentMethodCommandService(fakePaymentRepository);
+		var sut = new CreatePaymentMethodCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new CreatePaymentMethodCommand("MethodCode", "Bank");
 
@@ -53,6 +63,50 @@ public class PaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentMethodAsync(Arg.Is(command.Code), Arg.Is(command.BankType));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodCreatedEventAsync(Arg.Is(command.Code));
+	}
+
+	[Test]
+	public async Task Can_Create_PaymentMethodChannel()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new CreatePaymentMethodChannelCommandService(fakePaymentRepository, fakePaymentClient);
+
+		var command = new CreatePaymentMethodChannelCommand(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			Guid.NewGuid());
+
+		await sut.GetAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreatePaymentMethodChannelAsync(
+				Arg.Is(command.PaymentId),
+				Arg.Is(command.MethodId),
+				Arg.Is(command.ChannelId));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodChannelChangedEventAsync(Arg.Any<Guid>());
+	}
+
+	[Test]
+	public async Task Can_Delete_PaymentMethodChannel()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new DeletePaymentMethodChannelCommandService(fakePaymentRepository, fakePaymentClient);
+
+		var command = new DeletePaymentMethodChannelCommand(Guid.NewGuid());
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.DeletePaymentMethodChannelAsync(Arg.Is(command.PaymentMethodChannelId));
+		_ = fakePaymentClient.Received(1)
+			.EmitPaymentMethodChannelChangedEventAsync(Arg.Is(command.PaymentMethodChannelId));
 	}
 
 	[Test]
@@ -110,17 +164,23 @@ public class PaymentTests
 	[Test]
 	public async Task User_Can_Get_PaymentInfo()
 	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeQueryService = Substitute.For<IQueryService<GetAllPaymentsQuery, PaymentInfo>>();
 
-		var sut = new GetPaymentQueryService(fakePaymentRepository);
+		var sut = new GetPaymentQueryService(fakeQueryService);
 
 		var paymentId = Guid.NewGuid();
 
 		var query = new GetPaymentQuery(paymentId);
 
-		_ = await sut.GetAsync(query);
+		_ = fakeQueryService.QueryAsync(Arg.Any<GetAllPaymentsQuery>())
+			.Returns(new[] {
+				new PaymentInfo(Guid.NewGuid(), "Test1"),
+				new PaymentInfo(paymentId, "Test2")
+			}.ToAsyncEnumerable());
 
-		_ = fakePaymentRepository.Received(1)
-			.GetPaymentAsync(Arg.Is(paymentId));
+		var actual = await sut.GetAsync(query);
+
+		Assert.AreEqual(paymentId, actual.Id);
+		Assert.AreEqual("Test2", actual.Code);
 	}
 }

@@ -27,6 +27,8 @@ public interface IPaymentServiceClient
 
 	ValueTask CreatePaymentMethodAsync(PaymentMethodCreateInfo createInfo, CancellationToken cancellationToken = default);
 
+	ValueTask<Guid> CreatePaymentMethodChannelAsync(Guid paymentId, Guid methodId, Guid channelId, CancellationToken cancellationToken = default);
+
 	ValueTask<Guid> CreatePlayerBankInfoAsync(Guid brandId, string playerCode, BankCreateInfo info, string? modifyUser = null, CancellationToken cancellationToken = default);
 
 	ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default);
@@ -35,7 +37,11 @@ public interface IPaymentServiceClient
 
 	ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId, CancellationToken cancellationToken = default);
 
+	ValueTask DeletePaymentMethodChannelAsync(Guid pmcId, CancellationToken cancellationToken = default);
+
 	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
@@ -69,6 +75,12 @@ public interface IPaymentServiceClient
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default);
+
+	ValueTask<Guid> LockDepositPaymentAsync(
+		Guid formId,
+		string paymentCode,
+		string playerCode,
+		CancellationToken cancellationToken = default);
 
 	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 
@@ -114,5 +126,11 @@ public interface IPaymentServiceClient
 		string? thirdPartyOrderNo = null,
 		string? paidUserId = null,
 		string? paidUserName = null,
+		CancellationToken cancellationToken = default);
+
+	ValueTask UnlockDepositPaymentAsync(
+		Guid formId,
+		string paymentCode,
+		string playerCode,
 		CancellationToken cancellationToken = default);
 }

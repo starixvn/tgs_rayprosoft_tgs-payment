@@ -165,6 +165,25 @@ public class DepositController : ControllerBase
 	}
 
 	/// <summary>
+	/// Locks the payment asynchronous.
+	/// </summary>
+	/// <param name="lockService">The lock service.</param>
+	/// <param name="viewModel">The view model.</param>
+	/// <returns></returns>
+	[HttpPut("mutex", Name = "LockDepositPayment")]
+	public ValueTask<Guid> LockPaymentAsync(
+		[FromServices] IGetService<LockPaymentCommand, Guid> lockService,
+		[FromBody] LockDepositPaymentViewModel viewModel)
+	{
+		var command = new LockPaymentCommand(
+			viewModel.FormId,
+			viewModel.PaymentCode,
+			viewModel.PlayerCode);
+
+		return lockService.GetAsync(command, HttpContext.RequestAborted);
+	}
+
+	/// <summary>
 	/// Queries the deposit forms asynchronous.
 	/// </summary>
 	/// <param name="countService">The count service.</param>
@@ -324,5 +343,23 @@ public class DepositController : ControllerBase
 			request.ThirdPartyOrderNo);
 
 		return submitService.ExecuteAsync(command);
+	}
+
+	/// <summary>
+	/// Unlocks the payment asynchronous.
+	/// </summary>
+	/// <param name="unlockService">The unlock service.</param>
+	/// <param name="viewModel">The view model.</param>
+	/// <returns></returns>
+	[HttpDelete("mutex", Name = "UnlockDepositPayment")]
+	public ValueTask UnlockPaymentAsync(
+		[FromServices] ICommandService<UnlockPaymentCommand> unlockService,
+		[FromBody] LockDepositPaymentViewModel viewModel)
+	{
+		var command = new UnlockPaymentCommand(
+			viewModel.PaymentCode,
+			viewModel.PlayerCode);
+
+		return unlockService.ExecuteAsync(command, HttpContext.RequestAborted);
 	}
 }

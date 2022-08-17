@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.ServiceUtility;
@@ -7,15 +8,15 @@ namespace Tgs.Payment.ApplicationServices.Payments;
 
 internal class GetPaymentQueryService : IGetService<GetPaymentQuery, PaymentInfo>
 {
-	private readonly IPaymentRepository _paymentRepository;
+	private readonly IQueryService<GetAllPaymentsQuery, PaymentInfo> _queryService;
 
-	public GetPaymentQueryService(IPaymentRepository paymentRepository)
+	public GetPaymentQueryService(IQueryService<GetAllPaymentsQuery, PaymentInfo> queryService)
 	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+		_queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
 	}
 
 	public ValueTask<PaymentInfo> GetAsync(GetPaymentQuery query, CancellationToken cancellationToken = default)
-	{
-		return _paymentRepository.GetPaymentAsync(query.PaymentId, cancellationToken);
-	}
+		=> _queryService.QueryAsync(new GetAllPaymentsQuery(), cancellationToken)
+			.Where(p => p.Id == query.PaymentId)
+			.SingleAsync(cancellationToken: cancellationToken);
 }

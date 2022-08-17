@@ -1,10 +1,13 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using Stateless;
+using Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
 namespace Tgs.Payment.Clients;
 
@@ -184,8 +187,37 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask<Guid> CreatePaymentMethodChannelAsync(
+		Guid paymentId,
+		Guid methodId,
+		Guid channelId,
+		CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			PaymentId = paymentId,
+			MethodId = methodId,
+			ChannelId = channelId
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PutAsync("/payment/pmc", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		return await response.Content
+			.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask<Guid> CreatePlayerBankInfoAsync(
-		Guid brandId,
+			Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
 		string? modifyUser = null,
@@ -260,6 +292,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask DeletePaymentMethodChannelAsync(Guid pmcId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.DeleteAsync($"/payment/pmc/{pmcId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	public async ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
@@ -267,6 +308,45 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
+	}
+
+	public async IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default)
+	{
+		var blockListCondition = new BlockListCondition(blockList);
+		var whiteListCondition = new WhiteListCondition(whiteList);
+		var showOnAllPlayerCondition = new ShowOnAllPlayersCondition();
+
+		foreach (var bp in brandPaymentInfos)
+		{
+			if (!bp.Enabled)
+				continue;
+
+			var depositedAmountCondition = new DepositedAmountCondition(bp.DepositedAmountLimit);
+			var identityCondition = new IdentityCondition(bp.AuthenticateIdentity);
+			var phoneCondition = new PhoneCondition(bp.AuthenticatePhone);
+			var vipCondition = new VipCondition(brandPaymentVipLevels.Contains(bp.Id)
+					? brandPaymentVipLevels[bp.Id]
+					: Array.Empty<Guid>());
+
+			var filterCondition = new BrandPaymentFilterCondition(
+				blockListCondition,
+				whiteListCondition,
+				showOnAllPlayerCondition,
+				bp.ConditionMatchType == ConditionMatchType.MatchAll
+					? new MatchAllCondition(
+						depositedAmountCondition,
+						identityCondition,
+						phoneCondition,
+						vipCondition)
+					: new MatchOneCondition(
+						depositedAmountCondition,
+						identityCondition,
+						phoneCondition,
+						vipCondition));
+
+			if (filterCondition.IsValid(bp, playerInfo!))
+				yield return bp;
+		}
 	}
 
 	public async IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(
@@ -457,6 +537,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		_ = response.EnsureSuccessStatusCode();
 
+		if (response.StatusCode == HttpStatusCode.NoContent)
+			return null;
+
 		var contentJson = await response.Content
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -474,6 +557,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
+
+		if (response.StatusCode == HttpStatusCode.NoContent)
+			return null;
 
 		var contentJson = await response.Content
 			.ReadAsStringAsync(cancellationToken)
@@ -548,8 +634,32 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<WithdrawFormInfo>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<Guid> LockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			FormId = formId,
+			PaymentCode = paymentCode,
+			PlayerCode = playerCode
+		};
+
+		var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PutAsync("/deposit/mutex", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		return await response.Content
+			.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
-		DepositFormQueryConditions conditions,
+			DepositFormQueryConditions conditions,
 		Paging paging,
 		CancellationToken cancellationToken = default)
 	{
@@ -844,6 +954,29 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		var response = await _httpClient
 			.PatchAsync($"/withdraw/{formId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
+	public async ValueTask UnlockDepositPaymentAsync(Guid formId, string paymentCode, string playerCode, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			FormId = formId,
+			PaymentCode = paymentCode,
+			PlayerCode = playerCode
+		};
+
+		var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.SendAsync(new HttpRequestMessage(HttpMethod.Delete, "/deposit/mutex")
+			{
+				Content = requestContent
+			}, cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
