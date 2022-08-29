@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
-using Tgs.Paging;
 
 namespace TGS.Payment.Repositories;
 
@@ -671,8 +671,49 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public async ValueTask SetDefaultPlayerBankInfoAsync(
+	public async ValueTask RemoveBankInfoTagsAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
+	{
+		var tags = await _tgsContext.PlayerBankInfoTags
+			.Where(bt => bt.BrandId == brandId
+				&& bt.BankInfoId == bankInfoId)
+			.ToArrayAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		_tgsContext.PlayerBankInfoTags.RemoveRange(tags);
+
+		_ = await _tgsContext
+			.SaveChangesAsync(cancellationToken)
+			.ConfigureAwait(false);
+	}
+
+	public async ValueTask SetBankInfoTagAsync(
+		Guid brandId,
+		Guid bankInfoId,
+		string tagType,
 		string playerCode,
+		string tag,
+		CancellationToken cancellationToken = default)
+	{
+		var insertTag = new PlayerBankInfoTag
+		{
+			BrandId = brandId,
+			BankInfoId = bankInfoId,
+			TagType = tagType,
+			PlayerCode = playerCode,
+			Tag = tag
+		};
+
+		_ = await _tgsContext.PlayerBankInfoTags
+			.AddAsync(insertTag, cancellationToken)
+			.ConfigureAwait(false);
+
+		await _tgsContext
+			.SaveChangesAsync(cancellationToken)
+			.ConfigureAwait(false);
+	}
+
+	public async ValueTask SetDefaultPlayerBankInfoAsync(
+				string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
 		CancellationToken cancellationToken = default)

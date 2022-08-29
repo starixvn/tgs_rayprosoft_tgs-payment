@@ -56,23 +56,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
                 .HasColumnType("jsonb")
                 .HasColumnName("extended_data");
 
-            entity.Property(e => e.FeePercentage)
-                .HasPrecision(18, 6)
-                .HasColumnName("fee_percentage");
-
             entity.Property(e => e.HandlingFeeRateTenPercentile)
                 .HasPrecision(18, 6)
                 .HasColumnName("handling_fee_rate_ten_percentile");
 
-            entity.Property(e => e.HighestFee)
-                .HasPrecision(18, 6)
-                .HasColumnName("highest_fee");
-
             entity.Property(e => e.IdentityAuthentication).HasColumnName("identity_authentication");
-
-            entity.Property(e => e.LowestFee)
-                .HasPrecision(18, 6)
-                .HasColumnName("lowest_fee");
 
             entity.Property(e => e.PaymentMethodChannelId).HasColumnName("payment_method_channel_id");
 

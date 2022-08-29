@@ -32,9 +32,6 @@ namespace Tgs.Payment.Repositories.Entities
         public decimal DepositedAmountMin { get; set; }
         public decimal DepositedAmountMax { get; set; }
         public string? Reason { get; set; }
-        public decimal? FeePercentage { get; set; }
-        public decimal? LowestFee { get; set; }
-        public decimal? HighestFee { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string CreatedByUsername { get; set; } = null!;
