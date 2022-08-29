@@ -15,7 +15,7 @@ namespace Tgs.Payment.Repositories.Entities
         }
 
         public Guid Id { get; set; }
-        public string Code { get; set; } = default!;
+        public string Code { get; set; } = null!;
         public string? Description { get; set; }
 
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }

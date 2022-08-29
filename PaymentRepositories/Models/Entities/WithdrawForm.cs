@@ -16,7 +16,7 @@ namespace Tgs.Payment.Repositories.Entities
         public int Status { get; set; }
         public string? Remark { get; set; }
         public Guid BankInfoId { get; set; }
-        public string BankInfo { get; set; } = default!;
+        public string BankInfo { get; set; } = null!;
         public string? ApplyInfo { get; set; }
         public string? PaymentReturn { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -32,8 +32,9 @@ namespace Tgs.Payment.Repositories.Entities
         public string? PaidUserName { get; set; }
         public string? OrderNo { get; set; }
         public string? Note { get; set; }
+        public decimal HandlingFee { get; set; }
 
-        public virtual Brand Brand { get; set; } = default!;
+        public virtual Brand Brand { get; set; } = null!;
         public virtual BrandPayment? BrandPayment { get; set; }
     }
 }
