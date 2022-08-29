@@ -2,7 +2,7 @@
 
 internal class BlockListCondition : IBrandPaymentCondition
 {
-	private Guid[] _blockList;
+	private readonly Guid[] _blockList;
 
 	public BlockListCondition(IEnumerable<Guid> playerBlockedBrandPaymentIds)
 	{

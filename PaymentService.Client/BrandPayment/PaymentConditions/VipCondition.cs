@@ -10,10 +10,5 @@ internal class VipCondition : IBrandPaymentCondition
 	}
 
 	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
-	{
-		if (player.VipLevelId == null)
-			return false;
-
-		return _allowVips.Contains(player.VipLevelId.Value);
-	}
+		=> player.VipLevelId != null && _allowVips.Contains(player.VipLevelId.Value);
 }

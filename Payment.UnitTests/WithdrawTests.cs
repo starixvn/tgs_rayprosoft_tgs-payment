@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
-using TGS.Paging;
+using Tgs.Paging;
 
 namespace Payment.UnitTests;
 

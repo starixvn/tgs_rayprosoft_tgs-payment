@@ -10,5 +10,5 @@ internal class IdentityCondition : IBrandPaymentCondition
 	}
 
 	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
-		=> _enabled ? player.IdentityAuthentication : true;
+		=> !_enabled || player.IdentityAuthentication;
 }

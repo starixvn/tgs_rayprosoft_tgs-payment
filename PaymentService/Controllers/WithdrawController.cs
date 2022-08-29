@@ -4,7 +4,7 @@ using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
-using TGS.Paging;
+using Tgs.Paging;
 
 namespace Tgs.Payment.Controllers;
 

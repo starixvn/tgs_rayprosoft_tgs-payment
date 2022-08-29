@@ -80,7 +80,7 @@ public class PaymentTests
 			Guid.NewGuid(),
 			Guid.NewGuid());
 
-		await sut.GetAsync(command);
+		_ = await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreatePaymentMethodChannelAsync(
