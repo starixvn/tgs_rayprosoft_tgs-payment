@@ -893,7 +893,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		string modifyUser,
 		CancellationToken cancellationToken = default)
 	{
-		var requestMessage = new HttpRequestMessage(HttpMethod.Patch, $"/bankinfo/player/{playerCode}/{bankInfoId}/default");
+		var requestMessage = new HttpRequestMessage(HttpMethod.Patch, $"/bankinfo/player/default/{playerCode}/{bankInfoId}");
 		requestMessage.Headers.Add("ModifyUser", modifyUser);
 
 		var response = await _httpClient
