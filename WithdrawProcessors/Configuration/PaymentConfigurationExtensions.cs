@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tgs.Payment.ApplePay;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.LeePay;
 using Tgs.Payment.MalakiPay;
@@ -20,7 +19,6 @@ public static class PaymentConfigurationExtensions
 		_ = configuration.Services
 			.AddSingleton<LeePaySerializer>()
 			.AddSingleton<PrimePaySerializer>()
-			.AddSingleton<ApplePaySerializer>()
 			.AddSingleton<ManualDepositSerializer>()
 			.AddSingleton<MaticPaySerializer>()
 			.AddSingleton<Help2PaySerializer>()
@@ -32,7 +30,6 @@ public static class PaymentConfigurationExtensions
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
 			.RegisterWithdrawProcessor<PrimePayProcessor>("PrimePay")
-			.RegisterWithdrawProcessor<ApplePayProcessor>("ApplePay")
 			.RegisterWithdrawProcessor<ManualPayProcessor>("Manual")
 			.RegisterWithdrawProcessor<MaticPayProcessor>("MaticPay")
 			.RegisterWithdrawProcessor<Help2PayProcessor>("Help2Pay")

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TGS.Paging;
+using Tgs.Paging;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
 

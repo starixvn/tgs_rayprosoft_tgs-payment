@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
-using TGS.Paging;
+using Tgs.Paging;
 
 namespace TGS.Payment.Repositories;
 

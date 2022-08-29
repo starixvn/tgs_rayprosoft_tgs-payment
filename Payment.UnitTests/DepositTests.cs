@@ -6,7 +6,7 @@ using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
-using TGS.Paging;
+using Tgs.Paging;
 
 namespace Payment.UnitTests;
 
@@ -332,7 +332,7 @@ public class DepositTests
 			},
 			null,
 			null,
-			new TGS.Paging.Paging<DepositFormInfo>
+			new Tgs.Paging.Paging<DepositFormInfo>
 			{
 				Page = -1,
 				RowCount = -1

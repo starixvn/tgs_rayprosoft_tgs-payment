@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Tgs.Payment.ApplePay;
 using Tgs.Payment.SkyPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -27,7 +26,7 @@ internal class SkyPayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<ApplePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
