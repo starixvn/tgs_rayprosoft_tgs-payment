@@ -310,13 +310,19 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
-	public async IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default)
+	public async IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(
+		IEnumerable<BrandPaymentInfo> brandPaymentInfos,
+		PlayerInfo playerInfo,
+		IEnumerable<Guid> blockList,
+		IEnumerable<Guid> whiteList,
+		ILookup<Guid, Guid> brandPaymentVipLevels,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var blockListCondition = new BlockListCondition(blockList);
 		var whiteListCondition = new WhiteListCondition(whiteList);
 		var showOnAllPlayerCondition = new ShowOnAllPlayersCondition();
 
-		foreach (var bp in brandPaymentInfos)
+		await foreach (var bp in brandPaymentInfos.ToAsyncEnumerable())
 		{
 			if (!bp.Enabled)
 				continue;

@@ -2,7 +2,7 @@
 
 internal class DepositedAmountCondition : IBrandPaymentCondition
 {
-	private ValueRange<decimal> _depositedAmountLimit;
+	private readonly ValueRange<decimal> _depositedAmountLimit;
 
 	public DepositedAmountCondition(ValueRange<decimal> depositedAmountLimit)
 	{

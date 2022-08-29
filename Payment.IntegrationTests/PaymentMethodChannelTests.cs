@@ -226,7 +226,7 @@ public class PaymentMethodChannelTests
 
 		var dbContext = web.Services.GetRequiredService<TgsContext>();
 
-		await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
+		_ = await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
 		{
 			Id = pmcId,
 			MethodId = Guid.NewGuid(),
@@ -234,7 +234,7 @@ public class PaymentMethodChannelTests
 			ChannelId = Guid.NewGuid()
 		});
 
-		await dbContext.SaveChangesAsync();
+		_ = await dbContext.SaveChangesAsync();
 
 		dbContext.ChangeTracker.Clear();
 
@@ -257,7 +257,7 @@ public class PaymentMethodChannelTests
 
 		var dbContext = web.Services.GetRequiredService<TgsContext>();
 
-		await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
+		_ = await dbContext.PaymentMethodChannels.AddAsync(new PaymentMethodChannel
 		{
 			Id = pmcId,
 			MethodId = Guid.NewGuid(),
@@ -265,7 +265,7 @@ public class PaymentMethodChannelTests
 			ChannelId = Guid.NewGuid()
 		});
 
-		await dbContext.SaveChangesAsync();
+		_ = await dbContext.SaveChangesAsync();
 
 		dbContext.ChangeTracker.Clear();
 

@@ -20,16 +20,8 @@ internal class BrandPaymentFilterCondition : IBrandPaymentCondition
 	}
 
 	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
-	{
-		if (!_blockListCondition.IsValid(brandPayment, player))
-			return false;
-
-		if (_whiteListCondition.IsValid(brandPayment, player))
-			return true;
-
-		if (!_showOnAllPlayersCondition.IsValid(brandPayment, player))
-			return false;
-
-		return _brandPaymentCondition.IsValid(brandPayment, player);
-	}
+		=> _blockListCondition.IsValid(brandPayment, player)
+			&& (_whiteListCondition.IsValid(brandPayment, player)
+				|| _showOnAllPlayersCondition.IsValid(brandPayment, player)
+				&& _brandPaymentCondition.IsValid(brandPayment, player));
 }
