@@ -190,7 +190,7 @@ internal class PaymentRepository : IPaymentRepository
 			.AddAsync(pmc, cancellationToken)
 			.ConfigureAwait(false);
 
-		await _tgsContext
+		_ = await _tgsContext
 			.SaveChangesAsync(cancellationToken)
 			.ConfigureAwait(false);
 
@@ -263,7 +263,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		_tgsContext.Entry(deletePmc).State = EntityState.Deleted;
 
-		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask<AgentBankInfo> GetAgentBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)

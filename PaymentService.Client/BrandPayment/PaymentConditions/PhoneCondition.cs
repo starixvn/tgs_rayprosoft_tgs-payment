@@ -10,5 +10,5 @@ internal class PhoneCondition : IBrandPaymentCondition
 	}
 
 	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)
-		=> _enabled ? player.PhoneAuthentication : true;
+		=> !_enabled || player.PhoneAuthentication;
 }
