@@ -713,7 +713,7 @@ internal class PaymentRepository : IPaymentRepository
 	}
 
 	public async ValueTask SetDefaultPlayerBankInfoAsync(
-				string playerCode,
+		string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
 		CancellationToken cancellationToken = default)
