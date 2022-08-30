@@ -12,19 +12,20 @@ namespace Tgs.Payment.Repositories.Entities
             AgentBankInfoItems = new HashSet<AgentBankInfoItem>();
             BrandPaymentPlayers = new HashSet<BrandPaymentPlayer>();
             DepositForms = new HashSet<DepositForm>();
+            PlayerBankInfoTags = new HashSet<PlayerBankInfoTag>();
             PlayerBankInfos = new HashSet<PlayerBankInfo>();
         }
 
-        public string PlayerCode { get; set; } = default!;
+        public string PlayerCode { get; set; } = null!;
         public string? IdNumber { get; set; }
-        public string Username { get; set; } = default!;
+        public string Username { get; set; } = null!;
         public string? RealName { get; set; }
-        public byte[] Password { get; set; } = default!;
-        public byte[] Salt { get; set; } = default!;
-        public byte[] WithdrawPassword { get; set; } = default!;
-        public byte[] WithdrawSalt { get; set; } = default!;
+        public byte[] Password { get; set; } = null!;
+        public byte[] Salt { get; set; } = null!;
+        public byte[] WithdrawPassword { get; set; } = null!;
+        public byte[] WithdrawSalt { get; set; } = null!;
         public Guid DefaultWalletId { get; set; }
-        public string DefaultWalletCurrencyCode { get; set; } = default!;
+        public string DefaultWalletCurrencyCode { get; set; } = null!;
         public Guid BrandId { get; set; }
         public DateTime? RegisteredOn { get; set; }
         public DateTime LastActiveOn { get; set; }
@@ -46,13 +47,14 @@ namespace Tgs.Payment.Repositories.Entities
         public string? AreaCode { get; set; }
         public DateTime? FirstPromotionOn { get; set; }
         public string? Remark { get; set; }
-        public DateTime? Birthdate { get; set; }
+        public DateOnly? Birthdate { get; set; }
         public string? Birthday { get; set; }
 
-        public virtual Brand Brand { get; set; } = default!;
+        public virtual Brand Brand { get; set; } = null!;
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual ICollection<DepositForm> DepositForms { get; set; }
+        public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
         public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; }
     }
 }

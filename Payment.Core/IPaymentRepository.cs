@@ -89,6 +89,16 @@ public interface IPaymentRepository
 		WithdrawFormQueryConditions conditions,
 		CancellationToken cancellationToken = default);
 
+	ValueTask RemoveBankInfoTagsAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default);
+
+	ValueTask SetBankInfoTagAsync(
+																Guid brandId,
+		Guid bankInfoId,
+		string tagType,
+		string playerCode,
+		string tag,
+		CancellationToken cancellationToken = default);
+
 	ValueTask SetDefaultPlayerBankInfoAsync(
 		string playerCode,
 		Guid bankInfoId,

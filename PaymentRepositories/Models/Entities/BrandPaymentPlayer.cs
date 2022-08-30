@@ -7,11 +7,11 @@ namespace Tgs.Payment.Repositories.Entities
 {
     public partial class BrandPaymentPlayer
     {
-        public string PlayerCode { get; set; } = default!;
+        public string PlayerCode { get; set; } = null!;
         public Guid BrandPaymentId { get; set; }
         public short ListType { get; set; }
 
-        public virtual BrandPayment BrandPayment { get; set; } = default!;
-        public virtual Player PlayerCodeNavigation { get; set; } = default!;
+        public virtual BrandPayment BrandPayment { get; set; } = null!;
+        public virtual Player PlayerCodeNavigation { get; set; } = null!;
     }
 }

@@ -15,7 +15,7 @@ namespace Tgs.Payment.Repositories.Entities
         public Guid BrandPaymentId { get; set; }
         public DateTime CreatedOn { get; set; }
         public string? PaymentReturn { get; set; }
-        public string PlayerCode { get; set; } = default!;
+        public string PlayerCode { get; set; } = null!;
         public Guid? PromotionId { get; set; }
         public string? Remark { get; set; }
         public int Status { get; set; }
@@ -26,9 +26,10 @@ namespace Tgs.Payment.Repositories.Entities
         public string? ReviewedUserName { get; set; }
         public string? OrderNo { get; set; }
         public int? PromotionPlayerId { get; set; }
+        public decimal HandlingFee { get; set; }
 
-        public virtual Brand Brand { get; set; } = default!;
-        public virtual BrandPayment BrandPayment { get; set; } = default!;
-        public virtual Player PlayerCodeNavigation { get; set; } = default!;
+        public virtual Brand Brand { get; set; } = null!;
+        public virtual BrandPayment BrandPayment { get; set; } = null!;
+        public virtual Player PlayerCodeNavigation { get; set; } = null!;
     }
 }

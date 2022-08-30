@@ -20,7 +20,7 @@ namespace Tgs.Payment.Repositories.Entities
         public int DisplayOrder { get; set; }
         public Guid PaymentMethodChannelId { get; set; }
         public int TransferType { get; set; }
-        public string ChannelName { get; set; } = default!;
+        public string ChannelName { get; set; } = null!;
         public int PaymentStatus { get; set; }
         public decimal TransferLimitFrom { get; set; }
         public decimal TransferLimitTo { get; set; }
@@ -32,17 +32,16 @@ namespace Tgs.Payment.Repositories.Entities
         public decimal DepositedAmountMin { get; set; }
         public decimal DepositedAmountMax { get; set; }
         public string? Reason { get; set; }
-        public decimal? FeePercentage { get; set; }
-        public decimal? LowestFee { get; set; }
-        public decimal? HighestFee { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = default!;
-        public string UpdatedByUsername { get; set; } = default!;
-        public string ExtendedData { get; set; } = default!;
+        public string CreatedByUsername { get; set; } = null!;
+        public string UpdatedByUsername { get; set; } = null!;
+        public string ExtendedData { get; set; } = null!;
+        public decimal HandlingFeeRateTenPercentile { get; set; }
+        public bool ReducePlayerAmount { get; set; }
 
-        public virtual Brand Brand { get; set; } = default!;
-        public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = default!;
+        public virtual Brand Brand { get; set; } = null!;
+        public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = null!;
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; }
         public virtual ICollection<DepositForm> DepositForms { get; set; }

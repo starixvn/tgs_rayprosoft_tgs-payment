@@ -10,6 +10,6 @@ namespace Tgs.Payment.Repositories.Entities
         public Guid BrandPaymentId { get; set; }
         public Guid VipLevelId { get; set; }
 
-        public virtual BrandPayment BrandPayment { get; set; } = default!;
+        public virtual BrandPayment BrandPayment { get; set; } = null!;
     }
 }
