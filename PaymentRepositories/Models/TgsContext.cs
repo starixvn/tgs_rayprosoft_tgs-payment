@@ -31,6 +31,7 @@ namespace Tgs.Payment.Repositories.Entities
         public virtual DbSet<PaymentMethodChannel> PaymentMethodChannels { get; set; } = null!;
         public virtual DbSet<Player> Players { get; set; } = null!;
         public virtual DbSet<PlayerBankInfo> PlayerBankInfos { get; set; } = null!;
+        public virtual DbSet<PlayerBankInfoTag> PlayerBankInfoTags { get; set; } = null!;
         public virtual DbSet<WithdrawForm> WithdrawForms { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -50,6 +51,7 @@ namespace Tgs.Payment.Repositories.Entities
             modelBuilder.ApplyConfiguration(new Configurations.PaymentMethodChannelConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoTagConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormConfiguration());
             OnModelCreatingPartial(modelBuilder);
         }

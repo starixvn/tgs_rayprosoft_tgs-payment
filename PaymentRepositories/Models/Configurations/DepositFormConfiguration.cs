@@ -20,6 +20,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.HasIndex(e => e.BrandPaymentId, "ix_deposit_forms_brand_payment_id");
 
+            entity.HasIndex(e => e.OrderNo, "ix_deposit_forms_order_no")
+                .IsUnique();
+
             entity.HasIndex(e => e.PlayerCode, "ix_deposit_forms_playerCode");
 
             entity.Property(e => e.Id)

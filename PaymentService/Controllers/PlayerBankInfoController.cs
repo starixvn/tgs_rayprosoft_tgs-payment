@@ -62,7 +62,8 @@ public class PlayerBankInfoController : ControllerBase
 			});
 	}
 
-	[HttpPatch("{playerCode}/{id}/default", Name = "SetDefaultPlayerBankInfo")]
+	[HttpPatch("default/{playerCode}/{id}", Name = "SetDefaultPlayerBankInfo")]
+	[HttpPatch("{playerCode}/{id}/default")]
 	public ValueTask SetDefaultPlayerBankInfoAsync(
 		[FromServices] ICommandService<SetDefaultPlayerBankInfoCommand> setService,
 		[FromHeader(Name = "ModifyUser")] string modifyUser,

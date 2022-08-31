@@ -77,7 +77,7 @@ push-k8s-template:
   only:
     - main
   script:
-    - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M)-dev.$CI_PIPELINE_IID"
+    - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
     - mkdir -p artifacts/k8s
     - cp -R deployment/k8s/payment-api artifacts/k8s/
     - |
@@ -124,7 +124,7 @@ deploy-dev:
       cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
         -n $namespace \
         -f - \
-        | kubectl -n dev apply -f -
+        | kubectl -n $namespace apply -f -
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
@@ -164,7 +164,7 @@ deploy-staging:
       cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
         -n $namespace \
         -f - \
-        | kubectl -n dev apply -f -
+        | kubectl -n $namespace apply -f -
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
@@ -204,7 +204,7 @@ deploy-prod:
       cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
         -n $namespace \
         -f - \
-        | kubectl -n dev apply -f -
+        | kubectl -n $namespace apply -f -
       {
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],

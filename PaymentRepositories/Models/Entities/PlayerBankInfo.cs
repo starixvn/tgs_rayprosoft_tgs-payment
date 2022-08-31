@@ -7,6 +7,11 @@ namespace Tgs.Payment.Repositories.Entities
 {
     public partial class PlayerBankInfo
     {
+        public PlayerBankInfo()
+        {
+            PlayerBankInfoTags = new HashSet<PlayerBankInfoTag>();
+        }
+
         public Guid Id { get; set; }
         public string PlayerCode { get; set; } = null!;
         public Guid BrandId { get; set; }
@@ -23,5 +28,7 @@ namespace Tgs.Payment.Repositories.Entities
         public virtual Brand Brand { get; set; } = null!;
         public virtual PaymentChannel PaymentChannel { get; set; } = null!;
         public virtual Player PlayerCodeNavigation { get; set; } = null!;
+        public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
+
     }
 }
