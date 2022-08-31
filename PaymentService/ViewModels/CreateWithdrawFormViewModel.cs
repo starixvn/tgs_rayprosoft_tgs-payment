@@ -8,11 +8,11 @@ public class CreateWithdrawFormViewModel
 
 	public Guid BrandId { get; set; }
 
+	public string? Note { get; set; }
+
 	public string? UserId { get; set; }
 
 	public string? UserName { get; set; }
 
 	public UserType UserType { get; set; }
-
-	public string? Note { get; set; }
 }
