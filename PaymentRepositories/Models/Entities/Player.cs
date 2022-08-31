@@ -12,7 +12,6 @@ namespace Tgs.Payment.Repositories.Entities
             AgentBankInfoItems = new HashSet<AgentBankInfoItem>();
             BrandPaymentPlayers = new HashSet<BrandPaymentPlayer>();
             DepositForms = new HashSet<DepositForm>();
-            PlayerBankInfoTags = new HashSet<PlayerBankInfoTag>();
             PlayerBankInfos = new HashSet<PlayerBankInfo>();
         }
 
@@ -54,7 +53,6 @@ namespace Tgs.Payment.Repositories.Entities
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
         public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
         public virtual ICollection<DepositForm> DepositForms { get; set; }
-        public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
         public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; }
     }
 }

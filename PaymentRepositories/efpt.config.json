@@ -42,10 +42,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.player_bank_info_tags",
-         "ObjectType": 0
-      },
-      {
          "Name": "dbo.brand_payment_vip_levels",
          "ObjectType": 0
       },
@@ -72,9 +68,13 @@
       {
          "Name": "dbo.agent_bank_infos",
          "ObjectType": 0
+      },
+      {
+         "Name": "dbo.player_bank_info_tags",
+         "ObjectType": 0
       }
    ],
-   "UiHint": "tgs-local",
+   "UiHint": "LocalDB",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
