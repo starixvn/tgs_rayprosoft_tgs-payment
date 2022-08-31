@@ -12,8 +12,7 @@ namespace Tgs.Payment.Repositories.Entities
         public string PlayerCode { get; set; } = null!;
         public string TagType { get; set; } = null!;
         public string Tag { get; set; } = null!;
-
-        public virtual PlayerBankInfo BankInfo { get; set; } = null!;
-        public virtual Player PlayerCodeNavigation { get; set; } = null!;
-    }
+		public virtual PlayerBankInfo BankInfo { get; set; } = null!;
+		public virtual Player PlayerCodeNavigation { get; set; } = null!;
+	}
 }

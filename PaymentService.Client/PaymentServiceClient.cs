@@ -492,6 +492,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<BrandPaymentFeeInfo?> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/fee/{brandPaymentId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<BrandPaymentFeeInfo>(contentJson, _SerializerOptions);
+	}
+
 	public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(
 		Guid brandId,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)

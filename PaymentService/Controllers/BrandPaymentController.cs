@@ -49,7 +49,23 @@ public class BrandPaymentController : ControllerBase
 			PaymentId = brandPayment.PaymentId,
 			PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 			TransferLimit = brandPayment.TransferLimit,
-			TransferType = brandPayment.TransferType
+			TransferType = brandPayment.TransferType,
+		};
+	}
+
+	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
+	public async ValueTask<BrandPaymentFeeViewModel> GetBrandPaymentFeeSettingsAsync(
+		[FromServices] IGetService<GetBrandPaymentFeeQuery, BrandPaymentFeeInfo> getService,
+		Guid id)
+	{
+		var brandPayment = await getService
+			.GetAsync(new GetBrandPaymentFeeQuery(id))
+			.ConfigureAwait(false);
+
+		return new BrandPaymentFeeViewModel
+		{
+			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
+			ReducePlayerAmount = brandPayment.ReducePlayerAmount
 		};
 	}
 

@@ -422,6 +422,18 @@ internal class PaymentRepository : IPaymentRepository
 			row.DisplayOrder);
 	}
 
+	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid id, CancellationToken cancellationToken = default)
+	{
+		var row = await _tgsContext.BrandPayments.AsQueryable()
+			.Where(bp => bp.Id == id)
+			.SingleAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return new BrandPaymentFeeInfo(
+			row.HandlingFeeRateTenPercentile,
+			row.ReducePlayerAmount);
+	}
+
 	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var query = from bp in _tgsContext.BrandPayments.AsQueryable()
