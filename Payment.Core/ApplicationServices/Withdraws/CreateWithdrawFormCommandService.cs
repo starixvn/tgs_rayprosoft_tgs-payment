@@ -112,7 +112,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 			command.BankInfoId,
 			playerBankInfo.PaymentChannelId,
 			playerBankInfo.BankType,
-			JsonDocument.Parse(playerBankInfo.Detail));
+			playerBankInfo.Detail);
 
 		await _paymentRepository
 			.CreateWithdrawFormAsync(

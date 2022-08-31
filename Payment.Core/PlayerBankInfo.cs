@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 
 namespace Tgs.Payment;
 
@@ -8,5 +9,5 @@ public record PlayerBankInfo(
 	Guid BrandId,
 	Guid PaymentChannelId,
 	string BankType,
-	string Detail,
+	JsonDocument Detail,
 	bool IsDefault);

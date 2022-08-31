@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Tgs.Payment.ApplicationServices.BankInfos;
@@ -8,9 +9,6 @@ public record CreatePlayerBankInfoCommand(
 	string PlayerCode,
 	Guid PaymentChannelId,
 	string BankType,
-	string Detail,
+	JsonDocument Detail,
 	bool IsDefault,
-	string ModifyUser)
-{
-	public TaskCompletionSource<Guid> TaskSource { get; } = new TaskCompletionSource<Guid>();
-}
+	string ModifyUser);

@@ -92,7 +92,7 @@ public interface IPaymentRepository
 	ValueTask RemoveBankInfoTagsAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default);
 
 	ValueTask SetBankInfoTagAsync(
-																Guid brandId,
+		Guid brandId,
 		Guid bankInfoId,
 		string tagType,
 		string playerCode,

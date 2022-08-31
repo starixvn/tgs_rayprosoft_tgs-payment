@@ -7,6 +7,7 @@ using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
 using Tgs.Paging;
+using System.Text.Json;
 
 namespace Payment.UnitTests;
 
@@ -139,7 +140,7 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}",
+				JsonDocument.Parse("{}"),
 				false));
 
 		await sut.ExecuteAsync(command);
@@ -784,7 +785,7 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}",
+				JsonDocument.Parse("{}"),
 				false));
 
 		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
@@ -858,7 +859,7 @@ public class WithdrawTests
 				command.BrandId,
 				Guid.NewGuid(),
 				"Bank",
-				"{}",
+				JsonDocument.Parse("{}"),
 				false));
 
 		fakePaymentRepository
