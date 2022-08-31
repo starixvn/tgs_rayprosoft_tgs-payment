@@ -19,6 +19,4 @@ public record BrandPaymentInfo(
 	ConditionMatchType ConditionMatchType,
 	TransferType TransferType,
 	bool Enabled,
-	int DisplayOrder,
-	decimal HandlingFeeRateTenPercentile,
-	bool ReducePlayerAmount);
+	int DisplayOrder);

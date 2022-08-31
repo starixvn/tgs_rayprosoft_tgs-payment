@@ -50,6 +50,20 @@ public class BrandPaymentController : ControllerBase
 			PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 			TransferLimit = brandPayment.TransferLimit,
 			TransferType = brandPayment.TransferType,
+		};
+	}
+
+	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
+	public async ValueTask<BrandPaymentFeeViewModel> GetBrandPaymentFeeSettingsAsync(
+		[FromServices] IGetService<GetBrandPaymentFeeQuery, BrandPaymentFeeInfo> getService,
+		Guid id)
+	{
+		var brandPayment = await getService
+			.GetAsync(new GetBrandPaymentFeeQuery(id))
+			.ConfigureAwait(false);
+
+		return new BrandPaymentFeeViewModel
+		{
 			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
 			ReducePlayerAmount = brandPayment.ReducePlayerAmount
 		};
