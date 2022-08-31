@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
@@ -13,8 +11,7 @@ public class PlayerBankInfoController : ControllerBase
 {
 	[HttpPut("{brandId}/{playerCode}", Name = "CreatePlayerBankInfo")]
 	public async Task<Guid> CreatePlayerBankInfoAsync(
-		[FromServices] ICommandService<CreatePlayerBankInfoCommand> createService,
-		[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+		[FromServices] IGetService<CreatePlayerBankInfoCommand, Guid> createService,
 		[FromHeader(Name = "ModifyUser")] string? modifyUser,
 		Guid brandId,
 		string playerCode,
@@ -25,13 +22,13 @@ public class PlayerBankInfoController : ControllerBase
 			playerCode,
 			request.PaymentChannelId,
 			request.BankType,
-			JsonSerializer.Serialize(request.Detail, jsonOptionsAccessor.Value.JsonSerializerOptions),
+			request.Detail,
 			request.IsDefault ?? false,
 			modifyUser ?? playerCode);
 
-		await createService.ExecuteAsync(command).ConfigureAwait(false);
-
-		return await command.TaskSource.Task.ConfigureAwait(false);
+		return await createService
+			.GetAsync(command, HttpContext.RequestAborted)
+			.ConfigureAwait(false);
 	}
 
 	[HttpDelete("{playerCode}/{id}", Name = "DeletePlayerBankInfo")]
@@ -57,7 +54,7 @@ public class PlayerBankInfoController : ControllerBase
 				BankType = bankInfo.BankType,
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
-				Detail = JsonDocument.Parse(bankInfo.Detail),
+				Detail = bankInfo.Detail,
 				IsDefault = bankInfo.IsDefault
 			});
 	}

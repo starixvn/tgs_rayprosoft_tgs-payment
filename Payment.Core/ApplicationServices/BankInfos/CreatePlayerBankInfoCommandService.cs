@@ -5,7 +5,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BankInfos;
 
-internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayerBankInfoCommand>
+internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBankInfoCommand, Guid>
 {
 	private readonly IPaymentRepository _paymentRepository;
 
@@ -14,7 +14,7 @@ internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayer
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 	}
 
-	public async ValueTask ExecuteAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask<Guid> GetAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = new PlayerBankInfo(
 			Guid.NewGuid(),
@@ -29,6 +29,6 @@ internal class CreatePlayerBankInfoCommandService : ICommandService<CreatePlayer
 			.CreateBankInfoAsync(bankInfo, command.ModifyUser, cancellationToken)
 			.ConfigureAwait(false);
 
-		command.TaskSource.SetResult(bankInfo.Id);
+		return bankInfo.Id;
 	}
 }

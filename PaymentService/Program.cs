@@ -1,4 +1,7 @@
 using System.Text.Json.Serialization;
+using JSLTSharp;
+using JSLTSharp.JsonTransforms.Abstractions;
+using JSLTSharp.JsonTransforms.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -31,6 +34,11 @@ builder.Logging
 		});
 	});
 
+builder.Services
+	.AddSingleton(sp => new JsonTransform(
+		sp.GetServices<IJsonTransformConditionalCustomOperation>(),
+		sp.GetServices<IJsonTransformCustomOperation>()))
+	.RegisterJsonCustomTransformFunctions();
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()

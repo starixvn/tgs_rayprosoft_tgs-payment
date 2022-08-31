@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -89,7 +90,7 @@ internal class PaymentRepository : IPaymentRepository
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
 				BankType = bankInfo.BankType,
-				Detail = bankInfo.Detail,
+				Detail = bankInfo.Detail.ToString(),
 				Default = bankInfo.IsDefault,
 				CreatedByUsername = modifyUser,
 				CreatedOn = createTime,
@@ -329,22 +330,32 @@ internal class PaymentRepository : IPaymentRepository
 			bankInfo.BrandId,
 			bankInfo.PaymentChannelId,
 			bankInfo.BankType,
-			bankInfo.Detail!,
+			string.IsNullOrEmpty(bankInfo.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(bankInfo.Detail),
 			bankInfo.Default);
 	}
 
 	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
 		=> _tgsContext.PlayerBankInfos.AsQueryable()
 			.Where(info => info.PlayerCode == playerCode)
+			.Select(info => new
+			{
+				info.Id,
+				info.PlayerCode,
+				info.BrandId,
+				info.PaymentChannelId,
+				info.BankType,
+				info.Detail,
+				info.Default
+			})
+			.ToAsyncEnumerable()
 			.Select(info => new Tgs.Payment.PlayerBankInfo(
 				info.Id,
 				info.PlayerCode,
 				info.BrandId,
 				info.PaymentChannelId,
 				info.BankType,
-				info.Detail!,
-				info.Default))
-			.ToAsyncEnumerable();
+				string.IsNullOrEmpty(info.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(info.Detail),
+				info.Default));
 
 	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{

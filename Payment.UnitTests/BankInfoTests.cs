@@ -59,11 +59,11 @@ public class BankInfoTests
 			playerCode,
 			paymentChannelId,
 			bankType,
-			JsonSerializer.Serialize(detail),
+			JsonSerializer.SerializeToDocument(detail),
 			false,
 			playerCode);
 
-		await sut.ExecuteAsync(command);
+		await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
@@ -94,11 +94,11 @@ public class BankInfoTests
 			playerCode,
 			paymentChannelId,
 			bankType,
-			JsonSerializer.Serialize(detail),
+			JsonSerializer.SerializeToDocument(detail),
 			false,
 			modifyUser);
 
-		await sut.ExecuteAsync(command);
+		await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
