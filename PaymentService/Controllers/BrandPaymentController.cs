@@ -49,7 +49,9 @@ public class BrandPaymentController : ControllerBase
 			PaymentId = brandPayment.PaymentId,
 			PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 			TransferLimit = brandPayment.TransferLimit,
-			TransferType = brandPayment.TransferType
+			TransferType = brandPayment.TransferType,
+			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
+			ReducePlayerAmount = brandPayment.ReducePlayerAmount
 		};
 	}
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
-using Tgs.Paging;
 
 namespace TGS.Payment.Repositories;
 
@@ -408,7 +408,9 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit,
 			},
 			row.PaymentStatus == 0,
-			row.DisplayOrder);
+			row.DisplayOrder,
+			row.HandlingFeeRateTenPercentile,
+			row.ReducePlayerAmount);
 	}
 
 	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -449,7 +451,9 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder));
+			bp.DisplayOrder,
+			bp.HandlingFeeRateTenPercentile,
+			bp.ReducePlayerAmount));
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)

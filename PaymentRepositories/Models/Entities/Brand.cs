@@ -23,9 +23,9 @@ namespace Tgs.Payment.Repositories.Entities
         public string? OperationalEmail { get; set; }
         public string? TimeZoneId { get; set; }
         public Guid LicenseeId { get; set; }
-        public string ClientId { get; set; } = default!;
-        public string SecretKey { get; set; } = default!;
-        public string ApiKey { get; set; } = default!;
+        public string ClientId { get; set; } = null!;
+        public string SecretKey { get; set; } = null!;
+        public string ApiKey { get; set; } = null!;
         public short SettlementIntervalType { get; set; }
         public DateTime PreviousSettlementFrom { get; set; }
         public DateTime PreviousSettlementTo { get; set; }
@@ -35,12 +35,12 @@ namespace Tgs.Payment.Repositories.Entities
         public DateTime NextSettlementTo { get; set; }
         public bool AutoSentPlayerBonus { get; set; }
         public bool AutoSentAgentBonus { get; set; }
-        public string Code { get; set; } = default!;
-        public string Name { get; set; } = default!;
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = default!;
-        public string UpdatedByUsername { get; set; } = default!;
+        public string CreatedByUsername { get; set; } = null!;
+        public string UpdatedByUsername { get; set; } = null!;
         public int? SettlementDay { get; set; }
         public string? LogoInfo { get; set; }
         public bool EnableSms { get; set; }
@@ -57,6 +57,9 @@ namespace Tgs.Payment.Repositories.Entities
         public decimal DepositHandlingFeeRateTenPercentile { get; set; }
         public decimal WithdrawHandlingFeeRateTenPercentile { get; set; }
         public bool EnableEmailRegisterFlow { get; set; }
+        public string? PlayerRegisterFlowSettings { get; set; }
+        public bool EnableBankInfoRegisterFlow { get; set; }
+        public bool DepositPaymentLockEnabled { get; set; }
 
         public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
         public virtual ICollection<BrandPayment> BrandPayments { get; set; }

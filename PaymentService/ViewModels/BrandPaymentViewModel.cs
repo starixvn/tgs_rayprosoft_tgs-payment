@@ -22,6 +22,8 @@ public class BrandPaymentViewModel
 
 	public string? ExtendedData { get; set; }
 
+	public decimal HandlingFeeRateTenPercentile { get; init; }
+
 	public Guid Id { get; set; }
 
 	public bool IsAllPlayers { get; set; }
@@ -31,6 +33,8 @@ public class BrandPaymentViewModel
 	public Guid PaymentId { get; set; }
 
 	public Guid PaymentMethodChannelId { get; set; }
+
+	public bool ReducePlayerAmount { get; init; }
 
 	public ValueRange<decimal> TransferLimit { get; set; }
 

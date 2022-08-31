@@ -35,4 +35,6 @@ public record BrandPaymentInfo
 	public TransferType TransferType { get; init; }
 
 	public int DisplayOrder { get; init; }
+	public decimal HandlingFeeRateTenPercentile { get; init; }
+	public bool ReducePlayerAmount { get; init; }
 }

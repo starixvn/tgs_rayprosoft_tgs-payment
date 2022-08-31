@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 0,
+   "CodeGenerationMode": 2,
    "ContextClassName": "TgsContext",
    "ContextNamespace": "Entities",
    "DefaultDacpacSchema": null,
@@ -50,11 +50,11 @@
          "ObjectType": 0
       },
       {
-         "Name": "dbo.player_bank_infos",
+         "Name": "dbo.brand_payment_players",
          "ObjectType": 0
       },
       {
-         "Name": "dbo.brand_payment_players",
+         "Name": "dbo.player_bank_infos",
          "ObjectType": 0
       },
       {
@@ -70,7 +70,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "Tgs",
+   "UiHint": "LocalDB",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,

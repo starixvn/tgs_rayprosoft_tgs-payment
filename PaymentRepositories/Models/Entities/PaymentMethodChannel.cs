@@ -18,9 +18,9 @@ namespace Tgs.Payment.Repositories.Entities
         public Guid ChannelId { get; set; }
         public short Status { get; set; }
 
-        public virtual PaymentChannel Channel { get; set; } = default!;
-        public virtual PaymentMethod Method { get; set; } = default!;
-        public virtual PaymentItem Payment { get; set; } = default!;
+        public virtual PaymentChannel Channel { get; set; } = null!;
+        public virtual PaymentMethod Method { get; set; } = null!;
+        public virtual PaymentItem Payment { get; set; } = null!;
         public virtual ICollection<BrandPayment> BrandPayments { get; set; }
     }
 }
