@@ -90,7 +90,7 @@ internal class PaymentRepository : IPaymentRepository
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
 				BankType = bankInfo.BankType,
-				Detail = bankInfo.Detail.ToString(),
+				Detail = JsonSerializer.Serialize(bankInfo.Detail),
 				Default = bankInfo.IsDefault,
 				CreatedByUsername = modifyUser,
 				CreatedOn = createTime,

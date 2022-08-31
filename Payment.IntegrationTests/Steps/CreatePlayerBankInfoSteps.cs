@@ -70,6 +70,7 @@ public class CreatePlayerBankInfoSteps
 
 		Assert.AreEqual(_brandId, data.BrandId);
 		Assert.AreEqual(_bankInfo.PaymentChannelId, data.PaymentChannelId);
+		Assert.AreEqual(JsonSerializer.Serialize(_bankInfo.Detail), data.Detail);
 	}
 
 	[When(@"call create bank info api")]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using JSLTSharp;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
@@ -192,5 +193,52 @@ public class BankInfoTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(command.BankInfoId),
 				Arg.Is(command.ModifyUser));
+	}
+
+	[Test]
+	public async Task Process_Player_BankInfo_Index()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBankInfoIndexParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+
+		var sut = new ProcessBankInfoTagsCommandService(
+			fakePaymentRepository,
+			fakeBankInfoIndexParserFactory,
+			new JsonTransform());
+
+		var command = new ProcessBankInfoTagsCommand(Guid.NewGuid());
+
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+			.Returns(new PlayerBankInfo(
+				command.BankInfoId,
+				"player1",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"Bank",
+				JsonSerializer.SerializeToDocument(new
+				{
+					name = "tester",
+					bankName = "bank1",
+					bankAccount = "1111111"
+				}),
+				false));
+
+		_ = fakeBankInfoIndexParserFactory.GetBankInfoTransformation(Arg.Any<string>())
+			.Returns(JsonSerializer.Serialize(new
+			{
+				BankAccount = "$.bankAccount"
+			}));
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.RemoveBankInfoTagsAsync(Arg.Any<Guid>(), Arg.Is(command.BankInfoId));
+		_ = fakePaymentRepository.Received(1)
+			.SetBankInfoTagAsync(
+				Arg.Any<Guid>(),
+				Arg.Is(command.BankInfoId),
+				Arg.Is("BankAccount"),
+				Arg.Is("player1"),
+				Arg.Is("1111111"));
 	}
 }
