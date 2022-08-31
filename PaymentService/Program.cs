@@ -1,7 +1,4 @@
 using System.Text.Json.Serialization;
-using JSLTSharp;
-using JSLTSharp.JsonTransforms.Abstractions;
-using JSLTSharp.JsonTransforms.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -73,6 +70,10 @@ builder.Services
 		var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
 
 		options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
+	})
+	.ConfigureBankInfoIndexParsers((options, _) =>
+	{
+		builder.Configuration.GetSection("BankInfoParsers").Bind(options);
 	})
 	.RegisterWithdrawProcessors()
 	.Services

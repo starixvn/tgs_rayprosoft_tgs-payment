@@ -5,6 +5,26 @@ metadata:
 data:
   appsettings.json: |
     {
+      "BankInfoParsers": {
+        "Crypto": {
+          "Address": "$.address"
+        },
+        "Bank": {
+          "BankAccount": "$.bankAccount"
+        },
+        "FPS": {
+          "Phone": "$.phone"
+        },
+        "ThirdParty": {
+          "Phone": "$.phone"
+        },
+        "Pulsa": {
+          "Phone": "$.phone"
+        },
+        "EWallet": {
+          "Phone": "$.phone"
+        }
+      }
     }
   monitor.settings.json: |
     {
