@@ -1,4 +1,7 @@
 ﻿using System.Reflection;
+using JSLTSharp;
+using JSLTSharp.JsonTransforms.Abstractions;
+using JSLTSharp.JsonTransforms.Extensions;
 using Tgs.Payment;
 using Tgs.Payment.Configuration;
 
@@ -19,7 +22,14 @@ public static class ServiceCollectionExtensions
 				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
 					sp,
 					configuration.GetAllRegisterWithdrawProcessorTypes()))
+			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
 			.AddOptions<PaymentOptions>();
+
+		services
+			.AddSingleton(sp => new JsonTransform(
+				sp.GetServices<IJsonTransformConditionalCustomOperation>(),
+				sp.GetServices<IJsonTransformCustomOperation>()))
+			.RegisterJsonCustomTransformFunctions();
 
 		return configuration;
 	}

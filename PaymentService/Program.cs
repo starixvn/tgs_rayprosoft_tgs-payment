@@ -35,11 +35,6 @@ builder.Logging
 	});
 
 builder.Services
-	.AddSingleton(sp => new JsonTransform(
-		sp.GetServices<IJsonTransformConditionalCustomOperation>(),
-		sp.GetServices<IJsonTransformCustomOperation>()))
-	.RegisterJsonCustomTransformFunctions();
-builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
 	.AddJsonOptions(options =>
