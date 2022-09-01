@@ -53,6 +53,11 @@ public class BrandPaymentController : ControllerBase
 		};
 	}
 
+	[HttpGet("designatedusers/{id}", Name = "QueryBrandPaymentAcls")]
+	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentDesignatedUsersAsync(
+		Guid id)
+		=> throw new NotImplementedException();
+
 	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
 	public async ValueTask<BrandPaymentFeeViewModel> GetBrandPaymentFeeSettingsAsync(
 		[FromServices] IGetService<GetBrandPaymentFeeQuery, BrandPaymentFeeInfo> getService,
@@ -69,7 +74,7 @@ public class BrandPaymentController : ControllerBase
 		};
 	}
 
-	[HttpGet(Name = "QueryBrandPayments")]
+	[HttpGet(Name = "GetBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(
 		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
 		[FromQuery(Name = "brand")] Guid brandId)
@@ -105,4 +110,35 @@ public class BrandPaymentController : ControllerBase
 				BrandPaymentId = vip.BrandPaymentId,
 				VipLevelId = vip.VipLevelId
 			});
+
+	[HttpGet("query", Name = "QueryBrandPayments")]
+	public IAsyncEnumerable<BrandPaymentViewModel> QueryBrandPaymentsAsync(
+		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
+		[FromQuery(Name = "brand_id")] Guid brandId,
+		[FromQuery(Name = "transfer_type")] TransferType transferType,
+		[FromQuery(Name = "enabled")] bool enabled,
+		[FromQuery(Name = "keyword")] string keyword)
+	{
+		return queryService.QueryAsync(new BrandPaymentQuery(brandId))
+				.Select(brandPayment => new BrandPaymentViewModel
+				{
+					Id = brandPayment.Id,
+					AuthenticateIdentity = brandPayment.AuthenticateIdentity,
+					AuthenticatePhone = brandPayment.AuthenticatePhone,
+					ChannelCode = brandPayment.ChannelCode,
+					ChannelId = brandPayment.ChannelId,
+					ChannelName = brandPayment.ChannelName,
+					ConditionMatchType = brandPayment.ConditionMatchType,
+					DepositedAmountLimit = brandPayment.DepositedAmountLimit,
+					Enabled = brandPayment.Enabled,
+					ExtendedData = brandPayment.ExtendedData,
+					IsAllPlayers = brandPayment.IsAllPlayers,
+					MethodId = brandPayment.MethodId,
+					PaymentId = brandPayment.PaymentId,
+					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
+					TransferLimit = brandPayment.TransferLimit,
+					TransferType = brandPayment.TransferType,
+					DisplayOrder = brandPayment.DisplayOrder
+				});
+	}
 }
