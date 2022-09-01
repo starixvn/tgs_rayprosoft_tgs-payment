@@ -119,13 +119,13 @@ public class BrandPaymentController : ControllerBase
 
 	[HttpGet("query", Name = "QueryBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> QueryBrandPaymentsAsync(
-		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
-		[FromQuery(Name = "brand_id")] Guid brandId,
-		[FromQuery(Name = "transfer_type")] TransferType transferType,
-		[FromQuery(Name = "enabled")] bool enabled,
-		[FromQuery(Name = "keyword")] string keyword)
+		[FromServices] IQueryService<QueryBrandPaymentQuery, BrandPaymentInfo> queryService,
+		[FromQuery(Name = "brand_id")] Guid? brandId,
+		[FromQuery(Name = "transfer_type")] TransferType? transferType,
+		[FromQuery(Name = "enabled")] bool? enabled,
+		[FromQuery(Name = "keyword")] string? keyword)
 	{
-		return queryService.QueryAsync(new BrandPaymentQuery(brandId))
+		return queryService.QueryAsync(new QueryBrandPaymentQuery(brandId, transferType, enabled, keyword))
 				.Select(brandPayment => new BrandPaymentViewModel
 				{
 					Id = brandPayment.Id,
@@ -144,7 +144,10 @@ public class BrandPaymentController : ControllerBase
 					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 					TransferLimit = brandPayment.TransferLimit,
 					TransferType = brandPayment.TransferType,
-					DisplayOrder = brandPayment.DisplayOrder
+					DisplayOrder = brandPayment.DisplayOrder,
+					PaymentMethodName = brandPayment.PaymentMethodName,
+					PaymentName = brandPayment.PaymentName,
+					VipLevelIds = brandPayment.VipLevelIds,
 				});
 	}
 }

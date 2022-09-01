@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Tgs.Payment;
 
@@ -19,4 +20,7 @@ public record BrandPaymentInfo(
 	ConditionMatchType ConditionMatchType,
 	TransferType TransferType,
 	bool Enabled,
-	int DisplayOrder);
+	int DisplayOrder,
+	string PaymentName,
+	string PaymentMethodName,
+	IEnumerable<Guid> VipLevelIds);
