@@ -50,7 +50,7 @@ public interface IPaymentRepository
 
 	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default);
 
-	ValueTask<PlayerBankInfo> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
+	ValueTask<PlayerBankInfo?> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default);
 

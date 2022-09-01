@@ -318,20 +318,22 @@ internal class PaymentRepository : IPaymentRepository
 			.Select(row => new PaymentInfo(row.Id, row.Code))
 			.ToAsyncEnumerable();
 
-	public async ValueTask<Tgs.Payment.PlayerBankInfo> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
+	public async ValueTask<Tgs.Payment.PlayerBankInfo?> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var bankInfo = await _tgsContext.PlayerBankInfos
 			.FindAsync(new object?[] { id }, cancellationToken)
 			.ConfigureAwait(false);
 
-		return new Tgs.Payment.PlayerBankInfo(
-			bankInfo!.Id,
-			bankInfo.PlayerCode,
-			bankInfo.BrandId,
-			bankInfo.PaymentChannelId,
-			bankInfo.BankType,
-			string.IsNullOrEmpty(bankInfo.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(bankInfo.Detail),
-			bankInfo.Default);
+		return bankInfo is null
+			? null
+			: new Tgs.Payment.PlayerBankInfo(
+				bankInfo!.Id,
+				bankInfo.PlayerCode,
+				bankInfo.BrandId,
+				bankInfo.PaymentChannelId,
+				bankInfo.BankType,
+				string.IsNullOrEmpty(bankInfo.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(bankInfo.Detail),
+				bankInfo.Default);
 	}
 
 	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
@@ -718,7 +720,7 @@ internal class PaymentRepository : IPaymentRepository
 			.AddAsync(insertTag, cancellationToken)
 			.ConfigureAwait(false);
 
-		await _tgsContext
+		_ = await _tgsContext
 			.SaveChangesAsync(cancellationToken)
 			.ConfigureAwait(false);
 	}
