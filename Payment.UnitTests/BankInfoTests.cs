@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using JSLTSharp;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
@@ -230,7 +231,8 @@ public class BankInfoTests
 		var sut = new ProcessBankInfoTagsCommandService(
 			fakePaymentRepository,
 			fakeBankInfoIndexParserFactory,
-			new JsonTransform());
+			new JsonTransform(),
+			NullLogger<ProcessBankInfoTagsCommandService>.Instance);
 
 		var command = new ProcessBankInfoTagsCommand(Guid.NewGuid());
 
