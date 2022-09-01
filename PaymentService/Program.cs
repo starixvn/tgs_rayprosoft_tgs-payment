@@ -78,7 +78,7 @@ builder.Services
 		builder.Configuration.Bind("BankInfoParsers", parsersConfig);
 
 		foreach (var p in parsersConfig)
-			options.Add(p.Key, JsonSerializer.SerializeToDocument(parsersConfig));
+			options.Add(p.Key, JsonSerializer.SerializeToDocument(p.Value));
 	})
 	.RegisterWithdrawProcessors()
 	.Services
