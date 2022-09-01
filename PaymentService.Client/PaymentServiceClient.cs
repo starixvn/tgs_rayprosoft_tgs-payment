@@ -918,6 +918,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask SetPlayerBankInfoTagsAsync(Guid bankInfoId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.PostAsync($"/bankinfo/player/tag/{bankInfoId}", null, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	public async ValueTask SubmitDepositFormStatusAsync(
 		Guid formId,
 		PaymentFlowState? state,

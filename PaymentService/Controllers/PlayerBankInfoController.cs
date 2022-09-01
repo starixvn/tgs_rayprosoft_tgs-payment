@@ -46,7 +46,7 @@ public class PlayerBankInfoController : ControllerBase
 	{
 		var query = new GetPlayerBankInfosQuery(playerCode);
 
-		return queryService.QueryAsync(query)
+		return queryService.QueryAsync(query, HttpContext.RequestAborted)
 			.Select(bankInfo => new PlayerBankInfoViewModel
 			{
 				Id = bankInfo.Id,
@@ -59,6 +59,16 @@ public class PlayerBankInfoController : ControllerBase
 			});
 	}
 
+	[HttpPost("tag/{id}")]
+	public ValueTask SetBankInfoTagsAsync(
+		[FromServices] ICommandService<ProcessBankInfoTagsCommand> tagService,
+		Guid id)
+	{
+		var command = new ProcessBankInfoTagsCommand(id);
+
+		return tagService.ExecuteAsync(command, HttpContext.RequestAborted);
+	}
+
 	[HttpPatch("default/{playerCode}/{id}", Name = "SetDefaultPlayerBankInfo")]
 	[HttpPatch("{playerCode}/{id}/default")]
 	public ValueTask SetDefaultPlayerBankInfoAsync(
@@ -67,5 +77,6 @@ public class PlayerBankInfoController : ControllerBase
 		string playerCode,
 		Guid id)
 		=> setService.ExecuteAsync(
-			new SetDefaultPlayerBankInfoCommand(playerCode, id, modifyUser));
+			new SetDefaultPlayerBankInfoCommand(playerCode, id, modifyUser),
+			HttpContext.RequestAborted);
 }

@@ -15,6 +15,15 @@ public class PaymentConfiguration
 		Services = services ?? throw new System.ArgumentNullException(nameof(services));
 	}
 
+	public PaymentConfiguration ConfigureBankInfoIndexParsers(Action<BankInfoParserOptions, IServiceProvider> configure)
+	{
+		_ = Services
+			.AddOptions<BankInfoParserOptions>()
+			.Configure(configure);
+
+		return this;
+	}
+
 	public PaymentConfiguration ConfigureOptions(Action<PaymentOptions, IServiceProvider> configure)
 	{
 		_ = Services

@@ -23,7 +23,9 @@ public static class ServiceCollectionExtensions
 					sp,
 					configuration.GetAllRegisterWithdrawProcessorTypes()))
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
-			.AddOptions<PaymentOptions>();
+			.AddOptions<PaymentOptions>()
+			.Services
+			.AddOptions<BankInfoParserOptions>();
 
 		services
 			.AddSingleton(sp => new JsonTransform(
