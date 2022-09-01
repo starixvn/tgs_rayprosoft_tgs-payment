@@ -493,7 +493,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
-			Guid brandPaymentId,
+		Guid brandPaymentId,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

@@ -424,6 +424,46 @@ internal class PaymentRepository : IPaymentRepository
 			row.DisplayOrder);
 	}
 
+	public IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
+		Guid id,
+		CancellationToken cancellationToken = default)
+	{
+		var brandPayment = _tgsContext.BrandPayments.AsQueryable()
+					.Where(bp => bp.Id == id)
+					.Include(bp => bp.BrandPaymentPlayers)
+					.ThenInclude(bp => bp.PlayerCodeNavigation)
+					.Include(bp => bp.BrandPaymentVipLevels)
+					.AsNoTracking()
+					.FirstOrDefault();
+
+		var vipLevelIds = brandPayment!.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId).ToArray();
+
+		var playerListType = (short)PlayerListType.White;
+		var playerCodes = brandPayment.BrandPaymentPlayers
+			.Where(bpp => bpp.ListType == playerListType)
+			.Select(bpp => bpp.PlayerCode)
+			.ToArray();
+
+		var isAll = brandPayment.PlayerListCondition == (int)ConditionMatchType.MatchAll;
+
+		var query = brandPayment.BrandPaymentPlayers
+			.Where(bpp => playerCodes.Contains(bpp.PlayerCode))
+			.Where(bpp => bpp.PlayerCodeNavigation.AccumulatedDeposit >= brandPayment.DepositedAmountMin
+				&& (brandPayment.DepositedAmountUnlimited || bpp.PlayerCodeNavigation.AccumulatedDeposit < brandPayment.DepositedAmountMax));
+
+		if (isAll && brandPayment.IdentityAuthentication)
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.IdentityAuthentication);
+
+		if (isAll && brandPayment.PhoneAuthentication)
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.PhoneAuthentication);
+
+		if (isAll && brandPayment.BrandPaymentVipLevels.Any())
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.VipId != null && vipLevelIds.Contains(bpp.PlayerCodeNavigation.VipId.Value));
+
+		return query.Select(bpp => new BrandPaymentPlayerInfo(bpp.PlayerCodeNavigation.Username))
+			.ToAsyncEnumerable();
+	}
+
 	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var row = await _tgsContext.BrandPayments.AsQueryable()
