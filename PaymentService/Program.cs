@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +74,11 @@ builder.Services
 	})
 	.ConfigureBankInfoIndexParsers((options, _) =>
 	{
-		builder.Configuration.GetSection("BankInfoParsers").Bind(options);
+		var parsersConfig = new Dictionary<string, Dictionary<string, string>>();
+		builder.Configuration.Bind("BankInfoParsers", parsersConfig);
+
+		foreach (var p in parsersConfig)
+			options.Add(p.Key, JsonSerializer.SerializeToDocument(parsersConfig));
 	})
 	.RegisterWithdrawProcessors()
 	.Services

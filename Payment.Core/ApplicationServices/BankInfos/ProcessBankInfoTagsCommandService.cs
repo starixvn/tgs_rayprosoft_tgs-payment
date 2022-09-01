@@ -31,7 +31,10 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 			.GetBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 
-		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo!.BankType);
+		if (bankInfo is null)
+			return;
+
+		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo.BankType);
 		var bankInfoDetail = JsonSerializer.Serialize(bankInfo.Detail);
 
 		var tranformResult = _jsonTransform.Transform(bankInfoDetail, transformation);
