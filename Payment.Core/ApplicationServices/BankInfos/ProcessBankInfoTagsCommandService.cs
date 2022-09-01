@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using JSLTSharp;
+using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BankInfos;
@@ -13,16 +14,19 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 {
 	private readonly IBankInfoIndexParserFactory _indexParserFactory;
 	private readonly JsonTransform _jsonTransform;
+	private readonly ILogger<ProcessBankInfoTagsCommandService> _logger;
 	private readonly IPaymentRepository _paymentRepository;
 
 	public ProcessBankInfoTagsCommandService(
 		IPaymentRepository paymentRepository,
 		IBankInfoIndexParserFactory indexParserFactory,
-		JsonTransform jsonTransform)
+		JsonTransform jsonTransform,
+		ILogger<ProcessBankInfoTagsCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_indexParserFactory = indexParserFactory ?? throw new ArgumentNullException(nameof(indexParserFactory));
 		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(ProcessBankInfoTagsCommand command, CancellationToken cancellationToken = default)
@@ -37,9 +41,11 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo.BankType);
 		var bankInfoDetail = JsonSerializer.Serialize(bankInfo.Detail);
 
-		var tranformResult = _jsonTransform.Transform(bankInfoDetail, transformation);
+		var transformResult = _jsonTransform.Transform(bankInfoDetail, transformation);
 
-		var dict = JsonSerializer.Deserialize<Dictionary<string, string?>>(tranformResult)!;
+		_logger.LogInformation("TransformResult: {transformResult}", transformResult);
+
+		var dict = JsonSerializer.Deserialize<Dictionary<string, string?>>(transformResult)!;
 
 		await _paymentRepository
 			.RemoveBankInfoTagsAsync(bankInfo.BrandId, bankInfo.Id, cancellationToken)
