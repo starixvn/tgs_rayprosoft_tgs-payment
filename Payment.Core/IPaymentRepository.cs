@@ -77,6 +77,8 @@ public interface IPaymentRepository
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(Guid? brandId, TransferType? transferType, bool? enabled, string? keyword, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 		DepositFormQueryConditions conditions,
 		Paging<DepositFormInfo> paging,
