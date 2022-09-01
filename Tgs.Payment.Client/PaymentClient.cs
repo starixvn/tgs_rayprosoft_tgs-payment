@@ -139,6 +139,34 @@ internal class PaymentClient : IPaymentClient
 		return _messageSender.PublishAsync("tgs.payment-method.created", request.ToByteArray(), cancellationToken);
 	}
 
+	public ValueTask EmitPlayerBankInfoAddedEventAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
+	{
+		var request = new PlayerBankInfoChangedEvent
+		{
+			Id = bankInfoId,
+			BrandId = brandId
+		};
+
+		return _messageSender.PublishAsync(
+			"tgs.player.bankinfo.added",
+			request.ToByteArray(),
+			cancellationToken);
+	}
+
+	public ValueTask EmitPlayerBankInfoDeletedEventAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
+	{
+		var request = new PlayerBankInfoChangedEvent
+		{
+			Id = bankInfoId,
+			BrandId = brandId
+		};
+
+		return _messageSender.PublishAsync(
+			"tgs.player.bankinfo.deleted",
+			request.ToByteArray(),
+			cancellationToken);
+	}
+
 	public ValueTask EmitWithdrawFormCreatedEventAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var request = new FormEvent

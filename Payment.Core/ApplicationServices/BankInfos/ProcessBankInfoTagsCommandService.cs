@@ -31,7 +31,7 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 			.GetBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 
-		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo.BankType);
+		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo!.BankType);
 		var bankInfoDetail = JsonSerializer.Serialize(bankInfo.Detail);
 
 		var tranformResult = _jsonTransform.Transform(bankInfoDetail, transformation);
@@ -43,7 +43,6 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 			.ConfigureAwait(false);
 
 		foreach (var p in dict.Where(p => p.Value is not null))
-		{
 			await _paymentRepository.SetBankInfoTagAsync(
 				bankInfo.BrandId,
 				bankInfo.Id,
@@ -51,6 +50,5 @@ internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankIn
 				bankInfo.PlayerCode,
 				p.Value!,
 				cancellationToken).ConfigureAwait(false);
-		}
 	}
 }

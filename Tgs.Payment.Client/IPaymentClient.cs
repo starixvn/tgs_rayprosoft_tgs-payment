@@ -20,6 +20,10 @@ public interface IPaymentClient
 
 	ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default);
 
+	ValueTask EmitPlayerBankInfoAddedEventAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default);
+
+	ValueTask EmitPlayerBankInfoDeletedEventAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default);
+
 	ValueTask EmitWithdrawFormCreatedEventAsync(Guid fromId, Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string status, CancellationToken cancellationToken = default);

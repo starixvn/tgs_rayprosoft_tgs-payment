@@ -108,7 +108,15 @@ builder.Services
 			"tgs.payment-channel.created")
 		.AddHandler(
 			Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType,
-			"tgs.payment-method-channel.changed"))
+			"tgs.payment-method-channel.changed")
+		.AddHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.PlayerBankInfoAddedHandlerType,
+			"tgs.player.bankinfo.added",
+			"tgs.player.bankinfo.added")
+		.AddHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.PlayerBankInfoDeletedHandlerType,
+			"tgs.player.bankinfo.deleted",
+			"tgs.player.bankinfo.deleted"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();

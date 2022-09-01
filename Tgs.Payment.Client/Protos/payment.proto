@@ -95,3 +95,8 @@ message PaymentChannelChangedEvent {
 message PaymentMethodChannelChangedEvent {
 	phoenix.protobuf.GuidValue id = 1;
 }
+
+message PlayerBankInfoChangedEvent {
+	phoenix.protobuf.GuidValue id = 1;
+	phoenix.protobuf.GuidValue brand_id = 2;
+}

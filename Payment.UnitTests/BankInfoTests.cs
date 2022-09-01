@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BankInfos;
+using Tgs.Payment.Clients;
 
 namespace Payment.UnitTests;
 
@@ -43,8 +44,9 @@ public class BankInfoTests
 	public async Task Can_Create_Player_BankInfo()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository);
+		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -64,20 +66,25 @@ public class BankInfoTests
 			false,
 			playerCode);
 
-		await sut.GetAsync(command);
+		var actual = await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
 				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
 				Arg.Is(playerCode));
+		_ = fakePaymentClient.Received(1)
+			.EmitPlayerBankInfoAddedEventAsync(
+				Arg.Is(command.BrandId),
+				Arg.Is(actual));
 	}
 
 	[Test]
 	public async Task Can_Create_Player_BankInfo_With_Specified_ModifyUser()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository);
+		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -99,12 +106,16 @@ public class BankInfoTests
 			false,
 			modifyUser);
 
-		await sut.GetAsync(command);
+		var actual = await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
 				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
 				Arg.Is(modifyUser));
+		_ = fakePaymentClient.Received(1)
+			.EmitPlayerBankInfoAddedEventAsync(
+				Arg.Is(command.BrandId),
+				Arg.Is(actual));
 	}
 
 	[Test]
@@ -129,16 +140,31 @@ public class BankInfoTests
 	public async Task Can_Delete_Player_BankInfo()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
-		var sut = new DeletePlayerBankInfoCommandService(fakePaymentRepository);
+		var sut = new DeletePlayerBankInfoCommandService(fakePaymentRepository, fakePaymentClient);
 
 		var command = new DeletePlayerBankInfoCommand("ThisIsPlayerCode", Guid.NewGuid());
+
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+			.Returns(new PlayerBankInfo(
+				command.BankInfoId,
+				"tester1",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"Bank",
+				JsonDocument.Parse("{}"),
+				false));
 
 		await sut.ExecuteAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.DeleteBankInfoAsync(
 				Arg.Is(command.PlayerCode),
+				Arg.Is(command.BankInfoId));
+		_ = fakePaymentClient.Received(1)
+			.EmitPlayerBankInfoDeletedEventAsync(
+				Arg.Any<Guid>(),
 				Arg.Is(command.BankInfoId));
 	}
 

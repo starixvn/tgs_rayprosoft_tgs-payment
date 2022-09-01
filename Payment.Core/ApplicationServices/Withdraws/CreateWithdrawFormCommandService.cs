@@ -105,7 +105,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 				.GetBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 				.ConfigureAwait(false);
 
-		if (playerBankInfo.PlayerCode != command.UserId)
+		if (playerBankInfo is null || playerBankInfo.PlayerCode != command.UserId)
 			throw new InvalidOperationException("Can't find bank info.");
 
 		var bankInfoData = new WithdrawBankInfo<JsonDocument>(
