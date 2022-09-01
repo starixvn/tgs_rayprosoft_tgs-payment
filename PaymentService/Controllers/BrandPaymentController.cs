@@ -57,9 +57,12 @@ public class BrandPaymentController : ControllerBase
 	public IAsyncEnumerable<BrandPaymentPlayerInfoViewModel> GetBrandPaymentDesignatedUsersAsync(
 		[FromServices] IQueryService<BrandPaymentDesignatedUserQuery, BrandPaymentPlayerInfo> queryService,
 		Guid id)
-	{
-		
-	}
+		=> queryService
+			.QueryAsync(new BrandPaymentDesignatedUserQuery(id))
+			.Select(bppi => new BrandPaymentPlayerInfoViewModel
+			{
+				Username = bppi.Username
+			});
 
 	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
 	public async ValueTask<BrandPaymentFeeViewModel> GetBrandPaymentFeeSettingsAsync(
