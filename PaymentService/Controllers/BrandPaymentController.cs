@@ -54,10 +54,11 @@ public class BrandPaymentController : ControllerBase
 	}
 
 	[HttpGet("designatedusers/{id}", Name = "GetBrandPaymentDesignatedUsers")]
-	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentDesignatedUsersAsync(
+	public IAsyncEnumerable<BrandPaymentPlayerInfoViewModel> GetBrandPaymentDesignatedUsersAsync(
+		[FromServices] IQueryService<BrandPaymentDesignatedUserQuery, BrandPaymentPlayerInfo> queryService,
 		Guid id)
 	{
-		throw new NotImplementedException();
+		
 	}
 
 	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
