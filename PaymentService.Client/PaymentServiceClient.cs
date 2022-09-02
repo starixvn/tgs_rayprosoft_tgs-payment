@@ -29,6 +29,29 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 	}
 
+	public async IAsyncEnumerable<BrandPaymentPlayerCheckInfo> CheckBrandPaymentDesignatedUsersExistAsync(
+		IEnumerable<Guid> brandPaymentIds,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var brandQueryString = string.Join(
+			"&",
+			brandPaymentIds.Select(id => $"brandPayment={id}"));
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/designatedusers/check?{brandQueryString}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var acls = JsonSerializer.Deserialize<BrandPaymentPlayerCheckInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var acl in acls!)
+			yield return acl;
+	}
+
 	public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

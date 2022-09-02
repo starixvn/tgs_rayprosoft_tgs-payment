@@ -16,7 +16,7 @@ public class BrandPaymentViewModel
 
 	public ValueRange<decimal> DepositedAmountLimit { get; set; }
 
-	public int DisplayOrder { get; set; }	
+	public int DisplayOrder { get; set; }
 
 	public bool Enabled { get; set; }
 
@@ -32,13 +32,7 @@ public class BrandPaymentViewModel
 
 	public Guid PaymentMethodChannelId { get; set; }
 
-	public string PaymentMethodName { get; init; } = default!;
-
-	public string PaymentName { get; init; } = default!;
-
 	public ValueRange<decimal> TransferLimit { get; set; }
 
 	public TransferType TransferType { get; set; }
-
-	public IEnumerable<Guid> VipLevelIds { get; init; } = default!;
 }

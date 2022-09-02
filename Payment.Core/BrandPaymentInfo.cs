@@ -20,7 +20,4 @@ public record BrandPaymentInfo(
 	ConditionMatchType ConditionMatchType,
 	TransferType TransferType,
 	bool Enabled,
-	int DisplayOrder,
-	string PaymentName,
-	string PaymentMethodName,
-	IEnumerable<Guid> VipLevelIds);
+	int DisplayOrder);

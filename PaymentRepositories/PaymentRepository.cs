@@ -38,6 +38,51 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 	}
 
+	public IAsyncEnumerable<BrandPaymentPlayerExistInfo> CheckBrandPaymentDesignatedUsersExistAsync(
+		IEnumerable<Guid> brandPaymentIds,
+		CancellationToken cancellationToken = default)
+	{
+		var brandPayments = _tgsContext.BrandPayments.AsQueryable()
+					.Where(bp => brandPaymentIds.Contains(bp.Id))
+					.Include(bp => bp.BrandPaymentPlayers)
+					.ThenInclude(bp => bp.PlayerCodeNavigation)
+					.Include(bp => bp.BrandPaymentVipLevels)
+					.AsEnumerable();
+
+		var query = brandPayments.SelectMany(bp =>
+		{
+			var vipLevelIds = bp.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId).ToArray();
+
+			var playerListType = (short)PlayerListType.White;
+			var playerCodes = bp.BrandPaymentPlayers
+				.Where(bpp => bpp.ListType == playerListType)
+				.Select(bpp => bpp.PlayerCode)
+				.ToArray();
+
+			var isAll = bp.PlayerListCondition == (int)ConditionMatchType.MatchAll;
+
+			var bpQuery = bp.BrandPaymentPlayers
+			.Where(bpp => playerCodes.Contains(bpp.PlayerCode))
+			.Where(bpp => bpp.PlayerCodeNavigation.AccumulatedDeposit >= bp.DepositedAmountMin
+				&& (bp.DepositedAmountUnlimited || bpp.PlayerCodeNavigation.AccumulatedDeposit < bp.DepositedAmountMax));
+
+			if (isAll && bp.IdentityAuthentication)
+				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.IdentityAuthentication);
+
+			if (isAll && bp.PhoneAuthentication)
+				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.PhoneAuthentication);
+
+			if (isAll && bp.BrandPaymentVipLevels.Any())
+				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.VipId != null
+					&& vipLevelIds.Contains(bpp.PlayerCodeNavigation.VipId.Value));
+
+			return bpQuery;
+		});
+
+		return brandPaymentIds.Select(bp => new BrandPaymentPlayerExistInfo(bp, query.Any(bpp => bpp.BrandPaymentId == bp)))
+			.ToAsyncEnumerable();
+	}
+
 	public async ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQuery(conditions);
@@ -419,18 +464,15 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit,
 			},
 			row.PaymentStatus == 0,
-			row.DisplayOrder,
-			row.PaymentMethodChannel.Payment.Code,
-			row.PaymentMethodChannel.Method.Code,
-			row.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId));
+			row.DisplayOrder);
 	}
 
 	public IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
-		Guid id,
+		Guid brandPaymentId,
 		CancellationToken cancellationToken = default)
 	{
 		var brandPayment = _tgsContext.BrandPayments.AsQueryable()
-					.Where(bp => bp.Id == id)
+					.Where(bp => bp.Id == brandPaymentId)
 					.Include(bp => bp.BrandPaymentPlayers)
 					.ThenInclude(bp => bp.PlayerCodeNavigation)
 					.Include(bp => bp.BrandPaymentVipLevels)
@@ -465,10 +507,10 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid id, CancellationToken cancellationToken = default)
+	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
 	{
 		var row = await _tgsContext.BrandPayments.AsQueryable()
-			.Where(bp => bp.Id == id)
+			.Where(bp => bp.Id == brandPaymentId)
 			.SingleAsync(cancellationToken)
 			.ConfigureAwait(false);
 
@@ -515,10 +557,7 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder,
-			bp.PaymentMethodChannel.Payment.Code,
-			bp.PaymentMethodChannel.Method.Code,
-			bp.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId)));
+			bp.DisplayOrder));
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
@@ -691,10 +730,7 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder,
-			bp.PaymentMethodChannel.Payment.Code,
-			PaymentMethodName: bp.PaymentMethodChannel.Method.Code,
-			VipLevelIds: bp.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId)));
+			bp.DisplayOrder));
 	}
 
 	public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(

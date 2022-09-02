@@ -352,10 +352,7 @@ public class WithdrawTests
 				ConditionMatchType.MatchOne,
 				TransferType.Withdraw,
 				true,
-				0,
-				"TestPaymentName",
-				"TestPaymentMethodName",
-				Array.Empty<Guid>()));
+				0));
 
 		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
 			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
@@ -450,10 +447,7 @@ public class WithdrawTests
 				ConditionMatchType.MatchOne,
 				TransferType.Withdraw,
 				true,
-				0,
-				"TestPaymentName",
-				"TestPaymentMethodName",
-				Array.Empty<Guid>()));
+				0));
 
 		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
 			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
@@ -548,10 +542,7 @@ public class WithdrawTests
 				ConditionMatchType.MatchOne,
 				TransferType.Withdraw,
 				true,
-				0,
-				"TestPaymentName",
-				"TestPaymentMethodName",
-				Array.Empty<Guid>()));
+				0));
 
 		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
 			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));

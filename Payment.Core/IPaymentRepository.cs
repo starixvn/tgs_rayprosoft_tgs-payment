@@ -12,6 +12,10 @@ public interface IPaymentRepository
 
 	ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<BrandPaymentPlayerExistInfo> CheckBrandPaymentDesignatedUsersExistAsync(
+		IEnumerable<Guid> brandPaymentIds,
+		CancellationToken cancellationToken = default);
+
 	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
@@ -63,9 +67,9 @@ public interface IPaymentRepository
 
 	ValueTask<BrandPaymentInfo> GetBrandPaymentByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid id, CancellationToken cancellationToken = default);
+	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
-	ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid id, CancellationToken cancellationToken = default);
+	ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
@@ -79,7 +83,12 @@ public interface IPaymentRepository
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(Guid? brandId, TransferType? transferType, bool? enabled, string? keyword, CancellationToken cancellationToken = default);
+	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
+		Guid? brandId,
+		TransferType? transferType,
+		bool? enabled,
+		string? keyword,
+		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 		DepositFormQueryConditions conditions,
