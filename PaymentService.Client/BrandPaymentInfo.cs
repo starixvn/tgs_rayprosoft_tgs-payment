@@ -35,9 +35,4 @@ public record BrandPaymentInfo
 	public TransferType TransferType { get; init; }
 
 	public int DisplayOrder { get; init; }
-	public string PaymentName { get; init; } = default!;
-
-	public string PaymentMethodName { get; init; } = default!;
-
-	public IEnumerable<Guid> VipLevelIds { get; init; } = default!;
 }
