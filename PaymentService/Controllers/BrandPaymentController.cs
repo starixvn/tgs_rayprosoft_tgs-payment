@@ -144,7 +144,8 @@ public class BrandPaymentController : ControllerBase
 					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 					TransferLimit = brandPayment.TransferLimit,
 					TransferType = brandPayment.TransferType,
-					DisplayOrder = brandPayment.DisplayOrder
+					DisplayOrder = brandPayment.DisplayOrder,
+					BrandId = brandPayment.BrandId,
 				});
 	}
 }
