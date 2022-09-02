@@ -119,13 +119,13 @@ public class BrandPaymentController : ControllerBase
 
 	[HttpGet("query", Name = "QueryBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> QueryBrandPaymentsAsync(
-		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
-		[FromQuery(Name = "brand_id")] Guid brandId,
-		[FromQuery(Name = "transfer_type")] TransferType transferType,
-		[FromQuery(Name = "enabled")] bool enabled,
-		[FromQuery(Name = "keyword")] string keyword)
+		[FromServices] IQueryService<BrandPaymentsQuery, BrandPaymentInfo> queryService,
+		[FromQuery(Name = "brand_id")] Guid? brandId,
+		[FromQuery(Name = "transfer_type")] TransferType? transferType,
+		[FromQuery(Name = "enabled")] bool? enabled,
+		[FromQuery(Name = "keyword")] string? keyword)
 	{
-		return queryService.QueryAsync(new BrandPaymentQuery(brandId))
+		return queryService.QueryAsync(new BrandPaymentsQuery(brandId, transferType, enabled, keyword))
 				.Select(brandPayment => new BrandPaymentViewModel
 				{
 					Id = brandPayment.Id,

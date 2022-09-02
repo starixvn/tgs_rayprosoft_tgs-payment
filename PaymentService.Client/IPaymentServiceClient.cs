@@ -86,7 +86,12 @@ public interface IPaymentServiceClient
 		string playerCode,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(Guid? brandId, TransferType? transferType, bool? enabled, string? keyword, CancellationToken cancellationToken = default);
+	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
+		Guid? brandId,
+		TransferType? transferType,
+		bool? enabled,
+		string? keyword,
+		CancellationToken cancellationToken = default);
 
 	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 

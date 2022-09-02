@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
+using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
-using Tgs.Paging;
-using System.Text.Json;
 
 namespace Payment.UnitTests;
 

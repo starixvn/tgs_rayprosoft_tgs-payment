@@ -425,11 +425,11 @@ internal class PaymentRepository : IPaymentRepository
 	}
 
 	public IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
-		Guid id,
+		Guid brandPaymentId,
 		CancellationToken cancellationToken = default)
 	{
 		var brandPayment = _tgsContext.BrandPayments.AsQueryable()
-					.Where(bp => bp.Id == id)
+					.Where(bp => bp.Id == brandPaymentId)
 					.Include(bp => bp.BrandPaymentPlayers)
 					.ThenInclude(bp => bp.PlayerCodeNavigation)
 					.Include(bp => bp.BrandPaymentVipLevels)
@@ -464,10 +464,10 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid id, CancellationToken cancellationToken = default)
+	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
 	{
 		var row = await _tgsContext.BrandPayments.AsQueryable()
-			.Where(bp => bp.Id == id)
+			.Where(bp => bp.Id == brandPaymentId)
 			.SingleAsync(cancellationToken)
 			.ConfigureAwait(false);
 
