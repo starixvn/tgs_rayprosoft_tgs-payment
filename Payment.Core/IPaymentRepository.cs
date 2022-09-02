@@ -12,10 +12,6 @@ public interface IPaymentRepository
 
 	ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentPlayerExistInfo> CheckBrandPaymentDesignatedUsersExistAsync(
-		IEnumerable<Guid> brandPaymentIds,
-		CancellationToken cancellationToken = default);
-
 	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);

@@ -38,51 +38,6 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 	}
 
-	public IAsyncEnumerable<BrandPaymentPlayerExistInfo> CheckBrandPaymentDesignatedUsersExistAsync(
-		IEnumerable<Guid> brandPaymentIds,
-		CancellationToken cancellationToken = default)
-	{
-		var brandPayments = _tgsContext.BrandPayments.AsQueryable()
-					.Where(bp => brandPaymentIds.Contains(bp.Id))
-					.Include(bp => bp.BrandPaymentPlayers)
-					.ThenInclude(bp => bp.PlayerCodeNavigation)
-					.Include(bp => bp.BrandPaymentVipLevels)
-					.AsEnumerable();
-
-		var query = brandPayments.SelectMany(bp =>
-		{
-			var vipLevelIds = bp.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId).ToArray();
-
-			var playerListType = (short)PlayerListType.White;
-			var playerCodes = bp.BrandPaymentPlayers
-				.Where(bpp => bpp.ListType == playerListType)
-				.Select(bpp => bpp.PlayerCode)
-				.ToArray();
-
-			var isAll = bp.PlayerListCondition == (int)ConditionMatchType.MatchAll;
-
-			var bpQuery = bp.BrandPaymentPlayers
-			.Where(bpp => playerCodes.Contains(bpp.PlayerCode))
-			.Where(bpp => bpp.PlayerCodeNavigation.AccumulatedDeposit >= bp.DepositedAmountMin
-				&& (bp.DepositedAmountUnlimited || bpp.PlayerCodeNavigation.AccumulatedDeposit < bp.DepositedAmountMax));
-
-			if (isAll && bp.IdentityAuthentication)
-				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.IdentityAuthentication);
-
-			if (isAll && bp.PhoneAuthentication)
-				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.PhoneAuthentication);
-
-			if (isAll && bp.BrandPaymentVipLevels.Any())
-				bpQuery = bpQuery.Where(bpp => bpp.PlayerCodeNavigation.VipId != null
-					&& vipLevelIds.Contains(bpp.PlayerCodeNavigation.VipId.Value));
-
-			return bpQuery;
-		});
-
-		return brandPaymentIds.Select(bp => new BrandPaymentPlayerExistInfo(bp, query.Any(bpp => bpp.BrandPaymentId == bp)))
-			.ToAsyncEnumerable();
-	}
-
 	public async ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQuery(conditions);

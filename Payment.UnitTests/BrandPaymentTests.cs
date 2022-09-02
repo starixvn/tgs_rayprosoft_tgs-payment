@@ -75,24 +75,6 @@ public class BrandPaymentTests
 	}
 
 	[Test]
-	public void Can_List_BrandPayment_Designated_Users_Exists_By_BrandPaymentIds()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-
-		var sut = new BrandPaymentDesignatedUsersExistQueryService(fakePaymentRepository);
-
-		var query = new BrandPaymentDesignatedUsersExistQuery(new[] {
-			Guid.NewGuid()
-		});
-
-		_ = sut.QueryAsync(query);
-
-		_ = fakePaymentRepository.Received(1)
-			.CheckBrandPaymentDesignatedUsersExistAsync(
-				Arg.Any<IEnumerable<Guid>>());
-	}
-
-	[Test]
 	public void Can_List_BrandPaymentAcl_By_PlayerCode_And_BrandPaymentIds()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();

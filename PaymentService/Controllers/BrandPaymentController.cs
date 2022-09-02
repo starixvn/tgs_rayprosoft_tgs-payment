@@ -9,18 +9,6 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class BrandPaymentController : ControllerBase
 {
-	[HttpGet("designatedusers/check", Name = "CheckBrandPaymentDesignatedUsersExist")]
-	public IAsyncEnumerable<BrandPaymentPlayerCheckInfoViewModel> CheckBrandPaymentDesignatedUsersExistAsync(
-		[FromServices] IQueryService<BrandPaymentDesignatedUsersExistQuery, BrandPaymentPlayerExistInfo> queryService,
-		[FromQuery(Name = "brandPayment")] IEnumerable<Guid> brandPaymentIds)
-		=> queryService
-			.QueryAsync(new BrandPaymentDesignatedUsersExistQuery(brandPaymentIds))
-			.Select(bpPlayerExistInfo => new BrandPaymentPlayerCheckInfoViewModel
-			{
-				BrandPaymentId = bpPlayerExistInfo.BrandPaymentId,
-				HasDesignatedUsers = bpPlayerExistInfo.HasDesignatedUsers,
-			});
-
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
