@@ -58,10 +58,6 @@ public interface IPaymentServiceClient
 		IEnumerable<Guid> brandPaymentIds,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentPlayerCheckInfo> CheckBrandPaymentDesignatedUsersExistAsync(		
-		IEnumerable<Guid> brandPaymentIds,
-		CancellationToken cancellationToken = default);
-
 	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
