@@ -27,6 +27,21 @@ public class BrandPaymentTests
 	}
 
 	[Test]
+	public async Task Can_Get_BrandPayment_Fee_Setting_By_BrandPaymentId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetBrandPaymentFeeQueryService(fakePaymentRepository);
+
+		var query = new GetBrandPaymentFeeQuery(Guid.NewGuid());
+
+		_ = await sut.GetAsync(query);
+
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentFeeSettingsAsync(Arg.Is(query.Id));
+	}
+
+	[Test]
 	public void Can_List_BrandPayment_By_BrandId()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -39,6 +54,42 @@ public class BrandPaymentTests
 
 		_ = fakePaymentRepository.Received(1)
 			.GetBrandPaymentsAsync(Arg.Is(query.BrandId));
+	}
+
+	[Test]
+	public void Can_List_BrandPayment_Designated_Users_By_BrandPaymentId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new BrandPaymentDesignatedUserQueryService(fakePaymentRepository);
+
+		var brandPaymentId = Guid.NewGuid();
+
+		var query = new BrandPaymentDesignatedUserQuery(brandPaymentId);
+
+		_ = sut.QueryAsync(query);
+
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandPaymentDesignatedUsersAsync(
+				Arg.Any<Guid>());
+	}
+
+	[Test]
+	public void Can_List_BrandPayment_Designated_Users_Exists_By_BrandPaymentIds()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new BrandPaymentDesignatedUsersExistQueryService(fakePaymentRepository);
+
+		var query = new BrandPaymentDesignatedUsersExistQuery(new[] {
+			Guid.NewGuid()
+		});
+
+		_ = sut.QueryAsync(query);
+
+		_ = fakePaymentRepository.Received(1)
+			.CheckBrandPaymentDesignatedUsersExistAsync(
+				Arg.Any<IEnumerable<Guid>>());
 	}
 
 	[Test]
@@ -60,6 +111,29 @@ public class BrandPaymentTests
 			.GetBrandPaymentAclsAsync(
 				Arg.Any<IEnumerable<Guid>>(),
 				Arg.Is(query.PlayerCode));
+	}
+
+	[Test]
+	public void Can_List_BrandPayments_By_BrandId_Or_TransferType_Or_Enabled_Or_Keyword()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new BrandPaymentsQueryService(fakePaymentRepository);
+
+		var query = new BrandPaymentsQuery(
+			Guid.NewGuid(),
+			TransferType.Deposit,
+			true,
+			null);
+
+		_ = sut.QueryAsync(query);
+
+		_ = fakePaymentRepository.Received(1)
+			.QueryBrandPaymentsAsync(
+				Arg.Is(query.BrandId),
+				Arg.Is(query.TransferType),
+				Arg.Is(query.Enabled),
+				Arg.Is(query.Keyword));
 	}
 
 	[Test]
