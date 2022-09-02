@@ -419,7 +419,8 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit,
 			},
 			row.PaymentStatus == 0,
-			row.DisplayOrder);
+			row.DisplayOrder,
+			row.BrandId);
 	}
 
 	public IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
@@ -512,7 +513,8 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder));
+			bp.DisplayOrder,
+			bp.BrandId));
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
@@ -685,7 +687,8 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder));
+			bp.DisplayOrder,
+			bp.BrandId));
 	}
 
 	public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(

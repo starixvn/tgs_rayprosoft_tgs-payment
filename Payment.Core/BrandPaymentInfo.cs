@@ -19,4 +19,5 @@ public record BrandPaymentInfo(
 	ConditionMatchType ConditionMatchType,
 	TransferType TransferType,
 	bool Enabled,
-	int DisplayOrder);
+	int DisplayOrder,
+	Guid BrandId);
