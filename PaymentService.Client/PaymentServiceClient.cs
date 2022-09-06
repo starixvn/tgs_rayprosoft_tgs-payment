@@ -31,13 +31,18 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 	public async ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default)
 	{
-		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+		var request = new CalculateHandlingFee
+		{
+			Amount = amount,
+		};
 
-		queryStrings.Add("brandPaymentId", brandPaymentId.ToString());
-		queryStrings.Add("amount", amount.ToString());
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
 		var response = await _httpClient
-			.GetAsync($"/brand/payment/calculatefee?{queryStrings}", cancellationToken)
+			.PostAsync($"/brand/payment/fee/{brandPaymentId}", requestContent, cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();

@@ -1,0 +1,39 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using NUnit.Framework;
+using Tgs.Payment;
+using Tgs.Payment.Clients;
+
+namespace Payment.IntegrationTests
+{
+	public class BrandPaymentTests
+	{
+		[Test]
+		public async Task CalculateHandlingFee()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+				.AddSingleton(fakePaymentRepository));
+
+			var httpClient = web.CreateClient();
+
+			var sut = new PaymentServiceClient(httpClient);
+
+			var brandPaymentId = Guid.NewGuid();
+			var amount = 1000m;
+
+			var expected = brandPaymentId;
+
+			_ = fakePaymentRepository
+				.GetBrandPaymentFeeSettingsAsync(
+					Arg.Is(brandPaymentId),
+					Arg.Any<CancellationToken>())
+				.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false));
+
+			var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
+
+			Assert.AreEqual(0m, actual);
+		}
+	}
+}

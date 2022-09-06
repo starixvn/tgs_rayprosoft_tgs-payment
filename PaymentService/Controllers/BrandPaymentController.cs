@@ -9,15 +9,15 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class BrandPaymentController : ControllerBase
 {
-	[HttpGet("calculatefee", Name = "CalculateHandlingFee")]
+	[HttpPost("fee/{brandPaymentId}", Name = "CalculateHandlingFee")]
 	public ValueTask<decimal> CalculateHandlingFeeAsync(
 			[FromServices] IGetService<CalculateHandlingFeeCommand, decimal> getService,
-			[FromQuery(Name = "brandPaymentId")] Guid brandPaymentId,
-			[FromQuery(Name = "amount")] decimal amount)
+			[FromBody] CalculateHandlingFeeViewModel request,
+			Guid brandPaymentId)
 	{
 		var query = new CalculateHandlingFeeCommand(
 			brandPaymentId,
-			amount);
+			request.Amount);
 
 		return getService.GetAsync(query);
 	}
