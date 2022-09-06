@@ -31,7 +31,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 	public async ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default)
 	{
-		var request = new CalculateHandlingFee
+		var request = new
 		{
 			Amount = amount,
 		};
