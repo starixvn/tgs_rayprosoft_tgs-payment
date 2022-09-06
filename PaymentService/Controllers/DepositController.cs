@@ -13,12 +13,12 @@ public class DepositController : ControllerBase
 {
 	[HttpGet("fee", Name = "CalculateDepositFormHandlingFee")]
 	public ValueTask<decimal> CalculateDepositFormHandlingFeeAsync(
-			[FromServices] IGetService<CalculateDepositFeeQuery, decimal> getService,
+			[FromServices] IGetService<CalculateDepositFeeCommand, decimal> getService,
 			[FromQuery] Guid formId,
 			[FromQuery] decimal amount,
 			[FromQuery] decimal? actualAmount)
 	{
-		var query = new CalculateDepositFeeQuery(
+		var query = new CalculateDepositFeeCommand(
 			formId,
 			amount,
 			actualAmount);

@@ -75,7 +75,7 @@ public class BrandPaymentController : ControllerBase
 
 		return new BrandPaymentFeeViewModel
 		{
-			HandlingFeeRatePercentile = brandPayment.HandlingFeeRatePercentile,
+			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
 			ReducePlayerAmount = brandPayment.ReducePlayerAmount
 		};
 	}

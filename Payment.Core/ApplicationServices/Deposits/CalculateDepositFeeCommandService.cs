@@ -5,16 +5,16 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits
 {
-	internal class CalculateDepositFeeQueryService : IGetService<CalculateDepositFeeQuery, decimal>
+	internal class CalculateDepositFeeCommandService : IGetService<CalculateDepositFeeCommand, decimal>
 	{
 		private readonly IPaymentRepository _paymentRepository;
 
-		public CalculateDepositFeeQueryService(IPaymentRepository paymentRepository)
+		public CalculateDepositFeeCommandService(IPaymentRepository paymentRepository)
 		{
 			_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		}
 
-		public async ValueTask<decimal> GetAsync(CalculateDepositFeeQuery query, CancellationToken cancellationToken = default)
+		public async ValueTask<decimal> GetAsync(CalculateDepositFeeCommand query, CancellationToken cancellationToken = default)
 		{
 			var form = await _paymentRepository
 				.GetDepositFormByIdAsync(query.FormId)
@@ -28,9 +28,9 @@ namespace Tgs.Payment.ApplicationServices.Deposits
 				return 0m;
 
 			if (query.ActualAmount != null)
-				return query.ActualAmount.Value * brandPaymentFeeInfo.HandlingFeeRatePercentile;
+				return query.ActualAmount.Value * brandPaymentFeeInfo.HandlingFeeRateTenPercentile * 0.1m;
 
-			return query.Amount * brandPaymentFeeInfo.HandlingFeeRatePercentile;
+			return query.Amount * brandPaymentFeeInfo.HandlingFeeRateTenPercentile * 0.1m;
 		}
 	}
 }

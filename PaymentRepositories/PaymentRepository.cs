@@ -473,7 +473,7 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 
 		return new BrandPaymentFeeInfo(
-			row.HandlingFeeRateTenPercentile * 0.1m,
+			row.HandlingFeeRateTenPercentile,
 			row.ReducePlayerAmount);
 	}
 
