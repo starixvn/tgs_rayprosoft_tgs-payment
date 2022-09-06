@@ -1,4 +1,7 @@
 ﻿namespace Tgs.Payment.ViewModels
 {
-	public record CalculateHandlingFeeViewModel(decimal Amount);
+	public class CalculateHandlingFeeViewModel
+	{
+		public decimal Amount { get; set; }
+	};
 }
