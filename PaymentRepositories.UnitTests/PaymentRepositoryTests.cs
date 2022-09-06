@@ -228,4 +228,40 @@ public class PaymentRepositoryTests
 
 		Assert.AreEqual("Test", testFormData.PaymentReturn);
 	}
+
+	[Test]
+	public async Task Get_BrandPayment_Fee_Settings()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandPaymentId = Guid.NewGuid();
+
+		var brandPayment = new BrandPayment
+		{
+			Id = brandPaymentId,
+			ReducePlayerAmount = true,
+			HandlingFeeRateTenPercentile = 10m,
+			ChannelName = "This is channel name",
+			ExtendedData = "{}",
+			CreatedByUsername = "createdUsername",
+			UpdatedByUsername = "updatedUsername",
+		};
+
+		_ = await dbContext.BrandPayments.AddAsync(brandPayment);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
+
+		Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+		Assert.AreEqual(true, actual.ReducePlayerAmount);
+	}
 }

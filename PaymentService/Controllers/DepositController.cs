@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tgs.Paging;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
-using Tgs.Paging;
 
 namespace Tgs.Payment.Controllers;
 

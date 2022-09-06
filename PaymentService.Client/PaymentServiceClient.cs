@@ -29,6 +29,31 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 	}
 
+	public async ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			Amount = amount,
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PostAsync($"/brand/payment/fee/{brandPaymentId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

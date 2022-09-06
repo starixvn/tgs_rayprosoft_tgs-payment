@@ -12,6 +12,43 @@ namespace Payment.UnitTests;
 public class BrandPaymentTests
 {
 	[Test]
+	public async Task Can_Calculate_BrandPayment_Fee_By_BrandPaymentId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CalculateHandlingFeeCommandService(fakePaymentRepository);
+
+		var query = new CalculateHandlingFeeCommand(Guid.NewGuid(), 1000m);
+
+		fakePaymentRepository
+			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
+			.Returns(new BrandPaymentFeeInfo(10m, false));
+
+		var actual = await sut.GetAsync(query);
+
+		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public async Task Can_Calculate_BrandPayment_Fee_By_BrandPayment_Id()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CalculateHandlingFeeCommandService(fakePaymentRepository);
+
+		var query = new CalculateHandlingFeeCommand(Guid.NewGuid(), 1000m);
+
+		fakePaymentRepository
+			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
+			.Returns(new BrandPaymentFeeInfo(10m, true));
+
+		var actual = await sut.GetAsync(query);
+
+		Assert.AreEqual(10m, actual);
+	}
+
+
+	[Test]
 	public async Task Can_Get_BrandPayment_By_Id()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
