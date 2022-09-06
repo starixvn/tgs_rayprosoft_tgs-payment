@@ -9,6 +9,19 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class BrandPaymentController : ControllerBase
 {
+	[HttpGet("calculatefee", Name = "CalculateHandlingFee")]
+	public ValueTask<decimal> CalculateHandlingFeeAsync(
+			[FromServices] IGetService<CalculateHandlingFeeCommand, decimal> getService,
+			[FromQuery(Name = "brandPaymentId")] Guid brandPaymentId,
+			[FromQuery(Name = "amount")] decimal amount)
+	{
+		var query = new CalculateHandlingFeeCommand(
+			brandPaymentId,
+			amount);
+
+		return getService.GetAsync(query);
+	}
+
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,

@@ -11,21 +11,6 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class DepositController : ControllerBase
 {
-	[HttpGet("fee", Name = "CalculateDepositFormHandlingFee")]
-	public ValueTask<decimal> CalculateDepositFormHandlingFeeAsync(
-			[FromServices] IGetService<CalculateDepositFeeCommand, decimal> getService,
-			[FromQuery] Guid formId,
-			[FromQuery] decimal amount,
-			[FromQuery] decimal? actualAmount)
-	{
-		var query = new CalculateDepositFeeCommand(
-			formId,
-			amount,
-			actualAmount);
-
-		return getService.GetAsync(query);
-	}
-
 	/// <summary>
 	/// Creates the deposit form asynchronous.
 	/// </summary>

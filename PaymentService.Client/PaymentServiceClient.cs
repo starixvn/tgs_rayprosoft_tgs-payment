@@ -29,18 +29,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 	}
 
-	public async ValueTask<decimal> CalculateDepositFormHandlingFeeAsync(Guid formId, decimal amount, decimal? actualAmount, CancellationToken cancellationToken = default)
+	public async ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default)
 	{
 		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
 
-		queryStrings.Add("formId", formId.ToString());
+		queryStrings.Add("brandPaymentId", brandPaymentId.ToString());
 		queryStrings.Add("amount", amount.ToString());
 
-		if (actualAmount != null)
-			queryStrings.Add("actualAmount", actualAmount.ToString());
-
 		var response = await _httpClient
-			.GetAsync($"/deposit/fee?{queryStrings}", cancellationToken)
+			.GetAsync($"/brand/payment/calculatefee?{queryStrings}", cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
