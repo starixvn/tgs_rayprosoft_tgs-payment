@@ -946,6 +946,7 @@ internal class PaymentRepository : IPaymentRepository
 		decimal? actualAmount,
 		string? thirdPartyOrderNo,
 		int? promotionPlayerId,
+		decimal? handlingFee,
 		CancellationToken cancellationToken = default)
 	{
 		var formData = await _tgsContext.DepositForms
@@ -960,6 +961,7 @@ internal class PaymentRepository : IPaymentRepository
 		formData.ActualAmount = actualAmount ?? formData.ActualAmount;
 		formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
 		formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
+		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
 		formData.UpdatedOn = DateTime.UtcNow;
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

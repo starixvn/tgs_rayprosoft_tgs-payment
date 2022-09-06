@@ -8,4 +8,5 @@ public record SubmitDepositFormStatusCommand(
 	string? PaymentReturn,
 	decimal? ActualAmount,
 	string? ThirdPartyOrderNo,
-	int? PromotionPlayerId);
+	int? PromotionPlayerId,
+	decimal? HandlingFee);

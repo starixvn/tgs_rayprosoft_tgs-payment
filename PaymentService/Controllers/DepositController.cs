@@ -319,7 +319,8 @@ public class DepositController : ControllerBase
 			request.PaymentReturn,
 			request.ActualAmount,
 			request.ThirdPartyOrderNo,
-			request.PromotionPlayerId);
+			request.PromotionPlayerId,
+			request.HandlingFee);
 
 		await submitService.ExecuteAsync(command).ConfigureAwait(false);
 	}
