@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tgs.Paging;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
-using Tgs.Paging;
 
 namespace Tgs.Payment.Controllers;
 
@@ -11,6 +11,21 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class DepositController : ControllerBase
 {
+	[HttpGet("fee", Name = "CalculateDepositFormHandlingFee")]
+	public ValueTask<decimal> CalculateDepositFormHandlingFeeAsync(
+			[FromServices] IGetService<CalculateDepositFeeQuery, decimal> getService,
+			[FromQuery] Guid formId,
+			[FromQuery] decimal amount,
+			[FromQuery] decimal? actualAmount)
+	{
+		var query = new CalculateDepositFeeQuery(
+			formId,
+			amount,
+			actualAmount);
+
+		return getService.GetAsync(query);
+	}
+
 	/// <summary>
 	/// Creates the deposit form asynchronous.
 	/// </summary>

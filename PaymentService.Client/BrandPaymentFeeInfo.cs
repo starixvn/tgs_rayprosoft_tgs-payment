@@ -2,7 +2,7 @@
 {
 	public record BrandPaymentFeeInfo
 	{
-		public decimal HandlingFeeRateTenPercentile { get; init; }
+		public decimal HandlingFeeRatePercentile { get; init; }
 		public bool ReducePlayerAmount { get; init; }
 	}
 }

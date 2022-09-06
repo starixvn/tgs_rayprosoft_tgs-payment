@@ -2,7 +2,7 @@
 
 public class BrandPaymentFeeViewModel
 {
-	public decimal HandlingFeeRateTenPercentile { get; init; }
+	public decimal HandlingFeeRatePercentile { get; init; }
 
 	public bool ReducePlayerAmount { get; init; }
 }

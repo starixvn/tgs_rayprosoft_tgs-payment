@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Payment
 {
 	public record BrandPaymentFeeInfo(
-		decimal HandlingFeeRateTenPercentile,
+		decimal HandlingFeeRatePercentile,
 		bool ReducePlayerAmount);
 }
