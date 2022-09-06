@@ -9,7 +9,7 @@ namespace Payment.IntegrationTests
 	public class BrandPaymentTests
 	{
 		[Test]
-		public async Task CalculateHandlingFee()
+		public async Task Calculate_Handling_Fee()
 		{
 			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
@@ -29,11 +29,37 @@ namespace Payment.IntegrationTests
 				.GetBrandPaymentFeeSettingsAsync(
 					Arg.Is(brandPaymentId),
 					Arg.Any<CancellationToken>())
-				.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false));
+				.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, true));
 
 			var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
-			Assert.AreEqual(0m, actual);
+			Assert.AreEqual(10m, actual);
+		}
+
+		[Test]
+		public async Task Get_BrandPayment_Fee_Settings()
+		{
+			var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+			await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+				.AddSingleton(fakePaymentRepository));
+
+			var httpClient = web.CreateClient();
+
+			var sut = new PaymentServiceClient(httpClient);
+
+			var brandPaymentId = Guid.NewGuid();
+
+			_ = fakePaymentRepository
+				.GetBrandPaymentFeeSettingsAsync(
+					Arg.Is(brandPaymentId),
+					Arg.Any<CancellationToken>())
+				.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false));
+
+			var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
+
+			Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+			Assert.AreEqual(false, actual.ReducePlayerAmount);
 		}
 	}
 }
