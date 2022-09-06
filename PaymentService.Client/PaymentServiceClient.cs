@@ -1016,6 +1016,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
 		int? promotionPlayerId = null,
+		decimal? handlingFee = null,
 		CancellationToken cancellationToken = default)
 	{
 		var request = new DepositFormStatus
@@ -1024,7 +1025,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			PaymentReturn = paymentReturn,
 			ActualAmount = actualAmount,
 			ThirdPartyOrderNo = thirdPartyOrderNo,
-			PromotionPlayerId = promotionPlayerId
+			PromotionPlayerId = promotionPlayerId,
+			HandlingFee = handlingFee,
 		};
 
 		var requestContent = new StringContent(

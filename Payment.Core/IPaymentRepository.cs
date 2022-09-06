@@ -141,6 +141,7 @@ public interface IPaymentRepository
 		decimal? actualAmount,
 		string? thirdPartyOrderNo,
 		int? promotionPlayerId,
+		decimal? handlingFee,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitWithdrawFormStatusAsync(

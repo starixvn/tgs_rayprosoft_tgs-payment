@@ -38,6 +38,7 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 				command.ActualAmount,
 				command.ThirdPartyOrderNo,
 				command.PromotionPlayerId,
+				command.HandlingFee,
 				cancellationToken)
 			.ConfigureAwait(false);
 

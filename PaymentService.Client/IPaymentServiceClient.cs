@@ -129,6 +129,7 @@ public interface IPaymentServiceClient
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
 		int? promotionPlayerId = null,
+		decimal? handlingFee = null,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitWithdrawFormStatusAsync(

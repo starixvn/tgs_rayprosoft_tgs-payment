@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
-using Tgs.Paging;
 
 namespace Payment.UnitTests;
 
@@ -123,7 +123,8 @@ public class DepositTests
 				Arg.Any<string>(),
 				Arg.Any<decimal?>(),
 				Arg.Any<string>(),
-				Arg.Any<int?>());
+				Arg.Any<int?>(),
+				Arg.Any<decimal?>());
 
 		_ = fakePaymentClient.Received(1)
 			.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());
@@ -447,7 +448,8 @@ public class DepositTests
 				Arg.Any<string>(),
 				Arg.Any<decimal?>(),
 				Arg.Is(command.ThirdPartyOrderNo),
-				Arg.Any<int?>());
+				Arg.Any<int?>(),
+				Arg.Any<decimal?>());
 	}
 
 	[Test]
@@ -464,7 +466,8 @@ public class DepositTests
 			null,
 			null,
 			null,
-			null);
+			null,
+			10m);
 
 		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
@@ -499,7 +502,8 @@ public class DepositTests
 				Arg.Any<string>(),
 				Arg.Any<decimal?>(),
 				Arg.Any<string>(),
-				Arg.Any<int?>());
+				Arg.Any<int?>(),
+				Arg.Is(command.HandlingFee));
 
 		_ = fakePaymentClient.Received(0)
 			.EmitDepositFormStatusChangedEventAsync(
@@ -728,7 +732,8 @@ public class DepositTests
 			null,
 			null,
 			null,
-			null);
+			null,
+			10m);
 
 		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Any<Guid>())
 			.Returns(new DepositFormInfo(
@@ -763,7 +768,8 @@ public class DepositTests
 				Arg.Any<string>(),
 				Arg.Any<decimal?>(),
 				Arg.Any<string>(),
-				Arg.Any<int?>());
+				Arg.Any<int?>(),
+				Arg.Is(command.HandlingFee));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitDepositFormStatusChangedEventAsync(

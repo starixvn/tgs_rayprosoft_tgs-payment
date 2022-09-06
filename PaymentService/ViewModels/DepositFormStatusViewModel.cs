@@ -4,6 +4,8 @@ public class DepositFormStatusViewModel
 {
 	public decimal? ActualAmount { get; set; }
 
+	public decimal? HandlingFee { get; set; }
+
 	public string? PaymentReturn { get; set; }
 
 	public int? PromotionPlayerId { get; set; }
