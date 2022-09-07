@@ -45,6 +45,7 @@ public class WithdrawTests
 				  null,
 				  null,
 				  null,
+				  HandlingFee: 0M,
 				  null,
 				  null));
 
@@ -190,6 +191,7 @@ public class WithdrawTests
 				  null,
 				  null,
 				  null,
+				  HandlingFee: 0M,
 				  Guid.NewGuid(),
 				  "ChannelName",
 				  Guid.NewGuid(),
@@ -234,6 +236,7 @@ public class WithdrawTests
 				  null,
 				  null,
 				  null,
+				  HandlingFee: 0M,
 				  Guid.NewGuid(),
 				  "ChannelName",
 				  Guid.NewGuid(),
@@ -327,7 +330,8 @@ public class WithdrawTests
 				DateTimeOffset.UtcNow,
 				null,
 				null,
-				null));
+				null,
+				HandlingFee: 0M));
 
 		_ = fakePaymentRepository
 			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
@@ -425,7 +429,8 @@ public class WithdrawTests
 				DateTimeOffset.UtcNow,
 				null,
 				null,
-				null));
+				null,
+				HandlingFee: 0M));
 
 		_ = fakePaymentRepository
 			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
@@ -523,7 +528,8 @@ public class WithdrawTests
 				DateTimeOffset.UtcNow,
 				null,
 				null,
-				null));
+				null,
+				HandlingFee: 0M));
 
 		_ = fakePaymentRepository
 			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
@@ -608,7 +614,8 @@ public class WithdrawTests
 				DateTimeOffset.UtcNow,
 				null,
 				null,
-				null));
+				null,
+				HandlingFee: 0M));
 
 		await sut.ExecuteAsync(command);
 
@@ -662,6 +669,7 @@ public class WithdrawTests
 				null,
 				null,
 				null,
+				HandlingFee: 0M,
 				null,
 				null,
 				null));

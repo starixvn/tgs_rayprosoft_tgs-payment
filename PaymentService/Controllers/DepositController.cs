@@ -83,7 +83,8 @@ public class DepositController : ControllerBase
 				OrderNo = formData.OrderNo,
 				PromotionPlayerId = formData.PromotionPlayerId,
 				ReviewedUserName = formData.ReviewedUserName,
-				ReviewedOn = formData.ReviewedOn
+				ReviewedOn = formData.ReviewedOn,
+				HandlingFee = formData.HandlingFee,
 			}
 			: null;
 	}

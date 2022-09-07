@@ -23,4 +23,5 @@ public record DepositFormInfo(
 	Guid? PromotionId,
 	int? PromotionPlayerId,
 	DateTimeOffset CreatedOn,
-	DateTimeOffset UpdatedOn);
+	DateTimeOffset UpdatedOn,
+	decimal HandlingFee);

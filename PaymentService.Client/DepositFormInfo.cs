@@ -16,6 +16,8 @@ public class DepositFormInfo
 
 	public DateTimeOffset CreatedOn { get; init; }
 
+	public decimal HandlingFee { get; init; }
+
 	public Guid Id { get; init; }
 
 	public string? OrderNo { get; init; }
