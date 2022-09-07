@@ -558,7 +558,8 @@ internal class PaymentRepository : IPaymentRepository
 						df.PromotionId,
 						df.PromotionPlayerId,
 						df.CreatedOn,
-						df.UpdatedOn);
+						df.UpdatedOn,
+						df.HandlingFee);
 
 		return await query.SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 	}
@@ -610,6 +611,7 @@ internal class PaymentRepository : IPaymentRepository
 						wf.PaidUserId,
 						wf.PaidUserName,
 						wf.PaidOn,
+						wf.HandlingFee,
 						wf.BrandPaymentId,
 						wf.BrandPayment!.ChannelName,
 						wf.BrandPayment.PaymentMethodChannel.MethodId,
@@ -720,7 +722,8 @@ internal class PaymentRepository : IPaymentRepository
 				form.PromotionId,
 				form.PromotionPlayerId,
 				form.CreatedOn,
-				form.UpdatedOn))
+				form.UpdatedOn,
+				form.HandlingFee))
 			.ToAsyncEnumerable();
 
 		dataQuery = dataQuery.ApplyOrderBy(paging);
@@ -756,6 +759,7 @@ internal class PaymentRepository : IPaymentRepository
 				form.PaidUserId,
 				form.PaidUserName,
 				form.PaidOn,
+				form.HandlingFee,
 				form.BrandPaymentId,
 				form.BrandPayment!.ChannelName,
 				form.BrandPayment.PaymentMethodChannel.MethodId,
@@ -798,6 +802,7 @@ internal class PaymentRepository : IPaymentRepository
 				form.PaidUserId,
 				form.PaidUserName,
 				form.PaidOn,
+				form.HandlingFee,
 				form.BrandPaymentId,
 				form.BrandPayment!.ChannelName,
 				form.BrandPayment.PaymentMethodChannel.MethodId,

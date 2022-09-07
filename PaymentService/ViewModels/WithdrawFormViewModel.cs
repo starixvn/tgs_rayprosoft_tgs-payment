@@ -20,6 +20,8 @@ public class WithdrawFormViewModel
 
 	public DateTimeOffset CreatedOn { get; set; }
 
+	public decimal HandlingFee { get; set; }
+
 	public Guid Id { get; set; }
 
 	public string? Note { get; set; }

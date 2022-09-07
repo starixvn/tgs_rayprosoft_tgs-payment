@@ -1,10 +1,10 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Tgs.Paging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
-using Tgs.Paging;
 
 namespace Tgs.Payment.Controllers;
 
@@ -109,7 +109,8 @@ public class WithdrawController : ControllerBase
 				PaidUserName = formData.PaidUserName,
 				PaidUserId = formData.PaidUserId,
 				PaidOn = formData.PaidOn,
-				Note = formData.Note
+				Note = formData.Note,
+				HandlingFee = formData.HandlingFee,
 			}
 			: null;
 	}
@@ -128,6 +129,7 @@ public class WithdrawController : ControllerBase
 			{
 				Id = formData.Id,
 				Amount = formData.Amount,
+				ActualAmount = formData.ActualAmount,
 				ApplyInfo = formData.ApplyInfo,
 				BankInfo = formData.BankInfo,
 				BankInfoId = formData.BankInfoId,
@@ -150,7 +152,8 @@ public class WithdrawController : ControllerBase
 				PaidOn = formData.PaidOn,
 				PaidUserName = formData.PaidUserName,
 				PaidUserId = formData.PaidUserId,
-				Note = formData.Note
+				Note = formData.Note,
+				HandlingFee = formData.HandlingFee,
 			}
 			: null;
 	}

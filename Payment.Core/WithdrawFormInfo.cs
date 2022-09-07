@@ -21,6 +21,7 @@ public record WithdrawFormInfo(
 	string? PaidUserId,
 	string? PaidUserName,
 	DateTimeOffset? PaidOn,
+	decimal HandlingFee,
 	Guid? BrandPaymentId = null,
 	string? ChannelName = null,
 	Guid? PaymentMethodId = null,

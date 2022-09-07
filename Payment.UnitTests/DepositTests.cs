@@ -44,7 +44,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		var actual = await sut.GetAsync(query);
 
@@ -161,7 +162,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		var actual = await sut.GetAsync(query);
 
@@ -199,7 +201,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		var actual = await sut.GetAsync(query);
 
@@ -236,7 +239,8 @@ public class DepositTests
 			null,
 			null,
 			DateTimeOffset.Now,
-			DateTimeOffset.Now);
+			DateTimeOffset.Now,
+			0M);
 		_ = fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
 		var command = new SignOffDepositFormCommand(
@@ -287,7 +291,8 @@ public class DepositTests
 			null,
 			null,
 			DateTimeOffset.Now,
-			DateTimeOffset.Now);
+			DateTimeOffset.Now,
+			0M);
 
 		_ = fakePaymentRepository.GetDepositFormByIdAsync(formId).Returns(depositFormInfo);
 
@@ -384,7 +389,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		await sut.ExecuteAsync(command);
 
@@ -437,7 +443,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		await sut.ExecuteAsync(command);
 
@@ -491,7 +498,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		await sut.ExecuteAsync(command);
 
@@ -590,7 +598,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		var actual = await sut.GetAsync(command);
 
@@ -644,7 +653,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		fakePaymentRateLimitRepository
 			.When(fake => fake.UnlockPaymentAsync(
@@ -757,7 +767,8 @@ public class DepositTests
 				null,
 				null,
 				DateTimeOffset.Now,
-				DateTimeOffset.Now));
+				DateTimeOffset.Now,
+				0M));
 
 		await sut.ExecuteAsync(command);
 
