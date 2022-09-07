@@ -567,11 +567,11 @@ public class WithdrawTests
 			.SignOffWithdrawFormAsync(
 				Arg.Is(command.FormId),
 				Arg.Is(command.BrandPaymentId),
-				Arg.Any<string?>(),
+				Arg.Any<string>(),
 				Arg.Is(PaymentFlowState.Approved),
 				Arg.Is(command.ReviewUserId),
 				Arg.Is(command.ReviewUserName),
-				Arg.Any<string?>(),
+				Arg.Any<string>(),
 				Arg.Any<decimal?>());
 
 		_ = fakePaymentClient.Received(1)
