@@ -69,7 +69,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 			var applyInfo = await _paymentClient
 				.WithdrawAsync(
 					processor.Subject,
-					formData.Amount,
+					formData.Amount - handlingFee,
 					withdrawSettings,
 					cancellationToken)
 				.ConfigureAwait(false);
