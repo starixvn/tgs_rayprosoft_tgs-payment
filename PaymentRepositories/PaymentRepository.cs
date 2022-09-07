@@ -916,6 +916,7 @@ internal class PaymentRepository : IPaymentRepository
 		string? reviewedUserId,
 		string? reviewedUserName,
 		string? remark,
+		decimal? handlingFee,
 		CancellationToken cancellationToken = default)
 	{
 		var formData = await _tgsContext.WithdrawForms
@@ -933,6 +934,7 @@ internal class PaymentRepository : IPaymentRepository
 		formData.UpdatedOn = DateTime.UtcNow;
 		formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
 		formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
+		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
 		if (reviewedUserId != null)
 			formData.ReviewedOn = DateTime.UtcNow;
 

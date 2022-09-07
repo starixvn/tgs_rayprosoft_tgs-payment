@@ -132,6 +132,7 @@ public interface IPaymentRepository
 		string? reviewedUserId,
 		string? reviewedUserName,
 		string? remark = null,
+		decimal? handlingFee = null,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitDepositFormStatusAsync(
