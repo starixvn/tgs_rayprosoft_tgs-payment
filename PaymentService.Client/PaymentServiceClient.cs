@@ -29,6 +29,31 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 	}
 
+	public async ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			Amount = amount,
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PostAsync($"/brand/payment/fee/{brandPaymentId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
@@ -217,7 +242,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async ValueTask<Guid> CreatePlayerBankInfoAsync(
-			Guid brandId,
+		Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
 		string? modifyUser = null,
@@ -376,7 +401,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+			[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
 			.GetAsync("/payment/channel", cancellationToken)
@@ -490,6 +515,41 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		return JsonSerializer.Deserialize<BrandPaymentInfo>(contentJson, _SerializerOptions);
+	}
+
+	public async IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
+		Guid brandPaymentId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/designatedusers/{brandPaymentId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var acls = JsonSerializer.Deserialize<BrandPaymentPlayerInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var acl in acls!)
+			yield return acl;
+	}
+
+	public async ValueTask<BrandPaymentFeeInfo?> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/fee/{brandPaymentId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<BrandPaymentFeeInfo>(contentJson, _SerializerOptions);
 	}
 
 	public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(
@@ -662,6 +722,43 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return await response.Content
 			.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
 			.ConfigureAwait(false);
+	}
+
+	public async IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
+		Guid? brandId,
+		TransferType? transferType,
+		bool? enabled,
+		string? keyword,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+
+		if (brandId != null)
+			queryStrings.Add("brand_id", brandId.ToString());
+
+		if (transferType != null)
+			queryStrings.Add("transfer_type", transferType.ToString());
+
+		if (enabled != null)
+			queryStrings.Add("enabled", enabled.ToString());
+
+		if (!string.IsNullOrWhiteSpace(keyword))
+			queryStrings.Add("keyword", keyword);
+
+		var response = await _httpClient
+		.GetAsync($"/brand/payment/query?{queryStrings}", cancellationToken)
+		.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var bp in brandPayments!)
+			yield return bp;
 	}
 
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
@@ -919,6 +1016,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
 		int? promotionPlayerId = null,
+		decimal? handlingFee = null,
 		CancellationToken cancellationToken = default)
 	{
 		var request = new DepositFormStatus
@@ -927,7 +1025,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			PaymentReturn = paymentReturn,
 			ActualAmount = actualAmount,
 			ThirdPartyOrderNo = thirdPartyOrderNo,
-			PromotionPlayerId = promotionPlayerId
+			PromotionPlayerId = promotionPlayerId,
+			HandlingFee = handlingFee,
 		};
 
 		var requestContent = new StringContent(

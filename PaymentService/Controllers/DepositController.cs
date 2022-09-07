@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tgs.Paging;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
-using Tgs.Paging;
 
 namespace Tgs.Payment.Controllers;
 
@@ -319,7 +319,8 @@ public class DepositController : ControllerBase
 			request.PaymentReturn,
 			request.ActualAmount,
 			request.ThirdPartyOrderNo,
-			request.PromotionPlayerId);
+			request.PromotionPlayerId,
+			request.HandlingFee);
 
 		await submitService.ExecuteAsync(command).ConfigureAwait(false);
 	}

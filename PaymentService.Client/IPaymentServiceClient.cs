@@ -4,6 +4,8 @@ namespace Tgs.Payment.Clients;
 
 public interface IPaymentServiceClient
 {
+	ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken);
+
 	ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountUntreatedWithdrawFormsAsync(Guid brandId, CancellationToken cancellationToken = default);
@@ -60,6 +62,10 @@ public interface IPaymentServiceClient
 
 	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
+
+	ValueTask<BrandPaymentFeeInfo?> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
@@ -80,6 +86,13 @@ public interface IPaymentServiceClient
 		Guid formId,
 		string paymentCode,
 		string playerCode,
+		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
+		Guid? brandId,
+		TransferType? transferType,
+		bool? enabled,
+		string? keyword,
 		CancellationToken cancellationToken = default);
 
 	ValueTask<DepositForms> QueryDepositFormsAsync(DepositFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
@@ -116,6 +129,7 @@ public interface IPaymentServiceClient
 		decimal? actualAmount = null,
 		string? thirdPartyOrderNo = null,
 		int? promotionPlayerId = null,
+		decimal? handlingFee = null,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitWithdrawFormStatusAsync(

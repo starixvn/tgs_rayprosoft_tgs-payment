@@ -194,6 +194,42 @@ public class PaymentRepositoryTests
 	}
 
 	[Test]
+	public async Task Get_BrandPayment_Fee_Settings()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandPaymentId = Guid.NewGuid();
+
+		var brandPayment = new BrandPayment
+		{
+			Id = brandPaymentId,
+			ReducePlayerAmount = true,
+			HandlingFeeRateTenPercentile = 10m,
+			ChannelName = "This is channel name",
+			ExtendedData = "{}",
+			CreatedByUsername = "createdUsername",
+			UpdatedByUsername = "updatedUsername",
+		};
+
+		_ = await dbContext.BrandPayments.AddAsync(brandPayment);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
+
+		Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+		Assert.AreEqual(true, actual.ReducePlayerAmount);
+	}
+
+	[Test]
 	public async Task Submit_DepositForm_Status_Without_PaymentReturn_The_Data_Will_Keep_Original()
 	{
 		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
@@ -221,6 +257,7 @@ public class PaymentRepositoryTests
 		await sut.SubmitDepositFormStatusAsync(
 			testFormData.Id,
 			Tgs.Payment.PaymentFlowState.Paid,
+			null,
 			null,
 			null,
 			null,

@@ -6,8 +6,10 @@ stages:
   - build
   - test
   - publish
-  - deploy
-
+  - deploy-dev
+  - deploy-staging
+  - deploy-prod
+  
 build-code:
   stage: build
   script:
@@ -98,7 +100,7 @@ deploy-dev:
     namespace: dev
   environment:
     name: dev
-  stage: deploy
+  stage: deploy-dev
   needs:
     - push-nuget
     - push-docker-image
@@ -140,7 +142,7 @@ deploy-staging:
     namespace: staging
   environment:
     name: staging
-  stage: deploy
+  stage: deploy-staging
   needs:
     - deploy-dev
     - job: push-k8s-template
@@ -182,7 +184,7 @@ deploy-prod:
     namespace: prod
   environment:
     name: prod
-  stage: deploy
+  stage: deploy-prod
   needs:
     - deploy-staging
     - job: push-k8s-template

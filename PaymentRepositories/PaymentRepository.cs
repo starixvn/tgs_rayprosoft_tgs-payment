@@ -421,7 +421,60 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit,
 			},
 			row.PaymentStatus == 0,
-			row.DisplayOrder);
+			row.DisplayOrder,
+			row.BrandId);
+	}
+
+	public IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(
+		Guid brandPaymentId,
+		CancellationToken cancellationToken = default)
+	{
+		var brandPayment = _tgsContext.BrandPayments.AsQueryable()
+					.Where(bp => bp.Id == brandPaymentId)
+					.Include(bp => bp.BrandPaymentPlayers)
+					.ThenInclude(bp => bp.PlayerCodeNavigation)
+					.Include(bp => bp.BrandPaymentVipLevels)
+					.AsNoTracking()
+					.FirstOrDefault();
+
+		var vipLevelIds = brandPayment!.BrandPaymentVipLevels.Select(bpvl => bpvl.VipLevelId).ToArray();
+
+		var playerListType = (short)PlayerListType.White;
+		var playerCodes = brandPayment.BrandPaymentPlayers
+			.Where(bpp => bpp.ListType == playerListType)
+			.Select(bpp => bpp.PlayerCode)
+			.ToArray();
+
+		var isAll = brandPayment.PlayerListCondition == (int)ConditionMatchType.MatchAll;
+
+		var query = brandPayment.BrandPaymentPlayers
+			.Where(bpp => playerCodes.Contains(bpp.PlayerCode))
+			.Where(bpp => bpp.PlayerCodeNavigation.AccumulatedDeposit >= brandPayment.DepositedAmountMin
+				&& (brandPayment.DepositedAmountUnlimited || bpp.PlayerCodeNavigation.AccumulatedDeposit < brandPayment.DepositedAmountMax));
+
+		if (isAll && brandPayment.IdentityAuthentication)
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.IdentityAuthentication);
+
+		if (isAll && brandPayment.PhoneAuthentication)
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.PhoneAuthentication);
+
+		if (isAll && brandPayment.BrandPaymentVipLevels.Any())
+			query = query.Where(bpp => bpp.PlayerCodeNavigation.VipId != null && vipLevelIds.Contains(bpp.PlayerCodeNavigation.VipId.Value));
+
+		return query.Select(bpp => new BrandPaymentPlayerInfo(bpp.PlayerCodeNavigation.Username))
+			.ToAsyncEnumerable();
+	}
+
+	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
+	{
+		var row = await _tgsContext.BrandPayments.AsQueryable()
+			.Where(bp => bp.Id == brandPaymentId)
+			.SingleAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return new BrandPaymentFeeInfo(
+			row.HandlingFeeRateTenPercentile,
+			row.ReducePlayerAmount);
 	}
 
 	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -462,7 +515,8 @@ internal class PaymentRepository : IPaymentRepository
 				_ => TransferType.Deposit
 			},
 			bp.PaymentStatus == 0,
-			bp.DisplayOrder));
+			bp.DisplayOrder,
+			bp.BrandId));
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
@@ -566,6 +620,77 @@ internal class PaymentRepository : IPaymentRepository
 						wf.Note);
 
 		return await query.SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
+		Guid? brandId,
+		TransferType? transferType,
+		bool? enabled,
+		string? keyword,
+		CancellationToken cancellationToken = default)
+	{
+		var query = from bp in _tgsContext.BrandPayments.AsQueryable()
+						.Include(bp => bp.PaymentMethodChannel)
+						.ThenInclude(pmc => pmc.Payment)
+						.Include(bp => bp.PaymentMethodChannel)
+						.ThenInclude(pmc => pmc.Method)
+						.Include(bp => bp.PaymentMethodChannel)
+						.ThenInclude(pmc => pmc.Channel)
+						.AsAsyncEnumerable()
+					select bp;
+
+		if (brandId != null)
+			query = query.Where(bp => bp.BrandId == brandId);
+
+		if (transferType != null)
+			query = query.Where(bp => bp.TransferType == (int)transferType);
+
+		if (enabled != null)
+		{
+			var paymentStatus = enabled.Value ? 0 : 1;
+			query = query.Where(bp => bp.PaymentStatus == paymentStatus);
+		}
+
+		if (!string.IsNullOrWhiteSpace(keyword))
+		{
+			var trimKeyword = keyword.Trim();
+			query = query.Where(bp => bp.ChannelName.Contains(trimKeyword)
+				|| bp.PaymentMethodChannel.Payment.Code == trimKeyword
+				|| bp.PaymentMethodChannel.Method.Code == trimKeyword
+				|| bp.PaymentMethodChannel.Channel.Code == trimKeyword);
+		}
+
+		return query.Select(bp => new BrandPaymentInfo(
+			bp.Id,
+			bp.PaymentMethodChannelId,
+			bp.PaymentMethodChannel.PaymentId,
+			bp.PaymentMethodChannel.MethodId,
+			bp.PaymentMethodChannel.ChannelId,
+			bp.ChannelName,
+			bp.PaymentMethodChannel.Channel.Code,
+			bp.ExtendedData,
+			new ValueRange<decimal>
+			{
+				From = bp.TransferLimitFrom,
+				To = bp.TransferLimitTo
+			},
+			bp.AllPlayers,
+			bp.IdentityAuthentication,
+			bp.PhoneAuthentication,
+			new ValueRange<decimal>
+			{
+				From = bp.DepositedAmountMin,
+				To = bp.DepositedAmountUnlimited ? decimal.MaxValue : bp.DepositedAmountMax
+			},
+			bp.PlayerListCondition == 1 ? ConditionMatchType.MatchOne : ConditionMatchType.MatchAll,
+			bp.TransferType switch
+			{
+				1 => TransferType.Withdraw,
+				_ => TransferType.Deposit
+			},
+			bp.PaymentStatus == 0,
+			bp.DisplayOrder,
+			bp.BrandId));
 	}
 
 	public IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
@@ -821,6 +946,7 @@ internal class PaymentRepository : IPaymentRepository
 		decimal? actualAmount,
 		string? thirdPartyOrderNo,
 		int? promotionPlayerId,
+		decimal? handlingFee,
 		CancellationToken cancellationToken = default)
 	{
 		var formData = await _tgsContext.DepositForms
@@ -835,6 +961,7 @@ internal class PaymentRepository : IPaymentRepository
 		formData.ActualAmount = actualAmount ?? formData.ActualAmount;
 		formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
 		formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
+		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
 		formData.UpdatedOn = DateTime.UtcNow;
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

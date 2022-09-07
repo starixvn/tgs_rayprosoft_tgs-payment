@@ -9,6 +9,19 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class BrandPaymentController : ControllerBase
 {
+	[HttpPost("fee/{brandPaymentId}", Name = "CalculateHandlingFee")]
+	public ValueTask<decimal> CalculateHandlingFeeAsync(
+			[FromServices] IGetService<CalculateHandlingFeeCommand, decimal> getService,
+			[FromBody] CalculateHandlingFeeViewModel request,
+			Guid brandPaymentId)
+	{
+		var query = new CalculateHandlingFeeCommand(
+			brandPaymentId,
+			request.Amount);
+
+		return getService.GetAsync(query);
+	}
+
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
@@ -49,11 +62,38 @@ public class BrandPaymentController : ControllerBase
 			PaymentId = brandPayment.PaymentId,
 			PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
 			TransferLimit = brandPayment.TransferLimit,
-			TransferType = brandPayment.TransferType
+			TransferType = brandPayment.TransferType,
 		};
 	}
 
-	[HttpGet(Name = "QueryBrandPayments")]
+	[HttpGet("designatedusers/{id}", Name = "GetBrandPaymentDesignatedUsers")]
+	public IAsyncEnumerable<BrandPaymentPlayerInfoViewModel> GetBrandPaymentDesignatedUsersAsync(
+		[FromServices] IQueryService<BrandPaymentDesignatedUserQuery, BrandPaymentPlayerInfo> queryService,
+		Guid id)
+		=> queryService
+			.QueryAsync(new BrandPaymentDesignatedUserQuery(id))
+			.Select(bppi => new BrandPaymentPlayerInfoViewModel
+			{
+				Username = bppi.Username
+			});
+
+	[HttpGet("fee/{id}", Name = "GetBrandPaymentFeeSettings")]
+	public async ValueTask<BrandPaymentFeeViewModel> GetBrandPaymentFeeSettingsAsync(
+		[FromServices] IGetService<GetBrandPaymentFeeQuery, BrandPaymentFeeInfo> getService,
+		Guid id)
+	{
+		var brandPayment = await getService
+			.GetAsync(new GetBrandPaymentFeeQuery(id))
+			.ConfigureAwait(false);
+
+		return new BrandPaymentFeeViewModel
+		{
+			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
+			ReducePlayerAmount = brandPayment.ReducePlayerAmount
+		};
+	}
+
+	[HttpGet(Name = "GetBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> GetBrandPaymentsAsync(
 		[FromServices] IQueryService<BrandPaymentQuery, BrandPaymentInfo> queryService,
 		[FromQuery(Name = "brand")] Guid brandId)
@@ -89,4 +129,36 @@ public class BrandPaymentController : ControllerBase
 				BrandPaymentId = vip.BrandPaymentId,
 				VipLevelId = vip.VipLevelId
 			});
+
+	[HttpGet("query", Name = "QueryBrandPayments")]
+	public IAsyncEnumerable<BrandPaymentViewModel> QueryBrandPaymentsAsync(
+		[FromServices] IQueryService<BrandPaymentsQuery, BrandPaymentInfo> queryService,
+		[FromQuery(Name = "brand_id")] Guid? brandId,
+		[FromQuery(Name = "transfer_type")] TransferType? transferType,
+		[FromQuery(Name = "enabled")] bool? enabled,
+		[FromQuery(Name = "keyword")] string? keyword)
+	{
+		return queryService.QueryAsync(new BrandPaymentsQuery(brandId, transferType, enabled, keyword))
+				.Select(brandPayment => new BrandPaymentViewModel
+				{
+					Id = brandPayment.Id,
+					AuthenticateIdentity = brandPayment.AuthenticateIdentity,
+					AuthenticatePhone = brandPayment.AuthenticatePhone,
+					ChannelCode = brandPayment.ChannelCode,
+					ChannelId = brandPayment.ChannelId,
+					ChannelName = brandPayment.ChannelName,
+					ConditionMatchType = brandPayment.ConditionMatchType,
+					DepositedAmountLimit = brandPayment.DepositedAmountLimit,
+					Enabled = brandPayment.Enabled,
+					ExtendedData = brandPayment.ExtendedData,
+					IsAllPlayers = brandPayment.IsAllPlayers,
+					MethodId = brandPayment.MethodId,
+					PaymentId = brandPayment.PaymentId,
+					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
+					TransferLimit = brandPayment.TransferLimit,
+					TransferType = brandPayment.TransferType,
+					DisplayOrder = brandPayment.DisplayOrder,
+					BrandId = brandPayment.BrandId,
+				});
+	}
 }

@@ -35,4 +35,6 @@ public record BrandPaymentInfo
 	public TransferType TransferType { get; init; }
 
 	public int DisplayOrder { get; init; }
+
+	public Guid BrandId { get; init; }
 }

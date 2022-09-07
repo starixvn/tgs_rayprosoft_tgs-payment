@@ -6,6 +6,8 @@ public class BrandPaymentViewModel
 
 	public bool AuthenticatePhone { get; set; }
 
+	public Guid BrandId { get; set; }
+
 	public string ChannelCode { get; set; } = default!;
 
 	public Guid ChannelId { get; set; }
