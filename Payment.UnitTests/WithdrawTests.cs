@@ -6,8 +6,10 @@ using NSubstitute;
 using NUnit.Framework;
 using Tgs.Paging;
 using Tgs.Payment;
+using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
+using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
 
@@ -290,11 +292,13 @@ public class WithdrawTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakeWithdrawProcessorFactory,
-			fakePaymentClient);
+			fakePaymentClient,
+			fakeCalculateService);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
@@ -386,11 +390,13 @@ public class WithdrawTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakeWithdrawProcessorFactory,
-			fakePaymentClient);
+			fakePaymentClient,
+			fakeCalculateService);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
@@ -482,11 +488,13 @@ public class WithdrawTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakeWithdrawProcessorFactory,
-			fakePaymentClient);
+			fakePaymentClient,
+			fakeCalculateService);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
@@ -559,11 +567,12 @@ public class WithdrawTests
 			.SignOffWithdrawFormAsync(
 				Arg.Is(command.FormId),
 				Arg.Is(command.BrandPaymentId),
-				Arg.Any<string>(),
+				Arg.Any<string?>(),
 				Arg.Is(PaymentFlowState.Approved),
 				Arg.Is(command.ReviewUserId),
 				Arg.Is(command.ReviewUserName),
-				Arg.Any<string>());
+				Arg.Any<string?>(),
+				Arg.Any<decimal?>());
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(

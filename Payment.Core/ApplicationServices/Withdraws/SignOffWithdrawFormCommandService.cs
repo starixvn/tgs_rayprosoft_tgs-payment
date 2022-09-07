@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
@@ -8,6 +9,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws;
 
 internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdrawFormCommand>
 {
+	private readonly IGetService<CalculateHandlingFeeCommand, decimal> _calculateService;
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly IWithdrawProcessorFactory _withdrawProcessorFactory;
@@ -15,11 +17,13 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 	public SignOffWithdrawFormCommandService(
 		IPaymentRepository paymentRepository,
 		IWithdrawProcessorFactory withdrawProcessorFactory,
-		IPaymentClient paymentClient)
+		IPaymentClient paymentClient,
+		IGetService<CalculateHandlingFeeCommand, decimal> calculateService)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_withdrawProcessorFactory = withdrawProcessorFactory ?? throw new ArgumentNullException(nameof(withdrawProcessorFactory));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+		_calculateService = calculateService ?? throw new ArgumentNullException(nameof(calculateService));
 	}
 
 	public async ValueTask ExecuteAsync(SignOffWithdrawFormCommand command, CancellationToken cancellationToken = default)
@@ -52,9 +56,13 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 			var processor = _withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
 
+			var handlingFee = await _calculateService
+				.GetAsync(new CalculateHandlingFeeCommand(command.BrandPaymentId.Value, formData.Amount), cancellationToken)
+				.ConfigureAwait(false);
+
 			var withdrawSettings = processor.MakeWithdrawSettings(
 				command.FormId,
-				formData.Amount,
+				formData.Amount - handlingFee,
 				formData.BankInfo,
 				brandPayment);
 
@@ -75,6 +83,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					command.ReviewUserId,
 					command.ReviewUserName,
 					command.Remark,
+					handlingFee,
 					cancellationToken)
 				.ConfigureAwait(false);
 		}
@@ -94,6 +103,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					command.ReviewUserId,
 					command.ReviewUserName,
 					command.Remark,
+					null,
 					cancellationToken)
 				.ConfigureAwait(false);
 		}
