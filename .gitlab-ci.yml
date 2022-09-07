@@ -96,6 +96,8 @@ deploy-dev:
   variables:
     GIT_STRATEGY: none
     namespace: dev
+  environment:
+    name: dev
   stage: deploy
   needs:
     - push-nuget
@@ -136,6 +138,8 @@ deploy-staging:
   variables:
     GIT_STRATEGY: none
     namespace: staging
+  environment:
+    name: staging
   stage: deploy
   needs:
     - deploy-dev
@@ -176,6 +180,8 @@ deploy-prod:
   variables:
     GIT_STRATEGY: none
     namespace: prod
+  environment:
+    name: prod
   stage: deploy
   needs:
     - deploy-staging
