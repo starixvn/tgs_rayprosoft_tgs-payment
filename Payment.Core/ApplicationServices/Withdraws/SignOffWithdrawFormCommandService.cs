@@ -62,7 +62,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 			var withdrawSettings = processor.MakeWithdrawSettings(
 				command.FormId,
-				formData.Amount - handlingFee,
+				formData.Amount,
 				formData.BankInfo,
 				brandPayment);
 
