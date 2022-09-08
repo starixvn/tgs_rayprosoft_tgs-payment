@@ -1,4 +1,3 @@
-﻿namespace Tgs.Payment
-{
-	public record BrandPaymentPlayerInfo(string Username);
-}
+﻿namespace Tgs.Payment;
+
+public record BrandPaymentPlayerInfo(string Username);
