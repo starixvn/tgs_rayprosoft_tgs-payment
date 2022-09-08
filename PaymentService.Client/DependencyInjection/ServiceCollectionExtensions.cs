@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Tgs.Payment.Clients;
+﻿using Tgs.Payment.Clients;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -7,18 +6,11 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddPaymentServiceClient(
 		this IServiceCollection services,
-		Action<PaymentServiceClientOptions, IServiceProvider> configure)
-		=> services
-			.AddOptions<PaymentServiceClientOptions>()
-			.Configure(configure)
-			.Services
-			.AddHttpClient<PaymentServiceClient>()
-			.ConfigureHttpClient((sp, httpClient) =>
-			{
-				var options = sp.GetRequiredService<IOptions<PaymentServiceClientOptions>>().Value;
+		Action<IHttpClientBuilder> configureHttpClient)
+	{
+		configureHttpClient(services.AddHttpClient<PaymentServiceClient>());
 
-				httpClient.BaseAddress = options.PaymentServiceBaseUrl;
-			})
-			.Services
+		return services
 			.AddTransient<IPaymentServiceClient>(sp => sp.GetRequiredService<PaymentServiceClient>());
+	}
 }
