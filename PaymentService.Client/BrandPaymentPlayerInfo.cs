@@ -1,7 +1,6 @@
-﻿namespace Tgs.Payment.Clients
+﻿namespace Tgs.Payment.Clients;
+
+public record BrandPaymentPlayerInfo
 {
-	public record BrandPaymentPlayerInfo
-	{
-		public string Username { get; init; } = default!;
-	}
+	public string Username { get; init; } = default!;
 }

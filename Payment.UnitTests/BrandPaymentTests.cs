@@ -20,7 +20,7 @@ public class BrandPaymentTests
 
 		var query = new CalculateHandlingFeeCommand(Guid.NewGuid(), 1000m);
 
-		fakePaymentRepository
+		_ = fakePaymentRepository
 			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
 			.Returns(new BrandPaymentFeeInfo(10m, false));
 
@@ -38,7 +38,7 @@ public class BrandPaymentTests
 
 		var query = new CalculateHandlingFeeCommand(Guid.NewGuid(), 1000m);
 
-		fakePaymentRepository
+		_ = fakePaymentRepository
 			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
 			.Returns(new BrandPaymentFeeInfo(10m, true));
 
@@ -46,7 +46,6 @@ public class BrandPaymentTests
 
 		Assert.AreEqual(10m, actual);
 	}
-
 
 	[Test]
 	public async Task Can_Get_BrandPayment_By_Id()
