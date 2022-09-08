@@ -667,6 +667,24 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			yield return bankInfo;
 	}
 
+	public IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(
+		Guid brandId,
+		string tagType,
+		string tag,
+		CancellationToken cancellationToken = default)
+		=> _httpClient.GetAsync($"/bankinfo/player/query/{tagType}/{brandId}?tag={tag}", cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<IEnumerable<string>>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable()
+				.Where(result => result is not null)
+				.SelectMany(result => result!.ToAsyncEnumerable()))
+			.ToArrayAsync(cancellationToken)
+			.AsTask()
+			.ToAsyncEnumerable()
+			.SelectMany(t => t.ToAsyncEnumerable());
+
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

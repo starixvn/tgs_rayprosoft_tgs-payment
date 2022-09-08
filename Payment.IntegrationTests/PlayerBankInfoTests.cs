@@ -58,4 +58,60 @@ public class PlayerBankInfoTests
 		Assert.AreEqual("BankAccount", actual.TagType);
 		Assert.AreEqual("111111", actual.Tag);
 	}
+
+	[Test]
+	public async Task GetPlayerCodes_By_BankInfoTag()
+	{
+		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
+		{
+			["Bank"] = JsonSerializer.SerializeToDocument(new
+			{
+				BankAccount = "$.bankAccount"
+			})
+		});
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+		var tagType = "Test";
+		var tag = "123";
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		await dbContext.PlayerBankInfoTags.AddRangeAsync(
+			new PlayerBankInfoTag
+			{
+				BrandId = brandId,
+				TagType = "Test",
+				Tag = "123",
+				BankInfoId = Guid.NewGuid(),
+				PlayerCode = "player1"
+			},
+			new PlayerBankInfoTag
+			{
+				BrandId = brandId,
+				TagType = "ABC",
+				Tag = "123",
+				BankInfoId = Guid.NewGuid(),
+				PlayerCode = "player2"
+			},
+			new PlayerBankInfoTag
+			{
+				BrandId = brandId,
+				TagType = "Test",
+				Tag = "456",
+				BankInfoId = Guid.NewGuid(),
+				PlayerCode = "player3"
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var actual = await sut.GetPlayersByBankInfoTagAsync(brandId, tagType, tag).ToArrayAsync();
+
+		CollectionAssert.AreEquivalent(new[] { "player1" }, actual);
+	}
 }

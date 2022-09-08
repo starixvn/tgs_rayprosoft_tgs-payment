@@ -585,6 +585,18 @@ internal class PaymentRepository : IPaymentRepository
 				pmc.ChannelId));
 	}
 
+	public IAsyncEnumerable<string> GetPlayerCodesByBankInfoTagAsync(
+		Guid brandId,
+		string tagType,
+		string tag,
+		CancellationToken cancellationToken = default)
+		=> _tgsContext.PlayerBankInfoTags
+			.Where(pbit => pbit.BrandId == brandId
+				&& pbit.TagType == tagType
+				&& pbit.Tag == tag)
+			.Select(pbit => pbit.PlayerCode)
+			.ToAsyncEnumerable();
+
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var query = from wf in _tgsContext.WithdrawForms

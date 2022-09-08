@@ -78,6 +78,8 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<PlayerBankInfo> GetPlayerBankInfosAsync(string playerCode, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(Guid brandId, string tagType, string tag, CancellationToken cancellationToken = default);
+
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default);

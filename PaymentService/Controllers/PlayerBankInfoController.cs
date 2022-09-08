@@ -59,6 +59,18 @@ public class PlayerBankInfoController : ControllerBase
 			});
 	}
 
+	[HttpGet("query/{tagType}/{brandId}", Name = "GetPlayersByBankInfoTag")]
+	public IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(
+		[FromServices] IQueryService<GetPlayersByBankInfoTagQuery, string> queryService,
+		string tagType,
+		Guid brandId,
+		[FromQuery] string tag)
+	{
+		var query = new GetPlayersByBankInfoTagQuery(brandId, tagType, tag);
+
+		return queryService.QueryAsync(query, HttpContext.RequestAborted);
+	}
+
 	[HttpPost("tag/{id}")]
 	public ValueTask SetBankInfoTagsAsync(
 		[FromServices] ICommandService<ProcessBankInfoTagsCommand> tagService,

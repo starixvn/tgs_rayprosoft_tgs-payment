@@ -77,6 +77,8 @@ public interface IPaymentRepository
 
 	IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync(CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<string> GetPlayerCodesByBankInfoTagAsync(Guid brandId, string tagType, string tag, CancellationToken cancellationToken = default);
+
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
