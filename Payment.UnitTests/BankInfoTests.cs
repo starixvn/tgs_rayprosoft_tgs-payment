@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using JSLTSharp;
@@ -220,6 +221,24 @@ public class BankInfoTests
 				Arg.Is(command.PlayerCode),
 				Arg.Is(command.BankInfoId),
 				Arg.Is(command.ModifyUser));
+	}
+
+	[Test]
+	public async Task GetPlayers_By_BankInfoTag()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetPlayersByBankInfoTagQueryService(fakePaymentRepository);
+
+		var query = new GetPlayersByBankInfoTagQuery(Guid.NewGuid(), "Test", "123");
+
+		_ = await sut.QueryAsync(query).ToArrayAsync();
+
+		_ = fakePaymentRepository.Received(1)
+			.GetPlayerCodesByBankInfoTagAsync(
+				Arg.Is(query.BrandId),
+				Arg.Is(query.TagType),
+				Arg.Is(query.Tag));
 	}
 
 	[Test]

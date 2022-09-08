@@ -7,7 +7,7 @@
 		<PackageId>Tgs.PaymentService.Client</PackageId>
 		<Product>Tgs.PaymentService.Client</Product>
 		<Authors>Raypro</Authors>
-		<Version>0.6.0</Version>
+		<Version>0.6.1</Version>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -26,6 +26,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="stateless" Version="5.11.0" />
+		<PackageReference Include="System.Interactive.Async" Version="6.0.1" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 		<PackageReference Include="System.Text.Json" Version="5.0.0" Condition="'$(TargetFramework)' == 'net5.0'" />
 		<PackageReference Include="System.Text.Json" Version="6.0.5" Condition="'$(TargetFramework)' == 'net6.0'" />
