@@ -473,9 +473,9 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 
 		return new BrandPaymentFeeInfo(
+			row.Id,
 			row.HandlingFeeRateTenPercentile,
-			row.ReducePlayerAmount,
-			row.Id);
+			row.ReducePlayerAmount);
 	}
 
 	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -526,7 +526,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		return _tgsContext.BrandPayments.AsQueryable()
 			.Where(bp => ids.Contains(bp.Id))
-			.Select(bp => new BrandPaymentFeeInfo(bp.HandlingFeeRateTenPercentile, bp.ReducePlayerAmount, bp.Id))
+			.Select(bp => new BrandPaymentFeeInfo(bp.Id, bp.HandlingFeeRateTenPercentile, bp.ReducePlayerAmount))
 			.ToAsyncEnumerable();
 	}
 

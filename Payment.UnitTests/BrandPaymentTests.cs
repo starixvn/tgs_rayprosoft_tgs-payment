@@ -23,7 +23,7 @@ public class BrandPaymentTests
 
 		_ = fakePaymentRepository
 			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
-			.Returns(new BrandPaymentFeeInfo(10m, true, brandPaymentId));
+			.Returns(new BrandPaymentFeeInfo(brandPaymentId, 10m, true));
 
 		var actual = await sut.GetAsync(query);
 
@@ -42,7 +42,7 @@ public class BrandPaymentTests
 
 		_ = fakePaymentRepository
 			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
-			.Returns(new BrandPaymentFeeInfo(10m, false, brandPaymentId));
+			.Returns(new BrandPaymentFeeInfo(brandPaymentId, 10m, false));
 
 		var actual = await sut.GetAsync(query);
 

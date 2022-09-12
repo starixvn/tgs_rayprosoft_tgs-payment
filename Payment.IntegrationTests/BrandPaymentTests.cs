@@ -30,7 +30,7 @@ public class BrandPaymentTests
 			.GetBrandPaymentFeeSettingsAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, true, brandPaymentId));
+			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(brandPaymentId, 10m, true));
 
 		var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
@@ -55,7 +55,7 @@ public class BrandPaymentTests
 			.GetBrandPaymentFeeSettingsAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false, brandPaymentId));
+			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(brandPaymentId, 10m, false));
 
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
 
