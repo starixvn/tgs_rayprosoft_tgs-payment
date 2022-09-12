@@ -89,7 +89,8 @@ public class BrandPaymentController : ControllerBase
 		return new BrandPaymentFeeViewModel
 		{
 			HandlingFeeRateTenPercentile = brandPayment.HandlingFeeRateTenPercentile,
-			ReducePlayerAmount = brandPayment.ReducePlayerAmount
+			ReducePlayerAmount = brandPayment.ReducePlayerAmount,
+			BrandPaymentId = brandPayment.BrandPaymentId,
 		};
 	}
 
@@ -117,6 +118,19 @@ public class BrandPaymentController : ControllerBase
 				TransferLimit = brandPayment.TransferLimit,
 				TransferType = brandPayment.TransferType,
 				DisplayOrder = brandPayment.DisplayOrder
+			});
+
+	[HttpGet("fees", Name = "GetBrandPaymentsFeeSettings")]
+	public IAsyncEnumerable<BrandPaymentFeeViewModel> GetBrandPaymentsFeeSettingsAsync(
+		[FromServices] IQueryService<GetBrandPaymentFeesQuery, BrandPaymentFeeInfo> queryService,
+		[FromQuery(Name = "brand")] IEnumerable<Guid> brandPaymentIds)
+		=> queryService
+			.QueryAsync(new GetBrandPaymentFeesQuery(brandPaymentIds))
+			.Select(bpfi => new BrandPaymentFeeViewModel
+			{
+				HandlingFeeRateTenPercentile = bpfi.HandlingFeeRateTenPercentile,
+				ReducePlayerAmount = bpfi.ReducePlayerAmount,
+				BrandPaymentId = bpfi.BrandPaymentId,
 			});
 
 	[HttpGet("vip", Name = "QueryBrandPaymentVips")]

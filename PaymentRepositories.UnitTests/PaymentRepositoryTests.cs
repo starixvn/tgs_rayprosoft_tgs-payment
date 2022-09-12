@@ -230,6 +230,67 @@ public class PaymentRepositoryTests
 	}
 
 	[Test]
+	public async Task Get_BrandPayments_Fee_Settings()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandPaymentIds = new Guid[]
+		{
+			Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
+			Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5")
+		};
+
+		var brandPayment = new BrandPayment
+		{
+			Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
+			ReducePlayerAmount = true,
+			HandlingFeeRateTenPercentile = 10M,
+			ChannelName = "This is channel name",
+			ExtendedData = "{}",
+			CreatedByUsername = "createdUsername",
+			UpdatedByUsername = "updatedUsername",
+		};
+
+		await dbContext.BrandPayments.AddRangeAsync(new BrandPayment[]
+		{
+			new BrandPayment
+			{
+				Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
+				ReducePlayerAmount = true,
+				HandlingFeeRateTenPercentile = 10M,
+				ChannelName = "This is channel name",
+				ExtendedData = "{}",
+				CreatedByUsername = "createdUsername",
+				UpdatedByUsername = "updatedUsername",
+			},
+			new BrandPayment
+			{
+				Id = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5"),
+				ReducePlayerAmount = false,
+				HandlingFeeRateTenPercentile = 0M,
+				ChannelName = "This is channel name2",
+				ExtendedData = "{}",
+				CreatedByUsername = "createdUsername2",
+				UpdatedByUsername = "updatedUsername2",
+			}
+		});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetBrandPaymentsFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
+
+		Assert.AreEqual(2, actual.Length);
+	}
+
+	[Test]
 	public async Task Submit_DepositForm_Status_Without_PaymentReturn_The_Data_Will_Keep_Original()
 	{
 		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();

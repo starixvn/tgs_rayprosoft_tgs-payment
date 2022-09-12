@@ -473,6 +473,7 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 
 		return new BrandPaymentFeeInfo(
+			row.Id,
 			row.HandlingFeeRateTenPercentile,
 			row.ReducePlayerAmount);
 	}
@@ -517,6 +518,16 @@ internal class PaymentRepository : IPaymentRepository
 			bp.PaymentStatus == 0,
 			bp.DisplayOrder,
 			bp.BrandId));
+	}
+
+	public IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentsFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
+	{
+		var ids = brandPaymentIds.ToArray();
+
+		return _tgsContext.BrandPayments.AsQueryable()
+			.Where(bp => ids.Contains(bp.Id))
+			.Select(bp => new BrandPaymentFeeInfo(bp.Id, bp.HandlingFeeRateTenPercentile, bp.ReducePlayerAmount))
+			.ToAsyncEnumerable();
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
