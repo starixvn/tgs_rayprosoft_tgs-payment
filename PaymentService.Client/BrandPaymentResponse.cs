@@ -40,4 +40,7 @@ public record BrandPaymentResponse
 
 	[JsonPropertyName("transferlimit")]
 	public ValueRange<decimal> TransferLimit { get; init; }
+
+	[JsonPropertyName("feepercentile")]
+	public decimal HandlingFeeRatePercentile { get; set; }
 }
