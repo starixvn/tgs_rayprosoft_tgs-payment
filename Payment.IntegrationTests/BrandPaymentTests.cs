@@ -27,7 +27,7 @@ public class BrandPaymentTests
 		var expected = brandPaymentId;
 
 		_ = fakePaymentRepository
-			.GetBrandPaymentFeeSettingsAsync(
+			.GetBrandPaymentFeeSettingAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(brandPaymentId, 10m, true));
@@ -52,7 +52,7 @@ public class BrandPaymentTests
 		var brandPaymentId = Guid.NewGuid();
 
 		_ = fakePaymentRepository
-			.GetBrandPaymentFeeSettingsAsync(
+			.GetBrandPaymentFeeSettingAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(brandPaymentId, 10m, false));
