@@ -1,5 +1,8 @@
-﻿namespace Tgs.Payment;
+﻿using System;
+
+namespace Tgs.Payment;
 
 public record BrandPaymentFeeInfo(
 	decimal HandlingFeeRateTenPercentile,
-	bool ReducePlayerAmount);
+	bool ReducePlayerAmount,
+	Guid BrandPaymentId);

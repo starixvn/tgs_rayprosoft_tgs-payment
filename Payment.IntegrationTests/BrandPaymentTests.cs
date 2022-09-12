@@ -3,6 +3,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
+using Tgs.Payment.Repositories.Entities;
 
 namespace Payment.IntegrationTests;
 
@@ -29,7 +30,7 @@ public class BrandPaymentTests
 			.GetBrandPaymentFeeSettingsAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, true));
+			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, true, brandPaymentId));
 
 		var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
@@ -54,7 +55,7 @@ public class BrandPaymentTests
 			.GetBrandPaymentFeeSettingsAsync(
 				Arg.Is(brandPaymentId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false));
+			.Returns(new Tgs.Payment.BrandPaymentFeeInfo(10m, false, brandPaymentId));
 
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
 
@@ -103,5 +104,66 @@ public class BrandPaymentTests
 		var actual = await sut.GetBrandPaymentByIdAsync(brandPaymentId);
 
 		Assert.AreEqual(brandPaymentId, actual.Id);
+	}
+
+	[Test]
+	public async Task Get_BrandPayments_Fee_Settings()
+	{
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost();
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandPaymentIds = new Guid[] {
+			Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
+			Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5")
+		};
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		await dbContext.BrandPayments.AddRangeAsync(
+			new BrandPayment
+			{
+				Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
+				HandlingFeeRateTenPercentile = 0M,
+				ReducePlayerAmount = false,
+				ChannelName = "This is channel name",
+				CreatedByUsername = "username",
+				ExtendedData = "{}",
+				UpdatedByUsername = "username",
+			},
+			new BrandPayment
+			{
+				Id = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5"),
+				HandlingFeeRateTenPercentile = 10M,
+				ReducePlayerAmount = true,
+				ChannelName = "This is channel name2",
+				CreatedByUsername = "username2",
+				ExtendedData = "{}",
+				UpdatedByUsername = "username2",
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var actual = await sut.GetBrandPaymentsFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
+
+		var expected = new Tgs.Payment.Clients.BrandPaymentFeeInfo[] {
+			new Tgs.Payment.Clients.BrandPaymentFeeInfo()
+			{
+				HandlingFeeRateTenPercentile = 0m,
+				ReducePlayerAmount = false,
+				BrandPaymentId = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8")
+			},
+			new Tgs.Payment.Clients.BrandPaymentFeeInfo()
+			{
+				HandlingFeeRateTenPercentile =10m,
+				ReducePlayerAmount = true,
+				BrandPaymentId = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5")
+			}
+		};
+
+		Assert.AreEqual(2, actual.Length);
+		CollectionAssert.AreEquivalent(expected, actual);
 	}
 }
