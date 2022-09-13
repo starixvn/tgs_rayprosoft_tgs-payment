@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+ARG BuildConfiguration=Release
 WORKDIR /src
 COPY ["NuGet.Config", "."]
 COPY ["PlayerBankInfoReindex/PlayerBankInfoReindex.csproj", "PlayerBankInfoReindex/"]
@@ -13,10 +14,11 @@ COPY ["Tgs.Payment.Client/Tgs.Payment.Client.csproj", "Tgs.Payment.Client/"]
 RUN dotnet restore "PlayerBankInfoReindex/PlayerBankInfoReindex.csproj"
 COPY . .
 WORKDIR "/src/PlayerBankInfoReindex"
-RUN dotnet build "PlayerBankInfoReindex.csproj" -c Release -o /app/build
+RUN dotnet build "PlayerBankInfoReindex.csproj" -c $BuildConfiguration -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PlayerBankInfoReindex.csproj" -c Release -o /app/publish /p:UseAppHost=false
+ARG BuildConfiguration
+RUN dotnet publish "PlayerBankInfoReindex.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
