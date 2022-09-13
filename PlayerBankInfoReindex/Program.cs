@@ -7,7 +7,8 @@ using Tgs.Payment.Repositories.Entities;
 
 var app = Host.CreateDefaultBuilder()
 	.ConfigureAppConfiguration(builder => builder
-		.AddJsonFile("appsettings.json"))
+		.AddJsonFile("appsettings.json")
+		.AddEnvironmentVariables())
 	.ConfigureServices(services => services
 		.AddDbContext<TgsContext>(builder => builder
 			.UseNpgsql("Name=Tgs"))
