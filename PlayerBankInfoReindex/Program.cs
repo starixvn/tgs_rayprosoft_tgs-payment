@@ -32,6 +32,10 @@ var paymentClient = hostScope.ServiceProvider.GetRequiredService<IPaymentClient>
 var allBankInfos = dbContext.PlayerBankInfos.ToAsyncEnumerable();
 
 await foreach (var bankInfo in allBankInfos)
+{
 	await paymentClient
 		.EmitPlayerBankInfoAddedEventAsync(bankInfo.BrandId, bankInfo.Id)
 		.ConfigureAwait(false);
+
+	await Task.Delay(100).ConfigureAwait(false);
+}
