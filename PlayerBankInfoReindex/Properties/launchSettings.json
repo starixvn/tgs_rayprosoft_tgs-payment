@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PlayerBankInfoReindex": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 variables:
   ImageName: pgtgs/payment-api
+  ReindexJobImageName: pgtgs/reindex-bankinfo
   TgsSettingKey: payment-api
 
 stages:
@@ -9,7 +10,7 @@ stages:
   - deploy-dev
   - deploy-staging
   - deploy-prod
-  
+
 build-code:
   stage: build
   script:
@@ -72,6 +73,20 @@ push-docker-image:
     - dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
     - docker push $ImageName:$Tag
 
+push-bankinfo-reindex-job-image:
+  stage: publish
+  needs:
+    - job: build-code
+      artifacts: true
+    - unit-test
+  only:
+    - main
+  when: manual
+  script:
+    - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
+    - dotnet build "PlayerBankInfoReindex/PlayerBankInfoReindex.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ReindexJobImageName:$Tag" --no-restore
+    - docker push $ReindexJobImageName:$Tag
+
 push-k8s-template:
   stage: publish
   needs:
@@ -87,6 +102,28 @@ push-k8s-template:
         .image.repository = strenv(ImageName) |
         .image.tag = strenv(Tag)
       ' artifacts/k8s/payment-api/values.yaml
+  artifacts:
+    name: HelmTemplate
+    untracked: false
+    expire_in: "180 days"
+    paths:
+      - artifacts/**/*
+
+push-bankinfo-reindex-k8s-template:
+  stage: publish
+  needs:
+    - push-bankinfo-reindex-job-image
+  only:
+    - main
+  script:
+    - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
+    - mkdir -p artifacts/k8s
+    - cp -R deployment/k8s/bankinfo-reindex artifacts/k8s/
+    - |
+      yq -i e '
+        .image.repository = strenv(ReindexJobImageName) |
+        .image.tag = strenv(Tag)
+      ' artifacts/k8s/bankinfo-reindex/values.yaml
   artifacts:
     name: HelmTemplate
     untracked: false
