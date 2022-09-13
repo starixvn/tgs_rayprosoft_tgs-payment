@@ -16,6 +16,6 @@ internal class GetBrandPaymentFeeQueryService : IGetService<GetBrandPaymentFeeQu
 
 	public ValueTask<BrandPaymentFeeInfo> GetAsync(GetBrandPaymentFeeQuery query, CancellationToken cancellationToken = default)
 	{
-		return _paymentRepository.GetBrandPaymentFeeSettingsAsync(query.Id, cancellationToken);
+		return _paymentRepository.GetBrandPaymentFeeSettingAsync(query.Id, cancellationToken);
 	}
 }

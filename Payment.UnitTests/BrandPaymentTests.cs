@@ -22,7 +22,7 @@ public class BrandPaymentTests
 		var query = new CalculateHandlingFeeCommand(brandPaymentId, 1000m);
 
 		_ = fakePaymentRepository
-			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
+			.GetBrandPaymentFeeSettingAsync(query.BrandPaymentId)
 			.Returns(new BrandPaymentFeeInfo(brandPaymentId, 10m, true));
 
 		var actual = await sut.GetAsync(query);
@@ -41,7 +41,7 @@ public class BrandPaymentTests
 		var query = new CalculateHandlingFeeCommand(brandPaymentId, 1000m);
 
 		_ = fakePaymentRepository
-			.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentId)
+			.GetBrandPaymentFeeSettingAsync(query.BrandPaymentId)
 			.Returns(new BrandPaymentFeeInfo(brandPaymentId, 10m, false));
 
 		var actual = await sut.GetAsync(query);
@@ -76,7 +76,7 @@ public class BrandPaymentTests
 		_ = await sut.GetAsync(query);
 
 		_ = fakePaymentRepository.Received(1)
-			.GetBrandPaymentFeeSettingsAsync(Arg.Is(query.Id));
+			.GetBrandPaymentFeeSettingAsync(Arg.Is(query.Id));
 	}
 
 	[Test]

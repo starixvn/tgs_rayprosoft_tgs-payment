@@ -17,7 +17,7 @@ internal class CalculateHandlingFeeCommandService : IGetService<CalculateHandlin
 	public async ValueTask<decimal> GetAsync(CalculateHandlingFeeCommand command, CancellationToken cancellationToken = default)
 	{
 		var brandPaymentFeeInfo = await _paymentRepository
-			.GetBrandPaymentFeeSettingsAsync(command.BrandPaymentId, cancellationToken)
+			.GetBrandPaymentFeeSettingAsync(command.BrandPaymentId, cancellationToken)
 			.ConfigureAwait(false);
 
 		return brandPaymentFeeInfo.ReducePlayerAmount is false

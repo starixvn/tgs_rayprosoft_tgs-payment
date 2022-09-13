@@ -65,11 +65,11 @@ public interface IPaymentRepository
 
 	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
-	ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
+	ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentsFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
+	IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 

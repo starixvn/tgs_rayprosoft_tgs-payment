@@ -465,7 +465,7 @@ internal class PaymentRepository : IPaymentRepository
 			.ToAsyncEnumerable();
 	}
 
-	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
+	public async ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
 	{
 		var row = await _tgsContext.BrandPayments.AsQueryable()
 			.Where(bp => bp.Id == brandPaymentId)
@@ -520,7 +520,7 @@ internal class PaymentRepository : IPaymentRepository
 			bp.BrandId));
 	}
 
-	public IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentsFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
+	public IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
 	{
 		var ids = brandPaymentIds.ToArray();
 

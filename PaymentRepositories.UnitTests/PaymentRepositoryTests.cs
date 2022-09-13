@@ -223,7 +223,7 @@ public class PaymentRepositoryTests
 
 		var sut = new PaymentRepository(dbContext);
 
-		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
+		var actual = await sut.GetBrandPaymentFeeSettingAsync(brandPaymentId);
 
 		Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
 		Assert.AreEqual(true, actual.ReducePlayerAmount);
@@ -285,7 +285,7 @@ public class PaymentRepositoryTests
 
 		var sut = new PaymentRepository(dbContext);
 
-		var actual = await sut.GetBrandPaymentsFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
+		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
 
 		Assert.AreEqual(2, actual.Length);
 	}

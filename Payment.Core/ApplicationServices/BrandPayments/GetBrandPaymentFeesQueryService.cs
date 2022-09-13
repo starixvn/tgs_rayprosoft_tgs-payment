@@ -15,6 +15,6 @@ namespace Tgs.Payment.ApplicationServices.BrandPayments
 		}
 
 		public IAsyncEnumerable<BrandPaymentFeeInfo> QueryAsync(GetBrandPaymentFeesQuery query, CancellationToken cancellationToken = default)
-			=> _paymentRepository.GetBrandPaymentsFeeSettingsAsync(query.BrandPaymentIds, cancellationToken);
+			=> _paymentRepository.GetBrandPaymentFeeSettingsAsync(query.BrandPaymentIds, cancellationToken);
 	}
 }
