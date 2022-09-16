@@ -245,7 +245,8 @@ public class WithdrawController : ControllerBase
 				OrderNo = row.OrderNo,
 				PaidUserId = row.PaidUserId,
 				PaidUserName = row.PaidUserName,
-				PaidOn = row.PaidOn
+				PaidOn = row.PaidOn,
+				HandlingFee = row.HandlingFee,
 			});
 
 		return new PagingWithdrawFormViewModel
