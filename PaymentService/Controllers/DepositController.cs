@@ -267,7 +267,8 @@ public class DepositController : ControllerBase
 				OrderNo = row.OrderNo,
 				ReviewedUserName = row.ReviewedUserName,
 				ReviewedOn = row.ReviewedOn,
-				PromotionPlayerId = row.PromotionPlayerId
+				PromotionPlayerId = row.PromotionPlayerId,
+				HandlingFee = row.HandlingFee,
 			});
 
 		return new()
