@@ -605,28 +605,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		var splitCount = 50;
 		var queryTimes = brandPaymentIds.Count() % splitCount == 0 ? brandPaymentIds.Count() / 50 : brandPaymentIds.Count() / splitCount + 1;
-		var i = 0;
+
+		var queryBrandPaymentIds = Array.Empty<IEnumerable<Guid>>();
+
+		for (int i = 0; i < queryTimes; i++)
+		{
+			_ = queryBrandPaymentIds.Append(brandPaymentIds.Take(splitCount).Skip(i * splitCount));
+		}
+
 		await Parallel.ForEachAsync(
-			brandPaymentIds.Take(splitCount).Skip(i * splitCount),
-			async (brandPaymentId, cancellationToken) =>
+			queryBrandPaymentIds,
+			async (splitBrandPaymentIds, cancellationToken) =>
 			{
-				var brandQueryString = string.Join(
-				"&",
-				brandPaymentIds.Select(id => $"brand={id}"));
-				var response = await _httpClient
-					.GetAsync($"/brand/payment/vip?{brandQueryString}", cancellationToken)
-					.ConfigureAwait(false);
-
-				_ = response.EnsureSuccessStatusCode();
-
-				var contentJson = await response.Content
-					.ReadAsStringAsync(cancellationToken)
-					.ConfigureAwait(false);
-
-				;
-
-				datas.Concat(JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _SerializerOptions)!);
-				i++;
+				var data = await QueryBrandPaymentVipsAsync(splitBrandPaymentIds, cancellationToken);
+				if (data != null)
+					_ = datas.Concat(data);
 			});
 
 		var vips = datas;
@@ -820,9 +813,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
-			DepositFormQueryConditions conditions,
-		Paging paging,
-		CancellationToken cancellationToken = default)
+				DepositFormQueryConditions conditions,
+			Paging paging,
+			CancellationToken cancellationToken = default)
 	{
 		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
 
@@ -1152,5 +1145,22 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
+	}
+
+	private async Task<BrandPaymentVip[]?> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
+	{
+		var brandQueryString = string.Join(
+			"&",
+			brandPaymentIds.Select(id => $"brand={id}"));
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/vip?{brandQueryString}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+		var contentJson = await response.Content
+					.ReadAsStringAsync(cancellationToken)
+					.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _SerializerOptions);
 	}
 }
