@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Data;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
@@ -552,8 +553,28 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<BrandPaymentFeeInfo>(contentJson, _SerializerOptions);
 	}
 
+	public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(
+		Guid brandId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment?brand={brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var bp in brandPayments!)
+			yield return bp;
+	}
+
 	public async IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentsFeeSettingsAsync(
-		IEnumerable<Guid> brandPaymentIds,
+			IEnumerable<Guid> brandPaymentIds,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var brandQueryString = string.Join(
@@ -576,45 +597,39 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			yield return bp;
 	}
 
-
-	public async IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(
-		Guid brandId,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
-	{
-		var response = await _httpClient
-			.GetAsync($"/brand/payment?brand={brandId}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		var brandPayments = JsonSerializer.Deserialize<BrandPaymentInfo[]>(contentJson, _SerializerOptions);
-
-		foreach (var bp in brandPayments!)
-			yield return bp;
-	}
-
 	public async IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(
 		IEnumerable<Guid> brandPaymentIds,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		var brandQueryString = string.Join(
-			"&",
-			brandPaymentIds.Select(id => $"brand={id}"));
-		var response = await _httpClient
-			.GetAsync($"/brand/payment/vip?{brandQueryString}", cancellationToken)
-			.ConfigureAwait(false);
+		var datas = Array.Empty<BrandPaymentVip>();
 
-		_ = response.EnsureSuccessStatusCode();
+		var splitCount = 50;
+		var queryTimes = brandPaymentIds.Count() % splitCount == 0 ? brandPaymentIds.Count() / 50 : brandPaymentIds.Count() / splitCount + 1;
+		var i = 0;
+		await Parallel.ForEachAsync(
+			brandPaymentIds.Take(splitCount).Skip(i * splitCount),
+			async (brandPaymentId, cancellationToken) =>
+			{
+				var brandQueryString = string.Join(
+				"&",
+				brandPaymentIds.Select(id => $"brand={id}"));
+				var response = await _httpClient
+					.GetAsync($"/brand/payment/vip?{brandQueryString}", cancellationToken)
+					.ConfigureAwait(false);
 
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
+				_ = response.EnsureSuccessStatusCode();
 
-		var vips = JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _SerializerOptions);
+				var contentJson = await response.Content
+					.ReadAsStringAsync(cancellationToken)
+					.ConfigureAwait(false);
+
+				;
+
+				datas.Concat(JsonSerializer.Deserialize<BrandPaymentVip[]>(contentJson, _SerializerOptions)!);
+				i++;
+			});
+
+		var vips = datas;
 
 		foreach (var vip in vips!)
 			yield return vip;
