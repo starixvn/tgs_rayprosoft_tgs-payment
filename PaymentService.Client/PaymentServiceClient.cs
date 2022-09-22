@@ -609,12 +609,15 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			queryTimes++;
 
 		var vips = Enumerable.Range(0, queryTimes)
-			.ToAsyncEnumerable()
-			.SelectMany(page => QueryBrandPaymentVipsAsync(
+			.AsParallel()
+			.Select(page => Task.Run(async () => await QueryBrandPaymentVipsAsync(
 				brandPaymentIds
 					.Take(splitCount)
 					.Skip(page * splitCount),
-				cancellationToken));
+				cancellationToken).ToArrayAsync(cancellationToken).ConfigureAwait(false)))
+			.ToArray()
+			.ToAsyncEnumerable()
+			.SelectMany(t => t.ToAsyncEnumerable().SelectMany(arr => arr.ToAsyncEnumerable()));
 
 		return vips;
 	}
