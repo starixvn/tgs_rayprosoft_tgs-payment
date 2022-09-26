@@ -16,6 +16,9 @@ public class WithdrawFormQueryViewModel
 	[FromQuery(Name = "bu")]
 	public DateTimeOffset? BeginUpdateOn { get; set; }
 
+	[FromQuery(Name = "bpid")]
+	public IEnumerable<Guid>? BrandPaymentIds { get; set; }
+
 	[FromQuery(Name = "channel")]
 	public string? ChannelName { get; set; }
 

@@ -478,6 +478,16 @@ internal class PaymentRepository : IPaymentRepository
 			row.ReducePlayerAmount);
 	}
 
+	public IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
+	{
+		var ids = brandPaymentIds.ToArray();
+
+		return _tgsContext.BrandPayments.AsQueryable()
+			.Where(bp => ids.Contains(bp.Id))
+			.Select(bp => new BrandPaymentFeeInfo(bp.Id, bp.HandlingFeeRateTenPercentile, bp.ReducePlayerAmount))
+			.ToAsyncEnumerable();
+	}
+
 	public IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var query = from bp in _tgsContext.BrandPayments.AsQueryable()
@@ -518,16 +528,6 @@ internal class PaymentRepository : IPaymentRepository
 			bp.PaymentStatus == 0,
 			bp.DisplayOrder,
 			bp.BrandId));
-	}
-
-	public IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
-	{
-		var ids = brandPaymentIds.ToArray();
-
-		return _tgsContext.BrandPayments.AsQueryable()
-			.Where(bp => ids.Contains(bp.Id))
-			.Select(bp => new BrandPaymentFeeInfo(bp.Id, bp.HandlingFeeRateTenPercentile, bp.ReducePlayerAmount))
-			.ToAsyncEnumerable();
 	}
 
 	public IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default)
@@ -1111,6 +1111,14 @@ internal class PaymentRepository : IPaymentRepository
 
 			if (statusList.Length > 0)
 				dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
+		}
+
+		if (conditions.BrandPaymentIds != null)
+		{
+			var brandIdList = conditions.BrandPaymentIds.Cast<Guid>().ToArray();
+
+			if (brandIdList.Length > 0)
+				dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));
 		}
 
 		if (conditions.CreateOnRange != null)

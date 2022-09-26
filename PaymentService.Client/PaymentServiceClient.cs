@@ -939,6 +939,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			queryStrings.Add("ep", conditions.PaidOnRange.Value.End.ToString("o"));
 		}
 
+		foreach (var brandPaymentId in conditions.BrandPaymentIds)
+			queryStrings.Add("bpid", brandPaymentId.ToString());
+
 		if (paging.ShowAll == true)
 			queryStrings.Add("all", "true");
 		else
