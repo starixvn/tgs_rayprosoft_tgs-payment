@@ -28,6 +28,7 @@ internal class CalculateWithdrawTotalAmountService
 					query.FormId,
 					query.PaymentMethodId,
 					query.Status,
+					query.BrandPaymentIds,
 					query.CreateOnRange,
 					query.UpdateOnRange,
 					query.ReviewOnRange,

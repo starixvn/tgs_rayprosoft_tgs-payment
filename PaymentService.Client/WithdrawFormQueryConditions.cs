@@ -4,6 +4,8 @@ public class WithdrawFormQueryConditions
 {
 	public Guid BrandId { get; init; }
 
+	public IEnumerable<Guid> BrandPaymentIds { get; init; } = Array.Empty<Guid>();
+
 	public string? ChannelName { get; init; }
 
 	public (DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange { get; init; }

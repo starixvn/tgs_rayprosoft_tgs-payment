@@ -29,6 +29,7 @@ internal class WithdrawFormQueryService
 				query.FormId,
 				query.PaymentMethodId,
 				query.Status,
+				query.BrandPaymentIds,
 				query.CreateOnRange,
 				query.UpdateOnRange,
 				query.ReviewOnRange,
@@ -47,10 +48,11 @@ internal class WithdrawFormQueryService
 				query.FormId,
 				query.PaymentMethodId,
 				query.Status,
+				query.BrandPaymentIds,
 				query.CreateOnRange,
 				query.UpdateOnRange,
 				query.ReviewOnRange,
-				 query.PaidOnRange),
+				query.PaidOnRange),
 			query.Paging, 
 			cancellationToken);
 }
