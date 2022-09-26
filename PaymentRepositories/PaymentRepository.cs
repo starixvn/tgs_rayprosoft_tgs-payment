@@ -1105,21 +1105,15 @@ internal class PaymentRepository : IPaymentRepository
 		if (conditions.FormId != null)
 			dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
-		if (conditions.Status != null)
-		{
-			var statusList = conditions.Status.Cast<int>().ToArray();
+		var statusList = conditions.Status.Cast<int>().ToArray();
 
-			if (statusList.Length > 0)
-				dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
-		}
+		if (statusList.Length > 0)
+			dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 
-		if (conditions.BrandPaymentIds != null)
-		{
-			var brandIdList = conditions.BrandPaymentIds.Cast<Guid>().ToArray();
+		var brandIdList = conditions.BrandPaymentIds.Cast<Guid>().ToArray();
 
-			if (brandIdList.Length > 0)
-				dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));
-		}
+		if (brandIdList.Length > 0)
+			dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));
 
 		if (conditions.CreateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
