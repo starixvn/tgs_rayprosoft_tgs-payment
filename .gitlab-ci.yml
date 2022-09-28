@@ -2,6 +2,7 @@ variables:
   ImageName: pgtgs/payment-api
   ReindexJobImageName: pgtgs/reindex-bankinfo
   TgsSettingKey: payment-api
+  BuildCacheKey: Tgs.Payment.$CI_PIPELINE_IID
 
 stages:
   - build
@@ -18,9 +19,9 @@ build-code:
   only:
     - merge_requests
     - main
-  artifacts:
-    untracked: true
-    expire_in: "1 days"
+  cache:
+    key: $BuildCacheKey
+    untracked: true   
 
 unit-test:
   stage: test
@@ -29,22 +30,29 @@ unit-test:
   script:
     - dotnet test -c $BuildConfiguration -l:"junit;LogFilePath=../TestReports/{assembly}-TestReport.xml" --no-restore --no-build
   needs:
-    - job: build-code
-      artifacts: true
+    - build-code
   only:
     - merge_requests
     - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true   
+    policy: pull
   artifacts:
     when: always
     reports:
       junit: ./TestReports/*-TestReport.xml
+  
 
 push-nuget:
   stage: publish
   needs:
-    - job: build-code
-      artifacts: true
+    - build-code
     - unit-test
+  cache:
+    key: $BuildCacheKey
+    untracked: true   
+    policy: pull
   only:
     - main
   script:
@@ -63,11 +71,14 @@ push-nuget:
 push-docker-image:
   stage: publish
   needs:
-    - job: build-code
-      artifacts: true
+    - build-code
     - unit-test
   only:
     - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true   
+    policy: pull
   script:
     - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
     - dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
