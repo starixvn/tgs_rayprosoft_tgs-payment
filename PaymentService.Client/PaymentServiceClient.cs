@@ -612,8 +612,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.AsParallel()
 			.Select(page => Task.Run(async () => await QueryBrandPaymentVipsAsync(
 				brandPaymentIds
-					.Take(splitCount)
-					.Skip(page * splitCount),
+					.Skip(page * splitCount)
+					.Take(splitCount),
 				cancellationToken).ToArrayAsync(cancellationToken).ConfigureAwait(false)))
 			.ToArray()
 			.ToAsyncEnumerable()
