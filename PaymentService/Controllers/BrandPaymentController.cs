@@ -48,6 +48,7 @@ public class BrandPaymentController : ControllerBase
 		return new BrandPaymentViewModel
 		{
 			Id = brandPayment.Id,
+			BrandId = brandPayment.BrandId,
 			AuthenticateIdentity = brandPayment.AuthenticateIdentity,
 			AuthenticatePhone = brandPayment.AuthenticatePhone,
 			ChannelCode = brandPayment.ChannelCode,
@@ -102,6 +103,7 @@ public class BrandPaymentController : ControllerBase
 			.Select(brandPayment => new BrandPaymentViewModel
 			{
 				Id = brandPayment.Id,
+				BrandId = brandPayment.BrandId,
 				AuthenticateIdentity = brandPayment.AuthenticateIdentity,
 				AuthenticatePhone = brandPayment.AuthenticatePhone,
 				ChannelCode = brandPayment.ChannelCode,
@@ -150,29 +152,27 @@ public class BrandPaymentController : ControllerBase
 		[FromQuery(Name = "brand_id")] Guid? brandId,
 		[FromQuery(Name = "transfer_type")] TransferType? transferType,
 		[FromQuery(Name = "enabled")] bool? enabled,
-		[FromQuery(Name = "keyword")] string? keyword)
-	{
-		return queryService.QueryAsync(new BrandPaymentsQuery(brandId, transferType, enabled, keyword))
-				.Select(brandPayment => new BrandPaymentViewModel
-				{
-					Id = brandPayment.Id,
-					AuthenticateIdentity = brandPayment.AuthenticateIdentity,
-					AuthenticatePhone = brandPayment.AuthenticatePhone,
-					ChannelCode = brandPayment.ChannelCode,
-					ChannelId = brandPayment.ChannelId,
-					ChannelName = brandPayment.ChannelName,
-					ConditionMatchType = brandPayment.ConditionMatchType,
-					DepositedAmountLimit = brandPayment.DepositedAmountLimit,
-					Enabled = brandPayment.Enabled,
-					ExtendedData = brandPayment.ExtendedData,
-					IsAllPlayers = brandPayment.IsAllPlayers,
-					MethodId = brandPayment.MethodId,
-					PaymentId = brandPayment.PaymentId,
-					PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
-					TransferLimit = brandPayment.TransferLimit,
-					TransferType = brandPayment.TransferType,
-					DisplayOrder = brandPayment.DisplayOrder,
-					BrandId = brandPayment.BrandId,
-				});
-	}
+		[FromQuery(Name = "keyword")] string? keyword) 
+		=> queryService.QueryAsync(new BrandPaymentsQuery(brandId, transferType, enabled, keyword))
+			.Select(brandPayment => new BrandPaymentViewModel
+			{
+				Id = brandPayment.Id,
+				BrandId = brandPayment.BrandId,
+				AuthenticateIdentity = brandPayment.AuthenticateIdentity,
+				AuthenticatePhone = brandPayment.AuthenticatePhone,
+				ChannelCode = brandPayment.ChannelCode,
+				ChannelId = brandPayment.ChannelId,
+				ChannelName = brandPayment.ChannelName,
+				ConditionMatchType = brandPayment.ConditionMatchType,
+				DepositedAmountLimit = brandPayment.DepositedAmountLimit,
+				Enabled = brandPayment.Enabled,
+				ExtendedData = brandPayment.ExtendedData,
+				IsAllPlayers = brandPayment.IsAllPlayers,
+				MethodId = brandPayment.MethodId,
+				PaymentId = brandPayment.PaymentId,
+				PaymentMethodChannelId = brandPayment.PaymentMethodChannelId,
+				TransferLimit = brandPayment.TransferLimit,
+				TransferType = brandPayment.TransferType,
+				DisplayOrder = brandPayment.DisplayOrder
+			});
 }

@@ -504,6 +504,82 @@ public class BrandPaymentConditionTests
 	}
 
 	[Test]
+	public void MatchAll_And_AllPlayers_Should_Pass()
+	{
+		var playerInfo = new PlayerInfo(
+			BrandId: Guid.NewGuid(),
+			DepositedAmount: 0M,
+			IdentityAuthentication: false,
+			PhoneAuthentication: false,
+			PlayerCode: "ThisIsPlayerCode",
+			VipLevelId: null);
+
+		var brandPayment = new BrandPaymentInfo
+		{
+			Id = Guid.NewGuid(),
+			AuthenticateIdentity = false,
+			AuthenticatePhone = false,
+			ChannelCode = "TestChannelCode",
+			ChannelId = Guid.NewGuid(),
+			ChannelName = "TestChannel",
+			ConditionMatchType = ConditionMatchType.MatchAll,
+			DepositedAmountLimit = new ValueRange<decimal>
+			{
+				From = 10M,
+				To = 100M
+			},
+			Enabled = true,
+			IsAllPlayers = true,
+			MethodId = Guid.NewGuid(),
+			PaymentId = Guid.NewGuid(),
+			PaymentMethodChannelId = Guid.NewGuid(),
+			TransferLimit = new ValueRange<decimal>
+			{
+				From = 10M,
+				To = 100M
+			},
+			TransferType = TransferType.Deposit
+		};
+
+		var fakeCondition1 = new Mock<IBrandPaymentCondition>();
+
+		_ = fakeCondition1
+			.Setup(fake => fake.IsValid(
+				It.IsAny<BrandPaymentInfo>(),
+				It.IsAny<PlayerInfo>()))
+			.Returns(true);
+
+		var fakeCondition2 = new Mock<IBrandPaymentCondition>();
+
+		_ = fakeCondition2
+			.Setup(fake => fake.IsValid(
+				It.IsAny<BrandPaymentInfo>(),
+				It.IsAny<PlayerInfo>()))
+			.Returns(true);
+
+		var fakeCondition3 = new Mock<IBrandPaymentCondition>();
+
+		_ = fakeCondition3
+			.Setup(fake => fake.IsValid(
+				It.IsAny<BrandPaymentInfo>(),
+				It.IsAny<PlayerInfo>()))
+			.Returns(true);
+
+		var sut = new BrandPaymentFilterCondition(
+			new BlockListCondition(Array.Empty<Guid>()),
+			new WhiteListCondition(Array.Empty<Guid>()),
+			new ShowOnAllPlayersCondition(),
+			new MatchAllCondition(
+				fakeCondition1.Object,
+				fakeCondition2.Object,
+				fakeCondition3.Object));
+
+		var actual = sut.IsValid(brandPayment, playerInfo);
+
+		Assert.IsTrue(actual);
+	}
+
+	[Test]
 	public void Player_In_BlockList_Should_Invalid()
 	{
 		var playerInfo = new PlayerInfo(
