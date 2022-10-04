@@ -1144,11 +1144,12 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
-	private IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
+	protected virtual IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
 	{
 		var brandQueryString = string.Join(
 			"&",
 			brandPaymentIds.Select(id => $"brand={id}"));
+
 		return _httpClient
 			.GetAsync($"/brand/payment/vip?{brandQueryString}", cancellationToken)
 			.ToAsyncEnumerable()
