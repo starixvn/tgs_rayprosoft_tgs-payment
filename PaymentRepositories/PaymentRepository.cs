@@ -78,7 +78,7 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default)
+	public async ValueTask CreateBankInfoAsync(Tgs.Payment.PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default)
 	{
 		var createTime = DateTime.UtcNow;
 
@@ -92,6 +92,7 @@ internal class PaymentRepository : IPaymentRepository
 				BankType = bankInfo.BankType,
 				Detail = JsonSerializer.Serialize(bankInfo.Detail),
 				Default = bankInfo.IsDefault,
+				BankInfoHash = bankInfo.DetailHash,
 				CreatedByUsername = modifyUser,
 				CreatedOn = createTime,
 				UpdatedByUsername = modifyUser,
