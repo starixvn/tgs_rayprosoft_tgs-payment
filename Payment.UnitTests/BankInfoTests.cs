@@ -47,8 +47,13 @@ public class BankInfoTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
 
-		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository, fakePaymentClient);
+		var sut = new CreatePlayerBankInfoCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeBankInfoParserFactory,
+			   new JsonTransform());
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -68,11 +73,14 @@ public class BankInfoTests
 			false,
 			playerCode);
 
+		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
+			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");
+
 		var actual = await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
-				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
+				Arg.Is<PlayerBankCreateInfo>(info => info.PaymentChannelId == paymentChannelId),
 				Arg.Is(playerCode));
 		_ = fakePaymentClient.Received(1)
 			.EmitPlayerBankInfoAddedEventAsync(
@@ -85,8 +93,13 @@ public class BankInfoTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
 
-		var sut = new CreatePlayerBankInfoCommandService(fakePaymentRepository, fakePaymentClient);
+		var sut = new CreatePlayerBankInfoCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeBankInfoParserFactory,
+			new JsonTransform());
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -108,11 +121,14 @@ public class BankInfoTests
 			false,
 			modifyUser);
 
+		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
+			.Returns("{}");
+
 		var actual = await sut.GetAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateBankInfoAsync(
-				Arg.Is<PlayerBankInfo>(info => info.PaymentChannelId == paymentChannelId),
+				Arg.Is<PlayerBankCreateInfo>(info => info.PaymentChannelId == paymentChannelId),
 				Arg.Is(modifyUser));
 		_ = fakePaymentClient.Received(1)
 			.EmitPlayerBankInfoAddedEventAsync(

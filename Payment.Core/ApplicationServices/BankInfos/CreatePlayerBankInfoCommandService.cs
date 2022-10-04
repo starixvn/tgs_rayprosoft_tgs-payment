@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using JSLTSharp;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
@@ -8,25 +12,45 @@ namespace Tgs.Payment.ApplicationServices.BankInfos;
 
 internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBankInfoCommand, Guid>
 {
+	private static readonly SHA256 _Hasher = SHA256.Create();
+	private readonly IBankInfoIndexParserFactory _bankInfoParserFactory;
+	private readonly JsonTransform _jsonTransform;
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 
-	public CreatePlayerBankInfoCommandService(IPaymentRepository paymentRepository, IPaymentClient paymentClient)
+	public CreatePlayerBankInfoCommandService(
+		IPaymentRepository paymentRepository,
+		IPaymentClient paymentClient,
+		IBankInfoIndexParserFactory bankInfoParserFactory,
+		JsonTransform jsonTransform)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+		_bankInfoParserFactory = bankInfoParserFactory ?? throw new ArgumentNullException(nameof(bankInfoParserFactory));
+		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
 	}
 
 	public async ValueTask<Guid> GetAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
 	{
-		var bankInfo = new PlayerBankInfo(
+		var transformation = _bankInfoParserFactory.GetBankInfoTransformation(command.BankType);
+		var bankInfoDetail = JsonSerializer.Serialize(command.Detail)!;
+
+		var feature = JsonSerializer.Serialize(JsonDocument.Parse(
+			  _jsonTransform.Transform(bankInfoDetail, transformation)));
+
+		var hash = feature is "{}"
+			? null
+			: _Hasher.ComputeHash(Encoding.UTF8.GetBytes(feature));
+
+		var bankInfo = new PlayerBankCreateInfo(
 			Guid.NewGuid(),
 			command.PlayerCode,
 			command.BrandId,
 			command.PaymentChannelId,
 			command.BankType,
 			command.Detail,
-			command.IsDefault);
+			command.IsDefault,
+			hash);
 
 		await _paymentRepository
 			.CreateBankInfoAsync(bankInfo, command.ModifyUser, cancellationToken)
