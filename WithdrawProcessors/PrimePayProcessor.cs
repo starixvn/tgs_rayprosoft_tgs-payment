@@ -12,19 +12,19 @@ internal class PrimePayProcessor : IWithdrawProcessor
 	private readonly Dictionary<string, string> _bankInfoTransformations = new()
 	{
 		["Bank"] = @"{
-			""id"": $.id,
-			""paymentChannelId"": $.paymentChannelId,
-			""bankType"": $.bankType,
+			""id"": ""$.id"",
+			""paymentChannelId"": ""$.paymentChannelId"",
+			""bankType"": ""$.bankType"",
 			""detail"": $.detail
 		}",
 		["FPS"] = @"{
-			""id"": $.id,
-			""paymentChannelId"": $.paymentChannelId,
-			""bankType"": $.bankType,
+			""id"": ""$.id"",
+			""paymentChannelId"": ""$.paymentChannelId"",
+			""bankType"": ""$.bankType"",
 			""detail"": {
 				""bankName"": ""FPS"",
-				""bankAccount"": $.detail.phone,
-				""name"": $.detail.username
+				""bankAccount"": ""$.detail.phone"",
+				""name"": ""$.detail.username""
 			}
 		}"
 	};
