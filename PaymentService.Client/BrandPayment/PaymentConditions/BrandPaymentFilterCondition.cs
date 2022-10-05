@@ -13,10 +13,10 @@ internal class BrandPaymentFilterCondition : IBrandPaymentCondition
 		ShowOnAllPlayersCondition showOnAllPlayersCondition,
 		IBrandPaymentCondition brandPaymentCondition)
 	{
-		_blockListCondition = blockListCondition;
-		_whiteListCondition = whiteListCondition;
-		_showOnAllPlayersCondition = showOnAllPlayersCondition;
-		_brandPaymentCondition = brandPaymentCondition;
+		_blockListCondition = blockListCondition ?? throw new ArgumentNullException(nameof(blockListCondition));
+		_whiteListCondition = whiteListCondition ?? throw new ArgumentNullException(nameof(whiteListCondition));
+		_showOnAllPlayersCondition = showOnAllPlayersCondition ?? throw new ArgumentNullException(nameof(showOnAllPlayersCondition));
+		_brandPaymentCondition = brandPaymentCondition ?? throw new ArgumentNullException(nameof(brandPaymentCondition));
 	}
 
 	public bool IsValid(BrandPaymentInfo brandPayment, PlayerInfo player)

@@ -25,10 +25,7 @@ internal class TestPaymentApplication : WebApplicationFactory<Program>
 			  .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 				  sp => new ConfigureNamedOptions<OtlpExporterOptions>(
 					  Options.DefaultName,
-					  exporterOptions =>
-					  {
-						  exporterOptions.Endpoint = null;
-					  })));
+					  exporterOptions => exporterOptions.Endpoint = null)));
 
 		_webHostConfigure?.Invoke(builder);
 	}

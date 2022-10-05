@@ -37,10 +37,8 @@ builder.Services
 	.AddControllers()
 	.AddMvcOptions(mvcOptions => mvcOptions
 		.AddWebApiToolkitFilters())
-	.AddJsonOptions(options =>
-	{
-		options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-	});
+	.AddJsonOptions(options => options
+		.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSwaggerGen(c =>
 {
