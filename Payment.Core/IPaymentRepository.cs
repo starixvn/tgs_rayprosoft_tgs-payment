@@ -12,6 +12,8 @@ public interface IPaymentRepository
 
 	ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
+	ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(Guid brandId, string bankType, byte[] hash, CancellationToken cancellationToken = default);
+
 	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
@@ -67,9 +69,9 @@ public interface IPaymentRepository
 
 	ValueTask<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
-
 	IAsyncEnumerable<BrandPaymentFeeInfo> GetBrandPaymentFeeSettingsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<BrandPaymentInfo> GetBrandPaymentsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 

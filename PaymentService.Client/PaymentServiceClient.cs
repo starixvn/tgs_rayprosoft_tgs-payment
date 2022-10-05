@@ -242,7 +242,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 	}
 
-	public async ValueTask<Guid> CreatePlayerBankInfoAsync(
+	public ValueTask<Guid> CreatePlayerBankInfoAsync(
 		Guid brandId,
 		string playerCode,
 		BankCreateInfo info,
@@ -257,17 +257,18 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		if (!string.IsNullOrWhiteSpace(modifyUser))
 			requestContent.Headers.Add("ModifyUser", modifyUser);
 
-		var response = await _httpClient
+		return _httpClient
 			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
+			.ToAsyncEnumerable()
+			.Do(response =>
+			{
+				if (response.StatusCode == HttpStatusCode.Conflict)
+					throw new PlayerBankInfoDuplicateException();
+			})
+			.Do(response => response.EnsureSuccessStatusCode())
+			.Select(response => response.Content.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken))
+			.SelectMany(t => t.ToAsyncEnumerable())
+			.FirstAsync(cancellationToken);
 	}
 
 	public async ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default)

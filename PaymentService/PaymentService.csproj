@@ -37,6 +37,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="Tgs.Logging" Version="0.0.19" />
 		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
+		<PackageReference Include="Tgs.WebApi.Toolkits" Version="0.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>

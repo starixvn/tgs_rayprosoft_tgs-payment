@@ -240,6 +240,47 @@ public class BankInfoTests
 	}
 
 	[Test]
+	public void Create_Player_BankInfo_If_Exists_Will_Throw_Exception()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+
+		var sut = new CreatePlayerBankInfoCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeBankInfoParserFactory,
+			   new JsonTransform());
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "ThisIsPlayerCode";
+		var paymentChannelId = Guid.NewGuid();
+		var bankType = "Bank";
+		var detail = new
+		{
+			bankAccount = "1234567890"
+		};
+
+		var command = new CreatePlayerBankInfoCommand(
+			brandId,
+			playerCode,
+			paymentChannelId,
+			bankType,
+			JsonSerializer.SerializeToDocument(detail),
+			false,
+			playerCode);
+
+		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
+			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");
+
+		_ = fakePaymentRepository
+			.CheckPlayerBankInfoIsExistsAsync(Arg.Is(command.BrandId), Arg.Is(command.BankType), Arg.Any<byte[]>())
+			.Returns(true);
+
+		_ = Assert.ThrowsAsync<PlayerBankInfoDuplicateException>(async () => await sut.GetAsync(command));
+	}
+
+	[Test]
 	public async Task GetPlayers_By_BankInfoTag()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
