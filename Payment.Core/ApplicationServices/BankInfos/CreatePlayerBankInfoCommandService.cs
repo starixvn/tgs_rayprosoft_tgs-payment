@@ -41,13 +41,13 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 			? null
 			: SHA256.HashData(Encoding.UTF8.GetBytes(feature));
 
-		if (hash is not null
-			&& await _paymentRepository.CheckPlayerBankInfoIsExistsAsync(
-				command.BrandId,
-				command.BankType,
-				hash,
-				cancellationToken).ConfigureAwait(false))
-			throw new PlayerBankInfoDuplicateException();
+		//if (hash is not null
+		//	&& await _paymentRepository.CheckPlayerBankInfoIsExistsAsync(
+		//		command.BrandId,
+		//		command.BankType,
+		//		hash,
+		//		cancellationToken).ConfigureAwait(false))
+		//	throw new PlayerBankInfoDuplicateException();
 
 		var bankInfo = new PlayerBankCreateInfo(
 			Guid.NewGuid(),
