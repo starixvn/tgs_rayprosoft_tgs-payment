@@ -44,7 +44,7 @@ internal class PaymentRepository : IPaymentRepository
 		byte[] hash,
 		CancellationToken cancellationToken = default)
 		=> await _tgsContext.PlayerBankInfos
-			.Where(info => info.BankInfoHash == hash && info.BrandId == brandId && info.BankInfoHash == hash)
+			.Where(info => info.BankInfoHash == hash && info.BrandId == brandId && info.BankType == bankType)
 			.AsNoTracking()
 			.AnyAsync(cancellationToken)
 			.ConfigureAwait(false);
