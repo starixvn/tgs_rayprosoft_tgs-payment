@@ -2,6 +2,7 @@
 using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
+using Tgs.WebApi.Toolkits;
 
 namespace Tgs.Payment.Controllers;
 
@@ -9,6 +10,8 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class PlayerBankInfoController : ControllerBase
 {
+	[SuccessStatusCode(StatusCodes.Status200OK)]
+	[FailStatusCode(StatusCodes.Status409Conflict, "BankInfo duplicate")]
 	[HttpPut("{brandId}/{playerCode}", Name = "CreatePlayerBankInfo")]
 	public async Task<Guid> CreatePlayerBankInfoAsync(
 		[FromServices] IGetService<CreatePlayerBankInfoCommand, Guid> createService,
@@ -17,18 +20,27 @@ public class PlayerBankInfoController : ControllerBase
 		string playerCode,
 		[FromBody] CreateBankInfoViewModel request)
 	{
-		var command = new CreatePlayerBankInfoCommand(
-			brandId,
-			playerCode,
-			request.PaymentChannelId,
-			request.BankType,
-			request.Detail,
-			request.IsDefault ?? false,
-			modifyUser ?? playerCode);
+		try
+		{
+			var command = new CreatePlayerBankInfoCommand(
+				brandId,
+				playerCode,
+				request.PaymentChannelId,
+				request.BankType,
+				request.Detail,
+				request.IsDefault ?? false,
+				modifyUser ?? playerCode);
 
-		return await createService
-			.GetAsync(command, HttpContext.RequestAborted)
-			.ConfigureAwait(false);
+			return await createService
+				.GetAsync(command, HttpContext.RequestAborted)
+				.ConfigureAwait(false);
+		}
+		catch (PlayerBankInfoDuplicateException)
+		{
+			return await this
+				.FailAsync<Guid, string>(StatusCodes.Status409Conflict, "Can't create player bankinfo.")
+				.ConfigureAwait(false);
+		}
 	}
 
 	[HttpDelete("{playerCode}/{id}", Name = "DeletePlayerBankInfo")]

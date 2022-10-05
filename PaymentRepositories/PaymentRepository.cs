@@ -38,6 +38,17 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 	}
 
+	public async ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(
+		Guid brandId,
+		string bankType,
+		byte[] hash,
+		CancellationToken cancellationToken = default)
+		=> await _tgsContext.PlayerBankInfos
+			.Where(info => info.BankInfoHash == hash && info.BrandId == brandId && info.BankType == bankType)
+			.AsNoTracking()
+			.AnyAsync(cancellationToken)
+			.ConfigureAwait(false);
+
 	public async ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
 		var dataQuery = MakeDepositFormQuery(conditions);

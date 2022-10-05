@@ -6,24 +6,23 @@ using System.Net.Http;
 using System.Threading;
 using Tgs.Payment.Clients;
 
-namespace PaymentService.Client.UnitTests
+namespace PaymentService.Client.UnitTests;
+
+internal class StubPaymentServiceClient : PaymentServiceClient
 {
-	internal class StubPaymentServiceClient : PaymentServiceClient
+	private readonly ConcurrentBag<Guid> _brandPaymentIds = new();
+
+	public IEnumerable<Guid> CalledBrandPaymentIds => _brandPaymentIds.ToArray();
+
+	public StubPaymentServiceClient(HttpClient httpClient) : base(httpClient)
 	{
-		private ConcurrentBag<Guid> _brandPaymentIds = new();
+	}
 
-		public IEnumerable<Guid> CalledBrandPaymentIds => _brandPaymentIds.ToArray();
+	protected override IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
+	{
+		foreach (var id in brandPaymentIds)
+			_brandPaymentIds.Add(id);
 
-		public StubPaymentServiceClient(HttpClient httpClient) : base(httpClient)
-		{
-		}
-
-		protected override IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
-		{
-			foreach (var id in brandPaymentIds)
-				_brandPaymentIds.Add(id);
-
-			return Array.Empty<BrandPaymentVip>().ToAsyncEnumerable();
-		}
+		return Array.Empty<BrandPaymentVip>().ToAsyncEnumerable();
 	}
 }

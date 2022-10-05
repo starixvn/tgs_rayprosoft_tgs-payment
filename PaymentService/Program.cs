@@ -35,16 +35,17 @@ builder.Logging
 builder.Services
 	.AddRouting(options => options.LowercaseUrls = true)
 	.AddControllers()
-	.AddJsonOptions(options =>
-	{
-		options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-	});
+	.AddMvcOptions(mvcOptions => mvcOptions
+		.AddWebApiToolkitFilters())
+	.AddJsonOptions(options => options
+		.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSwaggerGen(c =>
 {
 	c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentService", Version = "v1" });
 
 	c.OperationFilter<ApiDocOperationFilter>();
+	c.ApplyWebApiToolkitSupport();
 
 	var xml = $"PaymentService.xml";
 	var path = Path.Combine(AppContext.BaseDirectory, xml);

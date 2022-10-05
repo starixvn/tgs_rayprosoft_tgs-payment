@@ -12,7 +12,6 @@ namespace Tgs.Payment.ApplicationServices.BankInfos;
 
 internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBankInfoCommand, Guid>
 {
-	private static readonly SHA256 _Hasher = SHA256.Create();
 	private readonly IBankInfoIndexParserFactory _bankInfoParserFactory;
 	private readonly JsonTransform _jsonTransform;
 	private readonly IPaymentClient _paymentClient;
@@ -40,7 +39,15 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 
 		var hash = feature is "{}"
 			? null
-			: _Hasher.ComputeHash(Encoding.UTF8.GetBytes(feature));
+			: SHA256.HashData(Encoding.UTF8.GetBytes(feature));
+
+		if (hash is not null
+			&& await _paymentRepository.CheckPlayerBankInfoIsExistsAsync(
+				command.BrandId,
+				command.BankType,
+				hash,
+				cancellationToken).ConfigureAwait(false))
+			throw new PlayerBankInfoDuplicateException();
 
 		var bankInfo = new PlayerBankCreateInfo(
 			Guid.NewGuid(),

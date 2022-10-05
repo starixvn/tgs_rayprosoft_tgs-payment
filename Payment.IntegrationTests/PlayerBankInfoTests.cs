@@ -114,4 +114,44 @@ public class PlayerBankInfoTests
 
 		CollectionAssert.AreEquivalent(new[] { "player1" }, actual);
 	}
+
+	[Test]
+	public async Task Create_Duplicate_Player_BankInfo_Should_Fail()
+	{
+		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
+		{
+			["Bank"] = JsonSerializer.SerializeToDocument(new
+			{
+				BankName = "$.bankName",
+				BankAccount = "$.bankAccount"
+			})
+		});
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var bankInfoId = Guid.NewGuid();
+		var brandId = Guid.NewGuid();
+		var paymentChannelId = Guid.NewGuid();
+
+		var createInfo = new BankCreateInfo
+		{
+			BankType = "Bank",
+			Detail = JsonSerializer.SerializeToDocument(new
+			{
+				bankName = "test bank",
+				bankAccount = "111111",
+				name = "Tester"
+			}),
+			IsDefault = false,
+			PaymentChannelId = paymentChannelId
+		};
+
+		_ = await sut.CreatePlayerBankInfoAsync(brandId, "tester1", createInfo);
+		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoDuplicateException>(
+			  async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
+	}
 }
