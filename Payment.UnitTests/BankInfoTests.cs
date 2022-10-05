@@ -240,6 +240,7 @@ public class BankInfoTests
 	}
 
 	[Test]
+	[Ignore("暫時取消這個功能")]
 	public void Create_Player_BankInfo_If_Exists_Will_Throw_Exception()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();

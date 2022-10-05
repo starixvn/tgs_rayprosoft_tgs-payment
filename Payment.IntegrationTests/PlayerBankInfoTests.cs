@@ -116,6 +116,7 @@ public class PlayerBankInfoTests
 	}
 
 	[Test]
+	[Ignore("暫時取消這個功能")]
 	public async Task Create_Duplicate_Player_BankInfo_Should_Fail()
 	{
 		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
