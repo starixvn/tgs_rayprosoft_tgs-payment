@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.Clients;
+using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
 
@@ -48,12 +49,14 @@ public class BankInfoTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var sut = new CreatePlayerBankInfoCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeBankInfoParserFactory,
-			   new JsonTransform());
+			new JsonTransform(),
+			fakeServiceCoordinator);
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -94,12 +97,14 @@ public class BankInfoTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var sut = new CreatePlayerBankInfoCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeBankInfoParserFactory,
-			new JsonTransform());
+			new JsonTransform(),
+			fakeServiceCoordinator);
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
@@ -246,12 +251,14 @@ public class BankInfoTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
 
 		var sut = new CreatePlayerBankInfoCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeBankInfoParserFactory,
-			   new JsonTransform());
+			new JsonTransform(),
+			fakeServiceCoordinator);
 
 		var brandId = Guid.NewGuid();
 		var playerCode = "ThisIsPlayerCode";
