@@ -15,7 +15,7 @@ internal class PrimePayProcessor : IWithdrawProcessor
 			""id"": ""$.id"",
 			""paymentChannelId"": ""$.paymentChannelId"",
 			""bankType"": ""$.bankType"",
-			""detail"": $.detail
+			""detail"": ""$.detail""
 		}",
 		["FPS"] = @"{
 			""id"": ""$.id"",
