@@ -371,6 +371,18 @@ internal class PaymentRepository : IPaymentRepository
 				string.IsNullOrEmpty(info.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(info.Detail),
 				info.Default));
 
+	public async ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var flag = await _tgsContext.BrandPlayerBankinfoCheckFlags.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		if (flag is null)
+			return false;
+
+		return flag.IsEnabled;
+	}
+
 	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var brandInfo = await _tgsContext.Brands
@@ -890,8 +902,22 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 	}
 
+	public async ValueTask SetBrandCheckPlayerBankInfoDuplicateEnabledAsync(Guid brandId, bool brandEnabled, CancellationToken cancellationToken = default)
+	{
+		var flag = await _tgsContext.BrandPlayerBankinfoCheckFlags.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false)
+			?? (await _tgsContext.BrandPlayerBankinfoCheckFlags
+				.AddAsync(new BrandPlayerBankinfoCheckFlag { BrandId = brandId }, cancellationToken)
+				.ConfigureAwait(false)).Entity;
+
+		flag.IsEnabled = brandEnabled;
+
+		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
 	public async ValueTask SetDefaultPlayerBankInfoAsync(
-		string playerCode,
+			string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
 		CancellationToken cancellationToken = default)

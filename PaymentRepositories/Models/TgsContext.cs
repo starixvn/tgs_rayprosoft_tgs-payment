@@ -24,6 +24,7 @@ namespace Tgs.Payment.Repositories.Entities
         public virtual DbSet<BrandPayment> BrandPayments { get; set; } = null!;
         public virtual DbSet<BrandPaymentPlayer> BrandPaymentPlayers { get; set; } = null!;
         public virtual DbSet<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; } = null!;
+        public virtual DbSet<BrandPlayerBankinfoCheckFlag> BrandPlayerBankinfoCheckFlags { get; set; } = null!;
         public virtual DbSet<DepositForm> DepositForms { get; set; } = null!;
         public virtual DbSet<PaymentChannel> PaymentChannels { get; set; } = null!;
         public virtual DbSet<PaymentItem> PaymentItems { get; set; } = null!;
@@ -44,6 +45,7 @@ namespace Tgs.Payment.Repositories.Entities
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentPlayerConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentVipLevelConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.BrandPlayerBankinfoCheckFlagConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.DepositFormConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PaymentChannelConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PaymentItemConfiguration());

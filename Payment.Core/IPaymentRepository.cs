@@ -56,6 +56,8 @@ public interface IPaymentRepository
 
 	IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default);
 
+	ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
@@ -115,6 +117,8 @@ public interface IPaymentRepository
 		string playerCode,
 		string tag,
 		CancellationToken cancellationToken = default);
+
+	ValueTask SetBrandCheckPlayerBankInfoDuplicateEnabledAsync(Guid brandId, bool brandEnabled, CancellationToken cancellationToken = default);
 
 	ValueTask SetDefaultPlayerBankInfoAsync(
 		string playerCode,

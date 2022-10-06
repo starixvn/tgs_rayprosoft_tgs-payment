@@ -4,13 +4,13 @@
       "Tables": [
          {
             "Columns": [ ],
-            "Name": "payments",
-            "NewName": "PaymentItem"
+            "Name": "agent_bank_infos",
+            "NewName": "AgentBankInfoItem"
          },
          {
             "Columns": [ ],
-            "Name": "agent_bank_infos",
-            "NewName": "AgentBankInfoItem"
+            "Name": "payments",
+            "NewName": "PaymentItem"
          }
       ],
       "UseSchemaName": false
