@@ -16,12 +16,6 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
         {
             entity.ToTable("payments", "dbo");
 
-            entity.HasIndex(e => e.Name, "ix_payments_name");
-
-            entity.HasIndex(e => e.Name, "ix_trgm_payments_name")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
