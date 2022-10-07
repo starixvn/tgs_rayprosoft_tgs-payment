@@ -9,6 +9,9 @@ data:
         "Crypto": {
           "Address": "$.address"
         },
+        "Usdt": {
+          "Address": "$.address"
+        },
         "Bank": {
           "BankName": "$.bankName",
           "BankAccount": "$.bankAccount"
