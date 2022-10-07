@@ -122,7 +122,11 @@ builder.Services
 		.AddHandler(
 			Tgs.Payment.MessageQueue.ProcessorTypes.PlayerBankInfoDeletedHandlerType,
 			"tgs.player.bankinfo.deleted",
-			"tgs.player.bankinfo.deleted"))
+			"tgs.player.bankinfo.deleted")
+		.AddReplyHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.RebuildPlayerBankInfoTagHandlerType,
+			"tgs.player.bankinfo.rebuild",
+			"tgs.player.bankinfo.rebuild"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();

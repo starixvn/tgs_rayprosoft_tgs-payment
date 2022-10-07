@@ -216,6 +216,17 @@ internal class PaymentClient : IPaymentClient
 			cancellationToken: cancellationToken);
 	}
 
+	public ValueTask RebuildPlayerBankInfoHashAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
+	{
+		var request = new PlayerBankInfoChangedEvent
+		{
+			BrandId = brandId,
+			Id = bankInfoId
+		};
+
+		return _messageSender.SendAsync("tgs.player.bankinfo.rebuild", request.ToByteArray(), cancellationToken);
+	}
+
 	public ValueTask RejectDepositAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var request = new RejectDepositRequest

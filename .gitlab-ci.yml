@@ -1,8 +1,10 @@
 variables:
   ImageName: pgtgs/payment-api
   ReindexJobImageName: pgtgs/reindex-bankinfo
+  RebuildHashImageName: pgtgs/rebuild-bankinfo-hash
   TgsSettingKey: payment-api
   BuildCacheKey: Tgs.Payment.$CI_PIPELINE_IID
+  Tag: $(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID
 
 stages:
   - build
@@ -84,7 +86,7 @@ push-docker-image:
     - dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
     - docker push $ImageName:$Tag
 
-push-bankinfo-reindex-job-image:
+push-bankinfo-rebuild-hash-job-image:
   stage: publish
   needs:
     - build-code
@@ -98,8 +100,8 @@ push-bankinfo-reindex-job-image:
   when: manual
   script:
     - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
-    - dotnet build "PlayerBankInfoReindex/PlayerBankInfoReindex.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ReindexJobImageName:$Tag" --no-restore
-    - docker push $ReindexJobImageName:$Tag
+    - dotnet build "PlayerBankInfoRebuildHash/PlayerBankInfoRebuildHash.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$RebuildHashImageName:$Tag" --no-restore
+    - docker push $RebuildHashImageName:$Tag
 
 push-k8s-template:
   stage: publish
@@ -123,7 +125,7 @@ push-k8s-template:
     paths:
       - artifacts/**/*
 
-push-bankinfo-reindex-k8s-template:
+push-bankinfo-rebuild-hash-k8s-template:
   stage: publish
   needs:
     - push-bankinfo-reindex-job-image
@@ -132,12 +134,12 @@ push-bankinfo-reindex-k8s-template:
   script:
     - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
     - mkdir -p artifacts/k8s
-    - cp -R deployment/k8s/bankinfo-reindex artifacts/k8s/
+    - cp -R deployment/k8s/bankinfo-rebuild-hash artifacts/k8s/
     - |
       yq -i e '
-        .image.repository = strenv(ReindexJobImageName) |
+        .image.repository = strenv(RebuildHashImageName) |
         .image.tag = strenv(Tag)
-      ' artifacts/k8s/bankinfo-reindex/values.yaml
+      ' artifacts/k8s/bankinfo-rebuild-hash/values.yaml
   artifacts:
     name: HelmTemplate
     untracked: false

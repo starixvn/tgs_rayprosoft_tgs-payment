@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PlayerBankInfoRebuildHash": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
