@@ -128,7 +128,7 @@ push-k8s-template:
 push-bankinfo-rebuild-hash-k8s-template:
   stage: publish
   needs:
-    - push-bankinfo-reindex-job-image
+    - push-bankinfo-rebuild-hash-job-image
   only:
     - main
   script:
