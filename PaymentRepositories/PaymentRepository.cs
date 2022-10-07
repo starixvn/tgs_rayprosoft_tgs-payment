@@ -1067,6 +1067,20 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
+	public async ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default)
+	{
+		var bankInfo = await _tgsContext.PlayerBankInfos
+			.FindAsync(new object?[] { bankInfoId }, cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		if (bankInfo is null)
+			return;
+
+		bankInfo.BankInfoHash = hash;
+
+		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
 	{
 		var dataQuery = _tgsContext.DepositForms.AsQueryable()

@@ -353,4 +353,41 @@ public class BankInfoTests
 				Arg.Is("player1"),
 				Arg.Is("1111111"));
 	}
+
+	[Test]
+	public async Task Rebuild_PlayerBankInfo_Hash()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBankInfoIndexParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+
+		var sut = new RebuildPlayerBankInfoHashCommandService(
+			fakePaymentRepository,
+			fakeBankInfoIndexParserFactory,
+			new JsonTransform());
+
+		var command = new RebuildPlayerBankInfoHashCommand(Guid.NewGuid());
+
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
+			.Returns(new PlayerBankInfo(
+				command.BankInfoId,
+				"tester1",
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"Bank",
+				JsonDocument.Parse("{}"),
+				false));
+
+		_ = fakeBankInfoIndexParserFactory.GetBankInfoTransformation(Arg.Any<string>())
+			.Returns(JsonSerializer.Serialize(new
+			{
+				BankAccount = "$.bankAccount"
+			}));
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdatePlayerBankInfoHashAsync(
+				Arg.Is(command.BankInfoId),
+				Arg.Any<byte[]>());
+	}
 }

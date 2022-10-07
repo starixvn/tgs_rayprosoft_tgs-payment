@@ -30,6 +30,8 @@ public interface IPaymentClient
 
 	ValueTask PaidWithdrawAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default);
 
+	ValueTask RebuildPlayerBankInfoHashAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default);
+
 	ValueTask RejectDepositAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask RejectWithdrawAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default);

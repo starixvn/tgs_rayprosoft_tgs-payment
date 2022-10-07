@@ -22,6 +22,8 @@ public interface IPaymentRepository
 
 	ValueTask CreateBankInfoAsync(PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default);
 
+	ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default);
+
 	ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, CancellationToken cancellationToken = default);
 
 	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default);
