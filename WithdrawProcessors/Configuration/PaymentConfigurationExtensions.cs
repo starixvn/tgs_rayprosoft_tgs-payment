@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tgs.Payment.AlfaPay;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.LeePay;
 using Tgs.Payment.MalakiPay;
@@ -25,7 +26,8 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<SkyPaySerializer>()
 			.AddSingleton<ZeroNineNinePaySerializer>()
 			.AddSingleton<TuPaySerializer>()
-			.AddSingleton<MalakiPaySerializer>();
+			.AddSingleton<MalakiPaySerializer>()
+			.AddSingleton<AlfaPaySerializer>();
 
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
