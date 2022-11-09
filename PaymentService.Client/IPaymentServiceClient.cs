@@ -1,4 +1,5 @@
-﻿using Stateless;
+﻿using System.Text.Json;
+using Stateless;
 
 namespace Tgs.Payment.Clients;
 
@@ -151,4 +152,6 @@ public interface IPaymentServiceClient
 		string paymentCode,
 		string playerCode,
 		CancellationToken cancellationToken = default);
+
+	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
 }

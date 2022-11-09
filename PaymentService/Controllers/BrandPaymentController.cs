@@ -152,7 +152,7 @@ public class BrandPaymentController : ControllerBase
 		[FromQuery(Name = "brand_id")] Guid? brandId,
 		[FromQuery(Name = "transfer_type")] TransferType? transferType,
 		[FromQuery(Name = "enabled")] bool? enabled,
-		[FromQuery(Name = "keyword")] string? keyword) 
+		[FromQuery(Name = "keyword")] string? keyword)
 		=> queryService.QueryAsync(new BrandPaymentsQuery(brandId, transferType, enabled, keyword))
 			.Select(brandPayment => new BrandPaymentViewModel
 			{
@@ -175,4 +175,17 @@ public class BrandPaymentController : ControllerBase
 				TransferType = brandPayment.TransferType,
 				DisplayOrder = brandPayment.DisplayOrder
 			});
+
+	[HttpPost("extendeddata/{brandPaymentId}", Name = "UpdateBrandPaymentExtendedData")]
+	public ValueTask UpdateBrandPaymentExtendedDataAsync(
+			[FromServices] ICommandService<UpdateBrandPaymentExtendedDataCommand> commandService,
+			[FromBody] UpdateBrandPaymentExtendedDataViewModel request,
+			Guid brandPaymentId)
+	{
+		var command = new UpdateBrandPaymentExtendedDataCommand(
+			brandPaymentId,
+			request.ExtendedData);
+
+		return commandService.ExecuteAsync(command, HttpContext.RequestAborted);
+	}
 }

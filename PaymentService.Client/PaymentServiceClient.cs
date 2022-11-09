@@ -1145,6 +1145,25 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			ExtendedData = extendedData,
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PostAsync($"/brand/payment/extendeddata/{brandPaymentId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	protected virtual IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
 	{
 		var brandQueryString = string.Join(

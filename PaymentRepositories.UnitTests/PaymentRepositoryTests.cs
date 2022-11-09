@@ -326,4 +326,41 @@ public class PaymentRepositoryTests
 
 		Assert.AreEqual("Test", testFormData.PaymentReturn);
 	}
+
+	[Test]
+	public async Task Update_BrandPayment_Extended_Data()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandPaymentId = Guid.NewGuid();
+
+		var brandPayment = new BrandPayment
+		{
+			Id = brandPaymentId,
+			ReducePlayerAmount = true,
+			HandlingFeeRateTenPercentile = 10m,
+			ChannelName = "This is channel name",
+			ExtendedData = "{}",
+			CreatedByUsername = "createdUsername",
+			UpdatedByUsername = "updatedUsername",
+		};
+
+		_ = await dbContext.BrandPayments.AddAsync(brandPayment);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var extendedData = JsonDocument.Parse("{\"name\":\"Test\"}");
+
+		await sut.UpdateBrandPaymentExtendedDataAsync(brandPaymentId, extendedData);
+
+		Assert.AreEqual("{\"name\":\"Test\"}", dbContext.BrandPayments.FirstAsync(bp => bp.Id == brandPaymentId).Result.ExtendedData);
+	}
 }
