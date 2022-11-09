@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Paging;
@@ -21,8 +22,6 @@ public interface IPaymentRepository
 	ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser, CancellationToken cancellationToken = default);
 
 	ValueTask CreateBankInfoAsync(PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default);
-
-	ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default);
 
 	ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, CancellationToken cancellationToken = default);
 
@@ -166,4 +165,8 @@ public interface IPaymentRepository
 		string? paidUserId,
 		string? paidUserName,
 		CancellationToken cancellationToken = default);
+
+	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
+
+	ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default);
 }
