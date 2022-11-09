@@ -10,7 +10,7 @@
         "OTEL_SERVICE_NAME": "Payment-API(local)",
         "NODE_IP": "otel.rpgp.cc"
       },
-      "dotnetRunMessages": "true",
+      "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:5010"
     },
     "Docker": {

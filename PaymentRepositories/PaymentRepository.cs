@@ -1078,7 +1078,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		brandPayment.ExtendedData = JsonSerializer.Serialize(extendedData);
 
-		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default)
