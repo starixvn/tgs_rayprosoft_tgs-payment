@@ -1158,7 +1158,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
 		var response = await _httpClient
-			.PostAsync($"/brand/payment/extendeddata/{brandPaymentId}", requestContent, cancellationToken)
+			.PatchAsync($"/brand/payment/extendeddata/{brandPaymentId}", requestContent, cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();

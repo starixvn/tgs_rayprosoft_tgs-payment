@@ -176,7 +176,7 @@ public class BrandPaymentController : ControllerBase
 				DisplayOrder = brandPayment.DisplayOrder
 			});
 
-	[HttpPost("extendeddata/{brandPaymentId}", Name = "UpdateBrandPaymentExtendedData")]
+	[HttpPatch("extendeddata/{brandPaymentId}", Name = "UpdateBrandPaymentExtendedData")]
 	public ValueTask UpdateBrandPaymentExtendedDataAsync(
 			[FromServices] ICommandService<UpdateBrandPaymentExtendedDataCommand> commandService,
 			[FromBody] UpdateBrandPaymentExtendedDataViewModel request,
