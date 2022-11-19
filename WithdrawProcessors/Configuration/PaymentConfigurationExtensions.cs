@@ -40,6 +40,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<ZeroNineNinePayProcessor>("ZeroNineNinePay")
 			.RegisterWithdrawProcessor<TuPayProcessor>("TuPay")
 			.RegisterWithdrawProcessor<MalakiPayProcessor>("MalakiPay")
-			.RegisterWithdrawProcessor<AlfaPayProcessor>("AlfaPay");
+			.RegisterWithdrawProcessor<AlfaPayProcessor>("AlfaPay")
+			.RegisterWithdrawProcessor<WandaPayProcessor>("WandaPay");
 	}
 }
