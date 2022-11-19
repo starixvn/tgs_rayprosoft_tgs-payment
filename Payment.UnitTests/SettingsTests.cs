@@ -21,7 +21,7 @@ public class SettingsTests
 		_ = await sut.GetAsync(query);
 
 		_ = fakePaymentRepository.Received(1)
-			.GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Arg.Is(query.brandId));
+			.GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Arg.Is(query.BrandId));
 	}
 
 	[Test]

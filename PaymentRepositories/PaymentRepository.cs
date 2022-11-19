@@ -377,10 +377,7 @@ internal class PaymentRepository : IPaymentRepository
 			new object?[] { brandId },
 			cancellationToken: cancellationToken).ConfigureAwait(false);
 
-		if (flag is null)
-			return false;
-
-		return flag.IsEnabled;
+		return flag is not null && flag.IsEnabled;
 	}
 
 	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -913,7 +910,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		flag.IsEnabled = brandEnabled;
 
-		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask SetDefaultPlayerBankInfoAsync(
@@ -1092,7 +1089,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		bankInfo.BankInfoHash = hash;
 
-		await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
