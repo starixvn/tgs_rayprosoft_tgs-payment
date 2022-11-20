@@ -8,6 +8,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BankInfos;
+using Tgs.Payment.ApplicationServices.Settings;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
@@ -245,7 +246,6 @@ public class BankInfoTests
 	}
 
 	[Test]
-	[Ignore("暫時取消這個功能")]
 	public void Create_Player_BankInfo_If_Exists_Will_Throw_Exception()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -277,6 +277,10 @@ public class BankInfoTests
 			JsonSerializer.SerializeToDocument(detail),
 			false,
 			playerCode);
+
+		_ = fakeServiceCoordinator.GetAsync<GetPlayerBankInfoDuplicateCheckIsEnabledQuery, bool>(
+			Arg.Any<GetPlayerBankInfoDuplicateCheckIsEnabledQuery>())
+			.Returns(true);
 
 		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
 			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");

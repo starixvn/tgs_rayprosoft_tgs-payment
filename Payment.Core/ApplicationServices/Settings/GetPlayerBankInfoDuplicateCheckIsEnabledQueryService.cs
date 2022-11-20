@@ -15,5 +15,5 @@ internal class GetPlayerBankInfoDuplicateCheckIsEnabledQueryService : IGetServic
 	}
 
 	public ValueTask<bool> GetAsync(GetPlayerBankInfoDuplicateCheckIsEnabledQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(query.brandId, cancellationToken);
+		=> _paymentRepository.GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(query.BrandId, cancellationToken);
 }
