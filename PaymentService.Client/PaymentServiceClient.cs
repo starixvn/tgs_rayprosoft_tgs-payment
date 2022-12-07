@@ -895,6 +895,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 			queryStrings.Add("channel", conditions.ChannelName);
 
+		if (conditions.PaymentId != null)
+			queryStrings.Add("payment", conditions.PaymentId.ToString());
+
 		if (conditions.PaymentMethodId != null)
 			queryStrings.Add("method", conditions.PaymentMethodId.ToString());
 

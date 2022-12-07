@@ -40,6 +40,9 @@ public class WithdrawFormQueryViewModel
 	[FromQuery(Name = "order_no")]
 	public string? OrderNo { get; set; }
 
+	[FromQuery(Name = "payment")]
+	public Guid? PaymentId { get; set; }
+
 	[FromQuery(Name = "method")]
 	public Guid? PaymentMethodId { get; set; }
 

@@ -269,6 +269,7 @@ public class WithdrawTests
 			null,
 			null,
 			null,
+			null,
 			new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -703,6 +704,7 @@ public class WithdrawTests
 
 		var query = new WithdrawFormQuery(
 			Guid.NewGuid(),
+			null,
 			null,
 			null,
 			null,

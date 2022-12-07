@@ -16,6 +16,8 @@ public class WithdrawFormQueryConditions
 
 	public (DateTimeOffset Begin, DateTimeOffset End)? PaidOnRange { get; init; }
 
+	public Guid? PaymentId { get; init; }
+
 	public Guid? PaymentMethodId { get; init; }
 
 	public (DateTimeOffset Begin, DateTimeOffset End)? ReviewOnRange { get; init; }
