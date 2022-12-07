@@ -1106,6 +1106,8 @@ internal class PaymentRepository : IPaymentRepository
 			dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
 		if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 			dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
+		if (conditions.PaymentId != null)
+			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.PaymentId == conditions.PaymentId);
 		if (conditions.PaymentMethodId != null)
 			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
 		if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))

@@ -808,9 +808,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async ValueTask<DepositForms> QueryDepositFormsAsync(
-				DepositFormQueryConditions conditions,
-			Paging paging,
-			CancellationToken cancellationToken = default)
+		DepositFormQueryConditions conditions,
+		Paging paging,
+		CancellationToken cancellationToken = default)
 	{
 		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
 
@@ -819,6 +819,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		if (conditions.PaymentMethodId != null)
 			queryStrings.Add("method", conditions.PaymentMethodId.ToString());
+
+		if (conditions.PaymentId != null)
+			queryStrings.Add("payment", conditions.PaymentId.ToString());
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			queryStrings.Add("user_id", conditions.UserId);
