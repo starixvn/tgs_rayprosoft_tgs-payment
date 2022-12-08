@@ -1094,24 +1094,37 @@ internal class PaymentRepository : IPaymentRepository
 
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
 	{
+		var currentDate = DateTimeOffset.UtcNow;
+
 		var dataQuery = _tgsContext.DepositForms.AsQueryable()
 			.Include(f => f.PlayerCodeNavigation)
 			.Include(f => f.BrandPayment)
 			.ThenInclude(bp => bp.PaymentMethodChannel)
-			.Where(form => form.BrandId == conditions.BrandId);
+			.Where(form => form.BrandId == conditions.BrandId)
+			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+				&& form.CreatedOn < currentDate);
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
+
 		if (!string.IsNullOrWhiteSpace(conditions.UserName))
 			dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
+
 		if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 			dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
+
+		if (conditions.PaymentId != null)
+			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.PaymentId == conditions.PaymentId);
+
 		if (conditions.PaymentMethodId != null)
 			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+
 		if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 			dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+
 		if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
 			dataQuery = dataQuery.Where(form => form.OrderNo == conditions.OrderNo);
+
 		if (conditions.FormId != null)
 			dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
@@ -1136,10 +1149,14 @@ internal class PaymentRepository : IPaymentRepository
 
 	private IQueryable<WithdrawForm> MakeWithdrawFormQuery(WithdrawFormQueryConditions conditions)
 	{
+		var currentDate = DateTimeOffset.UtcNow;
+
 		var dataQuery = _tgsContext.WithdrawForms.AsQueryable()
 			.Include(f => f.BrandPayment)
 			.ThenInclude(bp => bp!.PaymentMethodChannel)
-			.Where(form => form.BrandId == conditions.BrandId);
+			.Where(form => form.BrandId == conditions.BrandId)
+			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+				&& form.CreatedOn < currentDate);
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
@@ -1156,12 +1173,18 @@ internal class PaymentRepository : IPaymentRepository
 		if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 			dataQuery = dataQuery.Where(form => form.BrandPayment!.ChannelName == conditions.ChannelName);
 
+		if (conditions.PaymentId != null)
+			dataQuery = dataQuery.Where(
+				form => form.BrandPayment!.PaymentMethodChannel.PaymentId == conditions.PaymentId);
+
 		if (conditions.PaymentMethodId != null)
 			dataQuery = dataQuery.Where(
 				 form => form.BrandPayment!.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+
 		if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 			dataQuery = dataQuery.Where(
 				form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+
 		if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
 			dataQuery = dataQuery.Where(
 				form => form.OrderNo == conditions.OrderNo);
@@ -1173,7 +1196,7 @@ internal class PaymentRepository : IPaymentRepository
 		if (statusList.Length > 0)
 			dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 
-		var brandIdList = conditions.BrandPaymentIds.Cast<Guid>().ToArray();
+		var brandIdList = conditions.BrandPaymentIds.ToArray();
 
 		if (brandIdList.Length > 0)
 			dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));

@@ -12,6 +12,7 @@ public record DepositFormQuery(
 	string? ThirdPartyOrderNo,
 	string? OrderNo,
 	Guid? FormId,
+	Guid? PaymentId,
 	Guid? PaymentMethodId,
 	IEnumerable<PaymentFlowState> Status,
 	(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,

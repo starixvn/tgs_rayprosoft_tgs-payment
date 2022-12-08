@@ -68,6 +68,7 @@ public class DepositTests
 			null,
 			null,
 			null,
+			null,
 			new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -330,6 +331,7 @@ public class DepositTests
 			null,
 			null,
 			null,
+			null,
 			new[] {
 					PaymentFlowState.WaitPayment,
 					PaymentFlowState.WaitApprove,
@@ -533,6 +535,7 @@ public class DepositTests
 			null,
 			null,
 			ThirdPartyOrderNo: null,
+			null,
 			null,
 			null,
 			null,

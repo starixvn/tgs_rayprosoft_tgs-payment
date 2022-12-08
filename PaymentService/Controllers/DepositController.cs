@@ -154,6 +154,7 @@ public class DepositController : ControllerBase
 			null,
 			null,
 			null,
+			null,
 			new[] {
 				PaymentFlowState.WaitApprove,
 				PaymentFlowState.WaitPayment
@@ -235,6 +236,7 @@ public class DepositController : ControllerBase
 			formQuery.ThirdPartyOrderNo,
 			formQuery.OrderNo,
 			formQuery.FormId,
+			formQuery.PaymentId,
 			formQuery.PaymentMethodId,
 			formQuery.Status ?? Array.Empty<PaymentFlowState>(),
 			createOnRange,

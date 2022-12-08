@@ -12,6 +12,8 @@ public class DepositFormQueryConditions
 
 	public string? OrderNo { get; init; }
 
+	public Guid? PaymentId { get; init; }
+
 	public Guid? PaymentMethodId { get; init; }
 
 	public IEnumerable<PaymentFlowState> Status { get; init; } = Array.Empty<PaymentFlowState>();

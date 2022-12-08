@@ -26,6 +26,7 @@ internal class CalculateWithdrawTotalAmountService
 					query.ThirdPartyOrderNo,
 					query.OrderNo,
 					query.FormId,
+					query.PaymentId,
 					query.PaymentMethodId,
 					query.Status,
 					query.BrandPaymentIds,

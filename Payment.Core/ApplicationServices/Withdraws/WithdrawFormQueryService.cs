@@ -27,6 +27,7 @@ internal class WithdrawFormQueryService
 				query.ThirdPartyOrderNo,
 				query.OrderNo,
 				query.FormId,
+				query.PaymentId,
 				query.PaymentMethodId,
 				query.Status,
 				query.BrandPaymentIds,
@@ -46,6 +47,7 @@ internal class WithdrawFormQueryService
 				query.ThirdPartyOrderNo,
 				query.OrderNo,
 				query.FormId,
+				query.PaymentId,
 				query.PaymentMethodId,
 				query.Status,
 				query.BrandPaymentIds,
@@ -53,6 +55,6 @@ internal class WithdrawFormQueryService
 				query.UpdateOnRange,
 				query.ReviewOnRange,
 				query.PaidOnRange),
-			query.Paging, 
+			query.Paging,
 			cancellationToken);
 }

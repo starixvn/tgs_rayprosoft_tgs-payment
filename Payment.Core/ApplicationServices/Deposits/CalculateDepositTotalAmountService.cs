@@ -24,6 +24,7 @@ internal class CalculateDepositTotalAmountService
 			query.ThirdPartyOrderNo,
 			query.OrderNo,
 			query.FormId,
+			query.PaymentId,
 			query.PaymentMethodId,
 			query.Status,
 			query.CreateOnRange,
