@@ -1094,11 +1094,15 @@ internal class PaymentRepository : IPaymentRepository
 
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
 	{
+		var currentDate = DateTimeOffset.UtcNow;
+
 		var dataQuery = _tgsContext.DepositForms.AsQueryable()
 			.Include(f => f.PlayerCodeNavigation)
 			.Include(f => f.BrandPayment)
 			.ThenInclude(bp => bp.PaymentMethodChannel)
-			.Where(form => form.BrandId == conditions.BrandId);
+			.Where(form => form.BrandId == conditions.BrandId)
+			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+				&& form.CreatedOn < currentDate);
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
@@ -1134,11 +1138,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		if (conditions.CreateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
-												&& form.CreatedOn < conditions.CreateOnRange.Value.End);
-
-		var currentDate = DateTimeOffset.UtcNow;
-		dataQuery = dataQuery.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
-											&& form.CreatedOn < currentDate);
+				&& form.CreatedOn < conditions.CreateOnRange.Value.End);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
@@ -1149,10 +1149,14 @@ internal class PaymentRepository : IPaymentRepository
 
 	private IQueryable<WithdrawForm> MakeWithdrawFormQuery(WithdrawFormQueryConditions conditions)
 	{
+		var currentDate = DateTimeOffset.UtcNow;
+
 		var dataQuery = _tgsContext.WithdrawForms.AsQueryable()
 			.Include(f => f.BrandPayment)
 			.ThenInclude(bp => bp!.PaymentMethodChannel)
-			.Where(form => form.BrandId == conditions.BrandId);
+			.Where(form => form.BrandId == conditions.BrandId)
+			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+				&& form.CreatedOn < currentDate);
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
@@ -1199,11 +1203,7 @@ internal class PaymentRepository : IPaymentRepository
 
 		if (conditions.CreateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
-												&& form.CreatedOn < conditions.CreateOnRange.Value.End);
-
-		var currentDate = DateTimeOffset.UtcNow;
-		dataQuery = dataQuery.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
-			&& form.CreatedOn < currentDate);
+				&& form.CreatedOn < conditions.CreateOnRange.Value.End);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
