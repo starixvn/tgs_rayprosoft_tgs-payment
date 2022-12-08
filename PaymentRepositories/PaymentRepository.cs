@@ -1102,18 +1102,25 @@ internal class PaymentRepository : IPaymentRepository
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.PlayerCode == conditions.UserId);
+
 		if (!string.IsNullOrWhiteSpace(conditions.UserName))
 			dataQuery = dataQuery.Where(form => form.PlayerCodeNavigation.Username == conditions.UserName);
+
 		if (!string.IsNullOrWhiteSpace(conditions.ChannelName))
 			dataQuery = dataQuery.Where(form => form.BrandPayment.ChannelName == conditions.ChannelName);
+
 		if (conditions.PaymentId != null)
 			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.PaymentId == conditions.PaymentId);
+
 		if (conditions.PaymentMethodId != null)
 			dataQuery = dataQuery.Where(form => form.BrandPayment.PaymentMethodChannel.MethodId == conditions.PaymentMethodId);
+
 		if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 			dataQuery = dataQuery.Where(form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+
 		if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
 			dataQuery = dataQuery.Where(form => form.OrderNo == conditions.OrderNo);
+
 		if (conditions.FormId != null)
 			dataQuery = dataQuery.Where(form => form.Id == conditions.FormId);
 
@@ -1125,9 +1132,11 @@ internal class PaymentRepository : IPaymentRepository
 				dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 		}
 
-		if (conditions.CreateOnRange != null)
-			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
-				&& form.CreatedOn < conditions.CreateOnRange.Value.End);
+		var currentDate = DateTimeOffset.UtcNow;
+		var createOnRange = conditions.CreateOnRange ?? (Begin: currentDate.AddDays(-90), End: currentDate);
+
+		dataQuery = dataQuery.Where(form => form.CreatedOn >= createOnRange.Begin
+			&& form.CreatedOn < createOnRange.End);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
@@ -1169,6 +1178,7 @@ internal class PaymentRepository : IPaymentRepository
 		if (!string.IsNullOrWhiteSpace(conditions.ThirdPartyOrderNo))
 			dataQuery = dataQuery.Where(
 				form => form.ThirdPartyOrderNo == conditions.ThirdPartyOrderNo);
+
 		if (!string.IsNullOrWhiteSpace(conditions.OrderNo))
 			dataQuery = dataQuery.Where(
 				form => form.OrderNo == conditions.OrderNo);
@@ -1180,14 +1190,16 @@ internal class PaymentRepository : IPaymentRepository
 		if (statusList.Length > 0)
 			dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 
-		var brandIdList = conditions.BrandPaymentIds.Cast<Guid>().ToArray();
+		var brandIdList = conditions.BrandPaymentIds.ToArray();
 
 		if (brandIdList.Length > 0)
 			dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));
 
-		if (conditions.CreateOnRange != null)
-			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
-				&& form.CreatedOn < conditions.CreateOnRange.Value.End);
+		var currentDate = DateTimeOffset.UtcNow;
+		var createOnRange = conditions.CreateOnRange ?? (Begin: currentDate.AddDays(-90), End: currentDate);
+
+		dataQuery = dataQuery.Where(form => form.CreatedOn >= createOnRange.Begin
+			&& form.CreatedOn < createOnRange.End);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
