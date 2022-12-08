@@ -1132,11 +1132,13 @@ internal class PaymentRepository : IPaymentRepository
 				dataQuery = dataQuery.Where(form => statusList.Contains(form.Status));
 		}
 
-		var currentDate = DateTimeOffset.UtcNow;
-		var createOnRange = conditions.CreateOnRange ?? (Begin: currentDate.AddDays(-90), End: currentDate);
+		if (conditions.CreateOnRange != null)
+			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
+												&& form.CreatedOn < conditions.CreateOnRange.Value.End);
 
-		dataQuery = dataQuery.Where(form => form.CreatedOn >= createOnRange.Begin
-			&& form.CreatedOn < createOnRange.End);
+		var currentDate = DateTimeOffset.UtcNow;
+		dataQuery = dataQuery.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+											&& form.CreatedOn < currentDate);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
@@ -1195,11 +1197,13 @@ internal class PaymentRepository : IPaymentRepository
 		if (brandIdList.Length > 0)
 			dataQuery = dataQuery.Where(form => brandIdList.Contains(form.BrandPaymentId!.Value));
 
-		var currentDate = DateTimeOffset.UtcNow;
-		var createOnRange = conditions.CreateOnRange ?? (Begin: currentDate.AddDays(-90), End: currentDate);
+		if (conditions.CreateOnRange != null)
+			dataQuery = dataQuery.Where(form => form.CreatedOn >= conditions.CreateOnRange.Value.Begin
+												&& form.CreatedOn < conditions.CreateOnRange.Value.End);
 
-		dataQuery = dataQuery.Where(form => form.CreatedOn >= createOnRange.Begin
-			&& form.CreatedOn < createOnRange.End);
+		var currentDate = DateTimeOffset.UtcNow;
+		dataQuery = dataQuery.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+			&& form.CreatedOn < currentDate);
 
 		if (conditions.UpdateOnRange != null)
 			dataQuery = dataQuery.Where(form => form.UpdatedOn >= conditions.UpdateOnRange.Value.Begin
