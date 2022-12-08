@@ -10,10 +10,10 @@ namespace Payment.IntegrationTests.Steps;
 [Scope(Scenario = "Get Untreated withdraw form Count")]
 public class GetUntreatedWithdrawFormsSteps
 {
-	private int _actual;
-	private Guid _brandId;
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
+	private int _actual;
+	private Guid _brandId;
 
 	public GetUntreatedWithdrawFormsSteps()
 	{
@@ -68,6 +68,7 @@ public class GetUntreatedWithdrawFormsSteps
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Init,
+					CreatedOn = DateTime.Now.AddMinutes(-15),
 					UpdatedOn = DateTime.Now,
 					BankInfo = "{}"
 				},
@@ -75,6 +76,7 @@ public class GetUntreatedWithdrawFormsSteps
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.WaitApprove,
+					CreatedOn = DateTime.Now.AddMinutes(-15),
 					UpdatedOn = DateTime.Now,
 					BankInfo = "{}"
 				},
@@ -82,6 +84,7 @@ public class GetUntreatedWithdrawFormsSteps
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Approved,
+					CreatedOn = DateTime.Now.AddMinutes(-15),
 					UpdatedOn = DateTime.Now,
 					BankInfo = "{}"
 				},
@@ -89,6 +92,7 @@ public class GetUntreatedWithdrawFormsSteps
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Reject,
+					CreatedOn = DateTime.Now.AddMinutes(-15),
 					UpdatedOn = DateTime.Now,
 					BankInfo = "{}"
 				},
@@ -96,6 +100,7 @@ public class GetUntreatedWithdrawFormsSteps
 					Id = Guid.NewGuid(),
 					BrandId = _brandId,
 					Status = (int)PaymentFlowState.Paid,
+					CreatedOn = DateTime.Now.AddMinutes(-15),
 					UpdatedOn = DateTime.Now,
 					BankInfo = "{}"
 				}

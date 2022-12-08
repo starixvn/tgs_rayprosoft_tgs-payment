@@ -84,6 +84,7 @@ public class GetUntreatedDepositCountSteps
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
 						Status = (int)PaymentFlowState.WaitApprove,
+						CreatedOn = DateTime.Now.AddMinutes(-5),
 						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
@@ -93,6 +94,7 @@ public class GetUntreatedDepositCountSteps
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
 						Status = (int)PaymentFlowState.Approved,
+						CreatedOn = DateTime.Now.AddMinutes(-5),
 						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
@@ -102,6 +104,7 @@ public class GetUntreatedDepositCountSteps
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
 						Status = (int)PaymentFlowState.Init,
+						CreatedOn = DateTime.Now.AddMinutes(-5),
 						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
@@ -111,6 +114,7 @@ public class GetUntreatedDepositCountSteps
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
 						Status = (int)PaymentFlowState.Reject,
+						CreatedOn = DateTime.Now.AddMinutes(-5),
 						UpdatedOn = DateTime.Now
 					},
 					new DepositForm
@@ -120,6 +124,7 @@ public class GetUntreatedDepositCountSteps
 						PlayerCode = "PlayerCode",
 						BrandPaymentId = bp.Id,
 						Status = (int)PaymentFlowState.WaitPayment,
+						CreatedOn = DateTime.Now.AddMinutes(-5),
 						UpdatedOn = DateTime.Now
 					}
 			});
