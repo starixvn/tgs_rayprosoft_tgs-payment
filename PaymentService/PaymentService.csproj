@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<RootNamespace>Tgs.Payment</RootNamespace>
 		<Nullable>enable</Nullable>
 		<UserSecretsId>6ea2f6f5-248c-47de-be1c-495e1cc78944</UserSecretsId>

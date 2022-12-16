@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<RootNamespace>Tgs.Payment</RootNamespace>
 		<Nullable>enable</Nullable>
 		<PackageId>Tgs.Payment.Core</PackageId>
