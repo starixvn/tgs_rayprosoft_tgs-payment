@@ -6,9 +6,7 @@
 		<Nullable>enable</Nullable>
 		<UserSecretsId>6ea2f6f5-248c-47de-be1c-495e1cc78944</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<GlobalNugetConfig>$(UserProfile)\AppData\Roaming\NuGet\NuGet.Config</GlobalNugetConfig>
-		<GlobalNugetConfig Condition="'$(UserProfile)'==''">$(HOME)/.nuget/NuGet/NuGet.Config</GlobalNugetConfig>
-		<DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)" --secret id=nuget,src="$(GlobalNugetConfig)"</DockerfileBuildArguments>
+		<DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)"</DockerfileBuildArguments>
 		<DockerfileTag Condition="$(DockerfileTag) == ''">payment/service</DockerfileTag>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
