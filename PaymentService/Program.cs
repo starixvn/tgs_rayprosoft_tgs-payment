@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +59,7 @@ builder.Services
 	.UseRedis((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		options.ConnectionString = config.GetConnectionString("RedisConfigurationString");
+		options.ConnectionString = config.GetConnectionString("RedisConfigurationString")!;
 	})
 	.UseTgsPaymentRepository((sp, builder) =>
 	{
@@ -93,7 +93,7 @@ builder.Services
 		{
 			var config = sp.GetRequiredService<IConfiguration>();
 
-			options.Url = config.GetConnectionString("Nats");
+			options.Url = config.GetConnectionString("Nats")!;
 		})
 		.AddReplyHandler(
 			Tgs.Payment.MessageQueue.ProcessorTypes.SaveWithdrawThirdNoHandlerType,

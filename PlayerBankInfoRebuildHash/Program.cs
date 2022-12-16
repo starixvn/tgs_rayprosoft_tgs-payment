@@ -19,7 +19,7 @@ var app = Host.CreateDefaultBuilder()
 			{
 				var config = sp.GetRequiredService<IConfiguration>();
 
-				options.Url = config.GetConnectionString("Nats");
+				options.Url = config.GetConnectionString("Nats")!;
 			}))
 		.AddNatsGlobPatternExchange("*"))
 	.Build();
