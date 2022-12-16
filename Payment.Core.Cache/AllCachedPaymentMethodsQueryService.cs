@@ -41,7 +41,7 @@ internal class AllCachedPaymentMethodsQueryService : IQueryService<AllPaymentMet
 			return data;
 		}).ConfigureAwait(false);
 
-		foreach (var item in result)
+		foreach (var item in result!)
 			yield return item;
 	}
 }
