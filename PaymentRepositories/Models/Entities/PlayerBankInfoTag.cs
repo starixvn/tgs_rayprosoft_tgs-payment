@@ -3,17 +3,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
-{
-    public partial class PlayerBankInfoTag
-    {
-        public Guid BankInfoId { get; set; }
-        public Guid BrandId { get; set; }
-        public string PlayerCode { get; set; } = null!;
-        public string TagType { get; set; } = null!;
-        public string Tag { get; set; } = null!;
+namespace Tgs.Payment.Repositories.Entities;
 
-        public virtual PlayerBankInfo BankInfo { get; set; } = null!;
-        public virtual Player PlayerCodeNavigation { get; set; } = null!;
-    }
+public partial class PlayerBankInfoTag
+{
+    public Guid BankInfoId { get; set; }
+
+    public Guid BrandId { get; set; }
+
+    public string PlayerCode { get; set; } = null!;
+
+    public string TagType { get; set; } = null!;
+
+    public string Tag { get; set; } = null!;
+
+    public virtual PlayerBankInfo BankInfo { get; set; } = null!;
+
+    public virtual Player PlayerCodeNavigation { get; set; } = null!;
 }

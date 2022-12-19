@@ -3,24 +3,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class PaymentMethodChannel
 {
-    public partial class PaymentMethodChannel
-    {
-        public PaymentMethodChannel()
-        {
-            BrandPayments = new HashSet<BrandPayment>();
-        }
+    public Guid Id { get; set; }
 
-        public Guid Id { get; set; }
-        public Guid PaymentId { get; set; }
-        public Guid MethodId { get; set; }
-        public Guid ChannelId { get; set; }
-        public short Status { get; set; }
+    public Guid PaymentId { get; set; }
 
-        public virtual PaymentChannel Channel { get; set; } = null!;
-        public virtual PaymentMethod Method { get; set; } = null!;
-        public virtual PaymentItem Payment { get; set; } = null!;
-        public virtual ICollection<BrandPayment> BrandPayments { get; set; }
-    }
+    public Guid MethodId { get; set; }
+
+    public Guid ChannelId { get; set; }
+
+    public short Status { get; set; }
+
+    public virtual ICollection<BrandPayment> BrandPayments { get; } = new List<BrandPayment>();
+
+    public virtual PaymentChannel Channel { get; set; } = null!;
+
+    public virtual PaymentMethod Method { get; set; } = null!;
+
+    public virtual PaymentItem Payment { get; set; } = null!;
 }

@@ -3,48 +3,67 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class BrandPayment
 {
-    public partial class BrandPayment
-    {
-        public BrandPayment()
-        {
-            BrandPaymentPlayers = new HashSet<BrandPaymentPlayer>();
-            BrandPaymentVipLevels = new HashSet<BrandPaymentVipLevel>();
-            DepositForms = new HashSet<DepositForm>();
-            WithdrawForms = new HashSet<WithdrawForm>();
-        }
+    public Guid Id { get; set; }
 
-        public Guid Id { get; set; }
-        public Guid BrandId { get; set; }
-        public int DisplayOrder { get; set; }
-        public Guid PaymentMethodChannelId { get; set; }
-        public int TransferType { get; set; }
-        public string ChannelName { get; set; } = null!;
-        public int PaymentStatus { get; set; }
-        public decimal TransferLimitFrom { get; set; }
-        public decimal TransferLimitTo { get; set; }
-        public int PlayerListCondition { get; set; }
-        public bool AllPlayers { get; set; }
-        public bool IdentityAuthentication { get; set; }
-        public bool PhoneAuthentication { get; set; }
-        public bool DepositedAmountUnlimited { get; set; }
-        public decimal DepositedAmountMin { get; set; }
-        public decimal DepositedAmountMax { get; set; }
-        public string? Reason { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = null!;
-        public string UpdatedByUsername { get; set; } = null!;
-        public string ExtendedData { get; set; } = null!;
-        public decimal HandlingFeeRateTenPercentile { get; set; }
-        public bool ReducePlayerAmount { get; set; }
+    public Guid BrandId { get; set; }
 
-        public virtual Brand Brand { get; set; } = null!;
-        public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = null!;
-        public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
-        public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; }
-        public virtual ICollection<DepositForm> DepositForms { get; set; }
-        public virtual ICollection<WithdrawForm> WithdrawForms { get; set; }
-    }
+    public int DisplayOrder { get; set; }
+
+    public Guid PaymentMethodChannelId { get; set; }
+
+    public int TransferType { get; set; }
+
+    public string ChannelName { get; set; } = null!;
+
+    public int PaymentStatus { get; set; }
+
+    public decimal TransferLimitFrom { get; set; }
+
+    public decimal TransferLimitTo { get; set; }
+
+    public int PlayerListCondition { get; set; }
+
+    public bool AllPlayers { get; set; }
+
+    public bool IdentityAuthentication { get; set; }
+
+    public bool PhoneAuthentication { get; set; }
+
+    public bool DepositedAmountUnlimited { get; set; }
+
+    public decimal DepositedAmountMin { get; set; }
+
+    public decimal DepositedAmountMax { get; set; }
+
+    public string? Reason { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime UpdatedOn { get; set; }
+
+    public string CreatedByUsername { get; set; } = null!;
+
+    public string UpdatedByUsername { get; set; } = null!;
+
+    public string ExtendedData { get; set; } = null!;
+
+    public decimal HandlingFeeRateTenPercentile { get; set; }
+
+    public bool ReducePlayerAmount { get; set; }
+
+    public virtual Brand Brand { get; set; } = null!;
+
+    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; } = new List<BrandPaymentPlayer>();
+
+    public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; } = new List<BrandPaymentVipLevel>();
+
+    public virtual ICollection<DepositForm> DepositForms { get; } = new List<DepositForm>();
+
+    public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = null!;
+
+    public virtual ICollection<WithdrawForm> WithdrawForms { get; } = new List<WithdrawForm>();
 }

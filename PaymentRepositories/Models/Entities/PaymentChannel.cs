@@ -3,23 +3,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class PaymentChannel
 {
-    public partial class PaymentChannel
-    {
-        public PaymentChannel()
-        {
-            AgentBankInfoItems = new HashSet<AgentBankInfoItem>();
-            PaymentMethodChannels = new HashSet<PaymentMethodChannel>();
-            PlayerBankInfos = new HashSet<PlayerBankInfo>();
-        }
+    public Guid Id { get; set; }
 
-        public Guid Id { get; set; }
-        public string Code { get; set; } = null!;
-        public string? Description { get; set; }
+    public string Code { get; set; } = null!;
 
-        public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
-        public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; set; }
-        public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; }
-    }
+    public string? Description { get; set; }
+
+    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
+
+    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; } = new List<PaymentMethodChannel>();
+
+    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
 }

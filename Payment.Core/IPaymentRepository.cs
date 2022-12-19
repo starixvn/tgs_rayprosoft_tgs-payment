@@ -7,23 +7,17 @@ using Tgs.Paging;
 
 namespace Tgs.Payment;
 
-public interface IPaymentRepository
+public partial interface IPaymentRepository
 {
-	ValueTask<decimal> CalculateDepositTotalAmountAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
-
 	ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(Guid brandId, string bankType, byte[] hash, CancellationToken cancellationToken = default);
-
-	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
 	ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser, CancellationToken cancellationToken = default);
 
 	ValueTask CreateBankInfoAsync(PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default);
-
-	ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, CancellationToken cancellationToken = default);
 
 	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default);
 
@@ -78,8 +72,6 @@ public interface IPaymentRepository
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default);
-
 	ValueTask<PaymentInfo> GetPaymentAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync(CancellationToken cancellationToken = default);
@@ -93,11 +85,6 @@ public interface IPaymentRepository
 		TransferType? transferType,
 		bool? enabled,
 		string? keyword,
-		CancellationToken cancellationToken = default);
-
-	IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
-		DepositFormQueryConditions conditions,
-		Paging<DepositFormInfo> paging,
 		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
@@ -127,14 +114,6 @@ public interface IPaymentRepository
 		string modifyUser,
 		CancellationToken cancellationToken = default);
 
-	ValueTask SignOffDepositFormAsync(
-		Guid formId,
-		ReviewState reviewStatus,
-		string? reviewedUserId,
-		string? reviewedUserName,
-		string? remark = null,
-		CancellationToken cancellationToken = default);
-
 	ValueTask SignOffWithdrawFormAsync(
 		Guid formId,
 		Guid? brandPaymentId,
@@ -144,16 +123,6 @@ public interface IPaymentRepository
 		string? reviewedUserName,
 		string? remark = null,
 		decimal? handlingFee = null,
-		CancellationToken cancellationToken = default);
-
-	ValueTask SubmitDepositFormStatusAsync(
-		Guid formId,
-		PaymentFlowState? status,
-		string? paymentReturn,
-		decimal? actualAmount,
-		string? thirdPartyOrderNo,
-		int? promotionPlayerId,
-		decimal? handlingFee,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SubmitWithdrawFormStatusAsync(

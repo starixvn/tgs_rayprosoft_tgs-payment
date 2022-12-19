@@ -3,13 +3,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
-{
-    public partial class BrandPaymentVipLevel
-    {
-        public Guid BrandPaymentId { get; set; }
-        public Guid VipLevelId { get; set; }
+namespace Tgs.Payment.Repositories.Entities;
 
-        public virtual BrandPayment BrandPayment { get; set; } = null!;
-    }
+public partial class BrandPaymentVipLevel
+{
+    public Guid BrandPaymentId { get; set; }
+
+    public Guid VipLevelId { get; set; }
+
+    public virtual BrandPayment BrandPayment { get; set; } = null!;
 }

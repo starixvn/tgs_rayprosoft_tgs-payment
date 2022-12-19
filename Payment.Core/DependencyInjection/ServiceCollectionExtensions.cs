@@ -23,6 +23,8 @@ public static class ServiceCollectionExtensions
 					sp,
 					configuration.GetAllRegisterWithdrawProcessorTypes()))
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
+			.AddSingleton<ISystemClock, DefaultSystemClock>()
+			.AddSerialNumberGenerator()
 			.AddOptions<PaymentOptions>()
 			.Services
 			.AddOptions<BankInfoParserOptions>();

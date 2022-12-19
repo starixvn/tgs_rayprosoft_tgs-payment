@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -288,43 +288,6 @@ public class PaymentRepositoryTests
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
 
 		Assert.AreEqual(2, actual.Length);
-	}
-
-	[Test]
-	public async Task Submit_DepositForm_Status_Without_PaymentReturn_The_Data_Will_Keep_Original()
-	{
-		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
-		_ = dbContextOptionsBuilder
-			.UseInMemoryDatabase(Guid.NewGuid().ToString())
-			.ConfigureWarnings(x => x.Ignore(
-				InMemoryEventId.TransactionIgnoredWarning));
-
-		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
-
-		var testFormData = new DepositForm
-		{
-			Id = Guid.NewGuid(),
-			PlayerCode = "Tester",
-			Status = 0,
-			PaymentReturn = "Test"
-		};
-
-		_ = await dbContext.DepositForms.AddAsync(testFormData);
-
-		_ = await dbContext.SaveChangesAsync();
-
-		var sut = new PaymentRepository(dbContext);
-
-		await sut.SubmitDepositFormStatusAsync(
-			testFormData.Id,
-			Tgs.Payment.PaymentFlowState.Paid,
-			null,
-			null,
-			null,
-			null,
-			null);
-
-		Assert.AreEqual("Test", testFormData.PaymentReturn);
 	}
 
 	[Test]
