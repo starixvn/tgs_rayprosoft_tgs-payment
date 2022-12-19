@@ -6,5 +6,5 @@ public enum DepositFormAction
 	Create,
 	Init,
 	Review,
-	ChanageStatus
+	ChangeStatus
 }
