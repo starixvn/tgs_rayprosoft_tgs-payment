@@ -45,7 +45,8 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 			PaymentReturn = command.PaymentReturn ?? formData.PaymentReturn,
 			ActualAmount = command.ActualAmount ?? formData.ActualAmount,
 			ThirdPartyOrderNo = command.ThirdPartyOrderNo ?? formData.ThirdPartyOrderNo,
-			HandlingFee = command.HandlingFee ?? formData.HandlingFee
+			HandlingFee = command.HandlingFee ?? formData.HandlingFee,
+			PromotionPlayerId = command.PromotionPlayerId ?? formData.PromotionPlayerId
 		};
 
 		var changeSets = newFormData.CreatePatch(formData, PaymentUtility.SerializerOptions);
