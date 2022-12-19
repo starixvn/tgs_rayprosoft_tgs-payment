@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Json.Patch;
 using Tgs.Payment.Clients;
+using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
@@ -10,19 +13,25 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 {
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
+	private readonly ISerialNumberGenerator _serialNumberGenerator;
+	private readonly ISystemClock _systemClock;
 
 	public SubmitDepositFormStatusCommandService(
 		IPaymentRepository paymentRepository,
-		IPaymentClient paymentClient)
+		IPaymentClient paymentClient,
+		ISystemClock systemClock,
+		ISerialNumberGenerator serialNumberGenerator)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
+		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
+		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 	}
 
 	public async ValueTask ExecuteAsync(SubmitDepositFormStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var formData = await _paymentRepository
-			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
+			.GetCurrentDepositFormSnapshotAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (formData == null)
@@ -30,25 +39,40 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 
 		var originStatus = formData.Status;
 
-		await _paymentRepository
-			.SubmitDepositFormStatusAsync(
-				command.FormId,
-				command.Status,
-				command.PaymentReturn,
-				command.ActualAmount,
-				command.ThirdPartyOrderNo,
-				command.PromotionPlayerId,
-				command.HandlingFee,
-				cancellationToken)
+		var newFormData = formData with
+		{
+			Status = command.Status ?? formData.Status,
+			PaymentReturn = command.PaymentReturn ?? formData.PaymentReturn,
+			ActualAmount = command.ActualAmount ?? formData.ActualAmount,
+			ThirdPartyOrderNo = command.ThirdPartyOrderNo ?? formData.ThirdPartyOrderNo,
+			HandlingFee = command.HandlingFee ?? formData.HandlingFee
+		};
+
+		var changeSets = newFormData.CreatePatch(formData, PaymentUtility.SerializerOptions);
+		var eventId = await _serialNumberGenerator
+			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
+		var currentTime = _systemClock.UtcNow.UtcDateTime;
+
+		await _paymentRepository.CreateDepositFormEventAsync(
+			eventId,
+			command.FormId,
+			DepositFormAction.ChanageStatus,
+			JsonSerializer.SerializeToDocument(changeSets),
+			null,
+			cancellationToken).ConfigureAwait(false);
+
+		await _paymentRepository.UpdateDepositFormSnapshotAsync(
+			newFormData,
+			eventId,
+			currentTime,
+			cancellationToken).ConfigureAwait(false);
 
 		if (originStatus != command.Status)
-			await _paymentClient
-				.EmitDepositFormStatusChangedEventAsync(
-					command.FormId,
-					formData.BrandId,
-					originStatus.ToString(),
-					cancellationToken)
-				.ConfigureAwait(false);
+			await _paymentClient.EmitDepositFormStatusChangedEventAsync(
+				command.FormId,
+				formData.BrandId,
+				originStatus.ToString(),
+				cancellationToken).ConfigureAwait(false);
 	}
 }

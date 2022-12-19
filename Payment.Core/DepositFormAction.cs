@@ -5,5 +5,6 @@ public enum DepositFormAction
 	None = 0,
 	Create,
 	Init,
-	Review
+	Review,
+	ChanageStatus
 }
