@@ -138,6 +138,29 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
+	public async ValueTask CreateDepositFormEventAsync(
+		Guid eventId,
+		Guid formId,
+		DepositFormAction action,
+		JsonDocument changeSets,
+		string? modifier,
+		CancellationToken cancellationToken = default)
+	{
+		_ = await _tgsContext.DepositFormEventSources.AddAsync(
+			new DepositFormEventSource
+			{
+				Id = eventId,
+				FormId = formId,
+				Action = action.ToString(),
+				ChangeSets = JsonSerializer.Serialize(changeSets),
+				ModifyUser = modifier,
+				CreatedOn = DateTime.UtcNow
+			},
+			cancellationToken).ConfigureAwait(false);
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
 	public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var createPayment = new PaymentItem
@@ -1074,6 +1097,47 @@ internal class PaymentRepository : IPaymentRepository
 			return;
 
 		brandPayment.ExtendedData = JsonSerializer.Serialize(extendedData);
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask UpdateDepositFormSnapshotAsync(
+		DepositFormSnapshot snapshot,
+		Guid snapshotId,
+		DateTime updatedOn,
+		CancellationToken cancellationToken = default)
+	{
+		var dbSnapshot = await _tgsContext.DepositForms
+			.FindAsync(new object?[] { snapshot.Id }, cancellationToken: cancellationToken)
+			.ConfigureAwait(false)
+			?? (await _tgsContext.DepositForms.AddAsync(new DepositForm
+			{
+				Id = snapshot.Id
+			}, cancellationToken).ConfigureAwait(false)).Entity;
+
+		if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
+		{
+			dbSnapshot.ActualAmount = snapshot.ActualAmount;
+			dbSnapshot.Amount = snapshot.Amount;
+			dbSnapshot.ApplyInfo = snapshot.ApplyInfo;
+			dbSnapshot.BrandId = snapshot.BrandId;
+			dbSnapshot.BrandPaymentId = snapshot.BrandPaymentId;
+			dbSnapshot.CreatedOn = snapshot.CreatedOn;
+			dbSnapshot.HandlingFee = snapshot.HandlingFee;
+			dbSnapshot.OrderNo = snapshot.OrderNo;
+			dbSnapshot.PaymentReturn = snapshot.PaymentReturn;
+			dbSnapshot.PlayerCode = snapshot.PlayerCode;
+			dbSnapshot.PromotionId = snapshot.PromotionId;
+			dbSnapshot.PromotionPlayerId = snapshot.PromotionPlayerId;
+			dbSnapshot.Remark = snapshot.Remark;
+			dbSnapshot.ReviewedOn = snapshot.ReviewedOn;
+			dbSnapshot.ReviewedUserId = snapshot.ReviewedUserId;
+			dbSnapshot.ReviewedUserName = snapshot.ReviewedUserName;
+			dbSnapshot.Status = (int)snapshot.Status;
+			dbSnapshot.ThirdPartyOrderNo = snapshot.ThirdPartyOrderNo;
+			dbSnapshot.SnapshotEventId = snapshotId;
+			dbSnapshot.UpdatedOn = updatedOn;
+		}
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}

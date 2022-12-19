@@ -3,58 +3,85 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class Player
 {
-    public partial class Player
-    {
-        public Player()
-        {
-            AgentBankInfoItems = new HashSet<AgentBankInfoItem>();
-            BrandPaymentPlayers = new HashSet<BrandPaymentPlayer>();
-            DepositForms = new HashSet<DepositForm>();
-            PlayerBankInfoTags = new HashSet<PlayerBankInfoTag>();
-            PlayerBankInfos = new HashSet<PlayerBankInfo>();
-        }
+    public string PlayerCode { get; set; } = null!;
 
-        public string PlayerCode { get; set; } = null!;
-        public string? IdNumber { get; set; }
-        public string Username { get; set; } = null!;
-        public string? RealName { get; set; }
-        public byte[] Password { get; set; } = null!;
-        public byte[] Salt { get; set; } = null!;
-        public byte[] WithdrawPassword { get; set; } = null!;
-        public byte[] WithdrawSalt { get; set; } = null!;
-        public Guid DefaultWalletId { get; set; }
-        public string DefaultWalletCurrencyCode { get; set; } = null!;
-        public Guid BrandId { get; set; }
-        public DateTime? RegisteredOn { get; set; }
-        public DateTime LastActiveOn { get; set; }
-        public short Status { get; set; }
-        public int BetLimitId { get; set; }
-        public short Type { get; set; }
-        public string? Email { get; set; }
-        public string? Phone { get; set; }
-        public string? Qq { get; set; }
-        public string? Wechat { get; set; }
-        public Guid? AgentId { get; set; }
-        public bool IdentityAuthentication { get; set; }
-        public bool PhoneAuthentication { get; set; }
-        public decimal AccumulatedDeposit { get; set; }
-        public Guid? VipId { get; set; }
-        public string? UpdatedByUsername { get; set; }
-        public DateTime UpdatedOn { get; set; }
-        public DateTime? FirstDepositOn { get; set; }
-        public string? AreaCode { get; set; }
-        public DateTime? FirstPromotionOn { get; set; }
-        public string? Remark { get; set; }
-        public DateOnly? Birthdate { get; set; }
-        public string? Birthday { get; set; }
+    public string? IdNumber { get; set; }
 
-        public virtual Brand Brand { get; set; } = null!;
-        public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; }
-        public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
-        public virtual ICollection<DepositForm> DepositForms { get; set; }
-        public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
-        public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; }
-    }
+    public string Username { get; set; } = null!;
+
+    public string? RealName { get; set; }
+
+    public byte[] Password { get; set; } = null!;
+
+    public byte[] Salt { get; set; } = null!;
+
+    public byte[] WithdrawPassword { get; set; } = null!;
+
+    public byte[] WithdrawSalt { get; set; } = null!;
+
+    public Guid DefaultWalletId { get; set; }
+
+    public string DefaultWalletCurrencyCode { get; set; } = null!;
+
+    public Guid BrandId { get; set; }
+
+    public DateTime? RegisteredOn { get; set; }
+
+    public DateTime LastActiveOn { get; set; }
+
+    public short Status { get; set; }
+
+    public int BetLimitId { get; set; }
+
+    public short Type { get; set; }
+
+    public string? Email { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? Qq { get; set; }
+
+    public string? Wechat { get; set; }
+
+    public Guid? AgentId { get; set; }
+
+    public bool IdentityAuthentication { get; set; }
+
+    public bool PhoneAuthentication { get; set; }
+
+    public decimal AccumulatedDeposit { get; set; }
+
+    public Guid? VipId { get; set; }
+
+    public string? UpdatedByUsername { get; set; }
+
+    public DateTime UpdatedOn { get; set; }
+
+    public DateTime? FirstDepositOn { get; set; }
+
+    public string? AreaCode { get; set; }
+
+    public DateTime? FirstPromotionOn { get; set; }
+
+    public string? Remark { get; set; }
+
+    public DateOnly? Birthdate { get; set; }
+
+    public string? Birthday { get; set; }
+
+    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
+
+    public virtual Brand Brand { get; set; } = null!;
+
+    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; } = new List<BrandPaymentPlayer>();
+
+    public virtual ICollection<DepositForm> DepositForms { get; } = new List<DepositForm>();
+
+    public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; } = new List<PlayerBankInfoTag>();
+
+    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
 }

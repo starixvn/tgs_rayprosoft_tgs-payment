@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -6,6 +7,7 @@ using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
+using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
@@ -88,11 +90,18 @@ public class DepositTests
 	[Test]
 	public async Task Can_Create_Deposit_Form()
 	{
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 
-		var sut = new CreateDepositFormCommandService(fakePaymentRepository, fakePaymentClient, fakeTakeNumberStore);
+		var sut = new CreateDepositFormCommandService(
+			fakeSerialNumberGenerator,
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeTakeNumberStore,
+			fakeSystemClock);
 
 		var brandId = Guid.NewGuid();
 		var command = new CreateDepositFormCommand(
@@ -106,9 +115,41 @@ public class DepositTests
 				PromotionId = null,
 				ApplyInfo = null
 			});
+		var eventId = Guid.NewGuid();
+		var orderNo = "Test00001";
+
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
 
 		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
 			.Returns(new BrandInfo("GPI"));
+
+		_ = fakeTakeNumberStore.GetDepositFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentDate = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentDate);
+
+		var expectedSnapshot = new DepositFormSnapshot(
+			command.FormId,
+			command.CreateInfo.PlayerCode,
+			command.CreateInfo.BrandId,
+			command.CreateInfo.BrandPaymentId,
+			command.CreateInfo.Amount,
+			null,
+			null,
+			PaymentFlowState.WaitPayment,
+			command.CreateInfo.ApplyInfo,
+			null,
+			null,
+			orderNo,
+			null,
+			null,
+			null,
+			command.CreateInfo.PromotionId,
+			null,
+			currentDate.UtcDateTime,
+			0M);
 
 		await sut.ExecuteAsync(command);
 
@@ -116,17 +157,18 @@ public class DepositTests
 			.GetBrandInfoByIdAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
-			.CreateDepositFormAsync(Arg.Is(command.FormId), Arg.Any<DepositFormCreateInfo>());
+			.CreateDepositFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(command.FormId),
+				Arg.Is(DepositFormAction.Init),
+				Arg.Any<JsonDocument>(),
+				Arg.Any<string>());
 
 		_ = fakePaymentRepository.Received(1)
-			.SubmitDepositFormStatusAsync(
-				Arg.Is(command.FormId),
-				Arg.Is(PaymentFlowState.WaitPayment),
-				Arg.Any<string>(),
-				Arg.Any<decimal?>(),
-				Arg.Any<string>(),
-				Arg.Any<int?>(),
-				Arg.Any<decimal?>());
+			.UpdateDepositFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(expectedSnapshot.CreatedOn));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitDepositFormCreatedEventAsync(Arg.Is(command.FormId), Arg.Any<Guid>());

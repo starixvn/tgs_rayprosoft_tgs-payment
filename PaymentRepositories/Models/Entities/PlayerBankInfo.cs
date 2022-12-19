@@ -3,31 +3,39 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class PlayerBankInfo
 {
-    public partial class PlayerBankInfo
-    {
-        public PlayerBankInfo()
-        {
-            PlayerBankInfoTags = new HashSet<PlayerBankInfoTag>();
-        }
+    public Guid Id { get; set; }
 
-        public Guid Id { get; set; }
-        public string PlayerCode { get; set; } = null!;
-        public Guid BrandId { get; set; }
-        public Guid PaymentChannelId { get; set; }
-        public string BankType { get; set; } = null!;
-        public string? Detail { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = null!;
-        public string UpdatedByUsername { get; set; } = null!;
-        public bool Default { get; set; }
-        public byte[]? BankInfoHash { get; set; }
+    public string PlayerCode { get; set; } = null!;
 
-        public virtual Brand Brand { get; set; } = null!;
-        public virtual PaymentChannel PaymentChannel { get; set; } = null!;
-        public virtual Player PlayerCodeNavigation { get; set; } = null!;
-        public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
-    }
+    public Guid BrandId { get; set; }
+
+    public Guid PaymentChannelId { get; set; }
+
+    public string BankType { get; set; } = null!;
+
+    public string? Detail { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime UpdatedOn { get; set; }
+
+    public string CreatedByUsername { get; set; } = null!;
+
+    public string UpdatedByUsername { get; set; } = null!;
+
+    public bool Default { get; set; }
+
+    public byte[]? BankInfoHash { get; set; }
+
+    public virtual Brand Brand { get; set; } = null!;
+
+    public virtual PaymentChannel PaymentChannel { get; set; } = null!;
+
+    public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; } = new List<PlayerBankInfoTag>();
+
+    public virtual Player PlayerCodeNavigation { get; set; } = null!;
 }

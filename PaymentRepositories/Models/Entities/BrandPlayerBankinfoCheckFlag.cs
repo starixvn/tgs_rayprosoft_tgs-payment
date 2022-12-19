@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.Payment.Repositories.Entities
+namespace Tgs.Payment.Repositories.Entities;
+
+public partial class BrandPlayerBankinfoCheckFlag
 {
-    public partial class BrandPlayerBankinfoCheckFlag
-    {
-        public Guid BrandId { get; set; }
-        public bool IsEnabled { get; set; }
-    }
+    public Guid BrandId { get; set; }
+
+    public bool IsEnabled { get; set; }
 }

@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 2,
+   "CodeGenerationMode": 3,
    "ContextClassName": "TgsContext",
    "ContextNamespace": "Entities",
    "DefaultDacpacSchema": null,
@@ -43,6 +43,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.deposit_form_event_source",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.deposit_forms",
          "ObjectType": 0
       },
@@ -80,7 +84,7 @@
       }
    ],
    "UiHint": "tgs-local",
-   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
    "UseFluentApiOnly": true,
@@ -88,9 +92,9 @@
    "UseHierarchyId": false,
    "UseInflector": true,
    "UseLegacyPluralizer": false,
-   "UseManyToManyEntity": false,
-   "UseNoConstructor": false,
-   "UseNoDefaultConstructor": false,
+   "UseManyToManyEntity": true,
+   "UseNoConstructor": true,
+   "UseNoDefaultConstructor": true,
    "UseNoNavigations": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
