@@ -330,27 +330,6 @@ public class DepositController : ControllerBase
 	}
 
 	/// <summary>
-	/// Submits the deposit form third party order no asynchronous.
-	/// </summary>
-	/// <param name="submitService">The submit service.</param>
-	/// <param name="formId">The form identifier.</param>
-	/// <param name="request">The request.</param>
-	/// <returns></returns>
-	[HttpPatch("thirdparty/{formId}", Name = "SubmitDepositFormThirdPartyOrderNo")]
-	[Obsolete("Method is obsolete, please use SubmitDepositFormStatus.")]
-	public ValueTask SubmitDepositFormThirdPartyOrderNoAsync(
-		[FromServices] ICommandService<SubmitDepositFormThirdPartyOrderNoCommand> submitService,
-		Guid formId,
-		[FromBody] DepositFormThirdPartyOrderNoViewModel request)
-	{
-		var command = new SubmitDepositFormThirdPartyOrderNoCommand(
-			formId,
-			request.ThirdPartyOrderNo);
-
-		return submitService.ExecuteAsync(command);
-	}
-
-	/// <summary>
 	/// Unlocks the payment asynchronous.
 	/// </summary>
 	/// <param name="unlockService">The unlock service.</param>

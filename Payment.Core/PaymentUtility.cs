@@ -11,6 +11,7 @@ internal static class PaymentUtility
 		WriteIndented = false,
 		Converters = {
 			new JsonStringEnumConverter()
-		}
+		},
+		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
 	};
 }

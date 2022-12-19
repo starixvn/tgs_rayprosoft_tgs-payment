@@ -62,7 +62,7 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 			Remark = command.Remark
 		};
 
-		var changeSets = updatedForm.CreatePatch(formData, PaymentUtility.SerializerOptions);
+		var changeSets = formData.CreatePatch(updatedForm, PaymentUtility.SerializerOptions);
 
 		await _paymentRepository.CreateDepositFormEventAsync(
 			eventId,

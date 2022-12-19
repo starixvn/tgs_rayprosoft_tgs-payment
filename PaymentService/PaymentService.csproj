@@ -9,6 +9,7 @@
 		<DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)"</DockerfileBuildArguments>
 		<DockerfileTag Condition="$(DockerfileTag) == ''">payment/service</DockerfileTag>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<SqlQueryToolsConnectionString />
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

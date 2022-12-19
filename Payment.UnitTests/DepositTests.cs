@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Json.Patch;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Paging;
@@ -503,91 +504,6 @@ public class DepositTests
 	}
 
 	[Test]
-	public async Task Can_Submit_DepositForm_Third_Party_Order_No()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new SubmitDepositFormThirdPartyOrderNoCommandService(
-			fakePaymentRepository,
-			fakeSystemClock,
-			fakeSerialNumberGenerator);
-
-		var command = new SubmitDepositFormThirdPartyOrderNoCommand(
-			Guid.NewGuid(),
-			"ThirdPartyOrderNo");
-
-		var depositForm = new DepositFormSnapshot(
-			command.FormId,
-			"PlayerCode",
-			Guid.NewGuid(),
-			Guid.NewGuid(),
-			1000M,
-			null,
-			null,
-			PaymentFlowState.Approved,
-			null,
-			null,
-			null,
-			"GPIT211028150001",
-			null,
-			null,
-			null,
-			null,
-			null,
-			DateTime.UtcNow,
-			0M);
-		_ = fakePaymentRepository.GetCurrentDepositFormSnapshotAsync(Arg.Is(command.FormId))
-			.Returns(depositForm);
-
-		var eventId = Guid.NewGuid();
-
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
-
-		var expectedSnapshot = new DepositFormSnapshot(
-			command.FormId,
-			"PlayerCode",
-			depositForm.BrandId,
-			depositForm.BrandPaymentId,
-			1000M,
-			null,
-			null,
-			PaymentFlowState.Approved,
-			null,
-			null,
-			"ThirdPartyOrderNo",
-			"GPIT211028150001",
-			null,
-			null,
-			null,
-			null,
-			null,
-			depositForm.CreatedOn,
-			0M);
-
-		await sut.ExecuteAsync(command);
-
-		_ = fakePaymentRepository.Received(1)
-			.CreateDepositFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(command.FormId),
-				Arg.Is(DepositFormAction.ChangeStatus),
-				Arg.Any<JsonDocument>(),
-				Arg.Is(default(string)));
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateDepositFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
-	}
-
-	[Test]
 	public async Task Can_Submit_DepostForm_Status()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -1007,5 +923,41 @@ public class DepositTests
 
 		_ = fakePaymentRateLimitRepository.Received(1)
 			.UnlockPaymentAsync(Arg.Is(command.PaymentCode), Arg.Is(command.PlayerCode));
+	}
+
+	[Test]
+	public void PaymentReturn變更記錄應該要記錄正確內容()
+	{
+		var depositForm = new DepositFormSnapshot(
+			Guid.NewGuid(),
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+
+		var sut = depositForm with
+		{
+			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
+		};
+
+		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+
+		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+
+		Assert.AreEqual(sut, actual);
 	}
 }
