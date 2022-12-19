@@ -972,34 +972,6 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask SignOffDepositFormAsync(
-		Guid formId,
-		ReviewState reviewStatus,
-		string? reviewedUserId,
-		string? reviewedUserName,
-		string? remark = null,
-		CancellationToken cancellationToken = default)
-	{
-		var formData = await _tgsContext.DepositForms
-			.FindAsync(new object?[] { formId }, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (formData == null)
-			return;
-
-		formData.Status = reviewStatus.ToNumber();
-		formData.Remark = remark;
-		formData.UpdatedOn = DateTime.UtcNow;
-		formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
-		formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
-		if (reviewedUserId != null)
-		{
-			formData.ReviewedOn = DateTime.UtcNow;
-		}
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
 	public async ValueTask SignOffWithdrawFormAsync(
 		Guid formId,
 		Guid? brandPaymentId,
@@ -1029,34 +1001,6 @@ internal class PaymentRepository : IPaymentRepository
 		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
 		if (reviewedUserId != null)
 			formData.ReviewedOn = DateTime.UtcNow;
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
-	public async ValueTask SubmitDepositFormStatusAsync(
-		Guid formId,
-		PaymentFlowState? status,
-		string? paymentReturn,
-		decimal? actualAmount,
-		string? thirdPartyOrderNo,
-		int? promotionPlayerId,
-		decimal? handlingFee,
-		CancellationToken cancellationToken = default)
-	{
-		var formData = await _tgsContext.DepositForms
-			.FindAsync(new object?[] { formId }, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (formData == null)
-			return;
-
-		formData.Status = status.HasValue ? (int)status.Value : formData.Status;
-		formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
-		formData.ActualAmount = actualAmount ?? formData.ActualAmount;
-		formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
-		formData.PromotionPlayerId = promotionPlayerId ?? formData.PromotionPlayerId;
-		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
-		formData.UpdatedOn = DateTime.UtcNow;
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}

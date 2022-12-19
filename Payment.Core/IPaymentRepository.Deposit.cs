@@ -30,23 +30,5 @@ public partial interface IPaymentRepository
 		Paging<DepositFormInfo> paging,
 		CancellationToken cancellationToken = default);
 
-	ValueTask SignOffDepositFormAsync(
-		Guid formId,
-		ReviewState reviewStatus,
-		string? reviewedUserId,
-		string? reviewedUserName,
-		string? remark = null,
-		CancellationToken cancellationToken = default);
-
-	ValueTask SubmitDepositFormStatusAsync(
-		Guid formId,
-		PaymentFlowState? status,
-		string? paymentReturn,
-		decimal? actualAmount,
-		string? thirdPartyOrderNo,
-		int? promotionPlayerId,
-		decimal? handlingFee,
-		CancellationToken cancellationToken = default);
-
 	ValueTask UpdateDepositFormSnapshotAsync(DepositFormSnapshot snapshot, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default);
 }
