@@ -9,6 +9,7 @@
 		<Authors>Raypro</Authors>
 		<Version>0.0.8-alpha</Version>
 		<IsPackable>true</IsPackable>
+		<SqlQueryToolsConnectionString />
 	</PropertyGroup>
 
 	<ItemGroup>

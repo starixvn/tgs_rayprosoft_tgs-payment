@@ -114,30 +114,6 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateDepositFormAsync(Guid createFormId, DepositFormCreateInfo form, CancellationToken cancellationToken = default)
-	{
-		var currentDate = DateTime.UtcNow;
-
-		_ = await _tgsContext.DepositForms
-			.AddAsync(new DepositForm
-			{
-				Id = createFormId,
-				PlayerCode = form.PlayerCode,
-				BrandId = form.BrandId,
-				BrandPaymentId = form.BrandPaymentId,
-				Amount = form.Amount,
-				ApplyInfo = form.ApplyInfo,
-				PaymentReturn = form.PaymentReturn,
-				PromotionId = form.PromotionId,
-				CreatedOn = currentDate,
-				UpdatedOn = currentDate,
-				OrderNo = form.OrderNo
-			}, cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
 	public async ValueTask CreateDepositFormEventAsync(
 		Guid eventId,
 		Guid formId,
@@ -582,6 +558,36 @@ internal class PaymentRepository : IPaymentRepository
 			.Where(v => ids.Contains(v.BrandPaymentId))
 			.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId))
 			.ToAsyncEnumerable();
+	}
+
+	public async ValueTask<DepositFormSnapshot?> GetCurrentDepositFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default)
+	{
+		var form = await _tgsContext.DepositForms.FindAsync(
+			new object?[] { id },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		return form is null
+			? null
+			: new DepositFormSnapshot(
+			form.Id,
+			form.PlayerCode,
+			form.BrandId,
+			form.BrandPaymentId,
+			form.Amount,
+			form.ActualAmount,
+			form.Remark,
+			(PaymentFlowState)form.Status,
+			form.ApplyInfo,
+			form.PaymentReturn,
+			form.ThirdPartyOrderNo,
+			form.OrderNo,
+			form.ReviewedUserId,
+			form.ReviewedUserName,
+			form.ReviewedOn,
+			form.PromotionId,
+			form.PromotionPlayerId,
+			form.CreatedOn,
+			form.HandlingFee);
 	}
 
 	public async ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default)

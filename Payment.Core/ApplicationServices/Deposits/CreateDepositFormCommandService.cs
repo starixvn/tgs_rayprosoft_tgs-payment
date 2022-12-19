@@ -68,7 +68,7 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 
 		var changeSets = new JsonPatch(PatchOperation.Add(
 			JsonPointer.Create<DepositFormSnapshot>(o => o),
-			JsonSerializer.SerializeToNode(createSnapshot)));
+			JsonSerializer.SerializeToNode(createSnapshot, PaymentUtility.SerializerOptions)));
 
 		await _paymentRepository.CreateDepositFormEventAsync(
 			eventId,

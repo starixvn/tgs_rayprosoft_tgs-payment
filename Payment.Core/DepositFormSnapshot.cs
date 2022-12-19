@@ -20,4 +20,26 @@ public record DepositFormSnapshot(
 	Guid? PromotionId,
 	int? PromotionPlayerId,
 	DateTime CreatedOn,
-	decimal HandlingFee);
+	decimal HandlingFee)
+{
+	internal static readonly DepositFormSnapshot _Default = new(
+		Guid.Empty,
+		string.Empty,
+		Guid.Empty,
+		Guid.Empty,
+		0M,
+		null,
+		null,
+		PaymentFlowState.Init,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		DateTime.MinValue,
+		0M);
+}
