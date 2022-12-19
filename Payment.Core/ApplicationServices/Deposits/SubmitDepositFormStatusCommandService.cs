@@ -49,7 +49,7 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 			PromotionPlayerId = command.PromotionPlayerId ?? formData.PromotionPlayerId
 		};
 
-		var changeSets = newFormData.CreatePatch(formData, PaymentUtility.SerializerOptions);
+		var changeSets = formData.CreatePatch(newFormData, PaymentUtility.SerializerOptions);
 		var eventId = await _serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);

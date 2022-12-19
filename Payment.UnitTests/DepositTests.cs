@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Json.Patch;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Paging;
@@ -922,5 +923,41 @@ public class DepositTests
 
 		_ = fakePaymentRateLimitRepository.Received(1)
 			.UnlockPaymentAsync(Arg.Is(command.PaymentCode), Arg.Is(command.PlayerCode));
+	}
+
+	[Test]
+	public void PaymentReturn變更記錄應該要記錄正確內容()
+	{
+		var depositForm = new DepositFormSnapshot(
+			Guid.NewGuid(),
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+
+		var sut = depositForm with
+		{
+			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
+		};
+
+		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+
+		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+
+		Assert.AreEqual(sut, actual);
 	}
 }
