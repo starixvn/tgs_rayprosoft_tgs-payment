@@ -436,7 +436,7 @@ public class DepositTests
 			null,
 			null,
 			PaymentFlowState.WaitApprove,
-			"{}",
+			null,
 			null,
 			null,
 			"GPIT211028150001",
@@ -467,7 +467,7 @@ public class DepositTests
 			null,
 			null,
 			PaymentFlowState.Approved,
-			"{}",
+			null,
 			null,
 			null,
 			"GPIT211028150001",
@@ -506,50 +506,85 @@ public class DepositTests
 	public async Task Can_Submit_DepositForm_Third_Party_Order_No()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitDepositFormThirdPartyOrderNoCommandService(
-			fakePaymentRepository);
+			fakePaymentRepository,
+			fakeSystemClock,
+			fakeSerialNumberGenerator);
 
 		var command = new SubmitDepositFormThirdPartyOrderNoCommand(
 			Guid.NewGuid(),
 			"ThirdPartyOrderNo");
 
-		_ = fakePaymentRepository.GetDepositFormByIdAsync(Arg.Is(command.FormId))
-			.Returns(new DepositFormInfo(
-				command.FormId,
-				"PlayerCode",
-				"UserName",
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"Channel1",
-				Guid.NewGuid(),
-				1000M,
-				null,
-				null,
-				PaymentFlowState.Approved,
-				null,
-				null,
-				null,
-				"GPIT211028150001",
-				null,
-				null,
-				null,
-				null,
-				DateTimeOffset.Now,
-				DateTimeOffset.Now,
-				0M));
+		var depositForm = new DepositFormSnapshot(
+			command.FormId,
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.Approved,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+		_ = fakePaymentRepository.GetCurrentDepositFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(depositForm);
+
+		var eventId = Guid.NewGuid();
+
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var expectedSnapshot = new DepositFormSnapshot(
+			command.FormId,
+			"PlayerCode",
+			depositForm.BrandId,
+			depositForm.BrandPaymentId,
+			1000M,
+			null,
+			null,
+			PaymentFlowState.Approved,
+			null,
+			null,
+			"ThirdPartyOrderNo",
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			depositForm.CreatedOn,
+			0M);
 
 		await sut.ExecuteAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
-			.SubmitDepositFormStatusAsync(
+			.CreateDepositFormEventAsync(
+				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(PaymentFlowState.Approved),
-				Arg.Any<string>(),
-				Arg.Any<decimal?>(),
-				Arg.Is(command.ThirdPartyOrderNo),
-				Arg.Any<int?>(),
-				Arg.Any<decimal?>());
+				Arg.Is(DepositFormAction.ChanageStatus),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(default(string)));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateDepositFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
 	}
 
 	[Test]
