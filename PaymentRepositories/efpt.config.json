@@ -79,6 +79,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.withdraw_form_event_source",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.withdraw_forms",
          "ObjectType": 0
       }

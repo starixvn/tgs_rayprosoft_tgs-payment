@@ -59,6 +59,8 @@ public partial class WithdrawForm
 
     public decimal HandlingFee { get; set; }
 
+    public Guid? SnapshotEventId { get; set; }
+
     public virtual Brand Brand { get; set; } = null!;
 
     public virtual BrandPayment? BrandPayment { get; set; }

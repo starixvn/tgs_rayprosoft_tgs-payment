@@ -46,6 +46,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<WithdrawForm> WithdrawForms { get; set; }
 
+    public virtual DbSet<WithdrawFormEventSource> WithdrawFormEventSources { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -68,6 +70,7 @@ public partial class TgsContext : DbContext
             modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoTagConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormEventSourceConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 
