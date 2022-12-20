@@ -40,7 +40,7 @@ public class PaymentEventSourceTests
 		var formId = Guid.NewGuid();
 		var brandPaymentId = Guid.NewGuid();
 
-		await sut.CreateDepositFormAsync(
+		_ = await sut.CreateDepositFormAsync(
 			formId,
 			new Tgs.Payment.Clients.DepositFormCreateInfo
 			{
