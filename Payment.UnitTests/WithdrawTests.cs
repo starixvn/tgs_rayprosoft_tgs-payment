@@ -866,10 +866,14 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitWithdrawFormStatusCommandService(
 			fakePaymentRepository,
-			fakePaymentClient);
+			fakePaymentClient,
+			fakeSystemClock,
+			fakeSerialNumberGenerator);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			Guid.NewGuid(),
@@ -880,42 +884,62 @@ public class WithdrawTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.GetWithdrawFormByIdAsync(Arg.Is(command.FormId))
-			.Returns(new WithdrawFormInfo(
-				command.FormId,
-				"PlayerCode",
-				UserType.Player,
-				"UserName",
-				Guid.NewGuid(),
-				1000M,
-				null,
-				(int)PaymentFlowState.Init,
-				null,
-				null,
-				null,
-				"GPIW211028160001",
-				Guid.NewGuid(),
-				DateTimeOffset.Now,
-				DateTimeOffset.Now,
-				null,
-				null,
-				null,
-				HandlingFee: 0M,
-				null,
-				null,
-				null));
+		var withdrawForm = new WithdrawFormSnapshot(
+			command.FormId,
+			Guid.NewGuid(),
+			"PlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			Guid.NewGuid(),
+			PaymentFlowState.Init,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(withdrawForm);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.WaitApprove
+		};
 
 		await sut.ExecuteAsync(command);
 
 		_ = fakePaymentRepository.Received(1)
-			.SubmitWithdrawFormStatusAsync(
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(command.Status),
-				Arg.Any<string>(),
-				Arg.Any<decimal?>(),
-				Arg.Any<string>(),
-				Arg.Any<string>(),
-				Arg.Any<string>());
+				Arg.Is(DepositFormAction.ChangeStatus),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(default(string)));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -1142,5 +1166,95 @@ public class WithdrawTests
 				Assert.IsNotNull(createInfo.BankInfo);
 			});
 		await sut.ExecuteAsync(command);
+	}
+
+	[Test]
+	public async Task Submit_WithdrawForm_Paid()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var sut = new SubmitWithdrawFormStatusCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeSystemClock,
+			fakeSerialNumberGenerator);
+
+		var command = new SubmitWithdrawFormStatusCommand(
+			Guid.NewGuid(),
+			PaymentFlowState.Paid,
+			null,
+			null,
+			null,
+			"PaidUser",
+			"PaidUserName");
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			command.FormId,
+			Guid.NewGuid(),
+			"PlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			Guid.NewGuid(),
+			PaymentFlowState.Approved,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			Guid.NewGuid().ToString(),
+			"Reviewer",
+			DateTime.UtcNow,
+			null,
+			null,
+			null);
+		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(withdrawForm);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.Paid,
+			PaidUserId = command.PaidUserId,
+			PaidUserName = command.PaidUserName,
+			PaidOn = currentTime.UtcDateTime
+		};
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(command.FormId),
+				Arg.Is(DepositFormAction.ChangeStatus),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(default(string)));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
+
+		_ = fakePaymentClient.Received(1)
+			.EmitWithdrawFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
 	}
 }
