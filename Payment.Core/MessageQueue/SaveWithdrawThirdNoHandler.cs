@@ -11,18 +11,18 @@ namespace Tgs.Payment.MessageQueue;
 
 internal class SaveWithdrawThirdNoHandler : IMessageHandler
 {
-	private readonly ICommandService<SaveWithdrawThirdPartyOrderNoCommand> _commandService;
+	private readonly ICommandService<SubmitWithdrawFormStatusCommand> _commandService;
 	private readonly ILogger<SaveWithdrawThirdNoHandler> _logger;
 
 	public SaveWithdrawThirdNoHandler(
-		ICommandService<SaveWithdrawThirdPartyOrderNoCommand> commandService,
+		ICommandService<SubmitWithdrawFormStatusCommand> commandService,
 		ILogger<SaveWithdrawThirdNoHandler> logger)
 	{
 		_commandService = commandService;
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
-	async ValueTask IMessageHandler.HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
+	public async ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
 	{
 		_logger.LogInformation("Receive SaveWithdrawThirdNo request.");
 
@@ -30,9 +30,14 @@ internal class SaveWithdrawThirdNoHandler : IMessageHandler
 
 		var formId = (Guid)request.FormId;
 
-		var command = new SaveWithdrawThirdPartyOrderNoCommand(
+		var command = new SubmitWithdrawFormStatusCommand(
 			formId,
-			request.ThirdPartyOrderNo);
+			null,
+			null,
+			null,
+			request.ThirdPartyOrderNo,
+			null,
+			null);
 
 		await _commandService
 			.ExecuteAsync(command, cancellationToken)

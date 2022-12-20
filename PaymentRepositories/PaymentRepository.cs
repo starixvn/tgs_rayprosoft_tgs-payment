@@ -209,35 +209,6 @@ internal class PaymentRepository : IPaymentRepository
 		return pmc.Id;
 	}
 
-	public async ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form, CancellationToken cancellationToken = default)
-	{
-		var currentDate = DateTime.UtcNow;
-
-		_ = await _tgsContext.WithdrawForms
-			.AddAsync(new WithdrawForm
-			{
-				Id = createFormId,
-				BrandId = form.BrandId,
-				UserId = form.UserId,
-				UserName = form.UserName,
-				UserType = (int)form.UserType,
-				BrandPaymentId = form.BrandPaymentId,
-				Amount = form.Amount,
-				BankInfoId = form.BankInfoId,
-				BankInfo = form.BankInfo!,
-				ApplyInfo = form.ApplyInfo,
-				PaymentReturn = form.PaymentReturn,
-				Status = (int)form.Status,
-				CreatedOn = currentDate,
-				UpdatedOn = currentDate,
-				OrderNo = form.OrderNo,
-				Note = form.Note,
-			}, cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
 	public async ValueTask CreateWithdrawFormEventAsync(
 		Guid eventId,
 		Guid formId,
@@ -1027,71 +998,6 @@ internal class PaymentRepository : IPaymentRepository
 			info.UpdatedOn = updateTime;
 			info.UpdatedByUsername = modifyUser;
 		}
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
-	public async ValueTask SignOffWithdrawFormAsync(
-		Guid formId,
-		Guid? brandPaymentId,
-		string? applyInfo,
-		PaymentFlowState afterState,
-		string? reviewedUserId,
-		string? reviewedUserName,
-		string? remark,
-		decimal? handlingFee,
-		CancellationToken cancellationToken = default)
-	{
-		var formData = await _tgsContext.WithdrawForms
-			.FindAsync(new object?[] { formId }, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (formData == null)
-			return;
-
-		formData.BrandPaymentId = brandPaymentId;
-		if (!string.IsNullOrEmpty(applyInfo))
-			formData.ApplyInfo = applyInfo;
-		formData.Status = (int)afterState;
-		formData.Remark = remark;
-		formData.UpdatedOn = DateTime.UtcNow;
-		formData.ReviewedUserId = reviewedUserId ?? formData.ReviewedUserId;
-		formData.ReviewedUserName = reviewedUserName ?? formData.ReviewedUserName;
-		formData.HandlingFee = handlingFee ?? formData.HandlingFee;
-		if (reviewedUserId != null)
-			formData.ReviewedOn = DateTime.UtcNow;
-
-		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
-	public async ValueTask SubmitWithdrawFormStatusAsync(
-		Guid formId,
-		PaymentFlowState? status,
-		string? paymentReturn,
-		decimal? actualAmount,
-		string? thirdPartyOrderNo,
-		string? paidUserId,
-		string? paidUserName,
-		CancellationToken cancellationToken = default)
-	{
-		var formData = await _tgsContext.WithdrawForms
-			.FindAsync(new object?[] { formId }, cancellationToken)
-			.ConfigureAwait(false);
-
-		var currentTime = DateTime.UtcNow;
-
-		if (formData == null)
-			return;
-
-		formData.Status = status.HasValue ? (int)status.Value : formData.Status;
-		formData.PaymentReturn = paymentReturn ?? formData.PaymentReturn;
-		formData.ActualAmount = actualAmount ?? formData.ActualAmount;
-		formData.ThirdPartyOrderNo = thirdPartyOrderNo ?? formData.ThirdPartyOrderNo;
-		formData.PaidUserId = paidUserId ?? formData.PaidUserId;
-		formData.PaidUserName = paidUserName ?? formData.PaidUserName;
-		formData.UpdatedOn = currentTime;
-		if (status == PaymentFlowState.Paid)
-			formData.PaidOn = currentTime;
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
