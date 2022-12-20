@@ -51,7 +51,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 			PaidOn = command.PaidUserId is null ? null : currentTime
 		};
 
-		var changeSets = newFormData.CreatePatch(formData, PaymentUtility.SerializerOptions);
+		var changeSets = formData.CreatePatch(newFormData, PaymentUtility.SerializerOptions);
 		var eventId = await _serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
