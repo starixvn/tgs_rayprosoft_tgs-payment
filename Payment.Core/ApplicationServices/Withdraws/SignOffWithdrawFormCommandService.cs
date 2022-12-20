@@ -132,7 +132,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 				Remark = command.Remark
 			};
 
-			var changeSets = updateFormData.CreatePatch(formData, PaymentUtility.SerializerOptions);
+			var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
 			var eventId = await _serialNumberGenerator
 				.GenerateAsync(cancellationToken)
 				.ConfigureAwait(false);
