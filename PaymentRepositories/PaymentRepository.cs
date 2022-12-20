@@ -613,6 +613,42 @@ internal class PaymentRepository : IPaymentRepository
 			form.HandlingFee);
 	}
 
+	public async ValueTask<WithdrawFormSnapshot?> GetCurrentWithdrawFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default)
+	{
+		var form = await _tgsContext.WithdrawForms.FindAsync(
+			new object?[] { id },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		return form is null
+			? null
+			: new WithdrawFormSnapshot(
+			form.Id,
+			form.BrandId,
+			form.UserId,
+			form.UserName,
+			(UserType)form.UserType,
+			form.Amount,
+			form.ActualAmount,
+			form.HandlingFee,
+			form.BrandPaymentId,
+			(PaymentFlowState)form.Status,
+			form.Remark,
+			form.Note,
+			form.BankInfoId,
+			form.BankInfo,
+			form.ApplyInfo,
+			form.PaymentReturn,
+			form.OrderNo,
+			form.ThirdPartyOrderNo,
+			form.CreatedOn,
+			form.ReviewedUserId,
+			form.ReviewedUserName,
+			form.ReviewedOn,
+			form.PaidUserId,
+			form.PaidUserName,
+			form.PaidOn);
+	}
+
 	public async ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default)
 	{
 		var query = from df in _tgsContext.DepositForms

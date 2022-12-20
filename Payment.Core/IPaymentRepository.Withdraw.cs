@@ -15,6 +15,16 @@ public partial interface IPaymentRepository
 
 	ValueTask CreateWithdrawFormAsync(Guid createFormId, WithdrawFormCreateInfo form, CancellationToken cancellationToken = default);
 
+	ValueTask CreateWithdrawFormEventAsync(
+		Guid eventId,
+		Guid formId,
+		DepositFormAction action,
+		JsonDocument changeSets,
+		string? modifier,
+		CancellationToken cancellationToken = default);
+
+	ValueTask<WithdrawFormSnapshot?> GetCurrentWithdrawFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default);
+
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
@@ -45,14 +55,6 @@ public partial interface IPaymentRepository
 		string? thirdPartyOrderNo,
 		string? paidUserId,
 		string? paidUserName,
-		CancellationToken cancellationToken = default);
-
-	ValueTask CreateWithdrawFormEventAsync(
-		Guid eventId,
-		Guid formId,
-		DepositFormAction action,
-		JsonDocument changeSets,
-		string? modifier,
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateWithdrawFormSnapshotAsync(WithdrawFormSnapshot snapshot, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default);
