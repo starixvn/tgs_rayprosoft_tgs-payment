@@ -104,7 +104,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 			await _paymentRepository.CreateWithdrawFormEventAsync(
 				eventId,
 				command.FormId,
-				DepositFormAction.Review,
+				EventAction.Review,
 				JsonSerializer.SerializeToDocument(changeSets),
 				command.ReviewUserId,
 				cancellationToken).ConfigureAwait(false);
@@ -140,7 +140,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 			await _paymentRepository.CreateWithdrawFormEventAsync(
 				eventId,
 				command.FormId,
-				DepositFormAction.Review,
+				EventAction.Review,
 				JsonSerializer.SerializeToDocument(changeSets),
 				command.ReviewUserId,
 				cancellationToken).ConfigureAwait(false);

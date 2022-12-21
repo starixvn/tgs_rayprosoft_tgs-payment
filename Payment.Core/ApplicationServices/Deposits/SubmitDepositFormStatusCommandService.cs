@@ -58,7 +58,7 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 		await _paymentRepository.CreateDepositFormEventAsync(
 			eventId,
 			command.FormId,
-			DepositFormAction.ChangeStatus,
+			EventAction.ChangeStatus,
 			JsonSerializer.SerializeToDocument(changeSets),
 			null,
 			cancellationToken).ConfigureAwait(false);

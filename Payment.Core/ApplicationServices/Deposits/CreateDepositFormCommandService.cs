@@ -73,7 +73,7 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 		await _paymentRepository.CreateDepositFormEventAsync(
 			eventId,
 			command.FormId,
-			DepositFormAction.Init,
+			EventAction.Create,
 			JsonSerializer.SerializeToDocument(changeSets),
 			null,
 			cancellationToken).ConfigureAwait(false);

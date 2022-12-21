@@ -67,7 +67,7 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 		await _paymentRepository.CreateDepositFormEventAsync(
 			eventId,
 			command.FormId,
-			DepositFormAction.Review,
+			EventAction.Review,
 			JsonSerializer.SerializeToDocument(changeSets),
 			command.ReviewUserId,
 			cancellationToken).ConfigureAwait(false);

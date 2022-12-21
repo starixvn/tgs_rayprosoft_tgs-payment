@@ -161,7 +161,7 @@ public class DepositTests
 			.CreateDepositFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(DepositFormAction.Init),
+				Arg.Is(EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -486,7 +486,7 @@ public class DepositTests
 			.CreateDepositFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(DepositFormAction.Review),
+				Arg.Is(EventAction.Review),
 				Arg.Any<JsonDocument>(),
 				Arg.Is(command.ReviewUserId));
 
@@ -584,7 +584,7 @@ public class DepositTests
 			.CreateDepositFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(DepositFormAction.ChangeStatus),
+				Arg.Is(EventAction.ChangeStatus),
 				Arg.Any<JsonDocument>(),
 				Arg.Is(default(string)));
 
@@ -891,7 +891,7 @@ public class DepositTests
 			.CreateDepositFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(command.FormId),
-				Arg.Is(DepositFormAction.ChangeStatus),
+				Arg.Is(EventAction.ChangeStatus),
 				Arg.Any<JsonDocument>(),
 				Arg.Is(default(string)));
 

@@ -1,10 +1,9 @@
 ﻿namespace Tgs.Payment;
 
-public enum DepositFormAction
+public enum EventAction
 {
 	None = 0,
 	Create,
-	Init,
 	Review,
 	ChangeStatus
 }
