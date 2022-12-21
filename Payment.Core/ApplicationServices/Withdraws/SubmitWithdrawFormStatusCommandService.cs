@@ -59,7 +59,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 		await _paymentRepository.CreateWithdrawFormEventAsync(
 			eventId,
 			command.FormId,
-			DepositFormAction.ChangeStatus,
+			EventAction.ChangeStatus,
 			JsonSerializer.SerializeToDocument(changeSets),
 			null,
 			cancellationToken).ConfigureAwait(false);

@@ -16,7 +16,7 @@ public partial interface IPaymentRepository
 	ValueTask CreateWithdrawFormEventAsync(
 		Guid eventId,
 		Guid formId,
-		DepositFormAction action,
+		EventAction action,
 		JsonDocument changeSets,
 		string? modifier,
 		CancellationToken cancellationToken = default);

@@ -117,7 +117,7 @@ internal class PaymentRepository : IPaymentRepository
 	public async ValueTask CreateDepositFormEventAsync(
 		Guid eventId,
 		Guid formId,
-		DepositFormAction action,
+		EventAction action,
 		JsonDocument changeSets,
 		string? modifier,
 		CancellationToken cancellationToken = default)
@@ -212,7 +212,7 @@ internal class PaymentRepository : IPaymentRepository
 	public async ValueTask CreateWithdrawFormEventAsync(
 		Guid eventId,
 		Guid formId,
-		DepositFormAction action,
+		EventAction action,
 		JsonDocument changeSets,
 		string? modifier,
 		CancellationToken cancellationToken = default)

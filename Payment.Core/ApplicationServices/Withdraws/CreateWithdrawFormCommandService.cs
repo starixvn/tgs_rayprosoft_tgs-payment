@@ -81,7 +81,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 		await _paymentRepository.CreateWithdrawFormEventAsync(
 			eventId,
 			createFormId,
-			DepositFormAction.Create,
+			EventAction.Create,
 			JsonSerializer.SerializeToDocument(changeSets),
 			null,
 			cancellationToken).ConfigureAwait(false);
