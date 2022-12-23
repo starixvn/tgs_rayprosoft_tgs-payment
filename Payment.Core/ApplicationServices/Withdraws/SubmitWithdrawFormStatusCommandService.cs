@@ -48,7 +48,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 			ThirdPartyOrderNo = command.ThirdPartyOrderNo ?? formData.ThirdPartyOrderNo,
 			PaidUserId = command.PaidUserId ?? formData.PaidUserId,
 			PaidUserName = command.PaidUserName ?? formData.PaidUserName,
-			PaidOn = command.Status == PaymentFlowState.Paid ? currentTime : null
+			PaidOn = command.Status == PaymentFlowState.Paid ? currentTime : formData.PaidOn
 		};
 
 		var changeSets = formData.CreatePatch(newFormData, PaymentUtility.SerializerOptions);
