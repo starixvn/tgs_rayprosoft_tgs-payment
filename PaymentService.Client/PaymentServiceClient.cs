@@ -981,8 +981,30 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<WithdrawForms>(contentJson, _SerializerOptions)!;
 	}
 
+	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
+		Guid brandId,
+		string userId,
+		UserType userType,
+		CancellationToken cancellationToken = default)
+	{
+		var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+
+		queryStrings.Add("user_id", userId);
+
+		queryStrings.Add("user_type", userType.ToString());
+
+		return _httpClient
+			.GetAsync($"/withdraw/fixtool/{brandId}?{queryStrings}", cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<WithdrawFormInfo[]>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable()
+				.SelectMany(arr => arr!.ToAsyncEnumerable()));
+	}
+
 	public async ValueTask ReviewDepositFormAsync(
-		Guid formId,
+			Guid formId,
 		ReviewState state,
 		string? reviewUserId,
 		string? reviewUserName,
