@@ -169,7 +169,7 @@ public class WithdrawController : ControllerBase
 		[FromQuery] WithdrawFormQueryViewModel formQuery,
 		[FromQuery] PagingViewModel paging)
 	{
-		_logger.LogInformation("Query WithdrawForms Request => {JsonSerializer.Serialize(formQuery)}", JsonSerializer.Serialize(formQuery));
+		_logger.LogInformation("Query WithdrawForms Request => {formQueryJson}", JsonSerializer.Serialize(formQuery));
 
 		var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 		var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
@@ -261,6 +261,17 @@ public class WithdrawController : ControllerBase
 			Items = items.ToEnumerable(),
 			Sum = sum
 		};
+	}
+
+	[HttpGet("fixtool/{brandId}", Name = "QueryWithdrawFormsForFixTool")]
+	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsForFixToolAsync(
+		[FromServices] IQueryService<WithdrawFormForFixToolQuery, WithdrawFormInfo> queryService,
+		Guid brandId,
+		[FromQuery] WithdrawFormFixToolQueryViewModel formQuery)
+	{
+		var query = new WithdrawFormForFixToolQuery(brandId, formQuery.UserId, formQuery.UserType);
+
+		return queryService.QueryAsync(query, HttpContext.RequestAborted);
 	}
 
 	[HttpPost("{formId}", Name = "ReviewWithdrawForm")]

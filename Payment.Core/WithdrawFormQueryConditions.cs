@@ -19,4 +19,23 @@ public record WithdrawFormQueryConditions(
 	(DateTimeOffset Begin, DateTimeOffset End)? CreateOnRange,
 	(DateTimeOffset Begin, DateTimeOffset End)? UpdateOnRange,
 	(DateTimeOffset Begin, DateTimeOffset End)? ReviewOnRange,
-	(DateTimeOffset Begin, DateTimeOffset End)? PaidOnRange);
+	(DateTimeOffset Begin, DateTimeOffset End)? PaidOnRange)
+{
+	public static readonly WithdrawFormQueryConditions Default = new(
+		Guid.Empty,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		Array.Empty<PaymentFlowState>(),
+		Array.Empty<Guid>(),
+		null,
+		null,
+		null,
+		null);
+};

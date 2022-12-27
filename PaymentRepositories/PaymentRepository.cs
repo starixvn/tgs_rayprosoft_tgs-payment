@@ -31,7 +31,7 @@ internal class PaymentRepository : IPaymentRepository
 
 	public async ValueTask<decimal> CalculateWithdrawTotalAmountAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
-		var dataQuery = MakeWithdrawFormQuery(conditions);
+		var dataQuery = MakeWithdrawFormQueryWithLimit90Days(conditions);
 
 		return await dataQuery
 			.SumAsync(x => x.ActualAmount ?? x.Amount, cancellationToken)
@@ -60,7 +60,7 @@ internal class PaymentRepository : IPaymentRepository
 
 	public async ValueTask<int> CountWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{
-		var dataQuery = MakeWithdrawFormQuery(conditions);
+		var dataQuery = MakeWithdrawFormQueryWithLimit90Days(conditions);
 
 		return await dataQuery
 			.CountAsync(cancellationToken)
@@ -842,7 +842,7 @@ internal class PaymentRepository : IPaymentRepository
 		Paging<WithdrawFormInfo> paging,
 		CancellationToken cancellationToken = default)
 	{
-		var dataQuery = MakeWithdrawFormQuery(conditions)
+		var dataQuery = MakeWithdrawFormQueryWithLimit90Days(conditions)
 			.Select(form => new WithdrawFormInfo(
 				form.Id,
 				form.UserId,
@@ -881,9 +881,14 @@ internal class PaymentRepository : IPaymentRepository
 		return dataQuery;
 	}
 
-	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, CancellationToken cancellationToken = default)
+	public IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
+		WithdrawFormQueryConditions conditions,
+		bool limitQuery = true,
+		CancellationToken cancellationToken = default)
 	{
-		var dataQuery = MakeWithdrawFormQuery(conditions);
+		var dataQuery = limitQuery
+			? MakeWithdrawFormQueryWithLimit90Days(conditions)
+			: MakeWithdrawFormQuery(conditions);
 
 		return dataQuery
 			.Select(form => new WithdrawFormInfo(
@@ -1177,14 +1182,10 @@ internal class PaymentRepository : IPaymentRepository
 
 	private IQueryable<WithdrawForm> MakeWithdrawFormQuery(WithdrawFormQueryConditions conditions)
 	{
-		var currentDate = DateTimeOffset.UtcNow;
-
 		var dataQuery = _tgsContext.WithdrawForms.AsQueryable()
 			.Include(f => f.BrandPayment)
 			.ThenInclude(bp => bp!.PaymentMethodChannel)
-			.Where(form => form.BrandId == conditions.BrandId)
-			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
-				&& form.CreatedOn < currentDate);
+			.Where(form => form.BrandId == conditions.BrandId);
 
 		if (!string.IsNullOrWhiteSpace(conditions.UserId))
 			dataQuery = dataQuery.Where(form => form.UserId == conditions.UserId);
@@ -1246,5 +1247,14 @@ internal class PaymentRepository : IPaymentRepository
 				&& form.PaidOn < conditions.PaidOnRange.Value.End);
 
 		return dataQuery;
+	}
+
+	private IQueryable<WithdrawForm> MakeWithdrawFormQueryWithLimit90Days(WithdrawFormQueryConditions conditions)
+	{
+		var currentDate = DateTimeOffset.UtcNow;
+
+		return MakeWithdrawFormQuery(conditions)
+			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
+				&& form.CreatedOn < currentDate);
 	}
 }

@@ -104,6 +104,8 @@ public interface IPaymentServiceClient
 
 	ValueTask<WithdrawForms> QueryWithdrawFormsAsync(WithdrawFormQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(Guid brandId, string userId, UserType userType, CancellationToken cancellationToken = default);
+
 	ValueTask ReviewDepositFormAsync(
 		Guid formId,
 		ReviewState state,

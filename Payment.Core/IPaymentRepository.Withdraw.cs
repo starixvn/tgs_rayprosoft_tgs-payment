@@ -32,7 +32,7 @@ public partial interface IPaymentRepository
 
 	IAsyncEnumerable<WithdrawFormInfo> QueryWithdrawFormsAsync(
 		WithdrawFormQueryConditions conditions,
+		bool limitQuery = true,
 		CancellationToken cancellationToken = default);
-
 	ValueTask UpdateWithdrawFormSnapshotAsync(WithdrawFormSnapshot snapshot, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default);
 }
