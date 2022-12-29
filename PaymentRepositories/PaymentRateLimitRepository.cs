@@ -29,7 +29,7 @@ internal class PaymentRateLimitRepository : IPaymentRateLimitRepository
 			.StringSetAsync(
 				key,
 				formId.ToString(),
-				expiry: TimeSpan.FromDays(1D),
+				expiry: TimeSpan.FromHours(1D),
 				when: When.NotExists)
 			.ConfigureAwait(false);
 
