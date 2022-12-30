@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -10,57 +9,6 @@ namespace Payment.IntegrationTests;
 
 public class PlayerBankInfoTests
 {
-	[Test]
-	public async Task Create_Duplicate_Player_BankInfo_Should_Fail()
-	{
-		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
-		{
-			["Bank"] = JsonSerializer.SerializeToDocument(new
-			{
-				BankName = "$.bankName",
-				BankAccount = "$.bankAccount"
-			})
-		});
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
-			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions));
-
-		var httpClient = web.CreateClient();
-
-		var sut = new PaymentServiceClient(httpClient);
-
-		var bankInfoId = Guid.NewGuid();
-		var brandId = Guid.NewGuid();
-		var paymentChannelId = Guid.NewGuid();
-
-		var createInfo = new BankCreateInfo
-		{
-			BankType = "Bank",
-			Detail = JsonSerializer.SerializeToDocument(new
-			{
-				bankName = "test bank",
-				bankAccount = "111111",
-				name = "Tester"
-			}),
-			IsDefault = false,
-			PaymentChannelId = paymentChannelId
-		};
-
-		var dbContext = web.Services.GetRequiredService<TgsContext>();
-
-		_ = await dbContext.BrandPlayerBankinfoCheckFlags
-			.AddAsync(new BrandPlayerBankinfoCheckFlag
-			{
-				BrandId = brandId,
-				IsEnabled = true
-			});
-
-		_ = await dbContext.SaveChangesAsync();
-
-		_ = await sut.CreatePlayerBankInfoAsync(brandId, "tester1", createInfo);
-		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoDuplicateException>(
-			  async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
-	}
-
 	[Test]
 	public async Task GetPlayerCodes_By_BankInfoTag()
 	{
@@ -164,5 +112,125 @@ public class PlayerBankInfoTests
 		Assert.AreEqual(1, count);
 		Assert.AreEqual("BankAccount", actual.TagType);
 		Assert.AreEqual("111111", actual.Tag);
+	}
+
+	[Test]
+	public async Task 建立玩家銀行卡_如果Account一樣_Channel不一樣_可以通過()
+	{
+		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
+		{
+			["Bank"] = JsonSerializer.SerializeToDocument(new
+			{
+				BankName = "$.bankName",
+				BankAccount = "$.bankAccount"
+			})
+		});
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var bankInfoId = Guid.NewGuid();
+		var brandId = Guid.NewGuid();
+		var paymentChannelId = Guid.NewGuid();
+
+		var createInfo1 = new BankCreateInfo
+		{
+			BankType = "Bank",
+			Detail = JsonSerializer.SerializeToDocument(new
+			{
+				bankName = "test bank",
+				bankAccount = "111111",
+				name = "Tester"
+			}),
+			IsDefault = false,
+			PaymentChannelId = paymentChannelId
+		};
+
+		var createInfo2 = new BankCreateInfo
+		{
+			BankType = "Bank",
+			Detail = JsonSerializer.SerializeToDocument(new
+			{
+				bankName = "test bank",
+				bankAccount = "111111",
+				name = "Tester"
+			}),
+			IsDefault = false,
+			PaymentChannelId = Guid.NewGuid()
+		};
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.BrandPlayerBankinfoCheckFlags
+			.AddAsync(new BrandPlayerBankinfoCheckFlag
+			{
+				BrandId = brandId,
+				IsEnabled = true
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		_ = await sut.CreatePlayerBankInfoAsync(brandId, "tester1", createInfo1);
+
+		var actual = await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo2);
+
+		var dbRecord = await dbContext.PlayerBankInfos.FindAsync(actual);
+
+		Assert.AreEqual(createInfo2.PaymentChannelId, dbRecord.PaymentChannelId);
+	}
+
+	[Test]
+	public async Task 建立玩家銀行卡如果Channel_Account一樣會出錯()
+	{
+		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
+		{
+			["Bank"] = JsonSerializer.SerializeToDocument(new
+			{
+				BankName = "$.bankName",
+				BankAccount = "$.bankAccount"
+			})
+		});
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var bankInfoId = Guid.NewGuid();
+		var brandId = Guid.NewGuid();
+		var paymentChannelId = Guid.NewGuid();
+
+		var createInfo = new BankCreateInfo
+		{
+			BankType = "Bank",
+			Detail = JsonSerializer.SerializeToDocument(new
+			{
+				bankName = "test bank",
+				bankAccount = "111111",
+				name = "Tester"
+			}),
+			IsDefault = false,
+			PaymentChannelId = paymentChannelId
+		};
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.BrandPlayerBankinfoCheckFlags
+			.AddAsync(new BrandPlayerBankinfoCheckFlag
+			{
+				BrandId = brandId,
+				IsEnabled = true
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		_ = await sut.CreatePlayerBankInfoAsync(brandId, "tester1", createInfo);
+
+		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoDuplicateException>(
+			  async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
 	}
 }

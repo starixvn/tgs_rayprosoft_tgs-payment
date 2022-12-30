@@ -286,7 +286,12 @@ public class BankInfoTests
 			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");
 
 		_ = fakePaymentRepository
-			.CheckPlayerBankInfoIsExistsAsync(Arg.Is(command.BrandId), Arg.Is(command.BankType), Arg.Any<byte[]>())
+			.CheckPlayerBankInfoIsExistsAsync(
+				Arg.Is(command.BrandId),
+				Arg.Is(command.BankType),
+				Arg.Is(command.PaymentChannelId),
+				Arg.Any<byte[]>(),
+				Arg.Is(command.PlayerCode))
 			.Returns(true);
 
 		_ = Assert.ThrowsAsync<PlayerBankInfoDuplicateException>(async () => await sut.GetAsync(command));

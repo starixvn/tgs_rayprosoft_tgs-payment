@@ -8,7 +8,13 @@ namespace Tgs.Payment;
 
 public partial interface IPaymentRepository
 {
-	ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(Guid brandId, string bankType, byte[] hash, CancellationToken cancellationToken = default);
+	ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(
+		Guid brandId,
+		string bankType,
+		Guid channelId,
+		byte[] hash,
+		string playerCode,
+		CancellationToken cancellationToken = default);
 
 	ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser, CancellationToken cancellationToken = default);
 

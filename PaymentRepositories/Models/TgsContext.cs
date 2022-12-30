@@ -44,6 +44,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<PlayerBankInfoTag> PlayerBankInfoTags { get; set; }
 
+    public virtual DbSet<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; set; }
+
     public virtual DbSet<WithdrawForm> WithdrawForms { get; set; }
 
     public virtual DbSet<WithdrawFormEventSource> WithdrawFormEventSources { get; set; }
@@ -69,6 +71,7 @@ public partial class TgsContext : DbContext
             modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoTagConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PlayerBankinfoAttributionConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormEventSourceConfiguration());
         OnModelCreatingPartial(modelBuilder);

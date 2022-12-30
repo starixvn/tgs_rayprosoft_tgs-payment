@@ -75,6 +75,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.player_bankinfo_attributions",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.players",
          "ObjectType": 0
       },

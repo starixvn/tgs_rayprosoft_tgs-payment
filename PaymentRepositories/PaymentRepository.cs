@@ -41,10 +41,15 @@ internal class PaymentRepository : IPaymentRepository
 	public async ValueTask<bool> CheckPlayerBankInfoIsExistsAsync(
 		Guid brandId,
 		string bankType,
+		Guid channelId,
 		byte[] hash,
+		string playerCode,
 		CancellationToken cancellationToken = default)
 		=> await _tgsContext.PlayerBankInfos
-			.Where(info => info.BankInfoHash == hash && info.BrandId == brandId && info.BankType == bankType)
+			.Where(info => info.BankInfoHash == hash
+				&& info.BrandId == brandId
+				&& info.BankType == bankType
+				&& info.PaymentChannelId == channelId)
 			.AsNoTracking()
 			.AnyAsync(cancellationToken)
 			.ConfigureAwait(false);
