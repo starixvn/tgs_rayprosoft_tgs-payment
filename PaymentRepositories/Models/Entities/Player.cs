@@ -84,4 +84,6 @@ public partial class Player
     public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; } = new List<PlayerBankInfoTag>();
 
     public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
+
+    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; } = new List<PlayerBankinfoAttribution>();
 }

@@ -54,7 +54,9 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 			&& await _paymentRepository.CheckPlayerBankInfoIsExistsAsync(
 				command.BrandId,
 				command.BankType,
+				command.PaymentChannelId,
 				hash,
+				command.PlayerCode,
 				cancellationToken).ConfigureAwait(false))
 			throw new PlayerBankInfoDuplicateException();
 

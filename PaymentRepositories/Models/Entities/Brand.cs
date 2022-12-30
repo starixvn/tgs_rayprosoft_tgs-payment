@@ -101,6 +101,8 @@ public partial class Brand
 
     public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
 
+    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; } = new List<PlayerBankinfoAttribution>();
+
     public virtual ICollection<Player> Players { get; } = new List<Player>();
 
     public virtual ICollection<WithdrawForm> WithdrawForms { get; } = new List<WithdrawForm>();
