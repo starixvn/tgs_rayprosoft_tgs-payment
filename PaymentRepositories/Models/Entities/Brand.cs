@@ -93,6 +93,8 @@ public partial class Brand
 
     public bool DepositPaymentLockEnabled { get; set; }
 
+    public int? TimeSpanMinutes { get; set; }
+
     public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
 
     public virtual ICollection<BrandPayment> BrandPayments { get; } = new List<BrandPayment>();

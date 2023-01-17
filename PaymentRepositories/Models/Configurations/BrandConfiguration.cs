@@ -104,6 +104,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnType("jsonb")
             .HasColumnName("sms_vendor_settings");
             entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.TimeSpanMinutes)
+            .HasDefaultValueSql("480")
+            .HasColumnName("time_span_minutes");
             entity.Property(e => e.TimeZoneId)
             .HasMaxLength(256)
             .HasColumnName("time_zone_id");
