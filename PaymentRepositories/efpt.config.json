@@ -79,6 +79,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.player_payment_overview",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.players",
          "ObjectType": 0
       },
@@ -92,6 +96,7 @@
       }
    ],
    "UiHint": "tgs-local",
+   "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
@@ -101,9 +106,7 @@
    "UseInflector": true,
    "UseLegacyPluralizer": false,
    "UseManyToManyEntity": true,
-   "UseNoConstructor": true,
    "UseNoDefaultConstructor": true,
-   "UseNoNavigations": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
    "UseNullableReferences": true,

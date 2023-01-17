@@ -695,8 +695,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			yield return bankInfo;
 	}
 
+	public async ValueTask<PaymentOverview> GetPlayerPaymentOverviewAsync(string playerCode, CancellationToken cancellationToken = default)
+		=> await _httpClient
+			.GetAsync($"/player/overview/{playerCode}", cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<PaymentOverview>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable())
+			.Where(arr => arr is not null)
+			.Select(overview => overview!)
+			.FirstAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
 	public IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(
-		Guid brandId,
+			Guid brandId,
 		string tagType,
 		string tag,
 		CancellationToken cancellationToken = default)

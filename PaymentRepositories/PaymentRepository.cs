@@ -693,6 +693,26 @@ internal class PaymentRepository : IPaymentRepository
 			.Select(pbit => pbit.PlayerCode)
 			.ToAsyncEnumerable();
 
+	public async ValueTask<PaymentOverview?> GetPlayerPaymentOverviewAsync(string playerCode, CancellationToken cancellationToken = default)
+	{
+		var overview = await _tgsContext.PlayerPaymentOverviews.FindAsync(
+			new object?[] { playerCode },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		return overview is null
+			? null
+			: new PaymentOverview(
+				overview.FirstDepositAmount,
+				overview.FirstDepositHandlingFee,
+				overview.FirstDepositOn,
+				overview.FirstWithdrawAmount,
+				overview.FirstWithdrawHandlingFee,
+				overview.FirstWithdrawOn,
+				overview.RecordedBy,
+				overview.TotalDepositAmount,
+				overview.TotalWithdrawAmount);
+	}
+
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var query = from wf in _tgsContext.WithdrawForms

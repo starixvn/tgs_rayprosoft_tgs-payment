@@ -77,8 +77,10 @@ public partial interface IPaymentRepository
 
 	IAsyncEnumerable<string> GetPlayerCodesByBankInfoTagAsync(Guid brandId, string tagType, string tag, CancellationToken cancellationToken = default);
 
+	ValueTask<PaymentOverview?> GetPlayerPaymentOverviewAsync(string playerCode, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
-		Guid? brandId,
+			Guid? brandId,
 		TransferType? transferType,
 		bool? enabled,
 		string? keyword,
