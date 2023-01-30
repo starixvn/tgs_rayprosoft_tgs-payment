@@ -43,9 +43,9 @@ internal class AlfaPayProcessor : IWithdrawProcessor
 		var settings = new AlfaPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("apiToken").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("notifyToken").GetString(),
-			withdrawBankInfo.Detail.AccountNumber,
+			withdrawBankInfo.Detail.AccountNumber.Trim(),
 			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString(),
-			withdrawBankInfo.Detail.BankOwner,
+			withdrawBankInfo.Detail.BankOwner.Trim(),
 			formId);
 
 		return _alfaPaySerializer.Serialize(settings);
