@@ -5,7 +5,7 @@ namespace Tgs.Payment.Clients;
 
 public interface IPaymentServiceClient
 {
-	ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken);
+	ValueTask<decimal> CalculateHandlingFeeAsync(Guid brandPaymentId, decimal amount, CancellationToken cancellationToken = default);
 
 	ValueTask<int> CountUntreatedDepositFormsAsync(Guid brandId, CancellationToken cancellationToken = default);
 
