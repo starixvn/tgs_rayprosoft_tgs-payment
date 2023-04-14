@@ -1,3 +1,7 @@
+include:
+  - project: rayprosoft/tgs-ci-scripts
+    ref: main
+    file: GitLab/Templates/gitlab-job-templates.yml
 
 variables:
   ImageName: pgtgs/payment-api
@@ -5,12 +9,7 @@ variables:
   RebuildHashImageName: pgtgs/rebuild-bankinfo-hash
   TgsSettingKey: payment-api
   BuildCacheKey: Tgs.Payment.$CI_PIPELINE_IID
-  
 
-default:
-  before_script:
-    - export Tag="$(date -d $CI_PIPELINE_CREATED_AT +%Y%m%d%H%M).$CI_PIPELINE_IID"
-    
 stages:
   - build
   - test
@@ -20,138 +19,53 @@ stages:
   - deploy-prod
 
 build-code:
-  stage: build
-  script:
-    - dotnet build -c $BuildConfiguration
-  only:
-    - merge_requests
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true   
+  extends: .build-code-template
 
 unit-test:
-  stage: test
+  extends: .unit-test-template
   variables:
     DOTNET_USE_POLLING_FILE_WATCHER: "true"
   script:
     - dotnet test -c $BuildConfiguration -l:"junit;LogFilePath=../TestReports/{assembly}-TestReport.xml" --no-restore --no-build
-  needs:
-    - build-code
-  only:
-    - merge_requests
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true   
-    policy: pull
-  artifacts:
-    when: always
-    reports:
-      junit: ./TestReports/*-TestReport.xml
-  
 
 push-nuget:
-  stage: publish
-  needs:
-    - build-code
-    - unit-test
-  cache:
-    key: $BuildCacheKey
-    untracked: true   
-    policy: pull
-  only:
-    - main
+  extends: .push-nuget-template
   script:
-    - dotnet pack -c $BuildConfiguration "Tgs.Payment.Client/Tgs.Payment.Client.csproj" --no-build --no-restore
-    - dotnet nuget push "Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro-baget" -k $NugetApiKey --skip-duplicate
-    - dotnet pack -c $BuildConfiguration "PaymentService.Client/PaymentService.Client.csproj" --no-build --no-restore
-    - dotnet nuget push "PaymentService.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k $NugetApiKey --skip-duplicate
+    - push_nuget "Tgs.Payment.Client"
+    - push_nuget "PaymentService.Client"
   artifacts:
-    name: Nuget
-    untracked: false
-    expire_in: "30 days"
     paths:
       - Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg
       - PaymentService.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
-  stage: publish
-  needs:
-    - build-code
-    - unit-test
-  only:
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true   
-    policy: pull
+  extends: .push-docker-image-template
   script:
-    - dotnet build "PaymentService/PaymentService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
-    - docker push $ImageName:$Tag
+    - push_docker "PaymentService/PaymentService.csproj" $ImageName $Tag
 
 push-bankinfo-rebuild-hash-job-image:
-  stage: publish
-  needs:
-    - build-code
-    - unit-test
-  only:
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true   
-    policy: pull
+  extends: .push-docker-image-template
   when: manual
   script:
-    - dotnet build "PlayerBankInfoRebuildHash/PlayerBankInfoRebuildHash.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$RebuildHashImageName:$Tag" --no-restore
-    - docker push $RebuildHashImageName:$Tag
+    - push_docker "PlayerBankInfoRebuildHash/PlayerBankInfoRebuildHash.csproj" $RebuildHashImageName $Tag
 
 push-k8s-template:
-  stage: publish
-  needs:
-    - unit-test
-  only:
-    - main
+  extends: .push-k8s-template
   script:
-    - mkdir -p artifacts/k8s
-    - cp -R deployment/k8s/payment-api artifacts/k8s/
-    - |
-      yq -i e '
-        .image.repository = strenv(ImageName) |
-        .image.tag = strenv(Tag)
-      ' artifacts/k8s/payment-api/values.yaml
-  artifacts:
-    name: HelmTemplate
-    untracked: false
-    expire_in: "180 days"
-    paths:
-      - artifacts/**/*
+    - push_k8s_template "payment-api" $ImageName $Tag
 
 push-bankinfo-rebuild-hash-k8s-template:
-  stage: publish
+  extends: .push-k8s-template
   needs:
     - push-bankinfo-rebuild-hash-job-image
-  only:
-    - main
   script:
-    - mkdir -p artifacts/k8s
-    - cp -R deployment/k8s/bankinfo-rebuild-hash artifacts/k8s/
-    - |
-      yq -i e '
-        .image.repository = strenv(RebuildHashImageName) |
-        .image.tag = strenv(Tag)
-      ' artifacts/k8s/bankinfo-rebuild-hash/values.yaml
-  artifacts:
-    name: HelmTemplate
-    untracked: false
-    expire_in: "180 days"
-    paths:
-      - artifacts/**/*
+    - push_k8s_template "bankinfo-rebuild-hash" $ImageName $Tag
 
 deploy-dev:
+  extends: .deploy-template
   variables:
-    GIT_STRATEGY: none
     namespace: dev
+    kube_config: KubeConfig_Raypro_dev
   environment:
     name: dev
   stage: deploy-dev
@@ -162,38 +76,14 @@ deploy-dev:
       artifacts: true
   only:
     - main
-  before_script:
-    - export KUBECONFIG=$KubeConfig_Raypro_dev
   script:
-    - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
-    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
-    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - 
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - \
-        | kubectl -n $namespace apply -f -
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
+    - deploy_k8s $TgsSettingKey "payment-api" $namespace
 
 deploy-staging:
+  extends: .deploy-template
   variables:
-    GIT_STRATEGY: none
     namespace: staging
+    kube_config: KubeConfig_Raypro_staging
   environment:
     name: staging
   stage: deploy-staging
@@ -204,38 +94,14 @@ deploy-staging:
   only:
     - main
   when: manual
-  before_script:
-    - export KUBECONFIG=$KubeConfig_Raypro_staging
   script:
-    - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
-    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
-    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - 
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - \
-        | kubectl -n $namespace apply -f -
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
+    - deploy_k8s $TgsSettingKey "payment-api" $namespace
 
 deploy-prod:
+  extends: .deploy-template
   variables:
-    GIT_STRATEGY: none
     namespace: prod
+    kube_config: KubeConfig_Raypro_prod
   environment:
     name: prod
   stage: deploy-prod
@@ -246,30 +112,5 @@ deploy-prod:
   only:
     - main
   when: manual
-  before_script:
-    - export KUBECONFIG=$KubeConfig_Raypro_prod
   script:
-    - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
-    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
-    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - 
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
-    - |
-      cat << EOF | yq e -P | helm template artifacts/k8s/payment-api \
-        -n $namespace \
-        -f - \
-        | kubectl -n $namespace apply -f -
-      {
-        "nodeSelector": $node_selector,
-        "tolerations": [$dedicated],
-        "resources": $resources
-      }
-      EOF
+    - deploy_k8s $TgsSettingKey "payment-api" $namespace

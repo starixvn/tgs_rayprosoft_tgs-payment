@@ -134,42 +134,10 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
-	{
-		var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
-
-		_ = fsm.Configure(PaymentFlowState.Init)
-			.Permit(PaymentTrigger.DepositCreate, PaymentFlowState.WaitPayment)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.WaitPayment)
-			.Permit(PaymentTrigger.PaymentDepositCompleted, PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		return fsm;
-	}
+		=> PaymentStateMachineFactory.CreateDepositStateMachine(initialState);
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateManualDepositStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
-	{
-		var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
-
-		_ = fsm.Configure(PaymentFlowState.Init)
-			.Permit(PaymentTrigger.DepositCreate, PaymentFlowState.WaitPayment)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.WaitPayment)
-			.Permit(PaymentTrigger.UploadPayCertificate, PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		return fsm;
-	}
+		=> PaymentStateMachineFactory.CreateManualDepositStateMachine(initialState);
 
 	public async ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
@@ -292,23 +260,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
-	{
-		var fsm = new StateMachine<PaymentFlowState, PaymentTrigger>(initialState);
-
-		_ = fsm.Configure(PaymentFlowState.Init)
-			.Permit(PaymentTrigger.WithdrawCreate, PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.WaitApprove)
-			.Permit(PaymentTrigger.Approve, PaymentFlowState.Approved)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		_ = fsm.Configure(PaymentFlowState.Approved)
-			.Permit(PaymentTrigger.PaymentWithdrawCompleted, PaymentFlowState.Paid)
-			.Permit(PaymentTrigger.Reject, PaymentFlowState.Reject);
-
-		return fsm;
-	}
+		=> PaymentStateMachineFactory.CreateWithdrawStateMachine(initialState);
 
 	public async ValueTask DeleteAgentBankInfoAsync(Guid agentId, Guid bankInfoId, CancellationToken cancellationToken = default)
 	{
