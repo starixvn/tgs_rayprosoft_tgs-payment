@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentdForward.OpenTelemetry.MessagePack;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.Configuration;
@@ -28,7 +30,9 @@ builder.Logging
 			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
 			fluentOptions.Host = nodeIp;
 			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
-			fluentOptions.UseMessagePack();
+			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
+				"MachineName",
+				() => Environment.MachineName));
 		});
 	});
 
@@ -134,7 +138,7 @@ builder.Services.AddHealthChecks();
 builder.Services
 	.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 		sp => new ConfigureNamedOptions<OtlpExporterOptions>(
-			Microsoft.Extensions.Options.Options.DefaultName,
+			Options.DefaultName,
 			exporterOptions =>
 			{
 				var config = sp.GetRequiredService<IConfiguration>();
@@ -145,17 +149,24 @@ builder.Services
 
 				config.GetSection("Opentelemetry:Tracing").Bind(exporterOptions);
 			}))
-	.AddOpenTelemetryTracing(
-		tracingBuilder => tracingBuilder
-			.SetResourceBuilder(ResourceBuilder.CreateDefault()
-				.AddEnvironmentVariableDetector())
-			.AddSource("Tgs.*")
-			.AddSource("TGS.*")
-			.AddAspNetCoreInstrumentation()
-			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-			.AddHttpClientInstrumentation()
-			.AddProfileViewExporter()
-			.AddOtlpExporter())
+	.AddOpenTelemetry()
+	.WithTracing(tracingBuilder => tracingBuilder
+		.SetResourceBuilder(ResourceBuilder.CreateDefault()
+			.AddEnvironmentVariableDetector())
+		.AddSource("Tgs.*")
+		.AddSource("TGS.*")
+		.AddAspNetCoreInstrumentation()
+		.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+		.AddHttpClientInstrumentation()
+		.AddProfileViewExporter()
+		.AddOtlpExporter())
+	.WithMetrics(meterBuiler => meterBuiler
+		.SetResourceBuilder(ResourceBuilder.CreateDefault()
+			.AddEnvironmentVariableDetector())
+		.AddRuntimeInstrumentation()
+		.AddAspNetCoreInstrumentation()
+		.AddOtlpExporter())
+	.Services
 	.Configure<AspNetCoreInstrumentationOptions>(
 		options => options.Filter = httpContext => !httpContext.Request.Path.HasValue
 			|| !httpContext.Request.Path.StartsWithSegments("/swagger")
