@@ -31,8 +31,8 @@ unit-test:
 push-nuget:
   extends: .push-nuget-template
   script:
-    - push_nuget "Tgs.Payment.Client"
-    - push_nuget "PaymentService.Client"
+    - push_package "Tgs.Payment.Client"
+    - push_package "PaymentService.Client"
   artifacts:
     paths:
       - Tgs.Payment.Client/bin/$BuildConfiguration/*.nupkg
