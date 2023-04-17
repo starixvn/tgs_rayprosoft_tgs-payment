@@ -74,6 +74,6 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 			withdrawBankInfo.Detail.BankCardName,
 			withdrawBankInfo.Detail.BankCardAccount);
 
-		return JsonSerializer.Serialize(settings, WandaPayUtility.SerializerOptions);
+		return JsonSerializer.Serialize(settings, PhpGoPayUtility.SerializerOptions);
 	}
 }
