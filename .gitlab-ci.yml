@@ -78,6 +78,7 @@ deploy-dev:
     - main
   script:
     - deploy_k8s $TgsSettingKey "payment-api" $namespace
+  when: on_success
 
 deploy-staging:
   extends: .deploy-template
