@@ -19,7 +19,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 				"bankType": "$.bankType",
 				"detail": {
 					"bankCardName": "$.detail.name",
-					"bankCardAccount": "$.detail.account"
+					"bankCardAccount": "$.detail.bankAccount"
 				}
 			}
 			""",
