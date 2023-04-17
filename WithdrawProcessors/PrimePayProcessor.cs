@@ -11,22 +11,26 @@ internal class PrimePayProcessor : IWithdrawProcessor
 {
 	private readonly Dictionary<string, string> _bankInfoTransformations = new()
 	{
-		["Bank"] = @"{
-			""id"": ""$.id"",
-			""paymentChannelId"": ""$.paymentChannelId"",
-			""bankType"": ""$.bankType"",
-			""detail"": ""$.detail""
-		}",
-		["FPS"] = @"{
-			""id"": ""$.id"",
-			""paymentChannelId"": ""$.paymentChannelId"",
-			""bankType"": ""$.bankType"",
-			""detail"": {
-				""bankName"": ""FPS"",
-				""bankAccount"": ""$.detail.phone"",
-				""name"": ""$.detail.username""
+		["Bank"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": "$.detail"
 			}
-		}"
+			""",
+		["FPS"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": {
+					"bankName": "FPS",
+					"bankAccount": "$.detail.phone",
+					"name": "$.detail.username"
+				}
+			}
+			"""
 	};
 
 	private readonly JsonSerializerOptions _jsonSerializerOptions;
