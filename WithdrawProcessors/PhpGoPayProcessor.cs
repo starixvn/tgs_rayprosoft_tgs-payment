@@ -4,7 +4,6 @@ using System.Text.Json;
 using JSLTSharp;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.PhpGoPay.Client;
-using Tgs.Payment.WandaPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
@@ -24,6 +23,17 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 			}
 			""",
 		["GCash"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": {
+					"bankCardName": "$.detail.phone",
+					"bankCardAccount": "$.detail.phone"
+				}
+			}
+			""",
+		["PayMaya"] = """
 			{
 				"id": "$.id",
 				"paymentChannelId": "$.paymentChannelId",
@@ -57,6 +67,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 		var bankType = bankCode switch
 		{
 			"gcash" => "GCash",
+			"PMP" => "PayMaya",
 			_ => "Bank"
 		};
 
