@@ -32,6 +32,9 @@ data:
           "Type": "EWallet",
           "Phone": "$.phone"
         }
+      },
+      "Payment":{
+        "PlayerServiceBaseUrl": "http://player-api"
       }
     }
   otel-collector-config.yaml: |

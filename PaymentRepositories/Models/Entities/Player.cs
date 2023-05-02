@@ -73,17 +73,17 @@ public partial class Player
 
     public string? Birthday { get; set; }
 
-    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
+    public virtual Agent? Agent { get; set; }
+
+    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; } = new List<AgentBankInfoItem>();
 
     public virtual Brand Brand { get; set; } = null!;
 
-    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; } = new List<BrandPaymentPlayer>();
+    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; } = new List<BrandPaymentPlayer>();
 
-    public virtual ICollection<DepositForm> DepositForms { get; } = new List<DepositForm>();
+    public virtual ICollection<DepositForm> DepositForms { get; set; } = new List<DepositForm>();
 
-    public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; } = new List<PlayerBankInfoTag>();
+    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; } = new List<PlayerBankInfo>();
 
-    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
-
-    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; } = new List<PlayerBankinfoAttribution>();
+    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; set; } = new List<PlayerBankinfoAttribution>();
 }

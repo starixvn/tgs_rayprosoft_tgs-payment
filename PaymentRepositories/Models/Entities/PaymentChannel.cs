@@ -13,9 +13,9 @@ public partial class PaymentChannel
 
     public string? Description { get; set; }
 
-    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
+    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; } = new List<AgentBankInfoItem>();
 
-    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; } = new List<PaymentMethodChannel>();
+    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; set; } = new List<PaymentMethodChannel>();
 
-    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
+    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; } = new List<PlayerBankInfo>();
 }

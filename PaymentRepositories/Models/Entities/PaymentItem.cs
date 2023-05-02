@@ -27,5 +27,5 @@ public partial class PaymentItem
 
     public string UpdatedByUsername { get; set; } = null!;
 
-    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; } = new List<PaymentMethodChannel>();
+    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; set; } = new List<PaymentMethodChannel>();
 }

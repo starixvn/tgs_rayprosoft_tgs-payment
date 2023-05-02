@@ -17,7 +17,7 @@ public partial class PaymentMethodChannel
 
     public short Status { get; set; }
 
-    public virtual ICollection<BrandPayment> BrandPayments { get; } = new List<BrandPayment>();
+    public virtual ICollection<BrandPayment> BrandPayments { get; set; } = new List<BrandPayment>();
 
     public virtual PaymentChannel Channel { get; set; } = null!;
 

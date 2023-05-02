@@ -45,7 +45,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.Birthdate).HasColumnName("birthdate");
             entity.Property(e => e.Birthday)
             .HasMaxLength(4)
-            .HasComputedColumnSql("(lpad((EXTRACT(month FROM birthdate))::text, 2, '0'::text) || lpad((EXTRACT(day FROM birthdate))::text, 2, '0'::text))", true)
+            .HasComputedColumnSql("(lpad((date_part('month'::text, birthdate))::text, 2, '0'::text) || lpad((date_part('day'::text, birthdate))::text, 2, '0'::text))", true)
             .HasColumnName("birthday");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.DefaultWalletCurrencyCode)
@@ -89,6 +89,11 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnName("wechat");
             entity.Property(e => e.WithdrawPassword).HasColumnName("withdraw_password");
             entity.Property(e => e.WithdrawSalt).HasColumnName("withdraw_salt");
+
+            entity.HasOne(d => d.Agent).WithMany(p => p.Players)
+            .HasForeignKey(d => d.AgentId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("fk_players_agents_agent_id");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.Players)
             .HasForeignKey(d => d.BrandId)

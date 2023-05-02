@@ -38,6 +38,8 @@ public partial interface IPaymentRepository
 
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default);
 
+	ValueTask<AgentInfo> GetAgentInfoByAgentIdAsync(Guid agentId,CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PaymentMethodChannelInfo> GetAllPaymentMethodChannelsAsync(CancellationToken cancellationToken = default);
