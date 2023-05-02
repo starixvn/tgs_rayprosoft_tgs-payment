@@ -14,6 +14,8 @@ public partial class TgsContext : DbContext
     {
     }
 
+    public virtual DbSet<Agent> Agents { get; set; }
+
     public virtual DbSet<AgentBankInfoItem> AgentBankInfoItems { get; set; }
 
     public virtual DbSet<Brand> Brands { get; set; }
@@ -58,6 +60,7 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("ltree")
             .HasPostgresExtension("pg_trgm");
 
+            modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentConfiguration());

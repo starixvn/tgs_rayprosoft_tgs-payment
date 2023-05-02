@@ -304,6 +304,15 @@ internal class PaymentRepository : IPaymentRepository
 				info.Detail!))
 			.ToAsyncEnumerable();
 
+	public async ValueTask<AgentInfo> GetAgentInfoByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default)
+	{
+		var agentInfo = await _tgsContext.Agents
+			.FindAsync(new object[] { agentId }, cancellationToken)
+			.ConfigureAwait(false);
+
+		return new AgentInfo(agentInfo!.Phone);
+	}
+
 	public IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default)
 		=> _tgsContext.PaymentChannels.AsQueryable()
 			.Select(row => new PaymentChannelInfo(row.Id, row.Code))

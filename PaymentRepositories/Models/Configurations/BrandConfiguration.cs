@@ -50,10 +50,10 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn).HasColumnName("created_on");
             entity.Property(e => e.CurrentSettlementFrom)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("current_settlement_from");
             entity.Property(e => e.CurrentSettlementTo)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("current_settlement_to");
             entity.Property(e => e.DepositHandlingFeeRateTenPercentile).HasColumnName("deposit_handling_fee_rate_ten_percentile");
             entity.Property(e => e.DepositPaymentLockEnabled).HasColumnName("deposit_payment_lock_enabled");
@@ -74,10 +74,10 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasMaxLength(255)
             .HasColumnName("name");
             entity.Property(e => e.NextSettlementFrom)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("next_settlement_from");
             entity.Property(e => e.NextSettlementTo)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("next_settlement_to");
             entity.Property(e => e.OperationalEmail)
             .HasMaxLength(128)
@@ -89,10 +89,10 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnType("jsonb")
             .HasColumnName("player_register_flow_settings");
             entity.Property(e => e.PreviousSettlementFrom)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("previous_settlement_from");
             entity.Property(e => e.PreviousSettlementTo)
-            .HasDefaultValueSql("'-infinity'::timestamp with time zone")
+            .HasDefaultValueSql("'0001-01-01 00:00:00+00'::timestamp with time zone")
             .HasColumnName("previous_settlement_to");
             entity.Property(e => e.SecretKey)
             .HasMaxLength(32)

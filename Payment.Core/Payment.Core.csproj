@@ -26,6 +26,7 @@
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 		<PackageReference Include="Tgs.MessageQueue" Version="2.3.0" />
 		<PackageReference Include="Tgs.Paging.AsyncEnumerable" Version="1.2.1" />
+		<PackageReference Include="Tgs.PlayerService.Client" Version="0.0.29" />
 		<PackageReference Include="Tgs.SerialNumberGenerator" Version="1.0.0" />
 		<PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
 	</ItemGroup>

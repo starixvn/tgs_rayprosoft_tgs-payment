@@ -16,8 +16,4 @@ public partial class PlayerBankInfoTag
     public string TagType { get; set; } = null!;
 
     public string Tag { get; set; } = null!;
-
-    public virtual PlayerBankInfo BankInfo { get; set; } = null!;
-
-    public virtual Player PlayerCodeNavigation { get; set; } = null!;
 }

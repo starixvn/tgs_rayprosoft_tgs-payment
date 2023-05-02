@@ -35,7 +35,5 @@ public partial class PlayerBankInfo
 
     public virtual PaymentChannel PaymentChannel { get; set; } = null!;
 
-    public virtual ICollection<PlayerBankInfoTag> PlayerBankInfoTags { get; } = new List<PlayerBankInfoTag>();
-
     public virtual Player PlayerCodeNavigation { get; set; } = null!;
 }

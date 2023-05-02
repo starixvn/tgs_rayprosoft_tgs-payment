@@ -57,13 +57,13 @@ public partial class BrandPayment
 
     public virtual Brand Brand { get; set; } = null!;
 
-    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; } = new List<BrandPaymentPlayer>();
+    public virtual ICollection<BrandPaymentPlayer> BrandPaymentPlayers { get; set; } = new List<BrandPaymentPlayer>();
 
-    public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; } = new List<BrandPaymentVipLevel>();
+    public virtual ICollection<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; } = new List<BrandPaymentVipLevel>();
 
-    public virtual ICollection<DepositForm> DepositForms { get; } = new List<DepositForm>();
+    public virtual ICollection<DepositForm> DepositForms { get; set; } = new List<DepositForm>();
 
     public virtual PaymentMethodChannel PaymentMethodChannel { get; set; } = null!;
 
-    public virtual ICollection<WithdrawForm> WithdrawForms { get; } = new List<WithdrawForm>();
+    public virtual ICollection<WithdrawForm> WithdrawForms { get; set; } = new List<WithdrawForm>();
 }

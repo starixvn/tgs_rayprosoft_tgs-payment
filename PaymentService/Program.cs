@@ -59,7 +59,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services
 	.AddPaymentClient()
-	.AddPayment()
+	.AddPayment()	
 	.UseRedis((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
@@ -88,7 +88,13 @@ builder.Services
 	.RegisterWithdrawProcessors()
 	.Services
 	.AddMemoryCache()
-	.AddPaymentCache();
+	.AddPaymentCache()
+	.AddPlayerServiceClient((options, sp) =>
+	{
+		var config = sp.GetRequiredService<IConfiguration>();
+
+		options.BaseUrl = config.GetValue<Uri>("Payment:PlayerServiceBaseUrl")!;
+	});
 
 builder.Services
 	.AddMessageQueue()

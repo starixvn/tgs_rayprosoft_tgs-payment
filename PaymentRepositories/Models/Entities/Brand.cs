@@ -95,17 +95,19 @@ public partial class Brand
 
     public int? TimeSpanMinutes { get; set; }
 
-    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; } = new List<AgentBankInfoItem>();
+    public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; } = new List<AgentBankInfoItem>();
 
-    public virtual ICollection<BrandPayment> BrandPayments { get; } = new List<BrandPayment>();
+    public virtual ICollection<Agent> Agents { get; set; } = new List<Agent>();
 
-    public virtual ICollection<DepositForm> DepositForms { get; } = new List<DepositForm>();
+    public virtual ICollection<BrandPayment> BrandPayments { get; set; } = new List<BrandPayment>();
 
-    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; } = new List<PlayerBankInfo>();
+    public virtual ICollection<DepositForm> DepositForms { get; set; } = new List<DepositForm>();
 
-    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; } = new List<PlayerBankinfoAttribution>();
+    public virtual ICollection<PlayerBankInfo> PlayerBankInfos { get; set; } = new List<PlayerBankInfo>();
 
-    public virtual ICollection<Player> Players { get; } = new List<Player>();
+    public virtual ICollection<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; set; } = new List<PlayerBankinfoAttribution>();
 
-    public virtual ICollection<WithdrawForm> WithdrawForms { get; } = new List<WithdrawForm>();
+    public virtual ICollection<Player> Players { get; set; } = new List<Player>();
+
+    public virtual ICollection<WithdrawForm> WithdrawForms { get; set; } = new List<WithdrawForm>();
 }

@@ -15,5 +15,5 @@ public partial class PaymentMethod
 
     public string? Description { get; set; }
 
-    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; } = new List<PaymentMethodChannel>();
+    public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; set; } = new List<PaymentMethodChannel>();
 }
