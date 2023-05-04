@@ -110,36 +110,15 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<MetaPayBankInfo>>(transforJson, _paymentSerializerOptions)!;
 
-		var payType = string.Empty;
-		var mobileNumber = withdrawBankInfo.Detail.BankCardAccount;
-
-		switch (paySetting)
+		var (payType, mobileNumber) = paySetting switch
 		{
-			case "GCASH":
-				payType = "7";
-				break;
-
-			case "PAYMAYA":
-				payType = "9";
-				break;
-
-			case "GRABPAY":
-				payType = "11";
-				break;
-
-			case "BANKRT":
-				payType = "8";
-				mobileNumber = GetWithdrawFormUserPhone(formId);
-				break;
-
-			case "BANKNRT":
-				payType = "12";
-				mobileNumber = GetWithdrawFormUserPhone(formId);
-				break;
-
-			default:
-				break;
-		}
+			"GCASH" => ("7", withdrawBankInfo.Detail.BankCardAccount),
+			"PAYMAYA" => ("9", withdrawBankInfo.Detail.BankCardAccount),
+			"GRABPAY" => ("11", withdrawBankInfo.Detail.BankCardAccount),
+			"BANKRT" => ("8", GetWithdrawFormUserPhone(formId)),
+			"BANKNRT" => ("12", GetWithdrawFormUserPhone(formId)),
+			_ => throw new NotImplementedException(),
+		};
 
 		var settings = new MetaPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("appId").GetString(),
