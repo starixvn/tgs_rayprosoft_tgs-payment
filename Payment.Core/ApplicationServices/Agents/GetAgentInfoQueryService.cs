@@ -15,5 +15,5 @@ internal class GetAgentInfoQueryService : IGetService<GetAgentInfoQuery, AgentIn
 	}
 
 	public ValueTask<AgentInfo> GetAsync(GetAgentInfoQuery query, CancellationToken cancellationToken = default)
-	=> _repository.GetAgentInfoByAgentIdAsync(query.AgentId);
+	=> _repository.GetAgentInfoByAgentIdAsync(query.AgentId, cancellationToken);
 }
