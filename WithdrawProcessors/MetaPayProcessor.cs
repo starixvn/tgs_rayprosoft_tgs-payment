@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using JSLTSharp;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplicationServices.Agents;
@@ -115,8 +117,8 @@ internal class MetaPayProcessor : IWithdrawProcessor
 			"GCASH" => ("7", withdrawBankInfo.Detail.BankCardAccount),
 			"PAYMAYA" => ("9", withdrawBankInfo.Detail.BankCardAccount),
 			"GRABPAY" => ("11", withdrawBankInfo.Detail.BankCardAccount),
-			"BANKRT" => ("8", GetWithdrawFormUserPhone(formId)),
-			"BANKNRT" => ("12", GetWithdrawFormUserPhone(formId)),
+			"BANKRT" => ("8", GetWithdrawFormUserPhoneAsync(formId).ToAsyncEnumerable().ToEnumerable().First()),
+			"BANKNRT" => ("12", GetWithdrawFormUserPhoneAsync(formId).ToAsyncEnumerable().ToEnumerable().First()),
 			_ => throw new NotImplementedException(),
 		};
 
@@ -134,25 +136,25 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		return JsonSerializer.Serialize(settings, MetaPayUtility.SerializerOptions);
 	}
 
-	private string GetWithdrawFormUserPhone(Guid formId)
+	private async Task<string> GetWithdrawFormUserPhoneAsync(Guid formId)
 	{
-		var withdrawForm = _getService
+		var withdrawForm = await _getService
 			.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
-			.Result;
+			.ConfigureAwait(false);
 
 		if (withdrawForm.UserType == UserType.Player)
 		{
-			var playerProperties = _playerServiceClient
+			var playerProperties = await _playerServiceClient
 				.GetPlayerPropertiesAsync(withdrawForm.UserId)
-				.Result;
+				.ConfigureAwait(false);
 
 			return playerProperties.GetValueOrDefault("Phone");
 		}
 		else
 		{
-			var agentInfo = _getAgentService
+			var agentInfo = await _getAgentService
 				.GetAsync(new GetAgentInfoQuery(Guid.Parse(withdrawForm.UserId)))
-				.Result;
+				.ConfigureAwait(false);
 
 			return agentInfo.Phone;
 		}
