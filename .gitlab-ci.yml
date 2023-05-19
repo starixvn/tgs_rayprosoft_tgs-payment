@@ -1,6 +1,6 @@
 include:
   - project: rayprosoft/tgs-ci-scripts
-    ref: feats/tgs-3344-extend-deploy-scripts
+    ref: main
     file: GitLab/Templates/gitlab-job-templates.yml
 
 variables:
