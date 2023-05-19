@@ -44,7 +44,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<WandaPayProcessor>("WandaPay")
 			.RegisterWithdrawProcessor<PhpGoPayProcessor>("PhpGoPay")
 			.RegisterWithdrawProcessor<FiveSevenPayProcessor>("FiveSevenPay")
-			.RegisterWithdrawProcessor<PhpGoPayProcessor>("FiveSevenPay-V2")
+			.RegisterWithdrawProcessor<FiveSevenPayV2Processor>("FiveSevenPay-V2")
 			.RegisterWithdrawProcessor<MetaPayProcessor>("MetaPay");
 	}
 }

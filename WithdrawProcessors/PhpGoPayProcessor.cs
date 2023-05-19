@@ -49,7 +49,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 	private readonly JsonTransform _jsonTransform;
 	private readonly JsonSerializerOptions _paymentSerializerOptions;
 
-	public string Subject => "tgs.payment.phpgopay.withdraw";
+	public virtual string Subject => "tgs.payment.phpgopay.withdraw";
 
 	public PhpGoPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, JsonTransform jsonTransform)
 	{
