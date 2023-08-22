@@ -16,7 +16,7 @@
       }
    ],
    "SelectedHandlebarsLanguage": 0,
-   "SelectedToBeGenerated": 0,
+   "SelectedToBeGenerated": 0,   
    "Tables": [
       {
          "Name": "dbo.agent_bank_infos",
@@ -24,6 +24,14 @@
       },
       {
          "Name": "dbo.agents",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.brand_payment_auto_withdraw",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.brand_payment_auto_withdraw_event_source",
          "ObjectType": 0
       },
       {
@@ -115,7 +123,7 @@
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
    "UseNullableReferences": true,
-   "UseSchemaFolders": false,
+   "UseSchemaFolders": false,   
    "UseSpatial": false,
    "UseT4": false
 }
