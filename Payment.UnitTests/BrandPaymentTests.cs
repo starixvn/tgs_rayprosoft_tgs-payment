@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NSubstitute;
-using NUnit.Framework;
+﻿using NSubstitute;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
 
@@ -47,6 +43,22 @@ public class BrandPaymentTests
 		var actual = await sut.GetAsync(query);
 
 		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public void Can_Get_Brand_Auto_Withdraw_Setting_By_BrandId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetBrandAutoWithdrawQueryService(fakePaymentRepository);
+
+		var query = new GetBrandAutoWithdrawQuery(Guid.NewGuid());
+
+		_ = sut.GetAsync(query);
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.GetBrandAutoWithdrawSettingAsync(Arg.Is(query.BrandId));
 	}
 
 	[Test]

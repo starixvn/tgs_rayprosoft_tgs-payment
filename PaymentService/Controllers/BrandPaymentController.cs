@@ -22,6 +22,25 @@ public class BrandPaymentController : ControllerBase
 		return getService.GetAsync(query);
 	}
 
+	[HttpGet("autowithdraw/{brandId}", Name = "GetBrandAutoWithdrawSetting")]
+	public async ValueTask<BrandAutoWithdrawViewModel?> GetBrandAutoWithdrawSettingAsync(
+		[FromServices] IGetService<GetBrandAutoWithdrawQuery, AutoWithdrawInfo?> getService,
+		Guid brandId)
+	{
+		var brandAutoWithdraw = await getService
+			.GetAsync(new GetBrandAutoWithdrawQuery(brandId))
+			.ConfigureAwait(false);
+
+		return brandAutoWithdraw != null
+			? new BrandAutoWithdrawViewModel
+			{
+				AmountUpperLimit = brandAutoWithdraw.AmountUpperLimit,
+				BrandPaymentCandidates = brandAutoWithdraw.BrandPaymentCandidates,
+				EnableAutoWithdraw = brandAutoWithdraw.EnableAutoWithdraw
+			}
+			: null;
+	}
+
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,

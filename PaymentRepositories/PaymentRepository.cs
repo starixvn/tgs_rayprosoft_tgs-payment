@@ -378,6 +378,20 @@ internal class PaymentRepository : IPaymentRepository
 				string.IsNullOrEmpty(info.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(info.Detail),
 				info.Default));
 
+	public async ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var autoWithdrawSetting = await _tgsContext.BrandPaymentAutoWithdraws
+			.FindAsync(new object?[] { brandId }, cancellationToken)
+			.ConfigureAwait(false);
+
+		return autoWithdrawSetting is null
+			? null
+			: new AutoWithdrawInfo(
+				autoWithdrawSetting.EnableAutoWithdraw,
+				autoWithdrawSetting.AmountUpperLimit,
+				autoWithdrawSetting.BrandPaymentCandidates);
+	}
+
 	public async ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var flag = await _tgsContext.BrandPlayerBankinfoCheckFlags.FindAsync(

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -36,6 +35,32 @@ public class BrandPaymentTests
 		var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
 		Assert.AreEqual(10m, actual);
+	}
+
+	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(
+				Arg.Is(brandId),
+				Arg.Any<CancellationToken>())
+			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, "{}"));
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.AreEqual(168m, actual.AmountUpperLimit);
+		Assert.AreEqual(true, actual.EnableAutoWithdraw);
 	}
 
 	[Test]

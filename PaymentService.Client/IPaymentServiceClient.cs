@@ -56,8 +56,10 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default);
 
+	ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
-		string playerCode,
+			string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
 		CancellationToken cancellationToken = default);
 

@@ -194,6 +194,40 @@ public class PaymentRepositoryTests
 	}
 
 	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandId = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8");
+
+		_ = await dbContext.BrandPaymentAutoWithdraws.AddAsync(
+			new BrandPaymentAutoWithdraw
+			{
+				BrandId = brandId,
+				AmountUpperLimit = 168M,
+				BrandPaymentCandidates = "{}",
+				EnableAutoWithdraw = true,
+				SnapshotEventId = Guid.NewGuid()
+			}
+		);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.True(actual.EnableAutoWithdraw);
+		Assert.AreEqual(168M, actual.AmountUpperLimit);
+	}
+
+	[Test]
 	public async Task Get_BrandPayment_Fee_Settings()
 	{
 		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();

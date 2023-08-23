@@ -432,6 +432,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			yield return payment;
 	}
 
+	public async ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/autowithdraw/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
+	}
+
 	public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
 		string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
