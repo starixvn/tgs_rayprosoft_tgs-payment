@@ -7,6 +7,4 @@ public class UpdateBrandAutoWithdrawViewModel
 	public IEnumerable<Guid> BrandPaymentIds { get; set; } = default!;
 
 	public bool EnableAutoWitdraw { get; set; }
-
-	public string ModifyUserId { get; set; } = default!;
 }

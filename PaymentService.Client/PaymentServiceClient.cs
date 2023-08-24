@@ -1176,6 +1176,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
+		requestContent.Headers.Add("ModifyUserId", modifyUserId);
+
 		var response = await _httpClient
 			.PatchAsync($"/brand/payment/autowithdraw/{brandId}", requestContent, cancellationToken)
 			.ConfigureAwait(false);

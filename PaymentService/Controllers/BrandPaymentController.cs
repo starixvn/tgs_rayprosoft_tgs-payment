@@ -198,15 +198,16 @@ public class BrandPaymentController : ControllerBase
 	[HttpPatch("autowithdraw/{brandId}", Name = "UpdateBrandAutoWithdraw")]
 	public async Task UpdateBrandAutoWithdrawAsync(
 		[FromServices] ICommandService<UpdateBrandAutoWithdrawCommand> commandService,
-		Guid brandId,
-		[FromBody] UpdateBrandAutoWithdrawViewModel request)
+		[FromHeader(Name = "ModifyUserId")] string modifyUserId,
+		[FromBody] UpdateBrandAutoWithdrawViewModel request,
+		Guid brandId)
 	{
 		var command = new UpdateBrandAutoWithdrawCommand(
 			brandId,
 			request.EnableAutoWitdraw,
 			request.AmountUpperLimit,
 			request.BrandPaymentIds,
-			request.ModifyUserId);
+			modifyUserId);
 
 		await commandService
 			.ExecuteAsync(command, HttpContext.RequestAborted)
