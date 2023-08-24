@@ -22,6 +22,25 @@ public class BrandPaymentController : ControllerBase
 		return getService.GetAsync(query);
 	}
 
+	[HttpGet("autowithdraw/{brandId}", Name = "GetBrandAutoWithdrawSetting")]
+	public async ValueTask<BrandAutoWithdrawViewModel?> GetBrandAutoWithdrawSettingAsync(
+		[FromServices] IGetService<GetBrandAutoWithdrawQuery, AutoWithdrawInfo?> getService,
+		Guid brandId)
+	{
+		var brandAutoWithdraw = await getService
+			.GetAsync(new GetBrandAutoWithdrawQuery(brandId), HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		return brandAutoWithdraw != null
+			? new BrandAutoWithdrawViewModel
+			{
+				AmountUpperLimit = brandAutoWithdraw.AmountUpperLimit,
+				BrandPaymentIds = brandAutoWithdraw.BrandPaymentIds,
+				EnableAutoWithdraw = brandAutoWithdraw.EnableAutoWithdraw
+			}
+			: null;
+	}
+
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
@@ -175,6 +194,25 @@ public class BrandPaymentController : ControllerBase
 				TransferType = brandPayment.TransferType,
 				DisplayOrder = brandPayment.DisplayOrder
 			});
+
+	[HttpPatch("autowithdraw/{brandId}", Name = "UpdateBrandAutoWithdraw")]
+	public async ValueTask UpdateBrandAutoWithdrawAsync(
+		[FromServices] ICommandService<UpdateBrandAutoWithdrawCommand> commandService,
+		[FromHeader(Name = "ModifyUserId")] string modifyUserId,
+		[FromBody] BrandAutoWithdrawViewModel request,
+		Guid brandId)
+	{
+		var command = new UpdateBrandAutoWithdrawCommand(
+			brandId,
+			request.EnableAutoWithdraw,
+			request.AmountUpperLimit,
+			request.BrandPaymentIds,
+			modifyUserId);
+
+		await commandService
+			.ExecuteAsync(command, HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+	}
 
 	[HttpPatch("extendeddata/{brandPaymentId}", Name = "UpdateBrandPaymentExtendedData")]
 	public ValueTask UpdateBrandPaymentExtendedDataAsync(

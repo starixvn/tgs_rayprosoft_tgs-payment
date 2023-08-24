@@ -20,6 +20,13 @@ public partial interface IPaymentRepository
 
 	ValueTask CreateBankInfoAsync(PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default);
 
+	ValueTask CreateBrandAutoWithdrawEventAsync(
+		Guid eventId,
+		Guid brandId,
+		JsonDocument changeSets,
+		string modifier,
+		CancellationToken cancellationToken = default);
+
 	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default);
 
 	ValueTask CreatePaymentChannelAsync(string channelCode, CancellationToken cancellationToken = default);
@@ -38,7 +45,7 @@ public partial interface IPaymentRepository
 
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default);
 
-	ValueTask<AgentInfo> GetAgentInfoByAgentIdAsync(Guid agentId,CancellationToken cancellationToken = default);
+	ValueTask<AgentInfo> GetAgentInfoByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PaymentChannelInfo> GetAllPaymentChannelsAsync(CancellationToken cancellationToken = default);
 
@@ -51,6 +58,8 @@ public partial interface IPaymentRepository
 	ValueTask<PlayerBankInfo?> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default);
+
+	ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default);
 
@@ -82,7 +91,7 @@ public partial interface IPaymentRepository
 	ValueTask<PaymentOverview?> GetPlayerPaymentOverviewAsync(string playerCode, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentInfo> QueryBrandPaymentsAsync(
-			Guid? brandId,
+		Guid? brandId,
 		TransferType? transferType,
 		bool? enabled,
 		string? keyword,
@@ -104,6 +113,13 @@ public partial interface IPaymentRepository
 		string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
+		CancellationToken cancellationToken = default);
+
+	ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
+		AutoWithdrawInfo snapshot,
+		Guid brandId,
+		Guid snapshotId,
+		DateTime updatedOn,
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);

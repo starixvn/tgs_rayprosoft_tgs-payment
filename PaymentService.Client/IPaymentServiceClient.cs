@@ -56,6 +56,8 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default);
 
+	ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
 		string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
@@ -155,6 +157,14 @@ public interface IPaymentServiceClient
 		Guid formId,
 		string paymentCode,
 		string playerCode,
+		CancellationToken cancellationToken = default);
+
+	ValueTask UpdateBrandAutoWithdrawAsync(
+		Guid brandId,
+		bool enableAutoWitdraw,
+		decimal amountUpperLimit,
+		IEnumerable<Guid> brandPaymentIds,
+		string modifyUserId,
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);

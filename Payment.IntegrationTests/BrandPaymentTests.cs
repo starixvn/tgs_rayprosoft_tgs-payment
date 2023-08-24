@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -36,6 +35,52 @@ public class BrandPaymentTests
 		var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
 		Assert.AreEqual(10m, actual);
+	}
+
+	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(
+				Arg.Is(brandId),
+				Arg.Any<CancellationToken>())
+			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, new Guid[] { Guid.NewGuid() }));
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.AreEqual(168m, actual.AmountUpperLimit);
+		Assert.AreEqual(true, actual.EnableAutoWithdraw);
+		Assert.AreEqual(1, actual.BrandPaymentIds.Count());
+	}
+
+	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting2()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();		
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.IsNull(actual);
 	}
 
 	[Test]
@@ -166,6 +211,28 @@ public class BrandPaymentTests
 
 		Assert.AreEqual(2, actual.Length);
 		CollectionAssert.AreEquivalent(expected, actual);
+	}
+
+	[Test]
+	public async Task Update_Brand_Auto_Withdraw_By_Brand_Id()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		await sut.UpdateBrandAutoWithdrawAsync(
+			brandId,
+			true,
+			168M,
+			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
+			"186f897e-56d2-47e6-b349-08d920ec59b6");
 	}
 
 	[Test]

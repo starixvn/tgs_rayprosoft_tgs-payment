@@ -1,16 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
+using Tgs.SerialNumberGenerator;
 
 namespace Payment.UnitTests;
 
 [TestFixture]
 public class BrandPaymentTests
 {
+	[Test]
+	public async Task Can_Add_Brand_Auto_Withdraw_Setting()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var brandId = Guid.NewGuid();
+		var eventId = Guid.NewGuid();
+
+		var command = new UpdateBrandAutoWithdrawCommand(
+			brandId,
+			true,
+			168M,
+			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
+			"userId");
+
+		var sut = new UpdateBrandAutoWithdrawCommandService(fakePaymentRepository, fakeSystemClock, fakeSerialNumberGenerator);
+
+		_ = fakeSerialNumberGenerator
+			.GenerateAsync()
+			.Returns(eventId);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.CreateBrandAutoWithdrawEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(brandId),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(command.UserId));
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.UpdateBrandAutoWithdrawSnapshotAsync(
+				Arg.Any<AutoWithdrawInfo>(),
+				Arg.Is(brandId),
+				Arg.Is(eventId),
+				Arg.Any<DateTime>());
+	}
+
 	[Test]
 	public async Task Can_Calculate_BrandPayment_Fee_By_BrandPayment_Id()
 	{
@@ -47,6 +87,22 @@ public class BrandPaymentTests
 		var actual = await sut.GetAsync(query);
 
 		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public void Can_Get_Brand_Auto_Withdraw_Setting_By_BrandId()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetBrandAutoWithdrawQueryService(fakePaymentRepository);
+
+		var query = new GetBrandAutoWithdrawQuery(Guid.NewGuid());
+
+		_ = sut.GetAsync(query);
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.GetBrandAutoWithdrawSettingAsync(Arg.Is(query.BrandId));
 	}
 
 	[Test]
@@ -173,5 +229,51 @@ public class BrandPaymentTests
 		_ = fakePaymentRepository.Received(1)
 			.GetBrandPaymentVipListAsync(
 				Arg.Any<IEnumerable<Guid>>());
+	}
+
+	[Test]
+	public async Task Can_Update_Brand_Auto_Withdraw_Setting()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var brandId = Guid.NewGuid();
+		var eventId = Guid.NewGuid();
+
+		var command = new UpdateBrandAutoWithdrawCommand(
+			brandId,
+			true,
+			1680M,
+			new Guid[] { Guid.Parse("95e7c419-127e-46fd-a322-a29ddaac6276") },
+			"userId");
+
+		var sut = new UpdateBrandAutoWithdrawCommandService(fakePaymentRepository, fakeSystemClock, fakeSerialNumberGenerator);
+
+		_ = fakeSerialNumberGenerator
+			.GenerateAsync()
+			.Returns(eventId);
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(brandId)
+			.Returns(new AutoWithdrawInfo(true, 168M, Array.Empty<Guid>()));
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.CreateBrandAutoWithdrawEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(brandId),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(command.UserId));
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.UpdateBrandAutoWithdrawSnapshotAsync(
+				Arg.Any<AutoWithdrawInfo>(),
+				Arg.Is(brandId),
+				Arg.Is(eventId),
+				Arg.Any<DateTime>());
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -119,8 +120,29 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateDepositFormEventAsync(
+	public async ValueTask CreateBrandAutoWithdrawEventAsync(
 		Guid eventId,
+		Guid brandId,
+		JsonDocument changeSets,
+		string modifier,
+		CancellationToken cancellationToken = default)
+	{
+		_ = await _tgsContext.BrandPaymentAutoWithdrawEventSources.AddAsync(
+			new BrandPaymentAutoWithdrawEventSource
+			{
+				Id = eventId,
+				BrandId = brandId,
+				ChangeSets = JsonSerializer.Serialize(changeSets),
+				ModifyUser = modifier,
+				CreatedOn = DateTime.UtcNow
+			},
+			cancellationToken).ConfigureAwait(false);
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask CreateDepositFormEventAsync(
+			Guid eventId,
 		Guid formId,
 		EventAction action,
 		JsonDocument changeSets,
@@ -377,6 +399,31 @@ internal class PaymentRepository : IPaymentRepository
 				info.BankType,
 				string.IsNullOrEmpty(info.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(info.Detail),
 				info.Default));
+
+	public async ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var autoWithdrawSetting = await _tgsContext.BrandPaymentAutoWithdraws
+			.FindAsync(new object?[] { brandId }, cancellationToken)
+			.ConfigureAwait(false);
+
+		if (autoWithdrawSetting is null)
+			return null;
+
+		IEnumerable<Guid> brandPaymentIds;
+
+		var jsonNode = JsonNode.Parse(autoWithdrawSetting.BrandPaymentCandidates);
+
+		if (jsonNode is null)
+			brandPaymentIds = Array.Empty<Guid>();
+		else
+			brandPaymentIds = jsonNode!["brandPaymentIds"]?.AsArray().Select(x => x!.GetValue<Guid>()).AsEnumerable()
+				?? Array.Empty<Guid>();
+
+		return new AutoWithdrawInfo(
+				autoWithdrawSetting.EnableAutoWithdraw,
+				autoWithdrawSetting.AmountUpperLimit,
+				brandPaymentIds);
+	}
 
 	public async ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
@@ -1036,6 +1083,36 @@ internal class PaymentRepository : IPaymentRepository
 			info.Default = info.Id == bankInfoId;
 			info.UpdatedOn = updateTime;
 			info.UpdatedByUsername = modifyUser;
+		}
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
+		AutoWithdrawInfo snapshot,
+		Guid brandId,
+		Guid snapshotId,
+		DateTime updatedOn,
+		CancellationToken cancellationToken = default)
+	{
+		var dbSnapshot = await _tgsContext.BrandPaymentAutoWithdraws
+			.FindAsync(new object?[] { brandId }, cancellationToken: cancellationToken)
+			.ConfigureAwait(false)
+			?? (await _tgsContext.BrandPaymentAutoWithdraws.AddAsync(new BrandPaymentAutoWithdraw
+			{
+				BrandId = brandId,
+				AmountUpperLimit = snapshot.AmountUpperLimit,
+				BrandPaymentCandidates = JsonSerializer.Serialize(new { brandPaymentIds = snapshot.BrandPaymentIds }),
+				EnableAutoWithdraw = snapshot.EnableAutoWithdraw,
+				SnapshotEventId = snapshotId,
+			}, cancellationToken).ConfigureAwait(false)).Entity;
+
+		if (dbSnapshot.SnapshotEventId.CompareTo(snapshotId) == -1)
+		{
+			dbSnapshot.AmountUpperLimit = snapshot.AmountUpperLimit;
+			dbSnapshot.EnableAutoWithdraw = snapshot.EnableAutoWithdraw;
+			dbSnapshot.BrandPaymentCandidates = JsonSerializer.Serialize(new { brandPaymentIds = snapshot.BrandPaymentIds });
+			dbSnapshot.SnapshotEventId = snapshotId;
 		}
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

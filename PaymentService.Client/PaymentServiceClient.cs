@@ -432,6 +432,23 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			yield return payment;
 	}
 
+	public async ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/autowithdraw/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return string.IsNullOrWhiteSpace(contentJson)
+			? null
+			: JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
+	}
+
 	public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
 		string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
@@ -1133,6 +1150,36 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			{
 				Content = requestContent
 			}, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
+	public async ValueTask UpdateBrandAutoWithdrawAsync(
+		Guid brandId,
+		bool enableAutoWitdraw,
+		decimal amountUpperLimit,
+		IEnumerable<Guid> brandPaymentIds,
+		string modifyUserId,
+		CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			AmountUpperLimit = amountUpperLimit,
+			BrandPaymentIds = brandPaymentIds,
+			EnableAutoWitdraw = enableAutoWitdraw,
+			ModifyUserId = modifyUserId,
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		requestContent.Headers.Add("ModifyUserId", modifyUserId);
+
+		var response = await _httpClient
+			.PatchAsync($"/brand/payment/autowithdraw/{brandId}", requestContent, cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();
