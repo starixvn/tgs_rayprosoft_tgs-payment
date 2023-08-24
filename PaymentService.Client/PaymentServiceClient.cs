@@ -1153,6 +1153,28 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask UpdateBrandAutoWithdrawAsync(Guid brandId, bool enableAutoWitdraw, decimal amountUpperLimit, JsonDocument brandPaymentCandidates, string modifyUserId, CancellationToken cancellationToken = default)
+	{
+		var request = new
+		{
+			AmountUpperLimit = amountUpperLimit,
+			BrandPaymentCandidates = brandPaymentCandidates,
+			EnableAutoWitdraw = enableAutoWitdraw,
+			ModifyUserId = modifyUserId,
+		};
+
+		var requestContent = new StringContent(
+			JsonSerializer.Serialize(request, _SerializerOptions));
+
+		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+		var response = await _httpClient
+			.PatchAsync($"/brand/payment/autowithdraw/{brandId}", requestContent, cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+	}
+
 	public async ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default)
 	{
 		var request = new

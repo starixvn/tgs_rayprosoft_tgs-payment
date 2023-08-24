@@ -159,5 +159,13 @@ public interface IPaymentServiceClient
 		string playerCode,
 		CancellationToken cancellationToken = default);
 
+	ValueTask UpdateBrandAutoWithdrawAsync(
+		Guid brandId,
+		bool enableAutoWitdraw,
+		decimal amountUpperLimit,
+		JsonDocument brandPaymentCandidates,
+		string modifyUserId,
+		CancellationToken cancellationToken = default);
+
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
 }

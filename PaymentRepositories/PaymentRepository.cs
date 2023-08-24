@@ -119,8 +119,29 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
-	public async ValueTask CreateDepositFormEventAsync(
+	public async ValueTask CreateBrandAutoWithdrawEventAsync(
 		Guid eventId,
+		Guid brandId,
+		JsonDocument changeSets,
+		string modifier,
+		CancellationToken cancellationToken = default)
+	{
+		_ = await _tgsContext.BrandPaymentAutoWithdrawEventSources.AddAsync(
+			new BrandPaymentAutoWithdrawEventSource
+			{
+				Id = eventId,
+				BrandId = brandId,
+				ChangeSets = JsonSerializer.Serialize(changeSets),
+				ModifyUser = modifier,
+				CreatedOn = DateTime.UtcNow
+			},
+			cancellationToken).ConfigureAwait(false);
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask CreateDepositFormEventAsync(
+			Guid eventId,
 		Guid formId,
 		EventAction action,
 		JsonDocument changeSets,
@@ -1050,6 +1071,36 @@ internal class PaymentRepository : IPaymentRepository
 			info.Default = info.Id == bankInfoId;
 			info.UpdatedOn = updateTime;
 			info.UpdatedByUsername = modifyUser;
+		}
+
+		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
+		BrandAutoWithdrawSnapshot snapshot,
+		Guid brandId,
+		Guid snapshotId,
+		DateTime updatedOn,
+		CancellationToken cancellationToken = default)
+	{
+		var dbSnapshot = await _tgsContext.BrandPaymentAutoWithdraws
+			.FindAsync(new object?[] { brandId }, cancellationToken: cancellationToken)
+			.ConfigureAwait(false)
+			?? (await _tgsContext.BrandPaymentAutoWithdraws.AddAsync(new BrandPaymentAutoWithdraw
+			{
+				BrandId = brandId,
+				AmountUpperLimit = snapshot.AmountUpperLimit,
+				BrandPaymentCandidates = JsonSerializer.Serialize(snapshot.BrandPaymentCandidates),
+				EnableAutoWithdraw = snapshot.EnableAutoWithdraw,
+				SnapshotEventId = snapshotId,
+			}, cancellationToken).ConfigureAwait(false)).Entity;
+
+		if (dbSnapshot.SnapshotEventId.CompareTo(snapshotId) == -1)
+		{
+			dbSnapshot.AmountUpperLimit = snapshot.AmountUpperLimit;
+			dbSnapshot.EnableAutoWithdraw = snapshot.EnableAutoWithdraw;
+			dbSnapshot.BrandPaymentCandidates = JsonSerializer.Serialize(snapshot.BrandPaymentCandidates);
+			dbSnapshot.SnapshotEventId = snapshotId;
 		}
 
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -61,6 +61,7 @@ public class BrandPaymentTests
 
 		Assert.AreEqual(168m, actual.AmountUpperLimit);
 		Assert.AreEqual(true, actual.EnableAutoWithdraw);
+		Assert.AreEqual("{}", actual.BrandPaymentCandidates);
 	}
 
 	[Test]
@@ -191,6 +192,28 @@ public class BrandPaymentTests
 
 		Assert.AreEqual(2, actual.Length);
 		CollectionAssert.AreEquivalent(expected, actual);
+	}
+
+	[Test]
+	public async Task Update_Brand_Auto_Withdraw_By_Brand_Id()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		await sut.UpdateBrandAutoWithdrawAsync(
+			brandId,
+			true,
+			168M,
+			JsonDocument.Parse("{\"brandPaymentIds\": [\"018a2193-4282-0000-0001-07e7e07dc945\"]}"),
+			"186f897e-56d2-47e6-b349-08d920ec59b6");
 	}
 
 	[Test]

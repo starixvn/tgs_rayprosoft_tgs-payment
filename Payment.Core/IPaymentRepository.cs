@@ -20,6 +20,13 @@ public partial interface IPaymentRepository
 
 	ValueTask CreateBankInfoAsync(PlayerBankCreateInfo bankInfo, string modifyUser, CancellationToken cancellationToken = default);
 
+	ValueTask CreateBrandAutoWithdrawEventAsync(
+		Guid eventId,
+		Guid brandId,
+		JsonDocument changeSets,
+		string modifier,
+		CancellationToken cancellationToken = default);
+
 	ValueTask CreatePaymentAsync(PaymentCreateInfo createInfo, CancellationToken cancellationToken = default);
 
 	ValueTask CreatePaymentChannelAsync(string channelCode, CancellationToken cancellationToken = default);
@@ -106,6 +113,13 @@ public partial interface IPaymentRepository
 		string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
+		CancellationToken cancellationToken = default);
+
+	ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
+		BrandAutoWithdrawSnapshot snapshot,
+		Guid brandId,
+		Guid snapshotId,
+		DateTime updatedOn,
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
