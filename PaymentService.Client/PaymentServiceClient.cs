@@ -444,7 +444,9 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ReadAsStringAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		return JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
+		return string.IsNullOrWhiteSpace(contentJson)
+			? null
+			: JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
 	}
 
 	public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
@@ -1153,12 +1155,18 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
-	public async ValueTask UpdateBrandAutoWithdrawAsync(Guid brandId, bool enableAutoWitdraw, decimal amountUpperLimit, JsonDocument brandPaymentCandidates, string modifyUserId, CancellationToken cancellationToken = default)
+	public async ValueTask UpdateBrandAutoWithdrawAsync(
+		Guid brandId,
+		bool enableAutoWitdraw,
+		decimal amountUpperLimit,
+		IEnumerable<Guid> brandPaymentIds,
+		string modifyUserId,
+		CancellationToken cancellationToken = default)
 	{
 		var request = new
 		{
 			AmountUpperLimit = amountUpperLimit,
-			BrandPaymentCandidates = brandPaymentCandidates,
+			BrandPaymentIds = brandPaymentIds,
 			EnableAutoWitdraw = enableAutoWitdraw,
 			ModifyUserId = modifyUserId,
 		};

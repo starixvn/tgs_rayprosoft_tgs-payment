@@ -116,7 +116,7 @@ public partial interface IPaymentRepository
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
-		BrandAutoWithdrawSnapshot snapshot,
+		AutoWithdrawInfo snapshot,
 		Guid brandId,
 		Guid snapshotId,
 		DateTime updatedOn,

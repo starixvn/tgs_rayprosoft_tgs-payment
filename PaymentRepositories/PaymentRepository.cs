@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -405,12 +406,23 @@ internal class PaymentRepository : IPaymentRepository
 			.FindAsync(new object?[] { brandId }, cancellationToken)
 			.ConfigureAwait(false);
 
-		return autoWithdrawSetting is null
-			? null
-			: new AutoWithdrawInfo(
+		if (autoWithdrawSetting is null)
+			return null;
+
+		IEnumerable<Guid> brandPaymentIds;
+
+		var jsonNode = JsonNode.Parse(autoWithdrawSetting.BrandPaymentCandidates);
+
+		if (jsonNode is null)
+			brandPaymentIds = Array.Empty<Guid>();
+		else
+			brandPaymentIds = jsonNode!["brandPaymentIds"]?.AsArray().Select(x => x!.GetValue<Guid>()).AsEnumerable()
+				?? Array.Empty<Guid>();
+
+		return new AutoWithdrawInfo(
 				autoWithdrawSetting.EnableAutoWithdraw,
 				autoWithdrawSetting.AmountUpperLimit,
-				autoWithdrawSetting.BrandPaymentCandidates);
+				brandPaymentIds);
 	}
 
 	public async ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default)
@@ -1077,7 +1089,7 @@ internal class PaymentRepository : IPaymentRepository
 	}
 
 	public async ValueTask UpdateBrandAutoWithdrawSnapshotAsync(
-		BrandAutoWithdrawSnapshot snapshot,
+		AutoWithdrawInfo snapshot,
 		Guid brandId,
 		Guid snapshotId,
 		DateTime updatedOn,
@@ -1090,7 +1102,7 @@ internal class PaymentRepository : IPaymentRepository
 			{
 				BrandId = brandId,
 				AmountUpperLimit = snapshot.AmountUpperLimit,
-				BrandPaymentCandidates = JsonSerializer.Serialize(snapshot.BrandPaymentCandidates),
+				BrandPaymentCandidates = JsonSerializer.Serialize(new { brandPaymentIds = snapshot.BrandPaymentIds }),
 				EnableAutoWithdraw = snapshot.EnableAutoWithdraw,
 				SnapshotEventId = snapshotId,
 			}, cancellationToken).ConfigureAwait(false)).Entity;
@@ -1099,7 +1111,7 @@ internal class PaymentRepository : IPaymentRepository
 		{
 			dbSnapshot.AmountUpperLimit = snapshot.AmountUpperLimit;
 			dbSnapshot.EnableAutoWithdraw = snapshot.EnableAutoWithdraw;
-			dbSnapshot.BrandPaymentCandidates = JsonSerializer.Serialize(snapshot.BrandPaymentCandidates);
+			dbSnapshot.BrandPaymentCandidates = JsonSerializer.Serialize(new { brandPaymentIds = snapshot.BrandPaymentIds });
 			dbSnapshot.SnapshotEventId = snapshotId;
 		}
 

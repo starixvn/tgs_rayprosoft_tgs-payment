@@ -55,13 +55,32 @@ public class BrandPaymentTests
 			.GetBrandAutoWithdrawSettingAsync(
 				Arg.Is(brandId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, "{}"));
+			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, new Guid[] { Guid.NewGuid() }));
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
 		Assert.AreEqual(168m, actual.AmountUpperLimit);
 		Assert.AreEqual(true, actual.EnableAutoWithdraw);
-		Assert.AreEqual("{}", actual.BrandPaymentCandidates);
+		Assert.AreEqual(1, actual.BrandPaymentIds.Count());
+	}
+
+	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting2()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();		
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.IsNull(actual);
 	}
 
 	[Test]
@@ -212,7 +231,7 @@ public class BrandPaymentTests
 			brandId,
 			true,
 			168M,
-			JsonDocument.Parse("{\"brandPaymentIds\": [\"018a2193-4282-0000-0001-07e7e07dc945\"]}"),
+			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
 			"186f897e-56d2-47e6-b349-08d920ec59b6");
 	}
 

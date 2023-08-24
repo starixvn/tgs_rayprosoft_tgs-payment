@@ -52,9 +52,10 @@ public class PaymentRepositoryTests
 		var sut = new PaymentRepository(dbContext);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var brandPaymentIds = Guid.Parse("ef798189-a8c9-4d34-917c-694a2f8c5a0e");
 
 		await sut.UpdateBrandAutoWithdrawSnapshotAsync(
-			new Tgs.Payment.BrandAutoWithdrawSnapshot(true, 100M, JsonDocument.Parse("{}")),
+			new Tgs.Payment.AutoWithdrawInfo(true, 100M, new Guid[] { brandPaymentIds }),
 			brandId,
 			Guid.NewGuid(),
 			DateTime.UtcNow);
@@ -65,6 +66,7 @@ public class PaymentRepositoryTests
 		Assert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
 		Assert.True(brandAutoWithdrawInfo.EnableAutoWithdraw);
 		Assert.AreEqual(100M, brandAutoWithdrawInfo.AmountUpperLimit);
+		Assert.AreEqual("{\"brandPaymentIds\":[\"ef798189-a8c9-4d34-917c-694a2f8c5a0e\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
 	}
 
 	[Test]
@@ -266,7 +268,11 @@ public class PaymentRepositoryTests
 			EnableAutoWithdraw = true,
 			SnapshotEventId = Guid.Parse("018a218f-b4cb-0000-0001-07e7e07dc945"),
 			AmountUpperLimit = 100M,
-			BrandPaymentCandidates = "{}"
+			BrandPaymentCandidates = """
+				{
+					brandPaymentIds: []
+				}
+			"""
 		});
 
 		_ = await dbContext.SaveChangesAsync();
@@ -274,7 +280,7 @@ public class PaymentRepositoryTests
 		var sut = new PaymentRepository(dbContext);
 
 		await sut.UpdateBrandAutoWithdrawSnapshotAsync(
-			new Tgs.Payment.BrandAutoWithdrawSnapshot(false, 168M, JsonDocument.Parse(JsonSerializer.Serialize(new { BrandPaymentIds = new Guid[] { Guid.Parse("9a5afdb0-0502-49fe-b87f-0890c77be996") } }))),
+			new Tgs.Payment.AutoWithdrawInfo(false, 168M, new Guid[] { Guid.Parse("9a5afdb0-0502-49fe-b87f-0890c77be996") }),
 			brandId,
 			Guid.Parse("018a2190-10f1-0000-0001-07e7e07dc945"),
 			DateTime.UtcNow);
@@ -284,7 +290,7 @@ public class PaymentRepositoryTests
 		Assert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
 		Assert.False(brandAutoWithdrawInfo.EnableAutoWithdraw);
 		Assert.AreEqual(168M, brandAutoWithdrawInfo.AmountUpperLimit);
-		Assert.AreEqual("{\"BrandPaymentIds\":[\"9a5afdb0-0502-49fe-b87f-0890c77be996\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
+		Assert.AreEqual("{\"brandPaymentIds\":[\"9a5afdb0-0502-49fe-b87f-0890c77be996\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
 	}
 
 	[Test]
@@ -299,13 +305,18 @@ public class PaymentRepositoryTests
 		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
 
 		var brandId = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8");
+		var brandPaymentIds = Guid.Parse("2a4c7802-9448-4c80-97ac-c6ac2c8978b8");
 
 		_ = await dbContext.BrandPaymentAutoWithdraws.AddAsync(
 			new BrandPaymentAutoWithdraw
 			{
 				BrandId = brandId,
 				AmountUpperLimit = 168M,
-				BrandPaymentCandidates = "{}",
+				BrandPaymentCandidates = $$"""
+					{
+						"brandPaymentIds": ["{{brandPaymentIds}}"]
+					}
+					""",
 				EnableAutoWithdraw = true,
 				SnapshotEventId = Guid.NewGuid()
 			}
@@ -319,6 +330,28 @@ public class PaymentRepositoryTests
 
 		Assert.True(actual.EnableAutoWithdraw);
 		Assert.AreEqual(168M, actual.AmountUpperLimit);
+		Assert.AreEqual(1, actual.BrandPaymentIds.Count());
+		Assert.AreEqual(brandPaymentIds, actual.BrandPaymentIds.First());
+	}
+
+	[Test]
+	public async Task Get_Brand_Auto_Withdraw_Setting2()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandId = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8");
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
+
+		Assert.IsNull(actual);
 	}
 
 	[Test]

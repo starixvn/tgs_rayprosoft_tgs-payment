@@ -35,7 +35,7 @@ public class BrandPaymentController : ControllerBase
 			? new BrandAutoWithdrawViewModel
 			{
 				AmountUpperLimit = brandAutoWithdraw.AmountUpperLimit,
-				BrandPaymentCandidates = brandAutoWithdraw.BrandPaymentCandidates,
+				BrandPaymentIds = brandAutoWithdraw.BrandPaymentIds,
 				EnableAutoWithdraw = brandAutoWithdraw.EnableAutoWithdraw
 			}
 			: null;
@@ -205,7 +205,7 @@ public class BrandPaymentController : ControllerBase
 			brandId,
 			request.EnableAutoWitdraw,
 			request.AmountUpperLimit,
-			request.BrandPaymentCandidates,
+			request.BrandPaymentIds,
 			request.ModifyUserId);
 
 		await commandService

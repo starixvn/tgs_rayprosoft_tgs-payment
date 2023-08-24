@@ -34,31 +34,31 @@ internal class UpdateBrandAutoWithdrawCommandService : ICommandService<UpdateBra
 			.ConfigureAwait(false);
 
 		var changeSets = default(JsonPatch);
-		var snapshot = default(BrandAutoWithdrawSnapshot);
+		var snapshot = default(AutoWithdrawInfo);
 
 		if (brandAutoInfo is null)
 		{
-			snapshot = new BrandAutoWithdrawSnapshot(
+			snapshot = new AutoWithdrawInfo(
 				command.EnableAutoWithdraw,
 				command.AmountUpperLimit,
-				command.BrandPaymentCandidates);
+				command.BrandPaymentIds);
 
 			changeSets = new JsonPatch(PatchOperation.Add(
-			JsonPointer.Create<BrandAutoWithdrawSnapshot>(o => o),
+			JsonPointer.Create<AutoWithdrawInfo>(o => o),
 			JsonSerializer.SerializeToNode(snapshot, PaymentUtility.SerializerOptions)));
 		}
 		else
 		{
-			var oldData = new BrandAutoWithdrawSnapshot(
+			var oldData = new AutoWithdrawInfo(
 				brandAutoInfo.EnableAutoWithdraw,
 				brandAutoInfo.AmountUpperLimit,
-				JsonDocument.Parse(brandAutoInfo.BrandPaymentCandidates));
+				brandAutoInfo.BrandPaymentIds);
 
 			snapshot = oldData with
 			{
 				EnableAutoWithdraw = command.EnableAutoWithdraw,
 				AmountUpperLimit = command.AmountUpperLimit,
-				BrandPaymentCandidates = command.BrandPaymentCandidates,
+				BrandPaymentIds = command.BrandPaymentIds,
 			};
 
 			changeSets = brandAutoInfo.CreatePatch(snapshot, PaymentUtility.SerializerOptions);

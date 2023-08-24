@@ -19,7 +19,12 @@ public class BrandPaymentTests
 		var brandId = Guid.NewGuid();
 		var eventId = Guid.NewGuid();
 
-		var command = new UpdateBrandAutoWithdrawCommand(brandId, true, 168M, JsonDocument.Parse("{}"), "userId");
+		var command = new UpdateBrandAutoWithdrawCommand(
+			brandId,
+			true,
+			168M,
+			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
+			"userId");
 
 		var sut = new UpdateBrandAutoWithdrawCommandService(fakePaymentRepository, fakeSystemClock, fakeSerialNumberGenerator);
 
@@ -40,7 +45,7 @@ public class BrandPaymentTests
 		_ = fakePaymentRepository
 			.Received(1)
 			.UpdateBrandAutoWithdrawSnapshotAsync(
-				Arg.Any<BrandAutoWithdrawSnapshot>(),
+				Arg.Any<AutoWithdrawInfo>(),
 				Arg.Is(brandId),
 				Arg.Is(eventId),
 				Arg.Any<DateTime>());
@@ -236,7 +241,12 @@ public class BrandPaymentTests
 		var brandId = Guid.NewGuid();
 		var eventId = Guid.NewGuid();
 
-		var command = new UpdateBrandAutoWithdrawCommand(brandId, true, 1680M, JsonDocument.Parse("{\"BrandPaymentIds:\":[\"95e7c419-127e-46fd-a322-a29ddaac6276\"]}"), "userId");
+		var command = new UpdateBrandAutoWithdrawCommand(
+			brandId,
+			true,
+			1680M,
+			new Guid[] { Guid.Parse("95e7c419-127e-46fd-a322-a29ddaac6276") },
+			"userId");
 
 		var sut = new UpdateBrandAutoWithdrawCommandService(fakePaymentRepository, fakeSystemClock, fakeSerialNumberGenerator);
 
@@ -246,7 +256,7 @@ public class BrandPaymentTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 168M, "{}"));
+			.Returns(new AutoWithdrawInfo(true, 168M, Array.Empty<Guid>()));
 
 		await sut.ExecuteAsync(command);
 
@@ -261,7 +271,7 @@ public class BrandPaymentTests
 		_ = fakePaymentRepository
 			.Received(1)
 			.UpdateBrandAutoWithdrawSnapshotAsync(
-				Arg.Any<BrandAutoWithdrawSnapshot>(),
+				Arg.Any<AutoWithdrawInfo>(),
 				Arg.Is(brandId),
 				Arg.Is(eventId),
 				Arg.Any<DateTime>());
