@@ -58,7 +58,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services
 	.AddPaymentClient()
-	.AddPayment()	
+	.AddPayment()
 	.UseRedis((options, sp) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
@@ -135,7 +135,11 @@ builder.Services
 		.AddReplyHandler(
 			Tgs.Payment.MessageQueue.ProcessorTypes.RebuildPlayerBankInfoTagHandlerType,
 			"tgs.player.bankinfo.rebuild",
-			"tgs.player.bankinfo.rebuild"))
+			"tgs.player.bankinfo.rebuild")
+		.AddHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.ApproveWithdrawHandlerType,
+			"tgs.payment.withdraw.created",
+			"tgs.payment.withdraw.created"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();
