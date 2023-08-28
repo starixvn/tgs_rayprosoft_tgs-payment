@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
@@ -32,17 +34,14 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (withdrawForm.UserType is not UserType.Player)
 			return;
 
-		var playerBankInfo = await _repository
-			.GetBankInfosByPlayerCodeAsync(withdrawForm.UserId!, cancellationToken)
-			.FirstOrDefaultAsync(b => b.Id == withdrawForm.BankInfoId, cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
+		var withdrawBankInfo = JsonSerializer.Deserialize<WithdrawBankInfo<object>>(withdrawForm.BankInfo!, PaymentUtility.SerializerOptions);
 
-		if (playerBankInfo is null)
+		if (withdrawBankInfo is null)
 			return;
 
 		var couldChooseBrandPayments = await _repository
 			.GetBrandPaymentsAsync(command.BrandId, cancellationToken)
-			.Where(bp => bp.ChannelId == playerBankInfo.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
+			.Where(bp => bp.ChannelId == withdrawBankInfo.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 

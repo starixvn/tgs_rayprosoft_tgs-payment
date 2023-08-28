@@ -1299,6 +1299,7 @@ public class WithdrawTests
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 		var playerCode = "4uel5ke0uf3k";
 		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1319,32 +1320,24 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			0m);
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
 
 		_ = fakePaymentRepository
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
 
-		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 		var brandPaymentId = Guid.Parse("07e50f08-e0ca-4679-b043-7cc6c48f9826");
-
-		var playerBankInfo = new PlayerBankInfo(
-			playerBankInfoId,
-			playerCode,
-			brandId,
-			PaymentChannelId: paymentChannelId,
-			"ThirdParty",
-			JsonDocument.Parse("""
-				{
-					"phone": "09889988998899",
-					"username": "真真真"
-				}
-				"""),
-			false);
-
-		_ = fakePaymentRepository
-			.GetBankInfosByPlayerCodeAsync(playerCode)
-			.Returns(new PlayerBankInfo[] { playerBankInfo }.ToAsyncEnumerable());
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
@@ -1393,6 +1386,7 @@ public class WithdrawTests
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 		var playerCode = "4uel5ke0uf3k";
 		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1413,29 +1407,22 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			0m);
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
 
 		_ = fakePaymentRepository
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
-
-		var playerBankInfo = new PlayerBankInfo(
-			playerBankInfoId,
-			playerCode,
-			brandId,
-			Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640"),
-			"ThirdParty",
-			JsonDocument.Parse("""
-				{
-					"phone": "09889988998899",
-					"username": "真真真"
-				}
-				"""),
-			false);
-
-		_ = fakePaymentRepository
-			.GetBankInfosByPlayerCodeAsync(playerCode)
-			.Returns(new PlayerBankInfo[] { playerBankInfo }.ToAsyncEnumerable());
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
@@ -1460,6 +1447,7 @@ public class WithdrawTests
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 		var playerCode = "4uel5ke0uf3k";
 		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1480,29 +1468,22 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			0m);
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
 
 		_ = fakePaymentRepository
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
-
-		var playerBankInfo = new PlayerBankInfo(
-			playerBankInfoId,
-			playerCode,
-			brandId,
-			Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640"),
-			"ThirdParty",
-			JsonDocument.Parse("""
-				{
-					"phone": "09889988998899",
-					"username": "真真真"
-				}
-				"""),
-			false);
-
-		_ = fakePaymentRepository
-			.GetBankInfosByPlayerCodeAsync(playerCode)
-			.Returns(new PlayerBankInfo[] { playerBankInfo }.ToAsyncEnumerable());
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
@@ -1527,6 +1508,7 @@ public class WithdrawTests
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 		var playerCode = "4uel5ke0uf3k";
 		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1547,79 +1529,28 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			0m);
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
 
 		_ = fakePaymentRepository
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
-
-		var playerBankInfo = new PlayerBankInfo(
-			playerBankInfoId,
-			playerCode,
-			brandId,
-			Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640"),
-			"ThirdParty",
-			JsonDocument.Parse("""
-				{
-					"phone": "09889988998899",
-					"username": "真真真"
-				}
-				"""),
-			false);
-
-		_ = fakePaymentRepository
-			.GetBankInfosByPlayerCodeAsync(playerCode)
-			.Returns(new PlayerBankInfo[] { playerBankInfo }.ToAsyncEnumerable());
 
 		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
 
 		_ = fakeSignOffWithdrawService
 			.Received(0)
 			.ExecuteAsync(Arg.Any<SignOffWithdrawFormCommand>());
-	}
-
-	[Test]
-	public async Task 提款自動出款_找不到玩家銀行卡()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
-
-		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
-		var playerCode = "4uel5ke0uf3k";
-
-		var playerWithdrawForm = new WithdrawFormInfo(
-			formId,
-			UserId: playerCode,
-			UserType.Player,
-			"playerUsername",
-			brandId,
-			168m,
-			null,
-			PaymentFlowState.WaitApprove,
-			null,
-			null,
-			null,
-			"GPIW230828000001",
-			Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e"),
-			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
-			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
-			null,
-			null,
-			null,
-			0m);
-
-		_ = fakePaymentRepository
-			.GetWithdrawFormByIdAsync(formId)
-			.Returns(playerWithdrawForm);
-
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
-
-		_ = fakePaymentRepository
-			.Received(0)
-			.GetBrandPaymentsAsync(Arg.Is(brandId));
 	}
 
 	[Test]
@@ -1634,6 +1565,7 @@ public class WithdrawTests
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 		var playerCode = "4uel5ke0uf3k";
 		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1654,29 +1586,22 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			0m);
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
 
 		_ = fakePaymentRepository
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
-
-		var playerBankInfo = new PlayerBankInfo(
-			playerBankInfoId,
-			playerCode,
-			brandId,
-			Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640"),
-			"ThirdParty",
-			JsonDocument.Parse("""
-				{
-					"phone": "09889988998899",
-					"username": "真真真"
-				}
-				"""),
-			false);
-
-		_ = fakePaymentRepository
-			.GetBankInfosByPlayerCodeAsync(playerCode)
-			.Returns(new PlayerBankInfo[] { playerBankInfo }.ToAsyncEnumerable());
 
 		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
 
