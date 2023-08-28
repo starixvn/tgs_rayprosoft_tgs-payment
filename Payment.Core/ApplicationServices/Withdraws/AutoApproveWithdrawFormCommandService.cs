@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
@@ -24,6 +23,16 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 	public async ValueTask ExecuteAsync(AutoApproveWithdtawFormCommand command, CancellationToken cancellationToken = default)
 	{
+		var autoWithdrawSetting = await _repository
+			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)
+			.ConfigureAwait(false);
+
+		if (autoWithdrawSetting is null)
+			return;
+
+		if (autoWithdrawSetting.EnableAutoWithdraw is false || autoWithdrawSetting.BrandPaymentIds.Any() is false)
+			return;
+
 		var withdrawForm = await _repository
 			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
@@ -34,31 +43,18 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (withdrawForm.UserType is not UserType.Player)
 			return;
 
-		var withdrawBankInfo = JsonSerializer.Deserialize<WithdrawBankInfo<object>>(withdrawForm.BankInfo!, PaymentUtility.SerializerOptions);
-
-		if (withdrawBankInfo is null)
+		if (withdrawForm.Amount > autoWithdrawSetting.AmountUpperLimit)
 			return;
+
+		var withdrawBankInfo = JsonSerializer.Deserialize<WithdrawBankInfo<object>>(withdrawForm.BankInfo!, PaymentUtility.SerializerOptions);
 
 		var couldChooseBrandPayments = await _repository
 			.GetBrandPaymentsAsync(command.BrandId, cancellationToken)
-			.Where(bp => bp.ChannelId == withdrawBankInfo.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
+			.Where(bp => bp.ChannelId == withdrawBankInfo!.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
 		if (couldChooseBrandPayments == null || couldChooseBrandPayments.Any() == false)
-			return;
-
-		var autoWithdrawSetting = await _repository
-			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)
-			.ConfigureAwait(false);
-
-		if (autoWithdrawSetting is null)
-			return;
-
-		if (!autoWithdrawSetting.EnableAutoWithdraw)
-			return;
-
-		if (withdrawForm.Amount > autoWithdrawSetting.AmountUpperLimit)
 			return;
 
 		var brandPaymentCandidates = autoWithdrawSetting.BrandPaymentIds.Join(
@@ -67,7 +63,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			couldChoose => couldChoose.Id,
 			(setting, couldChoose) => setting);
 
-		var random = _Random.Next(0, brandPaymentCandidates.Count() - 1);
+		var random = _Random.Next(0, brandPaymentCandidates.Count());
 
 		var brandPaymentId = brandPaymentCandidates.ElementAt(random);
 
