@@ -29,11 +29,11 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (withdrawForm is null)
 			return;
 
-		if (withdrawForm.UserType is not UserType.Player || withdrawForm.UserId is null)
+		if (withdrawForm.UserType is not UserType.Player)
 			return;
 
 		var playerBankInfo = await _repository
-			.GetBankInfosByPlayerCodeAsync(withdrawForm.UserId, cancellationToken)
+			.GetBankInfosByPlayerCodeAsync(withdrawForm.UserId!, cancellationToken)
 			.FirstOrDefaultAsync(b => b.Id == withdrawForm.BankInfoId, cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
