@@ -30,7 +30,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (autoWithdrawSetting is null)
 			return;
 
-		if (autoWithdrawSetting.EnableAutoWithdraw is false || autoWithdrawSetting.BrandPaymentIds.Any() is false)
+		if (autoWithdrawSetting.EnableAutoWithdraw is false || autoWithdrawSetting.BrandPaymentIds.Count() is 0)
 			return;
 
 		var withdrawForm = await _repository
