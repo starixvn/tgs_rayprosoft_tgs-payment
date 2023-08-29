@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
@@ -11,14 +12,17 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 {
 	private static readonly Random _Random = new();
 	private readonly ICommandService<SignOffWithdrawFormCommand> _commandService;
+	private readonly ILogger<AutoApproveWithdrawFormCommandService> _logger;
 	private readonly IPaymentRepository _repository;
 
 	public AutoApproveWithdrawFormCommandService(
 		IPaymentRepository repository,
-		ICommandService<SignOffWithdrawFormCommand> commandService)
+		ICommandService<SignOffWithdrawFormCommand> commandService,
+		ILogger<AutoApproveWithdrawFormCommandService> logger)
 	{
 		_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(AutoApproveWithdtawFormCommand command, CancellationToken cancellationToken = default)
@@ -58,7 +62,10 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		var brandPaymentCandidates = couldChooseBrandPayments.Intersect(autoWithdrawSetting.BrandPaymentIds);
 
 		if (brandPaymentCandidates.Count() is 0)
+		{
+			_logger.LogWarning("System auto approve brand payment candidates Count is 0.");
 			return;
+		}
 
 		var random = _Random.Next(0, brandPaymentCandidates.Count());
 
