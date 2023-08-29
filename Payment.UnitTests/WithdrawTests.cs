@@ -1245,7 +1245,7 @@ public class WithdrawTests
 	}
 
 	[Test]
-	public async Task 提款自動出款_代理提款單不處理()
+	public async Task 提款自動出款_只處理玩家提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
@@ -1381,6 +1381,28 @@ public class WithdrawTests
 	}
 
 	[Test]
+	public async Task 提款自動出款_自動出款設定_未開啟自動出款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
+
+		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(brandId)
+			.Returns(new AutoWithdrawInfo(false, 10m, Array.Empty<Guid>()));
+
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+
+		_ = fakePaymentRepository
+			.Received(0)
+			.GetWithdrawFormByIdAsync(formId);
+	}
+
+	[Test]
 	public async Task 提款自動出款_自動出款設定_金流通道未設定()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -1403,7 +1425,25 @@ public class WithdrawTests
 	}
 
 	[Test]
-	public async Task 提款自動出款_自動出款設定_提款金額需小於等於設定金額()
+	public async Task 提款自動出款_找不到自動出款設定檔()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
+
+		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
+
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+
+		_ = fakePaymentRepository
+			.Received(0)
+			.GetWithdrawFormByIdAsync(formId);
+	}
+
+	[Test]
+	public async Task 提款自動出款_可選金流與設定金流交集為0()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
@@ -1418,7 +1458,114 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 100m, Array.Empty<Guid>()));
+			.Returns(new AutoWithdrawInfo(true, 200m, new Guid[] { Guid.Parse("07e50f08-e0ca-4679-b043-7cc6c48f9826") }));
+
+		var playerWithdrawForm = new WithdrawFormInfo(
+			formId,
+			UserId: playerCode,
+			UserType.Player,
+			"playerUsername",
+			brandId,
+			168m,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIW230828000001",
+			BankInfoId: playerBankInfoId,
+			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
+			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
+			null,
+			null,
+			null,
+			0m,
+			BankInfo: $$"""
+			{
+				"id": "{{playerBankInfoId}}",
+				"detail": {
+					"phone": "09889988998899",
+					"username": "真真真"
+				},
+				"bankType": "ThirdParty",
+				"paymentChannelId": "{{paymentChannelId}}"
+			}
+			""");
+
+		_ = fakePaymentRepository
+			.GetWithdrawFormByIdAsync(formId)
+			.Returns(playerWithdrawForm);
+
+		var brandPayment = new BrandPaymentInfo(
+			Guid.Parse("f33fabaf-870d-4bc6-bec2-5184265fe043"),
+			PaymentMethodChannelId: Guid.Parse("0a2bb387-7985-4000-953c-5529d1062f98"),
+			PaymentId: Guid.Parse("de0833b8-7ac7-4ef1-9742-5487469ef90f"),
+			MethodId: Guid.Parse("5501b945-9043-46b7-87b5-48330f002d0d"),
+			ChannelId: paymentChannelId,
+			ChannelName: "AlfaPay_ThirdParty_GCash直連",
+			"GCash",
+			"{}",
+			new ValueRange<decimal> { From = 100m, To = 10000m },
+			true,
+			false,
+			false,
+			new ValueRange<decimal> { From = 0, To = 0 },
+			ConditionMatchType.MatchAll,
+			TransferType.Withdraw,
+			Enabled: true,
+			DisplayOrder: 0,
+			brandId);
+
+		_ = fakePaymentRepository
+			.GetBrandPaymentsAsync(brandId)
+			.Returns(new BrandPaymentInfo[] { brandPayment }.ToAsyncEnumerable());
+
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+
+		_ = fakeSignOffWithdrawService
+			.Received(0)
+			.ExecuteAsync(Arg.Any<SignOffWithdrawFormCommand>());
+	}
+
+	[Test]
+	public async Task 提款自動出款_找不到提款單()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
+
+		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(brandId)
+			.Returns(new AutoWithdrawInfo(true, 100m, new Guid[] { Guid.NewGuid() }));
+
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+
+		_ = fakePaymentRepository
+			.Received(0)
+			.GetBrandPaymentsAsync(Arg.Any<Guid>());
+	}
+
+	[Test]
+	public async Task 提款自動出款_提款金額需小於等於設定金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
+
+		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
+		var playerCode = "4uel5ke0uf3k";
+		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
+		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
+
+		_ = fakePaymentRepository
+			.GetBrandAutoWithdrawSettingAsync(brandId)
+			.Returns(new AutoWithdrawInfo(true, 100m, new Guid[] { Guid.NewGuid() }));
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1461,125 +1608,6 @@ public class WithdrawTests
 		_ = fakePaymentRepository
 			.Received(0)
 			.GetBrandPaymentsAsync(brandId);
-	}
-
-	[Test]
-	public async Task 提款自動出款_自動出款設定未開啟自動出款()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
-
-		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
-
-		_ = fakePaymentRepository
-			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(false, 10m, Array.Empty<Guid>()));
-
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
-
-		_ = fakePaymentRepository
-			.Received(0)
-			.GetWithdrawFormByIdAsync(formId);
-	}
-
-	[Test]
-	public async Task 提款自動出款_找不到自動出款設定檔()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
-
-		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
-
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
-
-		_ = fakePaymentRepository
-			.Received(0)
-			.GetWithdrawFormByIdAsync(formId);
-	}
-
-	[Test]
-	public async Task 提款自動出款_找不到能選擇的金流通道()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
-
-		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
-		var playerCode = "4uel5ke0uf3k";
-		var playerBankInfoId = Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e");
-		var paymentChannelId = Guid.Parse("9e0b2d0d-6e4e-4a31-b482-946d33565640");
-
-		_ = fakePaymentRepository
-			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 10m, new Guid[] { Guid.NewGuid() }));
-
-		var playerWithdrawForm = new WithdrawFormInfo(
-			formId,
-			UserId: playerCode,
-			UserType.Player,
-			"playerUsername",
-			brandId,
-			168m,
-			null,
-			PaymentFlowState.WaitApprove,
-			null,
-			null,
-			null,
-			"GPIW230828000001",
-			BankInfoId: playerBankInfoId,
-			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
-			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
-			null,
-			null,
-			null,
-			0m,
-			BankInfo: $$"""
-			{
-				"id": "{{playerBankInfoId}}",
-				"detail": {
-					"phone": "09889988998899",
-					"username": "真真真"
-				},
-				"bankType": "ThirdParty",
-				"paymentChannelId": "{{paymentChannelId}}"
-			}
-			""");
-
-		_ = fakePaymentRepository
-			.GetWithdrawFormByIdAsync(formId)
-			.Returns(playerWithdrawForm);
-
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
-
-		_ = fakeSignOffWithdrawService
-			.Received(0)
-			.ExecuteAsync(Arg.Any<SignOffWithdrawFormCommand>());
-	}
-
-	[Test]
-	public async Task 提款自動出款_找不到提款單()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeSignOffWithdrawService = Substitute.For<ICommandService<SignOffWithdrawFormCommand>>();
-
-		var sut = new AutoApproveWithdrawFormCommandService(fakePaymentRepository, fakeSignOffWithdrawService);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
-
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
-
-		_ = fakePaymentRepository
-			.Received(0)
-			.GetBrandPaymentsAsync(Arg.Any<Guid>());
-	}
+	}	
 }
 ;

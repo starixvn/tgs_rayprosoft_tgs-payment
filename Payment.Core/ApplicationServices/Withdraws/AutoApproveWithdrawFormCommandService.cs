@@ -51,17 +51,14 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		var couldChooseBrandPayments = await _repository
 			.GetBrandPaymentsAsync(command.BrandId, cancellationToken)
 			.Where(bp => bp.ChannelId == withdrawBankInfo!.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
+			.Select(x => x.Id)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		if (couldChooseBrandPayments == null || couldChooseBrandPayments.Any() == false)
-			return;
+		var brandPaymentCandidates = couldChooseBrandPayments.Intersect(autoWithdrawSetting.BrandPaymentIds);
 
-		var brandPaymentCandidates = autoWithdrawSetting.BrandPaymentIds.Join(
-			couldChooseBrandPayments,
-			settingBrandPayment => settingBrandPayment,
-			couldChoose => couldChoose.Id,
-			(setting, couldChoose) => setting);
+		if (brandPaymentCandidates.Count() is 0)
+			return;
 
 		var random = _Random.Next(0, brandPaymentCandidates.Count());
 
