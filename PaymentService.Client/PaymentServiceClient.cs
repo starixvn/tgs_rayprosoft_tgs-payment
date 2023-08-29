@@ -1157,7 +1157,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 
 	public async ValueTask UpdateBrandAutoWithdrawAsync(
 		Guid brandId,
-		bool enableAutoWitdraw,
+		bool enableAutoWithdraw,
 		decimal amountUpperLimit,
 		IEnumerable<Guid> brandPaymentIds,
 		string modifyUserId,
@@ -1167,7 +1167,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		{
 			AmountUpperLimit = amountUpperLimit,
 			BrandPaymentIds = brandPaymentIds,
-			EnableAutoWitdraw = enableAutoWitdraw,
+			EnableAutoWithdraw = enableAutoWithdraw,
 			ModifyUserId = modifyUserId,
 		};
 

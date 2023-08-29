@@ -161,7 +161,7 @@ public interface IPaymentServiceClient
 
 	ValueTask UpdateBrandAutoWithdrawAsync(
 		Guid brandId,
-		bool enableAutoWitdraw,
+		bool enableAutoWithdraw,
 		decimal amountUpperLimit,
 		IEnumerable<Guid> brandPaymentIds,
 		string modifyUserId,

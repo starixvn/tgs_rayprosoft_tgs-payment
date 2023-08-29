@@ -76,7 +76,7 @@ public class BrandPaymentTests
 
 		var sut = new PaymentServiceClient(httpClient);
 
-		var brandId = Guid.NewGuid();		
+		var brandId = Guid.NewGuid();
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
@@ -214,7 +214,7 @@ public class BrandPaymentTests
 	}
 
 	[Test]
-	public async Task Update_Brand_Auto_Withdraw_By_Brand_Id()
+	public async Task UpdateSert_Brand_Auto_Withdraw_By_Brand_Id()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
@@ -233,6 +233,24 @@ public class BrandPaymentTests
 			168M,
 			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
 			"186f897e-56d2-47e6-b349-08d920ec59b6");
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.CreateBrandAutoWithdrawEventAsync(
+			Arg.Any<Guid>(),
+			Arg.Any<Guid>(),
+			Arg.Any<JsonDocument>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>());
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.UpdateBrandAutoWithdrawSnapshotAsync(
+				Arg.Any<Tgs.Payment.AutoWithdrawInfo>(),
+				Arg.Any<Guid>(),
+				Arg.Any<Guid>(),
+				Arg.Any<DateTime>(),
+				Arg.Any<CancellationToken>());
 	}
 
 	[Test]
