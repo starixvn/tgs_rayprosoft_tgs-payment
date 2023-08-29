@@ -278,11 +278,11 @@ public class BrandPaymentTests
 		_ = fakePaymentRepository
 			.Received(1)
 			.CreateBrandAutoWithdrawEventAsync(
-			Arg.Any<Guid>(),
-			Arg.Any<Guid>(),
-			Arg.Any<JsonDocument>(),
-			Arg.Any<string>(),
-			Arg.Any<CancellationToken>());
+				Arg.Any<Guid>(),
+				Arg.Any<Guid>(),
+				Arg.Any<JsonDocument>(),
+				Arg.Any<string>(),
+				Arg.Any<CancellationToken>());
 
 		_ = fakePaymentRepository
 			.Received(1)
