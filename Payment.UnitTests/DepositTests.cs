@@ -1,9 +1,6 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Json.Patch;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
@@ -811,6 +808,42 @@ public class DepositTests
 	}
 
 	[Test]
+	public void PaymentReturn變更記錄應該要記錄正確內容()
+	{
+		var depositForm = new DepositFormSnapshot(
+			Guid.NewGuid(),
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+
+		var sut = depositForm with
+		{
+			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
+		};
+
+		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+
+		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+
+		Assert.AreEqual(sut, actual);
+	}
+
+	[Test]
 	public async Task Submit_DepositForm_With_New_Status_Will_Emit_StatusChangedEvent()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -926,38 +959,93 @@ public class DepositTests
 	}
 
 	[Test]
-	public void PaymentReturn變更記錄應該要記錄正確內容()
+	public async Task 存款成功率()
 	{
-		var depositForm = new DepositFormSnapshot(
-			Guid.NewGuid(),
-			"PlayerCode",
-			Guid.NewGuid(),
-			Guid.NewGuid(),
-			1000M,
-			null,
-			null,
-			PaymentFlowState.WaitApprove,
-			null,
-			null,
-			null,
-			"GPIT211028150001",
-			null,
-			null,
-			null,
-			null,
-			null,
-			DateTime.UtcNow,
-			0M);
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = depositForm with
+		var sut = new SuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		var despositForms = new DepositFormInfo[]
 		{
-			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
+			new DepositFormInfo(
+				Guid.NewGuid(),
+				"playerCode",
+				"userName",
+				brandId,
+				Guid.NewGuid(),
+				"channelName",
+				Guid.NewGuid(),
+				100m,
+				null,
+				null,
+				PaymentFlowState.Approved,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				0),
+			new DepositFormInfo(
+				Guid.NewGuid(),
+				"playerCode",
+				"userName",
+				brandId,
+				Guid.NewGuid(),
+				"channelName",
+				Guid.NewGuid(),
+				100m,
+				null,
+				null,
+				PaymentFlowState.Approved,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				0),
+			new DepositFormInfo(
+				Guid.NewGuid(),
+				"playerCode",
+				"userName",
+				brandId,
+				Guid.NewGuid(),
+				"channelName",
+				Guid.NewGuid(),
+				100m,
+				null,
+				null,
+				PaymentFlowState.WaitApprove,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
+				0)
 		};
 
-		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+		_ = fakePaymentRepository
+			.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>(), Arg.Any<Paging<DepositFormInfo>>())
+			.Returns(despositForms.ToAsyncEnumerable());
 
-		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
 
-		Assert.AreEqual(sut, actual);
+		Assert.AreEqual(67, actual);
 	}
 }
