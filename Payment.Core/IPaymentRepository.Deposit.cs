@@ -23,6 +23,8 @@ public partial interface IPaymentRepository
 
 	ValueTask<DepositFormSnapshot?> GetCurrentDepositFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default);
 
+	ValueTask<DepositFormsStatusCount> CountCurrentDayDepositFormStatusAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(

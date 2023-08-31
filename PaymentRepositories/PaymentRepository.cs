@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Tgs.Paging;
 using Tgs.Payment;
@@ -679,6 +680,30 @@ internal class PaymentRepository : IPaymentRepository
 			form.PaidUserId,
 			form.PaidUserName,
 			form.PaidOn);
+	}
+
+	public async ValueTask<DepositFormsStatusCount> CountCurrentDayDepositFormStatusAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var currentDay = DateTime.Now;
+
+		var conn = _tgsContext.Database.GetDbConnection();
+
+		var result = await conn.QueryFirstAsync<DepositFormsStatusCount>($$"""
+			SELECT count(1) as Total,
+				   count(1) filter(where status=8000) as Approved
+			FROM dbo.deposit_forms
+			WHERE
+				brand_id = @brandId
+				AND
+				created_on >= @currentDay ::timestamp
+			""",
+			new Dictionary<string, object>
+			{
+			  {"brandId", brandId} ,
+			  {"currentDay", $"{currentDay:yyyy-MM-dd}+8"}
+			});
+
+		return result;
 	}
 
 	public async ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default)

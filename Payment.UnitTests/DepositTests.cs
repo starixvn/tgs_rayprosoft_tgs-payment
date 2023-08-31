@@ -959,7 +959,7 @@ public class DepositTests
 	}
 
 	[Test]
-	public async Task 存款成功率()
+	public async Task 存款成功率全部單為0時()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
@@ -967,85 +967,48 @@ public class DepositTests
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 
-		var despositForms = new DepositFormInfo[]
-		{
-			new DepositFormInfo(
-				Guid.NewGuid(),
-				"playerCode",
-				"userName",
-				brandId,
-				Guid.NewGuid(),
-				"channelName",
-				Guid.NewGuid(),
-				100m,
-				null,
-				null,
-				PaymentFlowState.Approved,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				0),
-			new DepositFormInfo(
-				Guid.NewGuid(),
-				"playerCode",
-				"userName",
-				brandId,
-				Guid.NewGuid(),
-				"channelName",
-				Guid.NewGuid(),
-				100m,
-				null,
-				null,
-				PaymentFlowState.Approved,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				0),
-			new DepositFormInfo(
-				Guid.NewGuid(),
-				"playerCode",
-				"userName",
-				brandId,
-				Guid.NewGuid(),
-				"channelName",
-				Guid.NewGuid(),
-				100m,
-				null,
-				null,
-				PaymentFlowState.WaitApprove,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				new DateTimeOffset(2023,8,30,12,0,0,0,TimeSpan.FromHours(8d)),
-				0)
-		};
-
 		_ = fakePaymentRepository
-			.QueryDepositFormsAsync(Arg.Any<DepositFormQueryConditions>(), Arg.Any<Paging<DepositFormInfo>>())
-			.Returns(despositForms.ToAsyncEnumerable());
+			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 0, Total = 0 });
 
 		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
 
-		Assert.AreEqual(67, actual);
+		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public async Task 存款成功率整數四捨五入()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new SuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 2, Total = 3 });
+
+		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
+
+		Assert.AreEqual(67m, actual);
+	}
+
+	[Test]
+	public async Task 存款成功率整數四捨五入2()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new SuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 1, Total = 3 });
+
+		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
+
+		Assert.AreEqual(33m, actual);
 	}
 }

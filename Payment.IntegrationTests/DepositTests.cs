@@ -24,10 +24,10 @@ public class DepositTests
 
 		_ = fakeService
 			.GetAsync(new SuccessRateQuery(brandId), Arg.Any<CancellationToken>())
-			.Returns(67);
+			.Returns(67m);
 
 		var actual = await sut.GetDepositSuccessRateAsync(brandId);
 
-		Assert.AreEqual(67, actual);
+		Assert.AreEqual(67m, actual);
 	}
 }
