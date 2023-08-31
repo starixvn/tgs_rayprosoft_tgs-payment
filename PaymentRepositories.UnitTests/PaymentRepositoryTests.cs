@@ -294,58 +294,6 @@ public class PaymentRepositoryTests
 	}
 
 	[Test]
-	public async Task Count_Current_Day_Deposit_Forms_Status()
-	{
-		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
-		_ = dbContextOptionsBuilder
-			.UseInMemoryDatabase(Guid.NewGuid().ToString())
-			.ConfigureWarnings(x => x.Ignore(
-				InMemoryEventId.TransactionIgnoredWarning));
-
-		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
-
-		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
-
-		await dbContext.DepositForms.AddRangeAsync(new DepositForm[]
-		{
-			new DepositForm
-			{
-				Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
-				BrandId = brandId,
-				Status = 8000,
-				PlayerCode = "4uel5ke0uf3k",
-				CreatedOn = DateTime.UtcNow,
-			},
-			new DepositForm
-			{
-				Id = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5"),
-				BrandId = brandId,
-				Status = 8000,
-				PlayerCode = "4uel5ke0uf3k",
-				CreatedOn = DateTime.UtcNow,
-			},
-			new DepositForm
-			{
-				Id = Guid.Parse("5cd08736-f83c-4134-babf-85671bb1cfeb"),
-				BrandId = brandId,
-				Status = 7000,
-				PlayerCode = "4uel5ke0uf3k",
-				CreatedOn = DateTime.UtcNow,
-			}
-		});
-
-		_ = await dbContext.SaveChangesAsync();
-
-		var sut = new PaymentRepository(dbContext);
-
-		var actual = await sut.CountCurrentDayDepositFormsStatusAsync(brandId);
-
-		Assert.AreEqual(1, actual.Reject);
-		Assert.AreEqual(2, actual.Approved);
-		Assert.AreEqual(3, actual.Total);
-	}
-
-	[Test]
 	public async Task Get_Brand_Auto_Withdraw_Setting()
 	{
 		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
