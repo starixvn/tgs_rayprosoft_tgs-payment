@@ -1,4 +1,4 @@
 ﻿using System;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
-public record SuccessRateQuery(Guid BrandId);
+public record CurrentDaySuccessRateQuery(Guid BrandId);

@@ -128,10 +128,10 @@ public class DepositController : ControllerBase
 
 	[HttpGet("successrate/{brandId}", Name = "GetDepositSuccessRate")]
 	public ValueTask<decimal> GetDepositSuccessRateAsync(
-		[FromServices] IGetService<SuccessRateQuery, decimal> rateService,
+		[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
 		Guid brandId)
 	{
-		var query = new SuccessRateQuery(brandId);
+		var query = new CurrentDaySuccessRateQuery(brandId);
 		return rateService.GetAsync(query, HttpContext.RequestAborted);
 	}
 

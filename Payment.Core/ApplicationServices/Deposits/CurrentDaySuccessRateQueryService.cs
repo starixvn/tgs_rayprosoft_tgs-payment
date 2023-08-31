@@ -5,19 +5,19 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
 
-internal class SuccessRateQueryService : IGetService<SuccessRateQuery, decimal>
+internal class CurrentDaySuccessRateQueryService : IGetService<CurrentDaySuccessRateQuery, decimal>
 {
 	private readonly IPaymentRepository _paymentRepository;
 
-	public SuccessRateQueryService(IPaymentRepository paymentRepository)
+	public CurrentDaySuccessRateQueryService(IPaymentRepository paymentRepository)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 	}
 
-	public async ValueTask<decimal> GetAsync(SuccessRateQuery query, CancellationToken cancellationToken = default)
+	public async ValueTask<decimal> GetAsync(CurrentDaySuccessRateQuery query, CancellationToken cancellationToken = default)
 	{
 		var result = await _paymentRepository
-			.CountCurrentDayDepositFormStatusAsync(query.BrandId, cancellationToken)
+			.CountCurrentDayDepositFormsStatusAsync(query.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
 		return result.Total is 0

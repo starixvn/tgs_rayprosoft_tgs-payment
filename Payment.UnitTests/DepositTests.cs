@@ -963,15 +963,15 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new SuccessRateQueryService(fakePaymentRepository);
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
 			.Returns(new DepositFormsStatusCount { Approved = 0, Total = 0 });
 
-		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
 		Assert.AreEqual(0m, actual);
 	}
@@ -981,15 +981,15 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new SuccessRateQueryService(fakePaymentRepository);
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
 			.Returns(new DepositFormsStatusCount { Approved = 2, Total = 3 });
 
-		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
 		Assert.AreEqual(67m, actual);
 	}
@@ -999,15 +999,15 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new SuccessRateQueryService(fakePaymentRepository);
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormStatusAsync(Arg.Is(brandId))
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
 			.Returns(new DepositFormsStatusCount { Approved = 1, Total = 3 });
 
-		var actual = await sut.GetAsync(new SuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
 		Assert.AreEqual(33m, actual);
 	}
