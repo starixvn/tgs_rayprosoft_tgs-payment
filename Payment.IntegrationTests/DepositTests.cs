@@ -26,7 +26,7 @@ public class DepositTests
 			.GetAsync(new SuccessRateQuery(brandId), Arg.Any<CancellationToken>())
 			.Returns(67m);
 
-		var actual = await sut.GetDepositSuccessRateAsync(brandId);
+		var actual = await sut.GetCurrentDayDepositSuccessRateAsync(brandId);
 
 		Assert.AreEqual(67m, actual);
 	}

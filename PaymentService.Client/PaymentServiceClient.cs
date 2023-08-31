@@ -631,7 +631,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _SerializerOptions);
 	}
 
-	public async ValueTask<decimal> GetDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)
+	public async ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
 			.GetAsync($"/deposit/successrate/{brandId}", cancellationToken)

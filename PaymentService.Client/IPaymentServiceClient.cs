@@ -79,7 +79,7 @@ public interface IPaymentServiceClient
 
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default);
 
-	ValueTask<decimal> GetDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default);
+	ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default);
 
