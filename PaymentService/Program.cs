@@ -139,7 +139,14 @@ builder.Services
 		.AddHandler(
 			Tgs.Payment.MessageQueue.ProcessorTypes.ApproveWithdrawHandlerType,
 			"tgs.payment.withdraw.created",
-			"tgs.payment.withdraw.created"))
+			"tgs.payment.withdraw.created")
+		.AddHandler(
+			Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandDepositApprovedType,
+			"tgs.payment.deposit.status_ex",
+			"tgs.payment.deposit.status_ex")
+		.AddHandler(Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandWithdrawPaidType,
+			"tgs.payment.withdraw.status_ex",
+			"tgs.payment.withdraw.status_ex"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddHealthChecks();
