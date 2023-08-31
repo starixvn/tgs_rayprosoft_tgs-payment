@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Tgs.Paging;
 using Tgs.Payment;
+using Tgs.Payment.Repositories;
 using Tgs.Payment.Repositories.Entities;
 
 namespace TGS.Payment.Repositories;
@@ -54,6 +55,32 @@ internal class PaymentRepository : IPaymentRepository
 			.AsNoTracking()
 			.AnyAsync(cancellationToken)
 			.ConfigureAwait(false);
+
+	public async ValueTask<DepositFormsStatusCount> CountCurrentDayDepositFormsStatusAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var currentDay = new DateTimeOffset(
+			DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Date,
+			TimeSpan.FromHours(8D))
+			.UtcDateTime;
+
+		var result = await _tgsContext.Set<DepositStatusSummary>()
+			.FromSqlInterpolated($"""
+				SELECT
+					count(1) as total,
+					count(1) filter(where status=8000) as approved,
+					count(1) filter(where status=7000) as reject
+				FROM dbo.deposit_forms
+				WHERE
+					brand_id = {brandId}
+					AND
+					created_on >= {currentDay}
+				""")
+			.AsNoTracking()
+			.FirstOrDefaultAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		return new DepositFormsStatusCount { Approved = result!.Approved, Reject = result.Reject, Total = result.Total };
+	}
 
 	public async ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default)
 	{

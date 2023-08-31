@@ -1,9 +1,6 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Json.Patch;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
@@ -811,6 +808,42 @@ public class DepositTests
 	}
 
 	[Test]
+	public void PaymentReturn變更記錄應該要記錄正確內容()
+	{
+		var depositForm = new DepositFormSnapshot(
+			Guid.NewGuid(),
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+
+		var sut = depositForm with
+		{
+			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
+		};
+
+		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+
+		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+
+		Assert.AreEqual(sut, actual);
+	}
+
+	[Test]
 	public async Task Submit_DepositForm_With_New_Status_Will_Emit_StatusChangedEvent()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -926,38 +959,56 @@ public class DepositTests
 	}
 
 	[Test]
-	public void PaymentReturn變更記錄應該要記錄正確內容()
+	public async Task 存款成功率全部單為0時()
 	{
-		var depositForm = new DepositFormSnapshot(
-			Guid.NewGuid(),
-			"PlayerCode",
-			Guid.NewGuid(),
-			Guid.NewGuid(),
-			1000M,
-			null,
-			null,
-			PaymentFlowState.WaitApprove,
-			null,
-			null,
-			null,
-			"GPIT211028150001",
-			null,
-			null,
-			null,
-			null,
-			null,
-			DateTime.UtcNow,
-			0M);
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = depositForm with
-		{
-			PaymentReturn = "{\"manualReceiptFileId\": \"639fffd50c20c141ae1992bc\"}"
-		};
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
 
-		var patch = depositForm.CreatePatch(sut, PaymentUtility.SerializerOptions);
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 
-		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 0, Total = 0 });
 
-		Assert.AreEqual(sut, actual);
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public async Task 存款成功率整數四捨五入()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 2, Total = 3 });
+
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(67m, actual);
+	}
+
+	[Test]
+	public async Task 存款成功率整數四捨五入2()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 1, Total = 3 });
+
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(33m, actual);
 	}
 }

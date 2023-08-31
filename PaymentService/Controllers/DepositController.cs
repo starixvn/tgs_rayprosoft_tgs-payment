@@ -126,6 +126,15 @@ public class DepositController : ControllerBase
 			: null;
 	}
 
+	[HttpGet("successrate/{brandId}", Name = "GetDepositSuccessRate")]
+	public ValueTask<decimal> GetDepositSuccessRateAsync(
+		[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
+		Guid brandId)
+	{
+		var query = new CurrentDaySuccessRateQuery(brandId);
+		return rateService.GetAsync(query, HttpContext.RequestAborted);
+	}
+
 	/// <summary>
 	/// Gets the untreated deposit form count asynchronous.
 	/// </summary>
