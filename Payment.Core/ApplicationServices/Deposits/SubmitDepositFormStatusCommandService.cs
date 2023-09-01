@@ -12,10 +12,10 @@ namespace Tgs.Payment.ApplicationServices.Deposits;
 
 internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDepositFormStatusCommand>
 {
+	private readonly ILogger<SubmitDepositFormStatusCommandService> _logger;
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ILogger<SubmitDepositFormStatusCommandService> _logger;
 	private readonly ISystemClock _systemClock;
 
 	public SubmitDepositFormStatusCommandService(
@@ -73,7 +73,7 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
 
-		if (originStatus != command.Status)
+		if (command.Status is not null && originStatus != command.Status)
 		{
 			_logger.LogInformation("Submit deposit form status send EmitDepositFormStatusChangedEvent, originStatus:{originStatus}, command status:{status}, formId:{formId}",
 				originStatus,

@@ -35,8 +35,8 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 			command.Status,
 			depositForm!.Status);
 
-		if (command.Status == depositForm!.Status)
-			return;
+		if (depositForm!.Status == PaymentFlowState.Reject)
+			return;		
 
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;
 

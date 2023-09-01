@@ -948,6 +948,105 @@ public class DepositTests
 	}
 
 	[Test]
+	public async Task Submit_DepositForm_With_Null_Status_Will_Not_Emit_StatusChangedEvent()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var sut = new SubmitDepositFormStatusCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
+
+		var command = new SubmitDepositFormStatusCommand(
+			Guid.NewGuid(),
+			Status: null,
+			null,
+			null,
+			null,
+			null,
+			10m);
+
+		var depositForm = new DepositFormSnapshot(
+			command.FormId,
+			"PlayerCode",
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			DateTime.UtcNow,
+			0M);
+		_ = fakePaymentRepository.GetCurrentDepositFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(depositForm);
+
+		var eventId = Guid.NewGuid();
+
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var expectedSnapshot = new DepositFormSnapshot(
+			command.FormId,
+			"PlayerCode",
+			depositForm.BrandId,
+			depositForm.BrandPaymentId,
+			1000M,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			"GPIT211028150001",
+			null,
+			null,
+			null,
+			null,
+			null,
+			depositForm.CreatedOn,
+			10M);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateDepositFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(command.FormId),
+				Arg.Is(EventAction.ChangeStatus),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(default(string)));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateDepositFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
+
+		_ = fakePaymentClient.Received(0)
+			.EmitDepositFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
 	public async Task UnlockPayment()
 	{
 		var fakePaymentRateLimitRepository = Substitute.For<IPaymentRateLimitRepository>();
@@ -1019,6 +1118,53 @@ public class DepositTests
 	}
 
 	[Test]
+	public async Task 站台存提差_不加總已拒絕存款金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountDepositApprovedCommandService>.Instance);
+
+		var brandId = Guid.NewGuid();
+		var formId = Guid.NewGuid();
+		var amount = 168m;
+
+		var depositForm = new DepositFormInfo(
+			formId,
+			"playerCode",
+			"userName",
+			brandId,
+			Guid.NewGuid(),
+			"channelName",
+			Guid.NewGuid(),
+			amount,
+			null,
+			null,
+			PaymentFlowState.Reject,
+			null,
+			null,
+			null,
+			null,
+			"reviewedUsername",
+			DateTimeOffset.Now,
+			null,
+			null,
+			DateTimeOffset.Now,
+			DateTimeOffset.Now,
+			0m);
+
+		_ = fakePaymentRepository
+			.GetDepositFormByIdAsync(formId)
+			.Returns(depositForm);
+
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(brandId, formId, PaymentFlowState.WaitApprove));
+
+		_ = fakeCountRepository
+			.Received(0)
+			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)amount));
+	}
+
+	[Test]
 	public async Task 站台存提差_加總已通過存款金額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -1041,7 +1187,7 @@ public class DepositTests
 			amount,
 			null,
 			null,
-			PaymentFlowState.WaitPayment,
+			PaymentFlowState.Approved,
 			null,
 			null,
 			null,
