@@ -22,7 +22,7 @@ public static class PaymentConfigurationExtensions
 		return paymentConfiguration
 			.UseRepository<RedisTakeNumberStore>()
 			.UseRateLimitRepository<PaymentRateLimitRepository>()
-			.UseCountRepository<CountRepository>();
+			.UseCountRepository<BrandNetDepositRepository>();
 	}
 
 	public static PaymentConfiguration UseTgsPaymentRepository(

@@ -4,17 +4,17 @@ using StackExchange.Redis;
 
 namespace Tgs.Payment.Repositories;
 
-internal class CountRepository : ICountRepository
+internal class BrandNetDepositRepository : IBrandNetDepositRepository
 {
 	private static readonly string _KeyPrefix = "TGS:Payment:NetDeposit";
 	private readonly IDatabase _redisDatabase;
 
-	public CountRepository(RedisConnectionFactory redisConnectionFactory)
+	public BrandNetDepositRepository(RedisConnectionFactory redisConnectionFactory)
 	{
 		_redisDatabase = redisConnectionFactory.Database;
 	}
 
-	public async ValueTask CountAmountAsync(Guid brandId, double amount)
+	public async ValueTask CountBrandNetDepositAsync(Guid brandId, double amount)
 	{
 		var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8));
 		var key = $"{_KeyPrefix}:{brandId}:{now:yyyyMMdd}";
@@ -28,5 +28,17 @@ internal class CountRepository : ICountRepository
 		_ = await _redisDatabase
 			.StringIncrementAsync(key, amount)
 			.ConfigureAwait(false);
+	}
+
+	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId)
+	{
+		var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8));
+		var key = $"{_KeyPrefix}:{brandId}:{now:yyyyMMdd}";
+
+		var netDeposit = await _redisDatabase
+			.StringGetAsync(key)
+			.ConfigureAwait(false);
+
+		return (decimal)netDeposit;
 	}
 }

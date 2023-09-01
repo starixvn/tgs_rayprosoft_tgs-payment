@@ -1249,7 +1249,7 @@ public class WithdrawTests
 	public async Task 站台存提差_加總已支付提款金額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeCountRepository = Substitute.For<ICountRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
 		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
 
@@ -1286,14 +1286,14 @@ public class WithdrawTests
 
 		_ = fakeCountRepository
 			.Received(1)
-			.CountAmountAsync(Arg.Is(brandId), Arg.Is((double)-amount));
+			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)-amount));
 	}
 
 	[Test]
 	public async Task 站台存提差_只處理已支付提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeCountRepository = Substitute.For<ICountRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
 		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
 
@@ -1305,7 +1305,7 @@ public class WithdrawTests
 
 		_ = fakeCountRepository
 			.Received(0)
-			.CountAmountAsync(Arg.Any<Guid>(), Arg.Any<double>());
+			.CountBrandNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
 	}
 
 	[Test]

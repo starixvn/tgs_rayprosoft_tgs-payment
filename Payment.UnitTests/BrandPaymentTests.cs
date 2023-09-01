@@ -276,4 +276,20 @@ public class BrandPaymentTests
 				Arg.Is(eventId),
 				Arg.Any<DateTime>());
 	}
+
+	[Test]
+	public async Task Get_Brand_Net_Deposit()
+	{
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new GetBrandNetDepositQueryService(fakeBrandNetDepositRepository);
+
+		var brandId = Guid.NewGuid();
+
+		_ = await sut.GetAsync(new GetBrandNetDepositQuery(brandId));
+
+		_ = fakeBrandNetDepositRepository
+			.Received(1)
+			.GetBrandNetDepositAsync(Arg.Is(brandId));
+	}
 }

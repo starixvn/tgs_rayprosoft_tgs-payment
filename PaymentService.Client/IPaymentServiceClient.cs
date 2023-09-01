@@ -58,8 +58,10 @@ public interface IPaymentServiceClient
 
 	ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default);
 
+	ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
-		string playerCode,
+			string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
 		CancellationToken cancellationToken = default);
 
@@ -75,11 +77,11 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 
+	ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default);
-
-	ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default);
 

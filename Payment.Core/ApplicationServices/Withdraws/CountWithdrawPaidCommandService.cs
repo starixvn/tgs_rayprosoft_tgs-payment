@@ -7,12 +7,12 @@ namespace Tgs.Payment.ApplicationServices.Withdraws;
 
 internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPaidCommand>
 {
-	private readonly ICountRepository _countRepository;
+	private readonly IBrandNetDepositRepository _countRepository;
 	private readonly IPaymentRepository _paymentRepository;
 
 	public CountWithdrawPaidCommandService(
 		IPaymentRepository paymentRepository,
-		ICountRepository countRepository)
+		IBrandNetDepositRepository countRepository)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_countRepository = countRepository ?? throw new ArgumentNullException(nameof(countRepository));
@@ -29,6 +29,6 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;
 
-		await _countRepository.CountAmountAsync(command.BrandId, (double)-amount);
+		await _countRepository.CountBrandNetDepositAsync(command.BrandId, (double)-amount);
 	}
 }

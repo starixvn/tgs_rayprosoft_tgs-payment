@@ -84,6 +84,30 @@ public class BrandPaymentTests
 	}
 
 	[Test]
+	public async Task Get_Brand_Net_Deposit()
+	{
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper
+			.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandNetDepositRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		_ = fakeBrandNetDepositRepository
+			.GetBrandNetDepositAsync(Arg.Is(brandId))
+			.Returns(168000m);
+
+		var actual = await sut.GetBrandNetDepositAsync(brandId);
+
+		Assert.AreEqual(168000m, actual);
+	}
+
+	[Test]
 	public async Task Get_BrandPayment_Fee_Settings()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
