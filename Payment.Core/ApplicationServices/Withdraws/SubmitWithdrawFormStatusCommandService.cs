@@ -70,7 +70,8 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
 
-		if (originStatus != command.Status)
+		if (command.Status is not null && originStatus != command.Status)
+		{
 			await _paymentClient
 				.EmitWithdrawFormStatusChangedEventAsync(
 					command.FormId,
@@ -78,5 +79,6 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 					originStatus.ToString(),
 					cancellationToken)
 				.ConfigureAwait(false);
+		}
 	}
 }

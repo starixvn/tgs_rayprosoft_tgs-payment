@@ -1158,6 +1158,96 @@ public class WithdrawTests
 	}
 
 	[Test]
+	public async Task Submit_WithdrawForm_With_Null_Status_Will_Not_Send_Emit_Status_Change_Event()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var sut = new SubmitWithdrawFormStatusCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeSystemClock,
+			fakeSerialNumberGenerator);
+
+		var command = new SubmitWithdrawFormStatusCommand(
+			Guid.NewGuid(),
+			Status: null,
+			null,
+			null,
+			null,
+			"PaidUser",
+			"PaidUserName");
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			command.FormId,
+			Guid.NewGuid(),
+			"PlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			Guid.NewGuid(),
+			PaymentFlowState.Approved,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			Guid.NewGuid().ToString(),
+			"Reviewer",
+			DateTime.UtcNow,
+			null,
+			null,
+			null);
+		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(withdrawForm);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.Approved,
+			PaidUserId = command.PaidUserId,
+			PaidUserName = command.PaidUserName,
+			PaidOn = null
+		};
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(command.FormId),
+				Arg.Is(EventAction.ChangeStatus),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(default(string)));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
+
+		_ = fakePaymentClient.Received(0)
+			.EmitWithdrawFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
 	public async Task 如果更新狀態為Paid_就會填寫PaidOn時間()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
