@@ -26,7 +26,10 @@ internal class CountBrandDepositApprovedHandler : IMessageHandler
 	{
 		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		_logger.LogInformation($"Count Brand Withdraw Paid, BrandId:{request.BrandId.ToGuid()}, FormId:{request.FormId.ToGuid()}, Status:{request.Status}");
+		_logger.LogInformation("Count Brand Deposit Form, BrandId:{brandId}, FormId:{formId}, Status:{status}",
+			request.BrandId.ToGuid(),
+			request.FormId.ToGuid(),
+			request.Status);
 
 		var command = new CountDepositApprovedCommand(
 			request.BrandId.ToGuid(),
