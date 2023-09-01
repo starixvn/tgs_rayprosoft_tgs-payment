@@ -24,7 +24,7 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 
 	public async ValueTask ExecuteAsync(CountDepositApprovedCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.Status != PaymentFlowState.Approved.ToString())
+		if (command.Status != PaymentFlowState.WaitApprove)
 			return;
 
 		var depositForm = await _paymentRepository
@@ -32,10 +32,10 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 			.ConfigureAwait(false);
 
 		_logger.LogInformation("command Status:{commandStatus}, depositForm status:{formStatus}",
-				Enum.Parse<PaymentFlowState>(command.Status),
-				depositForm!.Status);
+			command.Status,
+			depositForm!.Status);
 
-		if (Enum.Parse<PaymentFlowState>(command.Status) == depositForm!.Status)
+		if (command.Status == depositForm!.Status)
 			return;
 
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;

@@ -1036,7 +1036,7 @@ public class DepositTests
 			amount,
 			null,
 			null,
-			PaymentFlowState.WaitApprove,
+			PaymentFlowState.WaitPayment,
 			null,
 			null,
 			null,
@@ -1053,7 +1053,7 @@ public class DepositTests
 			.GetDepositFormByIdAsync(formId)
 			.Returns(depositForm);
 
-		await sut.ExecuteAsync(new CountDepositApprovedCommand(brandId, formId, PaymentFlowState.Approved.ToString()));
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakeCountRepository
 			.Received(1)
@@ -1068,7 +1068,7 @@ public class DepositTests
 
 		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountDepositApprovedCommandService>.Instance);
 
-		await sut.ExecuteAsync(new CountDepositApprovedCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.WaitApprove.ToString()));
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.Approved));
 
 		_ = fakePaymentRepository
 			.Received(0)

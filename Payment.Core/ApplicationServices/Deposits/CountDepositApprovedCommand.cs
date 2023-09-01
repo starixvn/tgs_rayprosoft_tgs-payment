@@ -1,4 +1,4 @@
 ﻿using System;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
-public record CountDepositApprovedCommand(Guid BrandId, Guid FormId, string Status);
+public record CountDepositApprovedCommand(Guid BrandId, Guid FormId, PaymentFlowState Status);
