@@ -27,6 +27,9 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
+		if (Enum.Parse<PaymentFlowState>(command.Status) == withdrawForm!.Status)
+			return;
+
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;
 
 		await _countRepository.CountBrandNetDepositAsync(command.BrandId, (double)-amount);

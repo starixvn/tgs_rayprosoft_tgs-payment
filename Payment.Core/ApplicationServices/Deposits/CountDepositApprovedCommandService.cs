@@ -27,6 +27,9 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
+		if (Enum.Parse<PaymentFlowState>(command.Status) == depositForm!.Status)
+			return;
+
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;
 
 		await _countRepository.CountBrandNetDepositAsync(command.BrandId, (double)amount);
