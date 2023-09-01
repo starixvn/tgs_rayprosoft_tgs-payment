@@ -72,5 +72,19 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
+
+		if (command.Status is not null && originStatus != command.Status)
+		{
+			_logger.LogInformation("Submit deposit form status send EmitDepositFormStatusChangedEvent, originStatus:{originStatus}, command status:{status}, formId:{formId}",
+				originStatus,
+				command.Status,
+				command.FormId);
+
+			await _paymentClient.EmitDepositFormStatusChangedEventAsync(
+				command.FormId,
+				formData.BrandId,
+				originStatus.ToString(),
+				cancellationToken).ConfigureAwait(false);
+		}
 	}
 }
