@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
@@ -14,18 +15,21 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
+	private readonly ILogger<SignOffDepositFormCommandService> _logger;
 	private readonly ISystemClock _systemClock;
 
 	public SignOffDepositFormCommandService(
 		IPaymentRepository paymentRepository,
 		IPaymentClient paymentClient,
 		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator)
+		ISerialNumberGenerator serialNumberGenerator,
+		ILogger<SignOffDepositFormCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(SignOffDepositFormCommand command, CancellationToken cancellationToken = default)
@@ -77,6 +81,11 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
+
+		_logger.LogInformation("Sign off deposit form send EmitDepositFormStatusChangedEvent, brandId:{brandId}, formId:{formId}, status:{status}",
+			formData.BrandId, 
+			command.FormId,
+			formStatus.ToString());
 
 		await _paymentClient
 			.EmitDepositFormStatusChangedEventAsync(

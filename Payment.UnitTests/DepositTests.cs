@@ -263,7 +263,8 @@ public class DepositTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SignOffDepositFormCommandService>.Instance);
 
 		var formId = Guid.NewGuid();
 
@@ -320,7 +321,8 @@ public class DepositTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SignOffDepositFormCommandService>.Instance);
 
 		var formId = Guid.NewGuid();
 
@@ -417,7 +419,8 @@ public class DepositTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SignOffDepositFormCommandService>.Instance);
 
 		var command = new SignOffDepositFormCommand(
 			Guid.NewGuid(),
@@ -513,7 +516,8 @@ public class DepositTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
 
 		var command = new SubmitDepositFormStatusCommand(
 			Guid.NewGuid(),
@@ -856,7 +860,8 @@ public class DepositTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
 
 		var command = new SubmitDepositFormStatusCommand(
 			Guid.NewGuid(),

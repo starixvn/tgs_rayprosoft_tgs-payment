@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
@@ -14,18 +15,21 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
+	private readonly ILogger<SubmitDepositFormStatusCommandService> _logger;
 	private readonly ISystemClock _systemClock;
 
 	public SubmitDepositFormStatusCommandService(
 		IPaymentRepository paymentRepository,
 		IPaymentClient paymentClient,
 		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator)
+		ISerialNumberGenerator serialNumberGenerator,
+		ILogger<SubmitDepositFormStatusCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(SubmitDepositFormStatusCommand command, CancellationToken cancellationToken = default)
@@ -70,10 +74,17 @@ internal class SubmitDepositFormStatusCommandService : ICommandService<SubmitDep
 			cancellationToken).ConfigureAwait(false);
 
 		if (originStatus != command.Status)
+		{
+			_logger.LogInformation("Submit deposit form status send EmitDepositFormStatusChangedEvent, originStatus:{originStatus}, command status:{status}, formId:{formId}",
+				originStatus,
+				command.Status,
+				command.FormId);
+
 			await _paymentClient.EmitDepositFormStatusChangedEventAsync(
 				command.FormId,
 				formData.BrandId,
 				originStatus.ToString(),
 				cancellationToken).ConfigureAwait(false);
+		}
 	}
 }

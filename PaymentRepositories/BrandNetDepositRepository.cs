@@ -27,7 +27,7 @@ internal class BrandNetDepositRepository : IBrandNetDepositRepository
 
 		_ = await _redisDatabase
 			.StringIncrementAsync(key, amount)
-			.ConfigureAwait(false);
+			.ConfigureAwait(false);		
 	}
 
 	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId)
