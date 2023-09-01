@@ -43,8 +43,15 @@ public class PaymentConfiguration
 		return this;
 	}
 
+	public PaymentConfiguration UseCountRepository<TCountRepository>()
+		where TCountRepository : class, IBrandNetDepositRepository
+	{
+		_ = Services.AddTransient<IBrandNetDepositRepository, TCountRepository>();
+		return this;
+	}
+
 	public PaymentConfiguration UsePaymentRepository<TPaymentRepository>()
-		where TPaymentRepository : class, IPaymentRepository
+			where TPaymentRepository : class, IPaymentRepository
 	{
 		_ = Services.AddTransient<IPaymentRepository, TPaymentRepository>();
 		return this;

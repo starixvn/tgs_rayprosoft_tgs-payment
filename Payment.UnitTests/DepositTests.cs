@@ -1011,4 +1011,70 @@ public class DepositTests
 
 		Assert.AreEqual(33m, actual);
 	}
+
+	[Test]
+	public async Task 站台存提差_加總已通過存款金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository);
+
+		var brandId = Guid.NewGuid();
+		var formId = Guid.NewGuid();
+		var amount = 168m;
+
+		var depositForm = new DepositFormInfo(
+			formId,
+			"playerCode",
+			"userName",
+			brandId,
+			Guid.NewGuid(),
+			"channelName",
+			Guid.NewGuid(),
+			amount,
+			null,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			null,
+			null,
+			"reviewedUsername",
+			DateTimeOffset.Now,
+			null,
+			null,
+			DateTimeOffset.Now,
+			DateTimeOffset.Now,
+			0m);
+
+		_ = fakePaymentRepository
+			.GetDepositFormByIdAsync(formId)
+			.Returns(depositForm);
+
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(brandId, formId, PaymentFlowState.Approved.ToString()));
+
+		_ = fakeCountRepository
+			.Received(1)
+			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)amount));
+	}
+
+	[Test]
+	public async Task 站台存提差_只處理已通過存款單()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository);
+
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.WaitApprove.ToString()));
+
+		_ = fakePaymentRepository
+			.Received(0)
+			.GetDepositFormByIdAsync(Arg.Any<Guid>());
+
+		_ = fakeCountRepository
+			.Received(0)
+			.CountBrandNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
+	}
 }

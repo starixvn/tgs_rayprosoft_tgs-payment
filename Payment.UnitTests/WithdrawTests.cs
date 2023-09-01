@@ -1246,6 +1246,69 @@ public class WithdrawTests
 	}
 
 	[Test]
+	public async Task 站台存提差_加總已支付提款金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
+
+		var brandId = Guid.NewGuid();
+		var formId = Guid.NewGuid();
+		var amount = 168m;
+
+		var withdrawForm = new WithdrawFormInfo(
+			formId,
+			"playerCode",
+			UserType.Player,
+			"userName",
+			brandId,
+			amount,
+			null,
+			PaymentFlowState.Approved,
+			null,
+			"reviewedUsername",
+			DateTimeOffset.Now,
+			null,
+			Guid.NewGuid(),
+			DateTimeOffset.Now,
+			DateTimeOffset.Now,
+			null,
+			null,
+			null,
+			0m);
+
+		_ = fakePaymentRepository
+			.GetWithdrawFormByIdAsync(formId)
+			.Returns(withdrawForm);
+
+		await sut.ExecuteAsync(new CountWithdrawPaidCommand(brandId, formId, PaymentFlowState.Paid.ToString()));
+
+		_ = fakeCountRepository
+			.Received(1)
+			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)-amount));
+	}
+
+	[Test]
+	public async Task 站台存提差_只處理已支付提款單()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
+
+		await sut.ExecuteAsync(new CountWithdrawPaidCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.Approved.ToString()));
+
+		_ = fakePaymentRepository
+			.Received(0)
+			.GetWithdrawFormByIdAsync(Arg.Any<Guid>());
+
+		_ = fakeCountRepository
+			.Received(0)
+			.CountBrandNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
+	}
+
+	[Test]
 	public async Task 提款自動出款_只處理玩家提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();

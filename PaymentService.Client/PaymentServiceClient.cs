@@ -1001,7 +1001,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	}
 
 	public async ValueTask ReviewDepositFormAsync(
-			Guid formId,
+		Guid formId,
 		ReviewState state,
 		string? reviewUserId,
 		string? reviewUserName,
@@ -1234,5 +1234,20 @@ internal class PaymentServiceClient : IPaymentServiceClient
 				!.ToAsyncEnumerable())
 			.Where(arr => arr is not null)
 			.SelectMany(arr => arr!.ToAsyncEnumerable());
+	}
+
+	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/netdeposit/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 }

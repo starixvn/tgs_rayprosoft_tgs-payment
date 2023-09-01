@@ -41,6 +41,12 @@ public class BrandPaymentController : ControllerBase
 			: null;
 	}
 
+	[HttpGet("netdeposit/{brandId}", Name = "GetBrandNetDeposit")]
+	public ValueTask<decimal> GetBrandNetDepositAsync(
+		[FromServices] IGetService<GetBrandNetDepositQuery, decimal> getService,
+		Guid brandId)
+		=> getService.GetAsync(new GetBrandNetDepositQuery(brandId), HttpContext.RequestAborted);
+
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
 		[FromServices] IQueryService<BrandPaymentAclQuery, BrandPaymentAcl> queryService,
