@@ -32,8 +32,8 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 			.ConfigureAwait(false);
 
 		_logger.LogInformation("command Status:{commandStatus}, withdrawForm status:{formStatus}",
-				command.Status,
-				withdrawForm!.Status);
+			command.Status,
+			withdrawForm!.Status);
 
 		if (command.Status == withdrawForm!.Status)
 			return;
