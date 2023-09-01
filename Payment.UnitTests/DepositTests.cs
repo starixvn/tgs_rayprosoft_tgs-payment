@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Json.Patch;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.Paging;
 using Tgs.Payment;
@@ -1018,7 +1019,7 @@ public class DepositTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository);
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountDepositApprovedCommandService>.Instance);
 
 		var brandId = Guid.NewGuid();
 		var formId = Guid.NewGuid();
@@ -1065,7 +1066,7 @@ public class DepositTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository);
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountDepositApprovedCommandService>.Instance);
 
 		await sut.ExecuteAsync(new CountDepositApprovedCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.WaitApprove.ToString()));
 

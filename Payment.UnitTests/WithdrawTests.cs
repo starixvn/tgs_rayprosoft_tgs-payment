@@ -1251,7 +1251,7 @@ public class WithdrawTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
+		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountWithdrawPaidCommandService>.Instance);
 
 		var brandId = Guid.NewGuid();
 		var formId = Guid.NewGuid();
@@ -1295,7 +1295,7 @@ public class WithdrawTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository);
+		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountWithdrawPaidCommandService>.Instance);
 
 		await sut.ExecuteAsync(new CountWithdrawPaidCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.Approved.ToString()));
 
