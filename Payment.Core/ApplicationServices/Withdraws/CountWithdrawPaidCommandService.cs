@@ -24,7 +24,7 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 
 	public async ValueTask ExecuteAsync(CountWithdrawPaidCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.Status != PaymentFlowState.Paid.ToString())
+		if (command.Status != PaymentFlowState.Approved)
 			return;
 
 		var withdrawForm = await _paymentRepository
@@ -32,10 +32,10 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 			.ConfigureAwait(false);
 
 		_logger.LogInformation("command Status:{commandStatus}, withdrawForm status:{formStatus}",
-				Enum.Parse<PaymentFlowState>(command.Status),
+				command.Status,
 				withdrawForm!.Status);
 
-		if (Enum.Parse<PaymentFlowState>(command.Status) == withdrawForm!.Status)
+		if (command.Status == withdrawForm!.Status)
 			return;
 
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;

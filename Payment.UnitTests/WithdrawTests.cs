@@ -1265,7 +1265,7 @@ public class WithdrawTests
 			brandId,
 			amount,
 			null,
-			PaymentFlowState.Approved,
+			PaymentFlowState.Paid,
 			null,
 			"reviewedUsername",
 			DateTimeOffset.Now,
@@ -1282,7 +1282,7 @@ public class WithdrawTests
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(withdrawForm);
 
-		await sut.ExecuteAsync(new CountWithdrawPaidCommand(brandId, formId, PaymentFlowState.Paid.ToString()));
+		await sut.ExecuteAsync(new CountWithdrawPaidCommand(brandId, formId, PaymentFlowState.Approved));
 
 		_ = fakeCountRepository
 			.Received(1)
@@ -1297,7 +1297,7 @@ public class WithdrawTests
 
 		var sut = new CountWithdrawPaidCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountWithdrawPaidCommandService>.Instance);
 
-		await sut.ExecuteAsync(new CountWithdrawPaidCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.Approved.ToString()));
+		await sut.ExecuteAsync(new CountWithdrawPaidCommand(Guid.NewGuid(), Guid.NewGuid(), PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)

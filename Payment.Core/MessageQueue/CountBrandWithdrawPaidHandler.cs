@@ -34,7 +34,7 @@ internal class CountBrandWithdrawPaidHandler : IMessageHandler
 		var command = new CountWithdrawPaidCommand(
 			request.BrandId.ToGuid(),
 			request.FormId.ToGuid(),
-			request.Status);
+			Enum.Parse<PaymentFlowState>(request.Status));
 
 		return _commandService.ExecuteAsync(command, cancellationToken);
 	}
