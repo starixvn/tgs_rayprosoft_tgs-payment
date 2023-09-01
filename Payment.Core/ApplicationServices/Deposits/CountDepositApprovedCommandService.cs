@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
@@ -8,14 +9,17 @@ namespace Tgs.Payment.ApplicationServices.Deposits;
 internal class CountDepositApprovedCommandService : ICommandService<CountDepositApprovedCommand>
 {
 	private readonly IBrandNetDepositRepository _countRepository;
+	private readonly ILogger<CountDepositApprovedCommandService> _logger;
 	private readonly IPaymentRepository _paymentRepository;
 
 	public CountDepositApprovedCommandService(
 		IPaymentRepository paymentRepository,
-		IBrandNetDepositRepository countRepository)
+		IBrandNetDepositRepository countRepository,
+		ILogger<CountDepositApprovedCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_countRepository = countRepository ?? throw new ArgumentNullException(nameof(countRepository));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(CountDepositApprovedCommand command, CancellationToken cancellationToken = default)
@@ -28,7 +32,12 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 			.ConfigureAwait(false);
 
 		if (Enum.Parse<PaymentFlowState>(command.Status) == depositForm!.Status)
+		{
+			_logger.LogInformation("command Status:{commandStatus}, depositForm status:{formStatus}",
+				Enum.Parse<PaymentFlowState>(command.Status),
+				depositForm.Status);
 			return;
+		}
 
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;
 
