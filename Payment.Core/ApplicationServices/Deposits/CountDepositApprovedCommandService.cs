@@ -31,13 +31,12 @@ internal class CountDepositApprovedCommandService : ICommandService<CountDeposit
 			.GetDepositFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
-		if (Enum.Parse<PaymentFlowState>(command.Status) == depositForm!.Status)
-		{
-			_logger.LogInformation("command Status:{commandStatus}, depositForm status:{formStatus}",
+		_logger.LogInformation("command Status:{commandStatus}, depositForm status:{formStatus}",
 				Enum.Parse<PaymentFlowState>(command.Status),
-				depositForm.Status);
+				depositForm!.Status);
+
+		if (Enum.Parse<PaymentFlowState>(command.Status) == depositForm!.Status)
 			return;
-		}
 
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;
 

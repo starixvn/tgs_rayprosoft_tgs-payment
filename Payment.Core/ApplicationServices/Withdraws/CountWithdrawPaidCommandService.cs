@@ -31,13 +31,12 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
-		if (Enum.Parse<PaymentFlowState>(command.Status) == withdrawForm!.Status)
-		{
-			_logger.LogInformation("command Status:{commandStatus}, withdrawForm status:{formStatus}",
+		_logger.LogInformation("command Status:{commandStatus}, withdrawForm status:{formStatus}",
 				Enum.Parse<PaymentFlowState>(command.Status),
-				withdrawForm.Status);
+				withdrawForm!.Status);
+
+		if (Enum.Parse<PaymentFlowState>(command.Status) == withdrawForm!.Status)
 			return;
-		}
 
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;
 
