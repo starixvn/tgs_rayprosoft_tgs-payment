@@ -35,7 +35,7 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 			command.Status,
 			withdrawForm!.Status);
 
-		if (command.Status == withdrawForm!.Status)
+		if (command.Status == withdrawForm!.Status || withdrawForm!.Status == PaymentFlowState.Reject)
 			return;
 
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;
