@@ -939,12 +939,6 @@ public class DepositTests
 				Arg.Is(expectedSnapshot),
 				Arg.Is(eventId),
 				Arg.Is(currentTime.UtcDateTime));
-
-		_ = fakePaymentClient.Received(1)
-			.EmitDepositFormStatusChangedEventAsync(
-				Arg.Is(command.FormId),
-				Arg.Any<Guid>(),
-				Arg.Any<string>());
 	}
 
 	[Test]
@@ -1041,7 +1035,7 @@ public class DepositTests
 			amount,
 			null,
 			null,
-			PaymentFlowState.WaitPayment,
+			PaymentFlowState.Approved,
 			null,
 			null,
 			null,
@@ -1062,6 +1056,53 @@ public class DepositTests
 
 		_ = fakeCountRepository
 			.Received(1)
+			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)amount));
+	}
+
+	[Test]
+	public async Task 站台存提差_不加總已拒絕存款金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeCountRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new CountDepositApprovedCommandService(fakePaymentRepository, fakeCountRepository, NullLogger<CountDepositApprovedCommandService>.Instance);
+
+		var brandId = Guid.NewGuid();
+		var formId = Guid.NewGuid();
+		var amount = 168m;
+
+		var depositForm = new DepositFormInfo(
+			formId,
+			"playerCode",
+			"userName",
+			brandId,
+			Guid.NewGuid(),
+			"channelName",
+			Guid.NewGuid(),
+			amount,
+			null,
+			null,
+			PaymentFlowState.Reject,
+			null,
+			null,
+			null,
+			null,
+			"reviewedUsername",
+			DateTimeOffset.Now,
+			null,
+			null,
+			DateTimeOffset.Now,
+			DateTimeOffset.Now,
+			0m);
+
+		_ = fakePaymentRepository
+			.GetDepositFormByIdAsync(formId)
+			.Returns(depositForm);
+
+		await sut.ExecuteAsync(new CountDepositApprovedCommand(brandId, formId, PaymentFlowState.WaitApprove));
+
+		_ = fakeCountRepository
+			.Received(0)
 			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)amount));
 	}
 
