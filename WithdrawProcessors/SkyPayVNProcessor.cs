@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.SkyPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class SkyPayVNProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly SkyPaySerializer _skyPaySerializer;
 
 	public string Subject { get; }
 
-	public SkyPayVNProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+	public SkyPayVNProcessor(
+		SkyPaySerializer skyPaySerializer)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
 
 		Subject = $"tgs.payment.skypay.vn.withdraw";
@@ -26,10 +21,10 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		return withdrawBankInfo.BankType switch
 		{
@@ -43,7 +38,7 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 	private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var settings = new GatewayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
@@ -59,7 +54,7 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 	private string MakeMomoWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<MomoBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var settings = new MomoWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),
@@ -73,7 +68,7 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 	private string MakeZaloWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<ZaloBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var settings = new ZaloWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),

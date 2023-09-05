@@ -56,7 +56,7 @@ public class WithdrawController : ControllerBase
 
 	[HttpPut(Name = "CreateWithdrawForm")]
 	public async Task<Guid> CreateWithdrawFormAsync(
-		[FromServices] ICommandService<CreateWithdrawFormCommand> createService,
+		[FromServices] IGetService<CreateWithdrawFormCommand, Guid> createService,
 		[FromBody] CreateWithdrawFormViewModel request)
 	{
 		var command = new CreateWithdrawFormCommand(
@@ -68,9 +68,9 @@ public class WithdrawController : ControllerBase
 			request.Amount,
 			request.Note);
 
-		await createService.ExecuteAsync(command).ConfigureAwait(false);
-
-		return await command.ReturnFormIdSource.Task.ConfigureAwait(false);
+		return await createService.GetAsync(
+			command,
+			HttpContext.RequestAborted).ConfigureAwait(false);
 	}
 
 	[HttpGet("{brandId}/{formId}", Name = "GetWithdrawFormWithBrandId")]

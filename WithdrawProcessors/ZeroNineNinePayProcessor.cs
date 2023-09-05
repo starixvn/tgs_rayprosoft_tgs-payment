@@ -1,27 +1,20 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.ZeroNineNinePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class ZeroNineNinePayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly ILogger<ZeroNineNinePayProcessor> _logger;
 	private readonly ZeroNineNinePaySerializer _zeroNineNinePaySerializer;
 	public string Subject => "tgs.payment.zeronineninepay.withdraw";
 
 	public ZeroNineNinePayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor,
 		ZeroNineNinePaySerializer zeroNineNinePaySerializer,
 		ILogger<ZeroNineNinePayProcessor> logger)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_zeroNineNinePaySerializer = zeroNineNinePaySerializer;
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
@@ -29,10 +22,10 @@ internal class ZeroNineNinePayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<ZeroNineNinePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<ZeroNineNinePayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		_logger.LogInformation(
 			"ZeroNineNinePayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",

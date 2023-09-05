@@ -440,10 +440,9 @@ internal class PaymentRepository : IPaymentRepository
 
 		var jsonNode = JsonNode.Parse(autoWithdrawSetting.BrandPaymentCandidates);
 
-		if (jsonNode is null)
-			brandPaymentIds = Array.Empty<Guid>();
-		else
-			brandPaymentIds = jsonNode!["brandPaymentIds"]?.AsArray().Select(x => x!.GetValue<Guid>()).AsEnumerable()
+		brandPaymentIds = jsonNode is null
+			? Array.Empty<Guid>()
+			: jsonNode!["brandPaymentIds"]?.AsArray().Select(x => x!.GetValue<Guid>()).AsEnumerable()
 				?? Array.Empty<Guid>();
 
 		return new AutoWithdrawInfo(

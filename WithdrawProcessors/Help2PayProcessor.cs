@@ -93,20 +93,12 @@ internal class Help2PayProcessor : IWithdrawProcessor
 	};
 
 	private readonly Help2PaySerializer _help2PaySerializer;
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 
 	public string Subject => "tgs.payment.help2pay.withdraw";
 
 	public Help2PayProcessor(
-		IOptions<PaymentOptions> optionsAccessor,
 		Help2PaySerializer help2PaySerializer)
 	{
-		if (optionsAccessor is null)
-		{
-			throw new ArgumentNullException(nameof(optionsAccessor));
-		}
-
-		_jsonSerializerOptions = optionsAccessor.Value.JsonSerializerOptions;
 		_help2PaySerializer = help2PaySerializer ?? throw new ArgumentNullException(nameof(help2PaySerializer));
 	}
 
@@ -117,10 +109,10 @@ internal class Help2PayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<Help2PayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<Help2PayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var bankCode = default(string);
 		if (brandPaymentExtendedData.RootElement.TryGetProperty("bankCode", out var element))

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.AlfaPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -9,19 +8,13 @@ namespace Tgs.Payment.WithdrawProcessors;
 internal class AlfaPayProcessor : IWithdrawProcessor
 {
 	private readonly AlfaPaySerializer _alfaPaySerializer;
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly ILogger<AlfaPayProcessor> _logger;
 	public string Subject => "tgs.payment.alfapay.withdraw";
 
 	public AlfaPayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor,
 		AlfaPaySerializer alfaPaySerializer,
 		ILogger<AlfaPayProcessor> logger)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_alfaPaySerializer = alfaPaySerializer ?? throw new ArgumentNullException(nameof(alfaPaySerializer));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
@@ -29,12 +22,12 @@ internal class AlfaPayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<AlfaPayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<AlfaPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		_logger.LogInformation(
-			"{nameof(AlfaPayProcessor)} formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
+			"{processor} formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPaymentExtendedData}",
 			nameof(AlfaPayProcessor),
 			formId,
 			bankInfo,

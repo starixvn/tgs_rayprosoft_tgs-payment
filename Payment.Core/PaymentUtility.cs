@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace Tgs.Payment;
 
-internal static class PaymentUtility
+public static class PaymentUtility
 {
-	public static readonly JsonSerializerOptions SerializerOptions = new()
+	public static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
 	{
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 		WriteIndented = false,

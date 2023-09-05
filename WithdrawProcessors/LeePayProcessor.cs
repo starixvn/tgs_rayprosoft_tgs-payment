@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.LeePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class LeePayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly LeePaySerializer _leePaySerializer;
 	public string Subject => "tgs.payment.leepay.withdraw";
 
 	public LeePayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor,
 		LeePaySerializer leePaySerializer)
 	{
 		_leePaySerializer = leePaySerializer ?? throw new ArgumentNullException(nameof(leePaySerializer));
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 	}
 
 	public string MakeWithdrawSettings(
@@ -26,7 +22,7 @@ internal class LeePayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<LeePayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<LeePayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 		var destinationAddress = withdrawBankInfo.Detail.Address;
 
 		var brandPaymentExtendedData = JsonSerializer
