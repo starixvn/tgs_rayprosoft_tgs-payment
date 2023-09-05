@@ -106,9 +106,7 @@ public class WithdrawTests
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
-		await sut.ExecuteAsync(command);
-
-		var actual = await command.ReturnFormIdSource.Task;
+		var actual = await sut.GetAsync(command);
 
 		Assert.AreNotEqual(Guid.Empty, actual);
 
@@ -219,9 +217,7 @@ public class WithdrawTests
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
-		await sut.ExecuteAsync(command);
-
-		var actual = await command.ReturnFormIdSource.Task;
+		var actual = await sut.GetAsync(command);
 
 		Assert.AreNotEqual(Guid.Empty, actual);
 
@@ -982,7 +978,7 @@ public class WithdrawTests
 				"Bank",
 				"{}"));
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
 	}
 
 	[Test]
@@ -1028,7 +1024,7 @@ public class WithdrawTests
 				JsonDocument.Parse("{}"),
 				false));
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
 	}
 
 	[Test]
@@ -1064,7 +1060,7 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
 			.Returns(new BrandInfo("GPI"));
 
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(command));
+		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
 	}
 
 	[Test]

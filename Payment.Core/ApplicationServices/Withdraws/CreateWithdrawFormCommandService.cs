@@ -11,7 +11,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdrawFormCommand>
+internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawFormCommand, Guid>
 {
 	private readonly JsonSerializerOptions? _jsonSerializerOptions;
 	private readonly IPaymentClient _paymentClient;
@@ -36,7 +36,7 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 		_jsonSerializerOptions = paymentOptionsAccessor.Value.JsonSerializerOptions;
 	}
 
-	public async ValueTask ExecuteAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask<Guid> GetAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
 	{
 		var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(command.BrandId, cancellationToken);
 
@@ -96,11 +96,11 @@ internal class CreateWithdrawFormCommandService : ICommandService<CreateWithdraw
 			.EmitWithdrawFormCreatedEventAsync(createFormId, command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
-		command.ReturnFormIdSource.SetResult(createFormId);
+		return createFormId;
 	}
 
 	private async ValueTask<string> GetAgentBankInfoContentAsync(
-		string userId,
+			string userId,
 		Guid bankInfoId,
 		CancellationToken cancellationToken = default)
 	{
