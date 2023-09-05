@@ -9,20 +9,76 @@ namespace Payment.UnitTests;
 public class WithdrawServiceTests
 {
 	[Test]
+	public async Task EmitCreateWithdrawFormEventPipe會發出表單建立事件()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { new EmitCreateWithdrawFormEventPipe(fakePaymentClient) });
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			Guid.NewGuid().ToString(),
+			"TestAgent");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
+
+		_ = fakePaymentClient.Received(1)
+			.EmitWithdrawFormCreatedEventAsync(
+				Arg.Is(actual),
+				Arg.Is(brandId));
+	}
+
+	[Test]
 	public async Task 建立Agent的提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
-			fakePaymentClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -107,26 +163,22 @@ public class WithdrawServiceTests
 				Arg.Is(expectedSnapshot),
 				Arg.Is(eventId),
 				Arg.Is(currentTime.UtcDateTime));
-
-		_ = fakePaymentClient.Received(1)
-			.EmitWithdrawFormCreatedEventAsync(Arg.Is(actual), Arg.Any<Guid>());
 	}
 
 	[Test]
 	public void 建立代理提款單時_如果BankInfo不是自己的會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
-			fakePaymentClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -160,17 +212,16 @@ public class WithdrawServiceTests
 	public async Task 建立玩家的提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
-			fakePaymentClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -258,26 +309,22 @@ public class WithdrawServiceTests
 				Arg.Is(expectedSnapshot),
 				Arg.Is(eventId),
 				Arg.Is(currentTime.UtcDateTime));
-
-		_ = fakePaymentClient.Received(1)
-			.EmitWithdrawFormCreatedEventAsync(Arg.Is(actual), Arg.Any<Guid>());
 	}
 
 	[Test]
 	public void 建立玩家提款單_如果BankInfo不是自己的會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
-			fakePaymentClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -309,20 +356,192 @@ public class WithdrawServiceTests
 	}
 
 	[Test]
+	public async Task 建立提款單時_Pipe的After會依照Order由小到大的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePipe1 = Substitute.For<ICreateWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<ICreateWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<ICreateWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { fakePipe1, fakePipe2, fakePipe3 });
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			Guid.NewGuid().ToString(),
+			"TestAgent");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		var actual = await sut.CreateWithdrawFormAsync(
+			user,
+			brandId,
+			bankInfoId,
+			amount,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe2.AfterCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)),
+				Arg.Is(actual));
+			_ = fakePipe1.AfterCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)),
+				Arg.Is(actual));
+			_ = fakePipe3.AfterCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)),
+				Arg.Is(actual));
+		});
+	}
+
+	[Test]
+	public async Task 建立提款單時_Pipe的Before會依照Order由大到小的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePipe1 = Substitute.For<ICreateWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<ICreateWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<ICreateWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { fakePipe1, fakePipe2, fakePipe3 });
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			Guid.NewGuid().ToString(),
+			"TestAgent");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = await sut.CreateWithdrawFormAsync(
+			user,
+			brandId,
+			bankInfoId,
+			amount,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe3.BeforeCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)));
+			_ = fakePipe1.BeforeCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)));
+			_ = fakePipe2.BeforeCreateWithdrawFormAsync(
+				Arg.Is(user),
+				Arg.Is(brandId),
+				Arg.Is(bankInfoId),
+				Arg.Is(amount),
+				Arg.Is(default(string)));
+		});
+	}
+
+	[Test]
 	public void 建立提款單時_UserType不正確時會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
-			fakePaymentClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
