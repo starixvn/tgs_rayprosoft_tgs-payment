@@ -48,24 +48,24 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 			Id = createFormId,
 			BrandId = command.BrandId,
 			OrderNo = orderNo,
-			UserId = command.UserId,
-			UserName = command.UserName,
-			UserType = command.UserType,
+			UserId = command.User.UserId,
+			UserName = command.User.UserName,
+			UserType = command.User.UserType,
 			Amount = command.Amount,
 			Status = PaymentFlowState.Init,
 			BankInfoId = command.BankInfoId,
 			Note = command.Note,
-			BankInfo = command.UserType switch
+			BankInfo = command.User.UserType switch
 			{
 				UserType.Player => await GetPlayerBankInfoContentAsync(
-					command.UserId!,
+					command.User.UserId!,
 					command.BankInfoId,
 					cancellationToken).ConfigureAwait(false),
 				UserType.Agent => await GetAgentBankInfoContentAsync(
-					command.UserId!,
+					command.User.UserId!,
 					command.BankInfoId,
 					cancellationToken).ConfigureAwait(false),
-				_ => throw new InvalidOperationException($"Can't handle user type: {command.UserType}")
+				_ => throw new InvalidOperationException($"Can't handle user type: {command.User.UserType}")
 			},
 			CreatedOn = currentTime
 		};
@@ -96,11 +96,11 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 	}
 
 	private async ValueTask<string> GetAgentBankInfoContentAsync(
-			string userId,
+		string userId,
 		Guid bankInfoId,
 		CancellationToken cancellationToken = default)
 	{
-		var agentId = Guid.Parse(userId!);
+		var agentId = Guid.Parse(userId);
 
 		var agentBankInfo = await _paymentRepository
 			.GetAgentBankInfoByIdAsync(bankInfoId, cancellationToken)

@@ -60,9 +60,10 @@ public class WithdrawController : ControllerBase
 		[FromBody] CreateWithdrawFormViewModel request)
 	{
 		var command = new CreateWithdrawFormCommand(
-			request.UserId,
-			request.UserName,
-			request.UserType,
+			new WithdrawUser(
+				request.UserType,
+				request.UserId,
+				request.UserName),
 			request.BrandId,
 			request.BankInfoId,
 			request.Amount,

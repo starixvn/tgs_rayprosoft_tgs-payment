@@ -70,9 +70,10 @@ public class WithdrawTests
 
 		var brandId = Guid.NewGuid();
 		var command = new CreateWithdrawFormCommand(
-			Guid.NewGuid().ToString(),
-			"TestAgent",
-			UserType.Agent,
+			new WithdrawUser(
+				UserType.Agent,
+				Guid.NewGuid().ToString(),
+				"TestAgent"),
 			brandId,
 			Guid.NewGuid(),
 			1000M,
@@ -83,7 +84,7 @@ public class WithdrawTests
 
 		var agentBankInfo = new AgentBankInfo(
 			command.BankInfoId,
-			Guid.Parse(command.UserId),
+			Guid.Parse(command.User.UserId),
 			command.BrandId,
 			Guid.NewGuid(),
 			"Bank",
@@ -109,9 +110,9 @@ public class WithdrawTests
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
 			command.BrandId,
-			command.UserId,
-			command.UserName,
-			command.UserType,
+			command.User.UserId,
+			command.User.UserName,
+			command.User.UserType,
 			command.Amount,
 			null,
 			0M,
@@ -177,9 +178,10 @@ public class WithdrawTests
 		var brandId = Guid.NewGuid();
 
 		var command = new CreateWithdrawFormCommand(
-			"ThisIsPlayerCode",
-			"TestUser",
-			UserType.Player,
+			new WithdrawUser(
+				UserType.Player,
+				"ThisIsPlayerCode",
+				"TestUser"),
 			brandId,
 			Guid.NewGuid(),
 			1000M,
@@ -190,7 +192,7 @@ public class WithdrawTests
 
 		var playerBankInfo = new PlayerBankInfo(
 			command.BankInfoId,
-			command.UserId,
+			command.User.UserId,
 			command.BrandId,
 			Guid.NewGuid(),
 			"Bank",
@@ -217,9 +219,9 @@ public class WithdrawTests
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
 			command.BrandId,
-			command.UserId,
-			command.UserName,
-			command.UserType,
+			command.User.UserId,
+			command.User.UserName,
+			command.User.UserType,
 			command.Amount,
 			null,
 			0M,
@@ -948,9 +950,10 @@ public class WithdrawTests
 		var brandId = Guid.NewGuid();
 
 		var command = new CreateWithdrawFormCommand(
-			Guid.NewGuid().ToString(),
-			"TestAgent",
-			UserType.Agent,
+			new WithdrawUser(
+				UserType.Agent,
+				Guid.NewGuid().ToString(),
+				"TestAgent"),
 			brandId,
 			Guid.NewGuid(),
 			1000M,
@@ -990,9 +993,10 @@ public class WithdrawTests
 		var brandId = Guid.NewGuid();
 
 		var command = new CreateWithdrawFormCommand(
-			"ThisIsPlayerCode",
-			"TestUser",
-			UserType.Player,
+			new WithdrawUser(
+				UserType.Player,
+				"ThisIsPlayerCode",
+				"TestUser"),
 			brandId,
 			Guid.NewGuid(),
 			1000M,
@@ -1033,9 +1037,10 @@ public class WithdrawTests
 		var brandId = Guid.NewGuid();
 
 		var command = new CreateWithdrawFormCommand(
-			"Unknown",
-			"Unknown",
-			UserType.None,
+			new WithdrawUser(
+				UserType.None,
+				"Unknown",
+				"Unknown"),
 			brandId,
 			Guid.NewGuid(),
 			1000M,
