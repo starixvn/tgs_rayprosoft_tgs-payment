@@ -70,12 +70,6 @@ builder.Services
 
 		_ = builder.UseNpgsql(config.GetConnectionString("Tgs"));
 	})
-	.ConfigureOptions((options, sp) =>
-	{
-		var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
-
-		options.JsonSerializerOptions = jsonOptions.JsonSerializerOptions;
-	})
 	.ConfigureBankInfoIndexParsers((options, _) =>
 	{
 		var parsersConfig = new Dictionary<string, Dictionary<string, string>>();

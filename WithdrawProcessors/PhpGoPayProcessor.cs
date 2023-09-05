@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using JSLTSharp;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.PhpGoPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -47,20 +46,18 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 	}.AsReadOnly();
 
 	private readonly JsonTransform _jsonTransform;
-	private readonly JsonSerializerOptions _paymentSerializerOptions;
 
 	public virtual string Subject => "tgs.payment.phpgopay.withdraw";
 
-	public PhpGoPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, JsonTransform jsonTransform)
+	public PhpGoPayProcessor(JsonTransform jsonTransform)
 	{
-		_paymentSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
 	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _paymentSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var bankCode = brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString();
 
@@ -75,7 +72,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<PhpGoPayBankInfo>>(transforJson, _paymentSerializerOptions);
+			.Deserialize<WithdrawBankInfo<PhpGoPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 
 		var settings = new PhpGoPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("merchant").GetString(),

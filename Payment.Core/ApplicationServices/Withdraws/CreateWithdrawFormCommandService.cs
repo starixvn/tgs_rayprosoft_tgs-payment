@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
 using Json.Pointer;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
@@ -13,7 +12,6 @@ namespace Tgs.Payment.ApplicationServices.Withdraws;
 
 internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawFormCommand, Guid>
 {
-	private readonly JsonSerializerOptions? _jsonSerializerOptions;
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
@@ -23,7 +21,6 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 	public CreateWithdrawFormCommandService(
 		IPaymentRepository paymentRepository,
 		IPaymentClient paymentClient,
-		IOptions<PaymentOptions> paymentOptionsAccessor,
 		ITakeNumberStore takeNumberStore,
 		ISystemClock systemClock,
 		ISerialNumberGenerator serialNumberGenerator)
@@ -33,7 +30,6 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 		_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_jsonSerializerOptions = paymentOptionsAccessor.Value.JsonSerializerOptions;
 	}
 
 	public async ValueTask<Guid> GetAsync(CreateWithdrawFormCommand command, CancellationToken cancellationToken = default)
@@ -119,7 +115,7 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 			agentBankInfo.BankType,
 			JsonDocument.Parse(agentBankInfo.Detail));
 
-		return JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions);
+		return JsonSerializer.Serialize(bankInfoData, PaymentUtility.SerializerOptions);
 	}
 
 	private async ValueTask<string> GetPlayerBankInfoContentAsync(
@@ -140,6 +136,6 @@ internal class CreateWithdrawFormCommandService : IGetService<CreateWithdrawForm
 			playerBankInfo.BankType,
 			playerBankInfo.Detail);
 
-		return JsonSerializer.Serialize(bankInfoData, _jsonSerializerOptions);
+		return JsonSerializer.Serialize(bankInfoData, PaymentUtility.SerializerOptions);
 	}
 }

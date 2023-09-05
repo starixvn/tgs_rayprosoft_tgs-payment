@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.TuPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class TuPayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly ILogger<TuPayProcessor> _logger;
 	private readonly TuPaySerializer _tuPaySerializer;
 	public string Subject => "tgs.payment.tupay.withdraw";
 
-	public TuPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, TuPaySerializer tuPaySerializer, ILogger<TuPayProcessor> logger)
+	public TuPayProcessor(
+		TuPaySerializer tuPaySerializer,
+		ILogger<TuPayProcessor> logger)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_tuPaySerializer = tuPaySerializer ?? throw new ArgumentNullException(nameof(tuPaySerializer));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
@@ -26,9 +22,9 @@ internal class TuPayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<TuPayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<TuPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		_logger.LogInformation(
 			"TuPayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",

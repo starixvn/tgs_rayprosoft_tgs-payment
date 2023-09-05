@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.Paging;
 using Tgs.Payment;
@@ -62,12 +61,9 @@ public class WithdrawTests
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
-
 		var sut = new CreateWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			optionsAccessor,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator);
@@ -128,7 +124,7 @@ public class WithdrawTests
 				agentBankInfo.Id,
 				agentBankInfo.PaymentChannelId,
 				agentBankInfo.BankType,
-				JsonDocument.Parse(agentBankInfo.Detail)), optionsAccessor.Value.JsonSerializerOptions),
+				JsonDocument.Parse(agentBankInfo.Detail)), PaymentUtility.SerializerOptions),
 			null,
 			null,
 			orderNo,
@@ -171,12 +167,9 @@ public class WithdrawTests
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
-
 		var sut = new CreateWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			optionsAccessor,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator);
@@ -239,7 +232,7 @@ public class WithdrawTests
 				playerBankInfo.Id,
 				playerBankInfo.PaymentChannelId,
 				playerBankInfo.BankType,
-				playerBankInfo.Detail), optionsAccessor.Value.JsonSerializerOptions),
+				playerBankInfo.Detail), PaymentUtility.SerializerOptions),
 			null,
 			null,
 			orderNo,
@@ -945,12 +938,9 @@ public class WithdrawTests
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
-
 		var sut = new CreateWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			optionsAccessor,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			 fakeSerialNumberGenerator);
@@ -990,12 +980,9 @@ public class WithdrawTests
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
-
 		var sut = new CreateWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			optionsAccessor,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator);
@@ -1036,12 +1023,9 @@ public class WithdrawTests
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var optionsAccessor = new OptionsWrapper<PaymentOptions>(new PaymentOptions());
-
 		var sut = new CreateWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			optionsAccessor,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator);

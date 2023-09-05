@@ -2,22 +2,13 @@
 
 using System;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.FiveSevenPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class FiveSevenPayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _paymentSerializerOptions;
-
 	public string Subject => "tgs.payment.fivesevenpay.withdraw";
-
-	public FiveSevenPayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor)
-	{
-		_paymentSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -26,10 +17,10 @@ internal class FiveSevenPayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<FiveSevenPayBankInfo>>(bankInfo!, _paymentSerializerOptions)!;
+			.Deserialize<WithdrawBankInfo<FiveSevenPayBankInfo>>(bankInfo!, PaymentUtility.SerializerOptions)!;
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _paymentSerializerOptions)!;
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions)!;
 
 		var payType = FiveSevenPayType.Parse(brandPaymentExtendedData.RootElement.GetProperty("payType").GetString()!)!;
 

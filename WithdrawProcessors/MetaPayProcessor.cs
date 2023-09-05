@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using JSLTSharp;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplicationServices.Agents;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.MetaPay.Client;
@@ -77,18 +76,16 @@ internal class MetaPayProcessor : IWithdrawProcessor
 	private readonly IGetService<GetAgentInfoQuery, AgentInfo> _getAgentService;
 	private readonly IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> _getService;
 	private readonly JsonTransform _jsonTransform;
-	private readonly JsonSerializerOptions _paymentSerializerOptions;
 	private readonly IPlayerServiceClient _playerServiceClient;
+
 	public string Subject => "tgs.payment.metapay.withdraw";
 
 	public MetaPayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor,
 		JsonTransform jsonTransform,
 		IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService,
 		IGetService<GetAgentInfoQuery, AgentInfo> getAgentService,
 		IPlayerServiceClient playerServiceClient)
 	{
-		_paymentSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
 		_getService = getService ?? throw new ArgumentNullException(nameof(getService));
 		_getAgentService = getAgentService ?? throw new ArgumentNullException(nameof(getAgentService));
@@ -102,7 +99,7 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _paymentSerializerOptions)!;
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions)!;
 
 		var paySetting = brandPaymentExtendedData.RootElement.GetProperty("payType").GetString();
 
@@ -110,7 +107,7 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<MetaPayBankInfo>>(transforJson, _paymentSerializerOptions)!;
+			.Deserialize<WithdrawBankInfo<MetaPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions)!;
 
 		var (payType, mobileNumber) = paySetting switch
 		{

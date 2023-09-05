@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.MaticPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -41,15 +40,12 @@ internal class MaticPayProcessor : IWithdrawProcessor
 		{ "工商银行公户", "ICBCB" }
 	};
 
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly MaticPaySerializer _maticPaySerializer;
 	public string Subject => "tgs.payment.maticpay.withdraw";
 
 	public MaticPayProcessor(
-		IOptions<PaymentOptions> jsonOptionsAccessor,
 		MaticPaySerializer maticPaySerializer)
 	{
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_maticPaySerializer = maticPaySerializer ?? throw new ArgumentNullException(nameof(maticPaySerializer));
 	}
 
@@ -60,13 +56,13 @@ internal class MaticPayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<MaticPayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<MaticPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var bankName = withdrawBankInfo.Detail.BankName;
 		_ = _BankMapping.TryGetValue(bankName, out var bankCode);
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var settings = new MaticPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("merchantNo").GetString(),

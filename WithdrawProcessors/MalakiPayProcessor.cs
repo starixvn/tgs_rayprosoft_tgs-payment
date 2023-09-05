@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.MalakiPay;
-using Tgs.Payment.TuPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class MalakiPayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly ILogger<MalakiPayProcessor> _logger;
 	private readonly MalakiPaySerializer _malakiPaySerializer;
 	public string Subject => "tgs.payment.malakipay.withdraw";
 
-	public MalakiPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, MalakiPaySerializer malakiPaySerializer, ILogger<MalakiPayProcessor> logger)
+	public MalakiPayProcessor(
+		MalakiPaySerializer malakiPaySerializer,
+		ILogger<MalakiPayProcessor> logger)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_malakiPaySerializer = malakiPaySerializer ?? throw new ArgumentNullException(nameof(malakiPaySerializer));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
@@ -27,9 +22,9 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<MalakiPayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<MalakiPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		_logger.LogInformation(
 			"{nameof(MalakiPayProcessor)} formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",

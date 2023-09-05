@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.WandaPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class WandaPayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _paymentSerializerOptions;
-
 	public string Subject => "tgs.payment.wandapay.withdraw";
-
-	public WandaPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor)
-	{
-		_paymentSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -23,9 +15,9 @@ internal class WandaPayProcessor : IWithdrawProcessor
 		BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<WandaPayBankInfo>>(bankInfo, _paymentSerializerOptions);
+			.Deserialize<WithdrawBankInfo<WandaPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _paymentSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var settings = new WandaPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("storeCode").GetString(),

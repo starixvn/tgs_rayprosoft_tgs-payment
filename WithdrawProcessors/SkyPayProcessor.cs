@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using Tgs.Payment.SkyPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class SkyPayProcessor : IWithdrawProcessor
 {
-	private readonly JsonSerializerOptions _jsonSerializerOptions;
 	private readonly SkyPaySerializer _skyPaySerializer;
 
 	public string Subject { get; }
 
-	public SkyPayProcessor(IOptions<PaymentOptions> jsonOptionsAccessor, SkyPaySerializer skyPaySerializer)
+	public SkyPayProcessor(
+		SkyPaySerializer skyPaySerializer)
 	{
-		if (jsonOptionsAccessor is null)
-			throw new ArgumentNullException(nameof(jsonOptionsAccessor));
-
-		_jsonSerializerOptions = jsonOptionsAccessor.Value.JsonSerializerOptions;
 		_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
 
 		Subject = $"tgs.payment.skypay.cn.withdraw";
@@ -26,10 +21,10 @@ internal class SkyPayProcessor : IWithdrawProcessor
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var brandPaymentExtendedData = JsonSerializer
-			.Deserialize<JsonDocument>(brandPayment.ExtendedData, _jsonSerializerOptions);
+			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		return withdrawBankInfo.BankType switch
 		{
@@ -41,7 +36,7 @@ internal class SkyPayProcessor : IWithdrawProcessor
 	private string MakeBankWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
 	{
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, _jsonSerializerOptions);
+			.Deserialize<WithdrawBankInfo<GatewayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
 
 		var settings = new GatewayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("accessToken").GetString(),

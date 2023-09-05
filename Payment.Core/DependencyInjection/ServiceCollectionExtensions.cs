@@ -25,8 +25,6 @@ public static class ServiceCollectionExtensions
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
 			.AddSingleton<ISystemClock, DefaultSystemClock>()
 			.AddSerialNumberGenerator()
-			.AddOptions<PaymentOptions>()
-			.Services
 			.AddOptions<BankInfoParserOptions>();
 
 		services

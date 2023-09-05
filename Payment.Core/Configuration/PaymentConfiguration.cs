@@ -24,15 +24,6 @@ public class PaymentConfiguration
 		return this;
 	}
 
-	public PaymentConfiguration ConfigureOptions(Action<PaymentOptions, IServiceProvider> configure)
-	{
-		_ = Services
-			.AddOptions<PaymentOptions>()
-			.Configure(configure);
-
-		return this;
-	}
-
 	public PaymentConfiguration RegisterWithdrawProcessor<TProcessor>(string paymentCode, params object[] parameters) where TProcessor : class, IWithdrawProcessor
 	{
 		_ = Services.AddSingleton(
