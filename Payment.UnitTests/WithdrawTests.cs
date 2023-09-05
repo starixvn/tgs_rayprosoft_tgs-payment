@@ -53,222 +53,6 @@ public class WithdrawTests
 	}
 
 	[Test]
-	public async Task Can_Create_Agent_WithdrawForm()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new CreateWithdrawFormCommandService(
-			fakePaymentRepository,
-			fakePaymentClient,
-			fakeTakeNumberStore,
-			fakeSystemClock,
-			fakeSerialNumberGenerator);
-
-		var brandId = Guid.NewGuid();
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				UserType.Agent,
-				Guid.NewGuid().ToString(),
-				"TestAgent"),
-			brandId,
-			Guid.NewGuid(),
-			1000M,
-			null);
-
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
-
-		var agentBankInfo = new AgentBankInfo(
-			command.BankInfoId,
-			Guid.Parse(command.User.UserId),
-			command.BrandId,
-			Guid.NewGuid(),
-			"Bank",
-			"{}");
-		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
-			.Returns(agentBankInfo);
-
-		var eventId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var orderNo = "TT11234567";
-		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
-			.Returns(orderNo);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
-
-		var actual = await sut.GetAsync(command);
-
-		Assert.AreNotEqual(Guid.Empty, actual);
-
-		var expectedSnapshot = new WithdrawFormSnapshot(
-			actual,
-			command.BrandId,
-			command.User.UserId,
-			command.User.UserName,
-			command.User.UserType,
-			command.Amount,
-			null,
-			0M,
-			null,
-			PaymentFlowState.Init,
-			null,
-			command.Note,
-			command.BankInfoId,
-			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
-				agentBankInfo.Id,
-				agentBankInfo.PaymentChannelId,
-				agentBankInfo.BankType,
-				JsonDocument.Parse(agentBankInfo.Detail)), PaymentUtility.SerializerOptions),
-			null,
-			null,
-			orderNo,
-			null,
-			currentTime.UtcDateTime,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null);
-
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
-
-		_ = fakePaymentRepository.Received(1)
-			.CreateWithdrawFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
-				Arg.Any<JsonDocument>(),
-				Arg.Any<string>());
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateWithdrawFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
-
-		_ = fakePaymentClient.Received(1)
-			.EmitWithdrawFormCreatedEventAsync(Arg.Is(actual), Arg.Any<Guid>());
-	}
-
-	[Test]
-	public async Task Can_Create_Player_Withdraw_Form()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new CreateWithdrawFormCommandService(
-			fakePaymentRepository,
-			fakePaymentClient,
-			fakeTakeNumberStore,
-			fakeSystemClock,
-			fakeSerialNumberGenerator);
-
-		var brandId = Guid.NewGuid();
-
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				UserType.Player,
-				"ThisIsPlayerCode",
-				"TestUser"),
-			brandId,
-			Guid.NewGuid(),
-			1000M,
-			"ThisIsPlayerNote");
-
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
-
-		var playerBankInfo = new PlayerBankInfo(
-			command.BankInfoId,
-			command.User.UserId,
-			command.BrandId,
-			Guid.NewGuid(),
-			"Bank",
-			JsonDocument.Parse("{}"),
-			false);
-		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
-			.Returns(playerBankInfo);
-
-		var eventId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var orderNo = "TT11234567";
-		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
-			.Returns(orderNo);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
-
-		var actual = await sut.GetAsync(command);
-
-		Assert.AreNotEqual(Guid.Empty, actual);
-
-		var expectedSnapshot = new WithdrawFormSnapshot(
-			actual,
-			command.BrandId,
-			command.User.UserId,
-			command.User.UserName,
-			command.User.UserType,
-			command.Amount,
-			null,
-			0M,
-			null,
-			PaymentFlowState.Init,
-			null,
-			command.Note,
-			command.BankInfoId,
-			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
-				playerBankInfo.Id,
-				playerBankInfo.PaymentChannelId,
-				playerBankInfo.BankType,
-				playerBankInfo.Detail), PaymentUtility.SerializerOptions),
-			null,
-			null,
-			orderNo,
-			null,
-			currentTime.UtcDateTime,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null);
-
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
-
-		_ = fakePaymentRepository.Received(1)
-			.CreateWithdrawFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
-				Arg.Any<JsonDocument>(),
-				Arg.Any<string>());
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateWithdrawFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
-
-		_ = fakePaymentClient.Received(1)
-			.EmitWithdrawFormCreatedEventAsync(Arg.Is(actual), Arg.Any<Guid>());
-	}
-
-	[Test]
 	public async Task Can_Get_One_WithdrawForm()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -932,127 +716,6 @@ public class WithdrawTests
 	}
 
 	[Test]
-	public void Create_Agent_WithdrawForm_If_BankInfo_Not_Self_Will_Fail()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new CreateWithdrawFormCommandService(
-			fakePaymentRepository,
-			fakePaymentClient,
-			fakeTakeNumberStore,
-			fakeSystemClock,
-			 fakeSerialNumberGenerator);
-
-		var brandId = Guid.NewGuid();
-
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				UserType.Agent,
-				Guid.NewGuid().ToString(),
-				"TestAgent"),
-			brandId,
-			Guid.NewGuid(),
-			1000M,
-			null);
-
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
-
-		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(command.BankInfoId))
-			.Returns(new AgentBankInfo(
-				command.BankInfoId,
-				Guid.NewGuid(),
-				command.BrandId,
-				Guid.NewGuid(),
-				"Bank",
-				"{}"));
-
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
-	}
-
-	[Test]
-	public void Create_Player_Withdraw_Form_If_BankInfo_Not_Self_Will_Fail()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new CreateWithdrawFormCommandService(
-			fakePaymentRepository,
-			fakePaymentClient,
-			fakeTakeNumberStore,
-			fakeSystemClock,
-			fakeSerialNumberGenerator);
-
-		var brandId = Guid.NewGuid();
-
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				UserType.Player,
-				"ThisIsPlayerCode",
-				"TestUser"),
-			brandId,
-			Guid.NewGuid(),
-			1000M,
-			null);
-
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
-
-		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(command.BankInfoId))
-			.Returns(new PlayerBankInfo(
-				command.BankInfoId,
-				"OtherPlayerCode",
-				command.BrandId,
-				Guid.NewGuid(),
-				"Bank",
-				JsonDocument.Parse("{}"),
-				false));
-
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
-	}
-
-	[Test]
-	public void Create_Withdraw_Form_With_Invalid_UserType_Will_Fail()
-	{
-		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-
-		var sut = new CreateWithdrawFormCommandService(
-			fakePaymentRepository,
-			fakePaymentClient,
-			fakeTakeNumberStore,
-			fakeSystemClock,
-			fakeSerialNumberGenerator);
-
-		var brandId = Guid.NewGuid();
-
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				UserType.None,
-				"Unknown",
-				"Unknown"),
-			brandId,
-			Guid.NewGuid(),
-			1000M,
-			null);
-
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
-
-		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.GetAsync(command));
-	}
-
-	[Test]
 	public async Task Submit_WithdrawForm_Paid()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -1318,6 +981,36 @@ public class WithdrawTests
 				Arg.Is(command.FormId),
 				Arg.Any<Guid>(),
 				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task 建立提款單()
+	{
+		var fakeWithdrawService = Substitute.For<IWithdrawService>();
+
+		var sut = new CreateWithdrawFormCommandService(
+			fakeWithdrawService);
+
+		var brandId = Guid.NewGuid();
+		var command = new CreateWithdrawFormCommand(
+			new WithdrawUser(
+				UserType.Agent,
+				Guid.NewGuid().ToString(),
+				"TestAgent"),
+			brandId,
+			Guid.NewGuid(),
+			1000M,
+			null);
+
+		_ = await sut.GetAsync(command);
+
+		_ = fakeWithdrawService.Received(1)
+			.CreateWithdrawFormAsync(
+				Arg.Is(command.User),
+				Arg.Is(command.BrandId),
+				Arg.Is(command.BankInfoId),
+				Arg.Is(command.Amount),
+				Arg.Is(command.Note));
 	}
 
 	[Test]

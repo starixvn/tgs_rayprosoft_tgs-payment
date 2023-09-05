@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
 			ServiceLifetime.Transient);
 
 		_ = services
+			.AddTransient<IWithdrawService, WithdrawService>()
 			.AddSingleton<IWithdrawProcessorFactory>(
 				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
 					sp,
