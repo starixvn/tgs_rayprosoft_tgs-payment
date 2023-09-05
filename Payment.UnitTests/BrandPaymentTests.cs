@@ -282,14 +282,59 @@ public class BrandPaymentTests
 	{
 		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new GetBrandNetDepositQueryService(fakeBrandNetDepositRepository);
+		var sut = new GetBrandCurrentDayNetDepositQueryService(fakeBrandNetDepositRepository);
 
 		var brandId = Guid.NewGuid();
 
-		_ = await sut.GetAsync(new GetBrandNetDepositQuery(brandId));
+		_ = await sut.GetAsync(new GetBrandCurrentDayNetDepositQuery(brandId));
 
 		_ = fakeBrandNetDepositRepository
 			.Received(1)
-			.GetBrandNetDepositAsync(Arg.Is(brandId));
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
+	}
+
+	[Test]
+	public async Task 查詢Brand非當日存提差()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new GetBrandReportDateNetDepositQueryService(fakePaymentRepository,fakeBrandNetDepositRepository);
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
+
+		_ = fakePaymentRepository
+			.GetBrandNetDepositAsync(Arg.Is(brandId),Arg.Is(reportDate))
+			.Returns(16800m);	
+
+		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
+
+		Assert.AreEqual(16800m, actual);
+
+		_ = fakeBrandNetDepositRepository
+			.Received(0)
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
+	}
+
+	[Test]
+	public async Task 查詢Brand當日存提差()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new GetBrandReportDateNetDepositQueryService(fakePaymentRepository, fakeBrandNetDepositRepository);
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
+
+		_ = fakeBrandNetDepositRepository
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
+			.Returns(16800m);
+
+		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
+
+		Assert.AreEqual(16800m, actual);
+		_ = fakeBrandNetDepositRepository
+			.Received(1)
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
 	}
 }

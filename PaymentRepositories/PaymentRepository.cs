@@ -469,6 +469,17 @@ internal class PaymentRepository : IPaymentRepository
 		return new BrandInfo(brandInfo!.Code);
 	}
 
+	public async ValueTask<decimal?> GetBrandNetDepositAsync(Guid brandId, DateOnly date, CancellationToken cancellationToken = default)
+	{
+		var netprofit = await _tgsContext.BrandDailyPaymentStatistics
+			.FirstOrDefaultAsync(p => p.BrandId == brandId && p.ReportDate == date, cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		return netprofit == null
+			? null
+			: netprofit.DailyDepositAmount - netprofit.DailyWithdrawAmount;
+	}
+
 	public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode, CancellationToken cancellationToken = default)
 	{
 		var ids = brandPaymentIds.ToArray();

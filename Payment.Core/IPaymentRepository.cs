@@ -65,6 +65,8 @@ public partial interface IPaymentRepository
 
 	ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+	ValueTask<decimal?> GetBrandNetDepositAsync(Guid brandId, DateOnly date, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
 		IEnumerable<Guid> brandPaymentIds,
 		string playerCode,

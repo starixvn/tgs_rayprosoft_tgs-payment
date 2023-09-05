@@ -41,11 +41,11 @@ public class BrandPaymentController : ControllerBase
 			: null;
 	}
 
-	[HttpGet("netdeposit/{brandId}", Name = "GetBrandNetDeposit")]
-	public ValueTask<decimal> GetBrandNetDepositAsync(
-		[FromServices] IGetService<GetBrandNetDepositQuery, decimal> getService,
+	[HttpGet("net-deposit/current-day/{brandId}", Name = "GetBrandCurrentDayNetDeposit")]
+	public ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(
+		[FromServices] IGetService<GetBrandCurrentDayNetDepositQuery, decimal> getService,
 		Guid brandId)
-		=> getService.GetAsync(new GetBrandNetDepositQuery(brandId), HttpContext.RequestAborted);
+		=> getService.GetAsync(new GetBrandCurrentDayNetDepositQuery(brandId), HttpContext.RequestAborted);
 
 	[HttpGet("acl/{playerCode}", Name = "QueryBrandPaymentAcls")]
 	public IAsyncEnumerable<BrandPaymentAclViewModel> GetBrandPaymentAclsAsync(
@@ -170,6 +170,13 @@ public class BrandPaymentController : ControllerBase
 				BrandPaymentId = vip.BrandPaymentId,
 				VipLevelId = vip.VipLevelId
 			});
+
+	[HttpGet("net-deposit/{brandId}", Name = "GetBrandReportDateNetDeposit")]
+	public ValueTask<decimal> GetBrandReportDateNetDepositAsync(
+		[FromServices] IGetService<GetBrandReportDateNetDepositQuery, decimal> getService,
+		Guid brandId,
+		[FromQuery] DateOnly date)
+		=> getService.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, date), HttpContext.RequestAborted);
 
 	[HttpGet("query", Name = "QueryBrandPayments")]
 	public IAsyncEnumerable<BrandPaymentViewModel> QueryBrandPaymentsAsync(

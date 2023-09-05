@@ -84,30 +84,6 @@ public class BrandPaymentTests
 	}
 
 	[Test]
-	public async Task Get_Brand_Net_Deposit()
-	{
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
-
-		await using TestPaymentApplication web = TestSiteHelper
-			.GetPaymentServiceTestHost(services => services
-			.AddSingleton(fakeBrandNetDepositRepository));
-
-		var httpClient = web.CreateClient();
-
-		var sut = new PaymentServiceClient(httpClient);
-
-		var brandId = Guid.NewGuid();
-
-		_ = fakeBrandNetDepositRepository
-			.GetBrandNetDepositAsync(Arg.Is(brandId))
-			.Returns(168000m);
-
-		var actual = await sut.GetBrandNetDepositAsync(brandId);
-
-		Assert.AreEqual(168000m, actual);
-	}
-
-	[Test]
 	public async Task Get_BrandPayment_Fee_Settings()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -316,5 +292,83 @@ public class BrandPaymentTests
 				Arg.Any<Guid>(),
 				Arg.Any<DateTime>(),
 				Arg.Any<CancellationToken>());
+	}
+
+	[Test]
+	public async Task 查詢Brand指定日期存提差_有統計資料()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper
+			.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository)
+			.AddSingleton(fakeBrandNetDepositRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+		_ = fakePaymentRepository
+			.GetBrandNetDepositAsync(Arg.Is(brandId), Arg.Is(reportDate), Arg.Any<CancellationToken>())
+			.Returns(168000m);
+
+		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
+
+		Assert.AreEqual(168000m, actual);
+	}
+
+	[Test]
+	public async Task 查詢Brand指定日期存提差_統計資料未出來時_返回即時資料()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper
+			.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakePaymentRepository)
+			.AddSingleton(fakeBrandNetDepositRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+		_ = fakeBrandNetDepositRepository
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
+			.Returns(168000m);
+
+		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
+
+		Assert.AreEqual(168000m, actual);
+	}
+
+	[Test]
+	public async Task 查詢Brand當日存提差()
+	{
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper
+			.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandNetDepositRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+
+		_ = fakeBrandNetDepositRepository
+			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
+			.Returns(168000m);
+
+		var actual = await sut.GetBrandCurrentDayNetDepositAsync(brandId);
+
+		Assert.AreEqual(168000m, actual);
 	}
 }

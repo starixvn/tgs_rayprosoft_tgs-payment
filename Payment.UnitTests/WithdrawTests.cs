@@ -1356,7 +1356,7 @@ public class WithdrawTests
 
 		_ = fakeCountRepository
 			.Received(1)
-			.CountBrandNetDepositAsync(Arg.Is(brandId), Arg.Is((double)-amount));
+			.CountBrandCurrentDayNetDepositAsync(Arg.Is(brandId), Arg.Is((double)-amount));
 	}
 
 	[Test]
@@ -1375,7 +1375,7 @@ public class WithdrawTests
 
 		_ = fakeCountRepository
 			.Received(0)
-			.CountBrandNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
+			.CountBrandCurrentDayNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
 	}
 
 	[Test]

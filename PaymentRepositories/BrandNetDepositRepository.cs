@@ -14,7 +14,7 @@ internal class BrandNetDepositRepository : IBrandNetDepositRepository
 		_redisDatabase = redisConnectionFactory.Database;
 	}
 
-	public async ValueTask CountBrandNetDepositAsync(Guid brandId, double amount)
+	public async ValueTask CountBrandCurrentDayNetDepositAsync(Guid brandId, double amount)
 	{
 		var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8));
 		var key = $"{_KeyPrefix}:{brandId}:{now:yyyyMMdd}";
@@ -30,7 +30,7 @@ internal class BrandNetDepositRepository : IBrandNetDepositRepository
 			.ConfigureAwait(false);		
 	}
 
-	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId)
+	public async ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId)
 	{
 		var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8));
 		var key = $"{_KeyPrefix}:{brandId}:{now:yyyyMMdd}";

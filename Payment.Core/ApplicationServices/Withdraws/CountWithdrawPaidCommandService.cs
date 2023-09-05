@@ -40,6 +40,6 @@ internal class CountWithdrawPaidCommandService : ICommandService<CountWithdrawPa
 
 		var amount = withdrawForm?.ActualAmount ?? withdrawForm?.Amount ?? 0m;
 
-		await _countRepository.CountBrandNetDepositAsync(command.BrandId, (double)-amount);
+		await _countRepository.CountBrandCurrentDayNetDepositAsync(command.BrandId, (double)-amount);
 	}
 }
