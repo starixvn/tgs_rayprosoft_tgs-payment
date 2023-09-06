@@ -239,24 +239,23 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.FirstAsync(cancellationToken);
 	}
 
-	public async ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default)
+	public ValueTask<Guid> CreateWithdrawFormAsync(WithdrawFormCreateInfo createInfo, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
 			JsonSerializer.Serialize(createInfo, _SerializerOptions));
 
 		requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
-		var response = await _httpClient
+		return _httpClient
 			.PutAsync("/withdraw", requestContent, cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
+			.ToAsyncEnumerable()
+			.Do(response => _ = response.StatusCode == HttpStatusCode.Conflict
+				? throw new InsufficientFundsException()
+				: response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable())
+			.FirstAsync(cancellationToken);
 	}
 
 	public StateMachine<PaymentFlowState, PaymentTrigger> CreateWithdrawStateMachine(PaymentFlowState initialState = PaymentFlowState.Init)
@@ -449,8 +448,38 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			: JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/net-deposit/current-day/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
+	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/netdeposit/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
-		string playerCode,
+			string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
@@ -592,6 +621,36 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return vips;
 	}
 
+	public async ValueTask<decimal> GetBrandReportDateNetDepositAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/net-deposit/{brandId}/?date={reportDate}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
+	public async ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/deposit/successrate/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
@@ -629,21 +688,6 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 		return JsonSerializer.Deserialize<DepositFormInfo>(contentJson, _SerializerOptions);
-	}
-
-	public async ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)
-	{
-		var response = await _httpClient
-			.GetAsync($"/deposit/successrate/{brandId}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default)
@@ -1234,35 +1278,5 @@ internal class PaymentServiceClient : IPaymentServiceClient
 				!.ToAsyncEnumerable())
 			.Where(arr => arr is not null)
 			.SelectMany(arr => arr!.ToAsyncEnumerable());
-	}
-
-	public async ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
-	{
-		var response = await _httpClient
-			.GetAsync($"/brand/payment/net-deposit/current-day/{brandId}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
-	}
-
-	public async ValueTask<decimal> GetBrandReportDateNetDepositAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)
-	{
-		var response = await _httpClient
-			.GetAsync($"/brand/payment/net-deposit/{brandId}/?date={reportDate}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 }
