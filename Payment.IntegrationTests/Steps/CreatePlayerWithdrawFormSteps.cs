@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
+using Tgs.CashService.Client;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Tgs.PlayerService.Client;
 
 namespace Payment.IntegrationTests.Steps;
 
@@ -18,7 +22,39 @@ public class CreatePlayerWithdrawFormSteps
 
 	public CreatePlayerWithdrawFormSteps()
 	{
-		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+
+		var walletId = Guid.NewGuid();
+		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new Dictionary<string, string>
+			{
+				["DefaultWalletId"] = walletId.ToString()
+			}.ToImmutableDictionary());
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(10000M);
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Any<decimal>(),
+			Arg.Any<string>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 1000M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
+			});
+
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost(
+			services => services
+				.AddSingleton(fakeCashServiceClient)
+				.AddSingleton(fakePlayerServiceClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}

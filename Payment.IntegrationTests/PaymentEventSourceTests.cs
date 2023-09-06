@@ -1,9 +1,13 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using Json.Patch;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Tgs.PlayerService.Client;
 
 namespace Payment.IntegrationTests;
 
@@ -91,7 +95,39 @@ public class PaymentEventSourceTests
 	[Test]
 	public async Task WithdrawForm_EventSource_Apply後應該和快照的資料一樣()
 	{
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+
+		var walletId = Guid.NewGuid();
+		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new Dictionary<string, string>
+			{
+				["DefaultWalletId"] = walletId.ToString()
+			}.ToImmutableDictionary());
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(10000M);
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Any<decimal>(),
+			Arg.Any<string>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 1000M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
+			});
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(
+			services => services
+				.AddSingleton(fakeCashServiceClient)
+				.AddSingleton(fakePlayerServiceClient));
 
 		var httpClient = web.CreateClient();
 

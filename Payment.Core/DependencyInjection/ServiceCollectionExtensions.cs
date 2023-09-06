@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
 			.AddSingleton<ISystemClock, DefaultSystemClock>()
 			.AddTransient<ICreateWithdrawFormPipe, EmitCreateWithdrawFormEventPipe>()
+			.AddTransient<ICreateWithdrawFormPipe, PlayerCashOperationCreateWithdrawFormEventPipe>()
 			.AddSerialNumberGenerator()
 			.AddOptions<BankInfoParserOptions>();
 

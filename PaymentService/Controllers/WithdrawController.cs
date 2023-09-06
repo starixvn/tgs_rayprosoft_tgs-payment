@@ -5,6 +5,7 @@ using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
+using Tgs.WebApi.Toolkits;
 
 namespace Tgs.Payment.Controllers;
 
@@ -55,23 +56,31 @@ public class WithdrawController : ControllerBase
 	}
 
 	[HttpPut(Name = "CreateWithdrawForm")]
+	[SuccessStatusCode(201)]
 	public async Task<Guid> CreateWithdrawFormAsync(
 		[FromServices] IGetService<CreateWithdrawFormCommand, Guid> createService,
 		[FromBody] CreateWithdrawFormViewModel request)
 	{
-		var command = new CreateWithdrawFormCommand(
-			new WithdrawUser(
-				request.UserType,
-				request.UserId,
-				request.UserName),
-			request.BrandId,
-			request.BankInfoId,
-			request.Amount,
-			request.Note);
+		try
+		{
+			var command = new CreateWithdrawFormCommand(
+				new WithdrawUser(
+					request.UserType,
+					request.UserId,
+					request.UserName),
+				request.BrandId,
+				request.BankInfoId,
+				request.Amount,
+				request.Note);
 
-		return await createService.GetAsync(
-			command,
-			HttpContext.RequestAborted).ConfigureAwait(false);
+			return await createService.GetAsync(
+				command,
+				HttpContext.RequestAborted).ConfigureAwait(false);
+		}
+		catch (InsufficientFundsException)
+		{
+			return HttpContext.TransformResult<Guid>(this.Problem(statusCode: 409));
+		}
 	}
 
 	[HttpGet("{brandId}/{formId}", Name = "GetWithdrawFormWithBrandId")]
