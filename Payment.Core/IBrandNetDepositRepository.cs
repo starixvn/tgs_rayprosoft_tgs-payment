@@ -8,4 +8,6 @@ public interface IBrandNetDepositRepository
 	ValueTask CountBrandCurrentDayNetDepositAsync(Guid brandId, double amount);
 
 	ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId);
+
+	ValueTask<decimal> GetBrandYesterDayNetDepositAsync(Guid brandId);
 }

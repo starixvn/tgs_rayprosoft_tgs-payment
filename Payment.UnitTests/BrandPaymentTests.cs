@@ -294,37 +294,84 @@ public class BrandPaymentTests
 	}
 
 	[Test]
-	public async Task 查詢Brand非當日存提差()
+	public async Task 查詢Brand存提差_查詢日期前天_無統計資料()
 	{
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new GetBrandReportDateNetDepositQueryService(fakePaymentRepository,fakeBrandNetDepositRepository);
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
+		var now = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(now);
+
+		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
+
+		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public async Task 查詢Brand存提差_查詢日期前天()
+	{
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
+
+		var now = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(now);
+
 		_ = fakePaymentRepository
-			.GetBrandNetDepositAsync(Arg.Is(brandId),Arg.Is(reportDate))
-			.Returns(16800m);	
+			.GetBrandNetDepositAsync(Arg.Is(brandId), Arg.Is(reportDate))
+			.Returns(16800m);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
 		Assert.AreEqual(16800m, actual);
-
-		_ = fakeBrandNetDepositRepository
-			.Received(0)
-			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
 	}
 
 	[Test]
-	public async Task 查詢Brand當日存提差()
+	public async Task 查詢Brand存提差_查詢日期為昨天且還時間小於排程時間()
 	{
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
 
-		var sut = new GetBrandReportDateNetDepositQueryService(fakePaymentRepository, fakeBrandNetDepositRepository);
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
 		var brandId = Guid.NewGuid();
-		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+		var today = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow
+			.Returns(new DateTimeOffset(today.Year, today.Month, today.Day, hour: 6, 0, 0, TimeSpan.FromHours(8d)));
+
+		_ = fakeBrandNetDepositRepository
+			.GetBrandYesterDayNetDepositAsync(Arg.Is(brandId))
+			.Returns(168000m);
+
+		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
+
+		Assert.AreEqual(168000m, actual);
+	}
+
+	[Test]
+	public async Task 查詢Brand存提差_查詢日期等於當日()
+	{
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
 		_ = fakeBrandNetDepositRepository
 			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
@@ -333,8 +380,5 @@ public class BrandPaymentTests
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
 		Assert.AreEqual(16800m, actual);
-		_ = fakeBrandNetDepositRepository
-			.Received(1)
-			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
 	}
 }
