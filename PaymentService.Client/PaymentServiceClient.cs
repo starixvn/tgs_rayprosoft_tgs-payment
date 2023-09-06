@@ -249,9 +249,12 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return _httpClient
 			.PutAsync("/withdraw", requestContent, cancellationToken)
 			.ToAsyncEnumerable()
-			.Do(response => _ = response.StatusCode == HttpStatusCode.Conflict
-				? throw new InsufficientFundsException()
-				: response.EnsureSuccessStatusCode())
+			.Do(response => _ = response.StatusCode switch
+			{
+				HttpStatusCode.Conflict => throw new InsufficientFundsException(),
+				HttpStatusCode.NotAcceptable => throw new InsufficientBucketException(),
+				_ => response.EnsureSuccessStatusCode()
+			})
 			.SelectMany(response => response.Content
 				.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken)
 				.ToAsyncEnumerable())

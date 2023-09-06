@@ -22,10 +22,10 @@ public class CreateDepositFormSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will create deposit form")]
-	public async Task GivenIWillCreateDepositForm()
+	public async Task GivenIWillCreateDepositFormAsync()
 	{
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 

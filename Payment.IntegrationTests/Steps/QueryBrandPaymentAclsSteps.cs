@@ -22,7 +22,7 @@ public class QueryBrandPaymentAclsSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"brand payment id is \{(.*)}、\{(.*)}")]
 	public void GivenBrandPaymentIdIs(Guid brandPaymentId1, Guid brandPaymentId2)

@@ -23,7 +23,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I get thirdparty order no ""(.*)""")]
 	public void GivenIGetThirdpartyOrderNo(string thirdPartyOrderNo)
@@ -33,7 +33,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 	}
 
 	[Then(@"form thirdparty_order_no should be ""(.*)""")]
-	public async Task ThenFormThirdparty_Order_NoShouldBe(string thirdPartyOrderNo)
+	public async Task ThenFormThirdparty_Order_NoShouldBeAsync(string thirdPartyOrderNo)
 	{
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
@@ -43,7 +43,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 	}
 
 	[When(@"I call save api")]
-	public async Task WhenICallSaveApi()
+	public async Task WhenICallSaveApiAsync()
 	{
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 

@@ -27,7 +27,7 @@ public class CreatePlayerBankInfoSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"brandId is \{(.*)}")]
 	public void GivenBrandIdIs(Guid brandId)
@@ -81,7 +81,7 @@ public class CreatePlayerBankInfoSteps
 	}
 
 	[When(@"call create bank info api with modify user")]
-	public async Task WhenCallCreateBankInfoApiWithModifyUser()
+	public async Task WhenCallCreateBankInfoApiWithModifyUserAsync()
 	{
 		_createdId = await _paymentServiceClient
 			.CreatePlayerBankInfoAsync(_brandId, _playerCode, _bankInfo, _modifyUser);

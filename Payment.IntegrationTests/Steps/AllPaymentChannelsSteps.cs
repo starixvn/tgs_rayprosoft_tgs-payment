@@ -18,7 +18,7 @@ public class AllPaymentChannelsSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will list all payment channels")]
 	public void GivenIWillListAllPaymentChannels()

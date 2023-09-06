@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -48,7 +48,7 @@ public class SetDefaultPlayerBankInfoSteps
 	}
 
 	[Then(@"the bank info is set to default")]
-	public async Task ThenTheBankInfoIsSetToDefault()
+	public async Task ThenTheBankInfoIsSetToDefaultAsync()
 	{
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
@@ -59,7 +59,7 @@ public class SetDefaultPlayerBankInfoSteps
 	}
 
 	[When(@"call set default bank info api")]
-	public async Task WhenCallSetDefaultBankInfoApi()
+	public async Task WhenCallSetDefaultBankInfoApiAsync()
 	{
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 

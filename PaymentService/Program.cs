@@ -87,7 +87,11 @@ var builder = WebApplication.CreateBuilder(args);
 		.AddPlayerServiceClient((options, _) => options.BaseUrl =
 			builder.Configuration.GetValue<Uri>("Payment:PlayerServiceBaseUrl")!)
 		.AddCashServiceClient((options, _) => options.BaseUrl =
-			builder.Configuration.GetValue<Uri>("Payment:CashServiceBaseUrl")!);
+			builder.Configuration.GetValue<Uri>("Payment:CashServiceBaseUrl")!)
+		.AddPlayerBucketClient(httpBuilder => httpBuilder
+			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
+				builder.Configuration.GetValue<Uri>("Payment:PlayerBucketServiceBaseUrl")!))
+		.AddPlayerBucketTypeClient();
 
 	_ = builder.Services
 		.AddMessageQueue()

@@ -20,7 +20,7 @@ public class GetPlayerBankInfosSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I has a playerCode ""(.*)""")]
 	public void GivenIHasAPlayerCode(string playerCode)

@@ -19,7 +19,7 @@ public class QueryWithdrawFormsSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I Query withdraw forms")]
 	public void GivenIQueryWithdrawForms()

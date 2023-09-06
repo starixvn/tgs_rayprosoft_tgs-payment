@@ -19,7 +19,7 @@ public class GetAllPaymentsSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will list all payments")]
 	public void GivenIWillListAllPayments()

@@ -36,7 +36,7 @@ public class ReviewWithdrawFormSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I review a withdraw form")]
 	public async Task GivenIReviewAWithdrawFormAsync()

@@ -79,7 +79,11 @@ public class WithdrawController : ControllerBase
 		}
 		catch (InsufficientFundsException)
 		{
-			return HttpContext.TransformResult<Guid>(this.Problem(statusCode: 409));
+			return HttpContext.TransformResult<Guid>(Problem(statusCode: 409));
+		}
+		catch (InsufficientBucketException)
+		{
+			return HttpContext.TransformResult<Guid>(Problem(statusCode: 406));
 		}
 	}
 

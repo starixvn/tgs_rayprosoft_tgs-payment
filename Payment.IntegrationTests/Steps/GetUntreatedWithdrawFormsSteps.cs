@@ -23,7 +23,7 @@ public class GetUntreatedWithdrawFormsSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will count untreated withdraw form count")]
 	public void GivenIWillCountUntreatedWithdrawFormCount()
