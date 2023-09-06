@@ -448,6 +448,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			: JsonSerializer.Deserialize<AutoWithdrawInfo?>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/net-deposit/current-day/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
@@ -604,6 +619,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.SelectMany(t => t.ToAsyncEnumerable().SelectMany(arr => arr.ToAsyncEnumerable()));
 
 		return vips;
+	}
+
+	public async ValueTask<decimal> GetBrandReportDateNetDepositAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/net-deposit/{brandId}/?date={reportDate}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
 	public async ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)

@@ -1,4 +1,4 @@
 ﻿using System;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
-public record GetBrandNetDepositQuery(Guid BrandId);
+public record GetBrandCurrentDayNetDepositQuery(Guid BrandId);

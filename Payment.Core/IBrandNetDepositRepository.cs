@@ -5,7 +5,9 @@ namespace Tgs.Payment;
 
 public interface IBrandNetDepositRepository
 {
-	ValueTask CountBrandNetDepositAsync(Guid brandId, double amount);
+	ValueTask CountBrandCurrentDayNetDepositAsync(Guid brandId, double amount);
 
-	ValueTask<decimal> GetBrandNetDepositAsync(Guid brandId);
+	ValueTask<decimal> GetBrandCurrentDayNetDepositAsync(Guid brandId);
+
+	ValueTask<decimal> GetBrandYesterDayNetDepositAsync(Guid brandId);
 }
