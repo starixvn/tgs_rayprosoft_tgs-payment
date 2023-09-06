@@ -34,7 +34,8 @@ data:
         }
       },
       "Payment":{
-        "PlayerServiceBaseUrl": "http://player-api"
+        "PlayerServiceBaseUrl": "http://player-api",
+        "CashServiceBaseUrl": "http://cashservice-api"
       }
     }
   otel-collector-config.yaml: |
