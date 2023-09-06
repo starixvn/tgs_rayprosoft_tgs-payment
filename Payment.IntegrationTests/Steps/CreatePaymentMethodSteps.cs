@@ -23,7 +23,7 @@ public class CreatePaymentMethodSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will create payment method info")]
 	public void GivenIWillCreatePaymentMethodInfo()

@@ -1,11 +1,14 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using NSubstitute;
+using NUnit.Framework;
 using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 using Tgs.PlayerService.Client;
+using Tgs.Service.PlayerBuckets;
 
 namespace Payment.IntegrationTests;
 
@@ -16,11 +19,13 @@ public class WithdrawFormTests
 	{
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 
 		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakePlayerServiceClient)
 				.AddSingleton(fakeCashServiceClient)
+				.AddSingleton(fakePlayerBucketClient)
 				.AddHttpClientLoggingHandler());
 
 		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
@@ -86,6 +91,11 @@ public class WithdrawFormTests
 			Arg.Any<CancellationToken>())
 			.Returns(0M);
 
+		_ = fakePlayerBucketClient.ReadBucketsAsync(
+			Arg.Is(playerCode),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(0M, null));
+
 		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.InsufficientFundsException>(
 			async () => await sut.CreateWithdrawFormAsync(withdrawForm));
 
@@ -101,12 +111,14 @@ public class WithdrawFormTests
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 
 		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakePaymentClient)
 				.AddSingleton(fakePlayerServiceClient)
-				.AddSingleton(fakeCashServiceClient));
+				.AddSingleton(fakeCashServiceClient)
+				.AddSingleton(fakePlayerBucketClient));
 
 		var httpClient = web.CreateClient();
 
@@ -183,6 +195,11 @@ public class WithdrawFormTests
 				TransactionId = Guid.NewGuid()
 			});
 
+		_ = fakePlayerBucketClient.ReadBucketsAsync(
+			Arg.Is(playerCode),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(0M, null));
+
 		var actual = await sut.CreateWithdrawFormAsync(withdrawForm);
 
 		_ = fakePaymentClient.Received(1)
@@ -224,5 +241,77 @@ public class WithdrawFormTests
 				}),
 				Arg.Is(false),
 				Arg.Any<CancellationToken>());
+	}
+
+	[Test]
+	public async Task 玩家提款時會檢查流水是否已經清空()
+	{
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
+			services => services
+				.AddSingleton(fakePlayerBucketClient)
+				.AddHttpClientLoggingHandler());
+
+		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "test1";
+		var bankInfoId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.PlayerBankInfos.AddAsync(
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = bankInfoId,
+				BankType = "Bank",
+				BrandId = brandId,
+				PlayerCode = playerCode,
+				Detail = "{}",
+				CreatedOn = DateTime.Now,
+				UpdatedOn = DateTime.Now,
+				CreatedByUsername = "System",
+				UpdatedByUsername = "System"
+			});
+
+		_ = await dbContext.Brands.AddAsync(
+			new Brand
+			{
+				Id = brandId,
+				Code = "GPI",
+				ApiKey = "apikey",
+				ClientId = "clientId",
+				CreatedByUsername = "System",
+				Name = "test",
+				SecretKey = "secret",
+				UpdatedByUsername = "System"
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var withdrawForm = new Tgs.Payment.Clients.WithdrawFormCreateInfo
+		{
+			Amount = 1000M,
+			BankInfoId = bankInfoId,
+			UserId = playerCode,
+			UserName = "UserName",
+			BrandId = brandId,
+			UserType = Tgs.Payment.Clients.UserType.Player
+		};
+
+		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(
+			Arg.Is(brandId),
+			Arg.Any<CancellationToken>())
+			.Returns(AsyncEnumerable.Empty<string>());
+		_ = fakePlayerBucketClient.ReadBucketsAsync(
+			Arg.Is(playerCode),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(100M, null));
+
+		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.InsufficientBucketException>(
+			async () => await sut.CreateWithdrawFormAsync(withdrawForm));
 	}
 }

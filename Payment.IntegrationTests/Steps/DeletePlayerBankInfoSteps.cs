@@ -23,7 +23,7 @@ public class DeletePlayerBankInfoSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"bank info id is \{(.*)}")]
 	public void GivenBankInfoIdIs(Guid bankInfoId)

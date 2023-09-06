@@ -27,7 +27,7 @@ public class CreateAgentBankinfoSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"agentId is \{(.*)}")]
 	public void GivenAgentIdIs(Guid agentId)

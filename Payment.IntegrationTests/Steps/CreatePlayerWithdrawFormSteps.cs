@@ -1,12 +1,12 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.CashService.Client;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 using Tgs.PlayerService.Client;
+using Tgs.Service.PlayerBuckets;
 
 namespace Payment.IntegrationTests.Steps;
 
@@ -24,6 +24,7 @@ public class CreatePlayerWithdrawFormSteps
 	{
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakePlayerBucketServiceClient = Substitute.For<IPlayerBucketClient>();
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -51,16 +52,27 @@ public class CreatePlayerWithdrawFormSteps
 				TransactionId = Guid.NewGuid()
 			});
 
+		_ = fakePlayerBucketServiceClient.GetBrandBucketTypesAsync(
+			Arg.Any<Guid>(),
+			Arg.Any<CancellationToken>())
+			.Returns(AsyncEnumerable.Empty<string>());
+
+		_ = fakePlayerBucketServiceClient.ReadBucketsAsync(
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(0M, null));
+
 		_testHost = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakeCashServiceClient)
-				.AddSingleton(fakePlayerServiceClient));
+				.AddSingleton(fakePlayerServiceClient)
+				.AddSingleton(fakePlayerBucketServiceClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I will create withdraw form")]
 	public void GivenIWillCreateWithdrawForm()

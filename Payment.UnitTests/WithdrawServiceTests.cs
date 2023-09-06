@@ -6,8 +6,10 @@ using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
+using Tgs.PlayerBucket.Client;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
+using Tgs.Service.PlayerBuckets;
 using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
@@ -69,6 +71,71 @@ public class WithdrawServiceTests
 			.EmitWithdrawFormCreatedEventAsync(
 				Arg.Is(actual),
 				Arg.Is(brandId));
+	}
+
+	[Test]
+	public async Task 代理提款不會執行玩家流水檢查()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+		var fakePlayerBucketForTypesClient = Substitute.For<IPlayerBucketForTypesClient>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[]
+			{
+				new CheckPlayerBucketCreateWithdrawEventPipe(
+					fakePlayerBucketClient,
+					fakePlayerBucketForTypesClient)
+			});
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			Guid.NewGuid().ToString(),
+			"TestAgent");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
+
+		_ = fakePlayerBucketClient.Received(0)
+			.GetBrandBucketTypesAsync(Arg.Any<Guid>());
+		_ = fakePlayerBucketForTypesClient.Received(0)
+			.ReadBucketsForBucketTypesAsync(
+				Arg.Any<string>(),
+				Arg.Any<IEnumerable<string>>());
 	}
 
 	[Test]
@@ -242,6 +309,211 @@ public class WithdrawServiceTests
 		_ = fakeSubmitWithdrawFormStatusCommandService.Received(1)
 			.ExecuteAsync(Arg.Is<SubmitWithdrawFormStatusCommand>(
 				cmd => expectedCommand.ToExpectedObject().Matches(cmd)));
+	}
+
+	[Test]
+	public void 玩家提款時流水如果沒清空不能提款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+		var fakePlayerBucketForTypesClient = Substitute.For<IPlayerBucketForTypesClient>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] {
+				new CheckPlayerBucketCreateWithdrawEventPipe(
+					fakePlayerBucketClient,
+					fakePlayerBucketForTypesClient)
+			});
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var playerBankInfo = new PlayerBankInfo(
+			bankInfoId,
+			user.UserId,
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			JsonDocument.Parse("{}"),
+			false);
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(playerBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
+			.Returns(new[] { "Game1", "Game2" }.ToAsyncEnumerable());
+
+		_ = fakePlayerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<IEnumerable<string>>())
+			.Returns(new[]
+			{
+				new TypeBucketResult(
+					null,
+					new ReadBucketResult(0M, null)),
+				new TypeBucketResult(
+					"Game1",
+					new ReadBucketResult(10M, null)),
+				new TypeBucketResult(
+					"Game2",
+					new ReadBucketResult(0M, null))
+			}.ToAsyncEnumerable());
+
+		_ = Assert.ThrowsAsync<InsufficientBucketException>(
+			async () => await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null));
+	}
+
+	[Test]
+	public async Task 玩家提款時流水都清空則可以建立表單()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+		var fakePlayerBucketForTypesClient = Substitute.For<IPlayerBucketForTypesClient>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] {
+				new CheckPlayerBucketCreateWithdrawEventPipe(
+					fakePlayerBucketClient,
+					fakePlayerBucketForTypesClient)
+			});
+
+		var brandId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var playerBankInfo = new PlayerBankInfo(
+			bankInfoId,
+			user.UserId,
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			JsonDocument.Parse("{}"),
+			false);
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(playerBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
+			.Returns(new[] { "Game1", "Game2" }.ToAsyncEnumerable());
+
+		_ = fakePlayerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<IEnumerable<string>>())
+			.Returns(new[]
+			{
+				new TypeBucketResult(
+					null,
+					new ReadBucketResult(0M, null)),
+				new TypeBucketResult(
+					"Game1",
+					new ReadBucketResult(0M, null)),
+				new TypeBucketResult(
+					"Game2",
+					new ReadBucketResult(0M, null))
+			}.ToAsyncEnumerable());
+
+		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
+
+		Assert.AreNotEqual(Guid.Empty, actual);
+
+		var expectedSnapshot = new WithdrawFormSnapshot(
+			actual,
+			brandId,
+			user.UserId,
+			user.UserName,
+			user.UserType,
+			amount,
+			null,
+			0M,
+			null,
+			PaymentFlowState.Init,
+			null,
+			null,
+			bankInfoId,
+			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
+				playerBankInfo.Id,
+				playerBankInfo.PaymentChannelId,
+				playerBankInfo.BankType,
+				playerBankInfo.Detail), PaymentUtility.SerializerOptions),
+			null,
+			null,
+			orderNo,
+			null,
+			currentTime.UtcDateTime,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(actual),
+				Arg.Is(EventAction.Create),
+				Arg.Any<JsonDocument>(),
+				Arg.Any<string>());
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
 	}
 
 	[Test]

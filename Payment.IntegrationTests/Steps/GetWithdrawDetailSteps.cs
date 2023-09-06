@@ -24,7 +24,7 @@ public class GetWithdrawDetailSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"a form id \{(.*)}")]
 	public void GivenAFormId(Guid formId)

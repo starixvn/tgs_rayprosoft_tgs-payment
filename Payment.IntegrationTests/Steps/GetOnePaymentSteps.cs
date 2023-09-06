@@ -23,7 +23,7 @@ public class GetOnePaymentSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I has a payment id \{(.*)}")]
 	public async Task GivenIHasAPaymentIdAsync(Guid paymentId)

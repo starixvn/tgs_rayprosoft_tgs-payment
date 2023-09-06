@@ -8,6 +8,7 @@ using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 using Tgs.PlayerService.Client;
+using Tgs.Service.PlayerBuckets;
 
 namespace Payment.IntegrationTests;
 
@@ -97,6 +98,7 @@ public class PaymentEventSourceTests
 	{
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -124,10 +126,16 @@ public class PaymentEventSourceTests
 				TransactionId = Guid.NewGuid()
 			});
 
+		_ = fakePlayerBucketClient.ReadBucketsAsync(
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(0M, null));
+
 		await using var web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakeCashServiceClient)
-				.AddSingleton(fakePlayerServiceClient));
+				.AddSingleton(fakePlayerServiceClient)
+				.AddSingleton(fakePlayerBucketClient));
 
 		var httpClient = web.CreateClient();
 

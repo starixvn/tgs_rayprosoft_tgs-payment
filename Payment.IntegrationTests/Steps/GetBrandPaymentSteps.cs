@@ -22,7 +22,7 @@ public class GetBrandPaymentSteps
 	}
 
 	[AfterScenario]
-	public void CleanUpAsync() => _testHost.DisposeAsync();
+	public void CleanUp() => _testHost.DisposeAsync();
 
 	[Given(@"I has a brand payment id \{(.*)}")]
 	public async Task GivenIHasABrandPaymentIdAsync(Guid brandPaymentId)
