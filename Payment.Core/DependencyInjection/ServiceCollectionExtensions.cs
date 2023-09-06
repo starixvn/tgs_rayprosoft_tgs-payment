@@ -18,12 +18,15 @@ public static class ServiceCollectionExtensions
 			ServiceLifetime.Transient);
 
 		_ = services
+			.AddTransient<IWithdrawService, WithdrawService>()
 			.AddSingleton<IWithdrawProcessorFactory>(
 				sp => ActivatorUtilities.CreateInstance<WithdrawProcessorFactory>(
 					sp,
 					configuration.GetAllRegisterWithdrawProcessorTypes()))
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
 			.AddSingleton<ISystemClock, DefaultSystemClock>()
+			.AddTransient<ICreateWithdrawFormPipe, EmitCreateWithdrawFormEventPipe>()
+			.AddTransient<ICreateWithdrawFormPipe, PlayerCashOperationCreateWithdrawFormEventPipe>()
 			.AddSerialNumberGenerator()
 			.AddOptions<BankInfoParserOptions>();
 
