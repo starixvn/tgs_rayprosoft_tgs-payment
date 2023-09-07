@@ -73,7 +73,7 @@ internal class PaymentRepository : IPaymentRepository
 				WHERE
 					brand_id = {brandId}
 					AND
-					created_on >= {currentDay}
+					updated_on >= {currentDay}
 				""")
 			.AsNoTracking()
 			.FirstOrDefaultAsync(cancellationToken: cancellationToken)
