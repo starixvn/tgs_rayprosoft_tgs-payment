@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
@@ -11,10 +12,10 @@ public class DepositTests
 	[Test]
 	public async Task Brand指定日期存款成功率()
 	{
-		var fakeService = Substitute.For<IGetService<ReportDateSuccessRateQuery, decimal>>();
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services
-			=> services.AddSingleton(fakeService));
+			=> services.AddSingleton(fakePaymentRepository));
 
 		var httpClient = web.CreateClient();
 
@@ -23,9 +24,14 @@ public class DepositTests
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 		var reportDate = DateOnly.FromDateTime(DateTime.Now);
 
-		_ = fakeService
-			.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate), Arg.Any<CancellationToken>())
-			.Returns(67m);
+		_ = fakePaymentRepository
+			.GetReportDateDepositFormSummaryAsync(brandId, reportDate, Arg.Any<CancellationToken>())
+			.Returns(new DepositFormsStatusCount
+			{
+				Total = 3,
+				Approved = 2,
+				Reject = 0,
+			});
 
 		var actual = await sut.GetBrandSuccessRateByReportDateAsync(brandId, reportDate);
 
