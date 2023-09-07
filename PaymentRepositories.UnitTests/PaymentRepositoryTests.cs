@@ -487,4 +487,40 @@ public class PaymentRepositoryTests
 
 		Assert.AreEqual("{\"name\":\"Test\"}", dbContext.BrandPayments.FirstAsync(bp => bp.Id == brandPaymentId).Result.ExtendedData);
 	}
+
+	[Test]
+	public async Task 查詢Brand金流統計指定日期的存款單數量()
+	{
+		var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+		_ = dbContextOptionsBuilder
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
+			.ConfigureWarnings(x => x.Ignore(
+				InMemoryEventId.TransactionIgnoredWarning));
+
+		var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+		var brandId = Guid.NewGuid();
+		var reportDate = DateOnly.FromDateTime(new DateTime(2023, 9, 7));
+
+		var brandDailyPaymentStatistic = new BrandDailyPaymentStatistic()
+		{
+			ReportDate = reportDate,
+			BrandId = brandId,
+			DailyDepositApprovedCount = 16,
+			DailyDepositRejectCount = 1,
+			DailyDepositTotalCount = 20
+		};
+
+		_ = await dbContext.BrandDailyPaymentStatistics.AddAsync(brandDailyPaymentStatistic);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var sut = new PaymentRepository(dbContext);
+
+		var actual = await sut.GetReportDateDepositFormSummaryAsync(brandId, reportDate);
+
+		Assert.AreEqual(16, actual.Approved);
+		Assert.AreEqual(1, actual.Reject);
+		Assert.AreEqual(20, actual.Total);
+	}
 }

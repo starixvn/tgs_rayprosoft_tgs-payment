@@ -9,7 +9,31 @@ namespace Payment.IntegrationTests;
 public class DepositTests
 {
 	[Test]
-	public async Task 存款成功率()
+	public async Task Brand指定日期存款成功率()
+	{
+		var fakeService = Substitute.For<IGetService<ReportDateSuccessRateQuery, decimal>>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services
+			=> services.AddSingleton(fakeService));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var reportDate = DateOnly.FromDateTime(DateTime.Now);
+
+		_ = fakeService
+			.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate), Arg.Any<CancellationToken>())
+			.Returns(67m);
+
+		var actual = await sut.GetBrandSuccessRateByReportDateAsync(brandId, reportDate);
+
+		Assert.AreEqual(67m, actual);
+	}
+
+	[Test]
+	public async Task Brand當日存款成功率()
 	{
 		var fakeService = Substitute.For<IGetService<CurrentDaySuccessRateQuery, decimal>>();
 

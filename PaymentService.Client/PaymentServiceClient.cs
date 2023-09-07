@@ -639,10 +639,25 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
+	public async ValueTask<decimal> GetBrandSuccessRateByReportDateAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/deposit/success-rate/report-date/{brandId}?date={reportDate}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient
-			.GetAsync($"/deposit/successrate/{brandId}", cancellationToken)
+			.GetAsync($"/deposit/success-rate/{brandId}", cancellationToken)
 			.ConfigureAwait(false);
 
 		_ = response.EnsureSuccessStatusCode();

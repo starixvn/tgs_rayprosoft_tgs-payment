@@ -15,6 +15,8 @@ public partial interface IPaymentRepository
 
 	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
+	ValueTask<DepositFormsStatusCount> GetReportDateDepositFormSummaryAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default);
+
 	ValueTask CreateDepositFormEventAsync(
 		Guid eventId,
 		Guid formId,

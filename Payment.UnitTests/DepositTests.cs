@@ -1064,55 +1064,73 @@ public class DepositTests
 	}
 
 	[Test]
-	public async Task 存款成功率全部單為0時()
+	public async Task 指定日期存款成功率_全部單為0()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+		var sut = new ReportDateSuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var reportDate = DateOnly.FromDateTime(DateTime.Now);
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
-			.Returns(new DepositFormsStatusCount { Approved = 0, Total = 0 });
+			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
+			.Returns(new DepositFormsStatusCount
+			{
+				Total = 0,
+				Approved = 0,
+				Reject = 0,
+			});
 
-		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
 		Assert.AreEqual(0m, actual);
 	}
 
 	[Test]
-	public async Task 存款成功率整數四捨五入()
+	public async Task 指定日期存款成功率_整數四捨五入_進位()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+		var sut = new ReportDateSuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var reportDate = DateOnly.FromDateTime(DateTime.Now);
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
-			.Returns(new DepositFormsStatusCount { Approved = 2, Total = 3 });
+			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
+			.Returns(new DepositFormsStatusCount
+			{
+				Total = 3,
+				Approved = 2,
+				Reject = 0,
+			});
 
-		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
 		Assert.AreEqual(67m, actual);
 	}
 
 	[Test]
-	public async Task 存款成功率整數四捨五入2()
+	public async Task 指定日期存款成功率_整數四捨五入_捨去()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
-		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+		var sut = new ReportDateSuccessRateQueryService(fakePaymentRepository);
 
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+		var reportDate = DateOnly.FromDateTime(DateTime.Now);
 
 		_ = fakePaymentRepository
-			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
-			.Returns(new DepositFormsStatusCount { Approved = 1, Total = 3 });
+			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
+			.Returns(new DepositFormsStatusCount
+			{
+				Total = 3,
+				Approved = 1,
+				Reject = 0,
+			});
 
-		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
 		Assert.AreEqual(33m, actual);
 	}
@@ -1228,5 +1246,59 @@ public class DepositTests
 		_ = fakeCountRepository
 			.Received(0)
 			.CountBrandCurrentDayNetDepositAsync(Arg.Any<Guid>(), Arg.Any<double>());
+	}
+
+	[Test]
+	public async Task 當日存款成功率_全部單為0()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 0, Total = 0 });
+
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(0m, actual);
+	}
+
+	[Test]
+	public async Task 當日存款成功率_整數四捨五入_進位()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 2, Total = 3 });
+
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(67m, actual);
+	}
+
+	[Test]
+	public async Task 當日存款成功率_整數四捨五入_捨去()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new CurrentDaySuccessRateQueryService(fakePaymentRepository);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakePaymentRepository
+			.CountCurrentDayDepositFormsStatusAsync(Arg.Is(brandId))
+			.Returns(new DepositFormsStatusCount { Approved = 1, Total = 3 });
+
+		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
+
+		Assert.AreEqual(33m, actual);
 	}
 }
