@@ -806,6 +806,22 @@ internal class PaymentRepository : IPaymentRepository
 				overview.TotalWithdrawAmount);
 	}
 
+	public async ValueTask<DepositFormsStatusCount> GetReportDateDepositFormSummaryAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)
+	{
+		var result = await _tgsContext.BrandDailyPaymentStatistics
+			.Where(p => p.BrandId == brandId && p.ReportDate == reportDate)
+			.AsNoTracking()
+			.FirstOrDefaultAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		return new DepositFormsStatusCount
+		{
+			Approved = result?.DailyDepositApprovedCount ?? 0,
+			Reject = result?.DailyDepositRejectCount ?? 0,
+			Total = result?.DailyDepositTotalCount ?? 0
+		};
+	}
+
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var query = from wf in _tgsContext.WithdrawForms

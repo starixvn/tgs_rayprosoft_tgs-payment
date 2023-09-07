@@ -43,6 +43,15 @@ public class DepositController : ControllerBase
 		return createCommand.FormId;
 	}
 
+	[HttpGet("success-rate/{brandId}", Name = "GetDepositSuccessRate")]
+	public ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(
+			[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
+			Guid brandId)
+	{
+		var query = new CurrentDaySuccessRateQuery(brandId);
+		return rateService.GetAsync(query, HttpContext.RequestAborted);
+	}
+
 	/// <summary>
 	/// Gets the deposit form asynchronous.
 	/// </summary>
@@ -126,12 +135,13 @@ public class DepositController : ControllerBase
 			: null;
 	}
 
-	[HttpGet("successrate/{brandId}", Name = "GetDepositSuccessRate")]
-	public ValueTask<decimal> GetDepositSuccessRateAsync(
-		[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
-		Guid brandId)
+	[HttpGet("success-rate/report-date/{brandId}", Name = "GetReportDateDepositSuccessRate")]
+	public ValueTask<decimal> GetReportDateDepositSuccessRateAsync(
+		[FromServices] IGetService<ReportDateSuccessRateQuery, decimal> rateService,
+		Guid brandId,
+		[FromQuery(Name = "date")] DateOnly reportDate)
 	{
-		var query = new CurrentDaySuccessRateQuery(brandId);
+		var query = new ReportDateSuccessRateQuery(brandId, reportDate);
 		return rateService.GetAsync(query, HttpContext.RequestAborted);
 	}
 
