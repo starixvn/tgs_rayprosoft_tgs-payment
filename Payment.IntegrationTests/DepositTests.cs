@@ -25,7 +25,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.Now);
 
 		_ = fakePaymentRepository
-			.GetReportDateDepositFormSummaryAsync(brandId, reportDate, Arg.Any<CancellationToken>())
+			.CountCurrentDayDepositFormsStatusAsync(brandId, Arg.Any<CancellationToken>())
 			.Returns(new DepositFormsStatusCount
 			{
 				Total = 3,
