@@ -142,6 +142,7 @@ public class DepositController : ControllerBase
 		[FromQuery(Name = "date")] DateOnly reportDate)
 	{
 		var query = new ReportDateSuccessRateQuery(brandId, reportDate);
+
 		return rateService.GetAsync(query, HttpContext.RequestAborted);
 	}
 

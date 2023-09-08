@@ -336,7 +336,7 @@ public class BrandPaymentTests
 	}
 
 	[Test]
-	public async Task 查詢Brand存提差_查詢日期為昨天且還時間小於排程時間()
+	public async Task 查詢Brand存提差_查詢日期為昨天且時間小於排程時間()
 	{
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();

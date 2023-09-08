@@ -15,7 +15,7 @@ public partial interface IPaymentRepository
 
 	ValueTask<int> CountDepositFormsAsync(DepositFormQueryConditions conditions, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositFormsStatusCount> GetReportDateDepositFormSummaryAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default);
+	ValueTask<DepositFormsStatusCount> CountYesterDayDepositFormsStatusAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	ValueTask CreateDepositFormEventAsync(
 		Guid eventId,
@@ -28,6 +28,8 @@ public partial interface IPaymentRepository
 	ValueTask<DepositFormSnapshot?> GetCurrentDepositFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default);
 
 	ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+	ValueTask<DepositFormsStatusCount> GetReportDateDepositFormSummaryAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<DepositFormInfo> QueryDepositFormsAsync(
 		DepositFormQueryConditions conditions,

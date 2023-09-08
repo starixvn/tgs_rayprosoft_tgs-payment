@@ -100,6 +100,36 @@ internal class PaymentRepository : IPaymentRepository
 			.ConfigureAwait(false);
 	}
 
+	public async ValueTask<DepositFormsStatusCount> CountYesterDayDepositFormsStatusAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var currentDay = new DateTimeOffset(
+			DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Date,
+			TimeSpan.FromHours(8D))
+			.UtcDateTime;
+
+		var yesterday = currentDay.AddDays(-1);
+
+		var result = await _tgsContext.Set<DepositStatusSummary>()
+			.FromSqlInterpolated($"""
+				SELECT
+					count(1) as total,
+					count(1) filter(where status=8000) as approved,
+					count(1) filter(where status=7000) as reject
+				FROM dbo.deposit_forms
+				WHERE
+					brand_id = {brandId}
+					AND
+					updated_on >= {yesterday}
+					AND
+					updated_on < {currentDay}
+				""")
+			.AsNoTracking()
+			.FirstOrDefaultAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		return new DepositFormsStatusCount { Approved = result!.Approved, Reject = result.Reject, Total = result.Total };
+	}
+
 	public async ValueTask CreateAgentBankInfoAsync(AgentBankInfo agentBankInfo, string modifyUser, CancellationToken cancellationToken = default)
 	{
 		var createTime = DateTimeOffset.UtcNow;
