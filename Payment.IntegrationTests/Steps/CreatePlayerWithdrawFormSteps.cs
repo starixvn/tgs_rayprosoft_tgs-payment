@@ -5,8 +5,11 @@ using TechTalk.SpecFlow;
 using Tgs.CashService.Client;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Tgs.Payment.WithdrawLimit;
+using Tgs.Payment.WithdrawLimit.Clients;
 using Tgs.PlayerService.Client;
 using Tgs.Service.PlayerBuckets;
+using Tgs.VipLevelService.Clients;
 
 namespace Payment.IntegrationTests.Steps;
 
@@ -26,6 +29,9 @@ public class CreatePlayerWithdrawFormSteps
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakePlayerBucketServiceClient = Substitute.For<IPlayerBucketClient>();
 
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
 			Arg.Any<string>(),
@@ -34,6 +40,13 @@ public class CreatePlayerWithdrawFormSteps
 			{
 				["DefaultWalletId"] = walletId.ToString()
 			}.ToImmutableDictionary());
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new Tgs.PlayerService.Client.PlayerInfo
+			{
+			});
 
 		_ = fakeCashServiceClient.GetBalanceAsync(
 			Arg.Is(walletId),
@@ -62,11 +75,45 @@ public class CreatePlayerWithdrawFormSteps
 			Arg.Any<CancellationToken>())
 			.Returns(new ReadBucketResult(0M, null));
 
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					Guid.NewGuid(),
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					10000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Any<string>(),
+			Arg.Any<DateOnly>(),
+			Arg.Any<decimal>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new WithdrawStatistics(1000M, 1));
+
 		_testHost = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakeCashServiceClient)
 				.AddSingleton(fakePlayerServiceClient)
-				.AddSingleton(fakePlayerBucketServiceClient));
+				.AddSingleton(fakePlayerBucketServiceClient)
+				.AddSingleton(fakeVipLevelClient)
+				.AddSingleton(fakeWithdrawLimitClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}

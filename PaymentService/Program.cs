@@ -91,10 +91,14 @@ var builder = WebApplication.CreateBuilder(args);
 		.AddPlayerBucketClient(httpBuilder => httpBuilder
 			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
 				builder.Configuration.GetValue<Uri>("Payment:PlayerBucketServiceBaseUrl")!))
-		.AddPlayerBucketTypeClient();
+		.AddPlayerBucketTypeClient()
+		.AddVipLevelServiceClient(httpBuilder => httpBuilder
+			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
+				builder.Configuration.GetValue<Uri>("Payment:VipLevelServiceBaseUrl")!))
+		.AddWithdrawLimitClient();
 
 	_ = builder.Services
-		.AddMessageQueue()
+		.AddPhoenixToolkitsMessageQueue()
 		.AddNatsMessageQueue(config => config
 			.ConfigQueueOptions((options, sp) =>
 			{

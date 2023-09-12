@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tgs.MessageQueue;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Protos;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
