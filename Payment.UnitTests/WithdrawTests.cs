@@ -1466,4 +1466,3 @@ public class WithdrawTests
 			.GetBrandPaymentsAsync(brandId);
 	}
 }
-;
