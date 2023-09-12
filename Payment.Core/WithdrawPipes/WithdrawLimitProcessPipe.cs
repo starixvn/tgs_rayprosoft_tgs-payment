@@ -62,10 +62,10 @@ internal class WithdrawLimitProcessPipe : ICreateWithdrawFormPipe
 
 		var errors = new Dictionary<string, object>();
 
-		if (result.TotalAmount > vipInfo.WithdrawTotalAmountPerDay)
+		if (vipInfo.WithdrawTotalAmountPerDay >= 0M && result.TotalAmount > vipInfo.WithdrawTotalAmountPerDay)
 			errors.Add("Amount", result.TotalAmount);
 
-		if (result.Count > vipInfo.WithdrawTransactionsPerDay)
+		if (vipInfo.WithdrawTransactionsPerDay >= 0M && result.Count > vipInfo.WithdrawTransactionsPerDay)
 			errors.Add("Count", result.Count);
 
 		if (errors.Count > 0)

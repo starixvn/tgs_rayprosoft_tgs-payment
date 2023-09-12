@@ -2,7 +2,6 @@
 using System.Text.Json;
 using ExpectedObjects;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
@@ -1186,7 +1185,7 @@ public class WithdrawServiceTests
 	}
 
 	[Test]
-	public void 提款申請時_當日提款累計如果超過VIP限額_會發生Exception()
+	public void 提款申請的VIP累計次數設定為0時_不能提款()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
@@ -1219,7 +1218,95 @@ public class WithdrawServiceTests
 		var amount = 1000M;
 
 		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
+			.Returns(new PlayerInfo
+			{
+				PlayerCode = user.UserId,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0,
+					20000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<DateOnly>(),
+			Arg.Is(amount))
+			.Returns(new WithdrawStatistics(11000M, 1));
+
+		var actual = Assert.ThrowsAsync<WithdrawLimitExceedException>(async () => await sut.CreateWithdrawFormAsync(
+			user,
+			brandId,
+			bankInfoId,
+			amount,
+			null));
+
+		Assert.AreEqual(1, actual.Count);
+		_ = fakeWithdrawLimitClient.Received(1)
+			.DecreasePlayerWithdrawStatisticsAsync(
+				Arg.Is(user.UserId),
+				Arg.Is(DateOnly.FromDateTime(currentTime.ToOffset(TimeSpan.FromHours(8D)).DateTime)),
+				Arg.Is(amount));
+	}
+
+	[Test]
+	public void 提款申請的VIP累計金額設定為0時_不能提款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var withdrawLimitPipe = new WithdrawLimitProcessPipe(
+			fakeVipLevelClient,
+			fakePlayerServiceClient,
+			fakeWithdrawLimitClient,
+			fakeSystemClock);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { withdrawLimitPipe });
+
+		var brandId = Guid.NewGuid();
+
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
@@ -1251,14 +1338,14 @@ public class WithdrawServiceTests
 					0M,
 					0M,
 					5,
-					10000M)
+					0M)
 			}.ToAsyncEnumerable());
 
 		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
 			Arg.Is(user.UserId),
 			Arg.Any<DateOnly>(),
 			Arg.Is(amount))
-			.Returns(new WithdrawStatistics(1000M, 6));
+			.Returns(new WithdrawStatistics(11000M, 1));
 
 		var actual = Assert.ThrowsAsync<WithdrawLimitExceedException>(async () => await sut.CreateWithdrawFormAsync(
 			user,
@@ -1267,12 +1354,162 @@ public class WithdrawServiceTests
 			amount,
 			null));
 
-		Assert.AreEqual(6, actual.Count);
+		Assert.AreEqual(11000M, actual.Amount);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
 				Arg.Is(DateOnly.FromDateTime(currentTime.ToOffset(TimeSpan.FromHours(8D)).DateTime)),
 				Arg.Is(amount));
+	}
+
+	[Test]
+	public async Task 提款申請的VIP累計金額設定為負一時_代表不限制()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var withdrawLimitPipe = new WithdrawLimitProcessPipe(
+			fakeVipLevelClient,
+			fakePlayerServiceClient,
+			fakeWithdrawLimitClient,
+			fakeSystemClock);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { withdrawLimitPipe });
+
+		var brandId = Guid.NewGuid();
+
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+		var note = "ThisIsPlayerNote";
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var playerBankInfo = new PlayerBankInfo(
+			bankInfoId,
+			user.UserId,
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			JsonDocument.Parse("{}"),
+			false);
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(playerBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
+			.Returns(new PlayerInfo
+			{
+				PlayerCode = user.UserId,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					-1M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<DateOnly>(),
+			Arg.Is(amount))
+			.Returns(new WithdrawStatistics(1000, 1));
+
+		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
+
+		Assert.AreNotEqual(Guid.Empty, actual);
+
+		var expectedSnapshot = new WithdrawFormSnapshot(
+			actual,
+			brandId,
+			user.UserId,
+			user.UserName,
+			user.UserType,
+			amount,
+			null,
+			0M,
+			null,
+			PaymentFlowState.Init,
+			null,
+			note,
+			bankInfoId,
+			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
+				playerBankInfo.Id,
+				playerBankInfo.PaymentChannelId,
+				playerBankInfo.BankType,
+				playerBankInfo.Detail), PaymentUtility.SerializerOptions),
+			null,
+			null,
+			orderNo,
+			null,
+			currentTime.UtcDateTime,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(actual),
+				Arg.Is(EventAction.Create),
+				Arg.Any<JsonDocument>(),
+				Arg.Any<string>());
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
 	}
 
 	[Test]
@@ -1357,6 +1594,96 @@ public class WithdrawServiceTests
 			null));
 
 		Assert.AreEqual(11000M, actual.Amount);
+		_ = fakeWithdrawLimitClient.Received(1)
+			.DecreasePlayerWithdrawStatisticsAsync(
+				Arg.Is(user.UserId),
+				Arg.Is(DateOnly.FromDateTime(currentTime.ToOffset(TimeSpan.FromHours(8D)).DateTime)),
+				Arg.Is(amount));
+	}
+
+	[Test]
+	public void 提款申請時_當日提款累計如果超過VIP限額_會發生Exception()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var withdrawLimitPipe = new WithdrawLimitProcessPipe(
+			fakeVipLevelClient,
+			fakePlayerServiceClient,
+			fakeWithdrawLimitClient,
+			fakeSystemClock);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { withdrawLimitPipe });
+
+		var brandId = Guid.NewGuid();
+
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		var currentTime = DateTimeOffset.UtcNow;
+
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
+			.Returns(new PlayerInfo
+			{
+				PlayerCode = user.UserId,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					10000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<DateOnly>(),
+			Arg.Is(amount))
+			.Returns(new WithdrawStatistics(1000M, 6));
+
+		var actual = Assert.ThrowsAsync<WithdrawLimitExceedException>(async () => await sut.CreateWithdrawFormAsync(
+			user,
+			brandId,
+			bankInfoId,
+			amount,
+			null));
+
+		Assert.AreEqual(6, actual.Count);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
@@ -1452,6 +1779,156 @@ public class WithdrawServiceTests
 					0M,
 					0M,
 					5,
+					10000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<DateOnly>(),
+			Arg.Is(amount))
+			.Returns(new WithdrawStatistics(1000, 1));
+
+		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
+
+		Assert.AreNotEqual(Guid.Empty, actual);
+
+		var expectedSnapshot = new WithdrawFormSnapshot(
+			actual,
+			brandId,
+			user.UserId,
+			user.UserName,
+			user.UserType,
+			amount,
+			null,
+			0M,
+			null,
+			PaymentFlowState.Init,
+			null,
+			note,
+			bankInfoId,
+			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
+				playerBankInfo.Id,
+				playerBankInfo.PaymentChannelId,
+				playerBankInfo.BankType,
+				playerBankInfo.Detail), PaymentUtility.SerializerOptions),
+			null,
+			null,
+			orderNo,
+			null,
+			currentTime.UtcDateTime,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+
+		_ = fakePaymentRepository.Received(1)
+			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(actual),
+				Arg.Is(EventAction.Create),
+				Arg.Any<JsonDocument>(),
+				Arg.Any<string>());
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
+	}
+
+	[Test]
+	public async Task 提款申請時VIP累計次數設定為負一時_代表不限制()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var withdrawLimitPipe = new WithdrawLimitProcessPipe(
+			fakeVipLevelClient,
+			fakePlayerServiceClient,
+			fakeWithdrawLimitClient,
+			fakeSystemClock);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { withdrawLimitPipe });
+
+		var brandId = Guid.NewGuid();
+
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+		var note = "ThisIsPlayerNote";
+
+		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
+			.Returns(new BrandInfo("GPI"));
+
+		var playerBankInfo = new PlayerBankInfo(
+			bankInfoId,
+			user.UserId,
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			JsonDocument.Parse("{}"),
+			false);
+		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(playerBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
+			.Returns(new PlayerInfo
+			{
+				PlayerCode = user.UserId,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					-1,
 					10000M)
 			}.ToAsyncEnumerable());
 
