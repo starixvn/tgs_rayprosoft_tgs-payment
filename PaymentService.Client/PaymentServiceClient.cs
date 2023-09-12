@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Web;
 using Stateless;
@@ -253,6 +254,18 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			{
 				HttpStatusCode.Conflict => throw new InsufficientFundsException(),
 				HttpStatusCode.NotAcceptable => throw new InsufficientBucketException(),
+				HttpStatusCode.BadRequest => throw response.Content.ReadFromJsonAsync<JsonNode>(_SerializerOptions)
+					.ToAsyncEnumerable()
+					.Select(node => node!)
+					.Select(node => node["title"]!.GetValue<string>() switch
+					{
+						nameof(WithdrawLimitExceedException) => new WithdrawLimitExceedException(
+							node["count"]!.GetValue<int?>(),
+							node["amount"]!.GetValue<decimal?>()),
+						_ => new Exception("Unknown error.")
+					})
+					.ToEnumerable()
+					.First(),
 				_ => response.EnsureSuccessStatusCode()
 			})
 			.SelectMany(response => response.Content
