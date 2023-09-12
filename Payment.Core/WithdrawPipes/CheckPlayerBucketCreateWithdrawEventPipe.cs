@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Tgs.PlayerBucket.Client;
 using Tgs.Service.PlayerBuckets;
 
-namespace Tgs.Payment;
+namespace Tgs.Payment.WithdrawPipes;
 
 internal class CheckPlayerBucketCreateWithdrawEventPipe : ICreateWithdrawFormPipe
 {

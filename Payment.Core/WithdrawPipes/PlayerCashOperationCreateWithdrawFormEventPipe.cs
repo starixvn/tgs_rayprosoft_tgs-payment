@@ -6,7 +6,7 @@ using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.PlayerService.Client;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment;
+namespace Tgs.Payment.WithdrawPipes;
 
 internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawFormPipe
 {

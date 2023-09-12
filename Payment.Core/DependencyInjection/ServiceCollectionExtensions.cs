@@ -4,6 +4,7 @@ using JSLTSharp.JsonTransforms.Abstractions;
 using JSLTSharp.JsonTransforms.Extensions;
 using Tgs.Payment;
 using Tgs.Payment.Configuration;
+using Tgs.Payment.WithdrawPipes;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

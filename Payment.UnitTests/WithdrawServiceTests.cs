@@ -6,6 +6,7 @@ using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Clients;
+using Tgs.Payment.WithdrawPipes;
 using Tgs.PlayerBucket.Client;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
