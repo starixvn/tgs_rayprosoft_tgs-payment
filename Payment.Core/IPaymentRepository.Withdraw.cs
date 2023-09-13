@@ -21,6 +21,8 @@ public partial interface IPaymentRepository
 		string? modifier,
 		CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenWithdrawPlayersAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	ValueTask<WithdrawFormSnapshot?> GetCurrentWithdrawFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default);
 
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormByIdAsync(Guid formId, CancellationToken cancellationToken = default);
@@ -34,5 +36,6 @@ public partial interface IPaymentRepository
 		WithdrawFormQueryConditions conditions,
 		bool limitQuery = true,
 		CancellationToken cancellationToken = default);
+
 	ValueTask UpdateWithdrawFormSnapshotAsync(WithdrawFormSnapshot snapshot, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default);
 }

@@ -60,4 +60,36 @@ public class DepositTests
 
 		Assert.AreEqual(67m, actual);
 	}
+
+	[Test]
+	public async Task 查詢當日前十大存款玩家()
+	{
+		var fakeService = Substitute.For<IQueryService<GetCurrentDayTopTenDepositPlayersQuery, Tgs.Payment.TopTenDepositWithdrawInfo>>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services
+			=> services.AddSingleton(fakeService));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+
+		_ = fakeService
+			.QueryAsync(new GetCurrentDayTopTenDepositPlayersQuery(brandId), Arg.Any<CancellationToken>())
+			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[] {
+				new Tgs.Payment.TopTenDepositWithdrawInfo{
+					PlayerCode = "playerCode1",
+					DepositTotalAmount = 16888m,
+					WithdrawTotalAmount = 200m
+				}
+			}.ToAsyncEnumerable());
+
+		var actual = await sut.GetCurrentDayTopTenDepositPlayersAsync(brandId).ToArrayAsync();
+
+		Assert.AreEqual(1, actual.Length);
+		Assert.AreEqual("playerCode1", actual[0].PlayerCode);
+		Assert.AreEqual(16888m, actual[0].DepositTotalAmount);
+		Assert.AreEqual(200m, actual[0].WithdrawTotalAmount);
+	}
 }

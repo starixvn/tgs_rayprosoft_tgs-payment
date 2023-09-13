@@ -25,6 +25,8 @@ public partial interface IPaymentRepository
 		string? modifier,
 		CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenDepositPlayersAsync(Guid brandId, CancellationToken cancellationToken = default);
+
 	ValueTask<DepositFormSnapshot?> GetCurrentDepositFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default);
 
 	ValueTask<DepositFormInfo?> GetDepositFormByIdAsync(Guid id, CancellationToken cancellationToken = default);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -680,6 +681,122 @@ internal class PaymentRepository : IPaymentRepository
 			.Where(v => ids.Contains(v.BrandPaymentId))
 			.Select(v => new BrandPaymentVip(v.BrandPaymentId, v.VipLevelId))
 			.ToAsyncEnumerable();
+	}
+
+	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenDepositPlayersAsync(
+		Guid brandId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var currentDay = new DateTimeOffset(
+			DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Date,
+			TimeSpan.FromHours(8D))
+			.UtcDateTime;
+
+		var query = await _tgsContext.Set<TopTenInfo>()
+			.FromSqlInterpolated($"""
+			SELECT
+				DF.player_code,
+				DF.deposit_total_amount,
+				Coalesce( WF.withdraw_total_amount,0) as withdraw_total_amount
+			FROM (
+				SELECT
+					Sum(amount) as deposit_total_amount,
+					player_code
+				FROM dbo.deposit_forms
+				WHERE brand_id = {brandId}
+					AND
+					updated_on >= {currentDay}
+					AND
+					status = 8000
+				GROUP BY player_code
+				ORDER BY deposit_total_amount DESC
+				LIMIT 10
+				) AS DF
+			LEFT JOIN
+			 (
+				SELECT
+					Sum(amount) AS withdraw_total_amount,
+					user_id AS player_code
+				FROM dbo.withdraw_forms
+				WHERE brand_id = {brandId}
+					AND updated_on >= {currentDay}
+					AND status = 9000
+					AND user_type = 1
+				GROUP BY user_id , brand_id
+				ORDER BY withdraw_total_amount DESC
+			) AS WF on DF.player_code = WF.player_code
+			ORDER BY DF.deposit_total_amount DESC
+			""")
+			.AsNoTracking()
+			.ToArrayAsync(cancellationToken);
+
+		foreach (var item in query)
+		{
+			yield return new TopTenDepositWithdrawInfo
+			{
+				PlayerCode = item.PlayerCode,
+				DepositTotalAmount = item.DepositTotalAmount,
+				WithdrawTotalAmount = item.WithdrawTotalAmount
+			};
+		}
+	}
+
+	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenWithdrawPlayersAsync(
+		Guid brandId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var currentDay = new DateTimeOffset(
+			DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(8D)).Date,
+			TimeSpan.FromHours(8D))
+			.UtcDateTime;
+
+		var query = await _tgsContext.Set<TopTenInfo>()
+			.FromSqlInterpolated($"""
+			SELECT
+				WF.player_code,
+				Coalesce(DF.deposit_total_amount,0) AS deposit_total_amount,
+				WF.withdraw_total_amount
+			FROM (
+				SELECT
+					sum(amount) AS withdraw_total_amount,
+					user_id AS player_code
+				FROM dbo.withdraw_forms
+				WHERE brand_id = {brandId}
+					AND updated_on >= {currentDay}
+					AND status = 9000
+					AND user_type = 1
+				GROUP BY user_id, brand_id
+				ORDER BY withdraw_total_amount DESC
+				LIMIT 10
+				) AS WF
+			LEFT JOIN
+			 (
+				SELECT
+					sum(amount) as deposit_total_amount,
+					player_code
+				FROM dbo.deposit_forms
+				WHERE brand_id = {brandId}
+					AND
+					updated_on >= {currentDay}
+					AND
+					status = 8000
+				GROUP BY player_code
+				ORDER BY deposit_total_amount DESC
+			) AS DF on WF.player_code = DF.player_code
+			ORDER BY WF.withdraw_total_amount DESC
+			""")
+			.AsNoTracking()
+			.ToArrayAsync(cancellationToken);
+
+		foreach (var item in query)
+		{
+			yield return new TopTenDepositWithdrawInfo
+			{
+				PlayerCode = item.PlayerCode,
+				DepositTotalAmount = item.DepositTotalAmount,
+				WithdrawTotalAmount = item.WithdrawTotalAmount
+			};
+		}
 	}
 
 	public async ValueTask<DepositFormSnapshot?> GetCurrentDepositFormSnapshotAsync(Guid id, CancellationToken cancellationToken = default)

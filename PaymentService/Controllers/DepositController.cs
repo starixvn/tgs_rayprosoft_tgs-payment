@@ -52,6 +52,27 @@ public class DepositController : ControllerBase
 		return rateService.GetAsync(query, HttpContext.RequestAborted);
 	}
 
+	[HttpGet("top-ten/{brandId}", Name = "GetCurrentDayTopTenDepositPlayers")]
+	public async IAsyncEnumerable<TopTenDepositWithdrawViewModel> GetCurrentDayTopTenDepositPlayersAsync(
+		[FromServices] IQueryService<GetCurrentDayTopTenDepositPlayersQuery, TopTenDepositWithdrawInfo> queryService,
+		Guid brandId)
+	{
+		var result = await queryService
+			.QueryAsync(new GetCurrentDayTopTenDepositPlayersQuery(brandId), HttpContext.RequestAborted)
+			.ToArrayAsync(HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		foreach (var item in result)
+		{
+			yield return new TopTenDepositWithdrawViewModel
+			{
+				PlayerCode = item.PlayerCode,
+				DepositTotalAmount = item.DepositTotalAmount,
+				WithdrawTotalAmount = item.WithdrawTotalAmount,
+			};
+		}
+	}
+
 	/// <summary>
 	/// Gets the deposit form asynchronous.
 	/// </summary>

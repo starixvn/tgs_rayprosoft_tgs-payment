@@ -682,6 +682,42 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
+	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenDepositPlayersAsync(
+		Guid brandId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/deposit/top-ten/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+		var topTenInfos = JsonSerializer.Deserialize<TopTenDepositWithdrawInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var topTenInfo in topTenInfos!)
+			yield return topTenInfo;
+	}
+
+	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenWithdrawPlayersAsync(
+		Guid brandId,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/withdraw/top-ten/{brandId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+		var topTenInfos = JsonSerializer.Deserialize<TopTenDepositWithdrawInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var topTenInfo in topTenInfos!)
+			yield return topTenInfo;
+	}
+
 	public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

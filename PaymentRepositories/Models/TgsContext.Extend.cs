@@ -18,5 +18,11 @@ partial class TgsContext
 		depositSummary.Property(d => d.Total).HasColumnName("total");
 		depositSummary.Property(d => d.Approved).HasColumnName("approved");
 		depositSummary.Property(d => d.Reject).HasColumnName("reject");
+
+		var topTenInfo = modelBuilder.Entity<TopTenInfo>();
+		topTenInfo.HasNoKey();
+		topTenInfo.Property(t => t.PlayerCode).HasColumnName("player_code");
+		topTenInfo.Property(t => t.DepositTotalAmount).HasColumnName("deposit_total_amount");
+		topTenInfo.Property(t => t.WithdrawTotalAmount).HasColumnName("withdraw_total_amount");
 	}
 }

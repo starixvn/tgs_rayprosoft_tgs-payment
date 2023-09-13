@@ -1014,6 +1014,24 @@ public class WithdrawTests
 	}
 
 	[Test]
+	public async Task 查詢當日前十大提款玩家()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetCurrentDayTopTenWithdrawPlayersQueryService(fakePaymentRepository);
+
+		var brandId = Guid.NewGuid();
+
+		_ = await sut
+			.QueryAsync(new GetCurrentDayTopTenWithdrawPlayersQuery(brandId))
+			.ToArrayAsync();
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.GetCurrentDayTopTenWithdrawPlayersAsync(Arg.Is(brandId));
+	}
+
+	[Test]
 	public async Task 站台存提差_加總已支付提款金額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
