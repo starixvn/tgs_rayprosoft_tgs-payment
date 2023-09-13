@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using Tgs.MessageQueue;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Valhalla.MessageQueue;
 
 namespace Payment.IntegrationTests;
 

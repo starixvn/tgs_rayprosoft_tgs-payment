@@ -13,7 +13,7 @@ var app = Host.CreateDefaultBuilder()
 		.AddDbContext<TgsContext>(builder => builder
 			.UseNpgsql("Name=Tgs"))
 		.AddPaymentClient()
-		.AddMessageQueue()
+		.AddPhoenixToolkitsMessageQueue()
 		.AddNatsMessageQueue(config => config
 			.ConfigQueueOptions((options, sp) =>
 			{

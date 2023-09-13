@@ -7,8 +7,11 @@ using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Tgs.Payment.WithdrawLimit;
+using Tgs.Payment.WithdrawLimit.Clients;
 using Tgs.PlayerService.Client;
 using Tgs.Service.PlayerBuckets;
+using Tgs.VipLevelService.Clients;
 
 namespace Payment.IntegrationTests;
 
@@ -96,9 +99,14 @@ public class PaymentEventSourceTests
 	[Test]
 	public async Task WithdrawForm_EventSource_Apply後應該和快照的資料一樣()
 	{
+		var brandId = Guid.NewGuid();
+		var bankInfoId = Guid.NewGuid();
+
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -131,20 +139,58 @@ public class PaymentEventSourceTests
 			Arg.Any<CancellationToken>())
 			.Returns(new ReadBucketResult(0M, null));
 
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is("TestPlayer"), Arg.Any<CancellationToken>())
+			.Returns(new Tgs.PlayerService.Client.PlayerInfo
+			{
+				PlayerCode = "TestPlayer",
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new[]
+			{
+				new VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					10000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is("TestPlayer"),
+			Arg.Any<DateOnly>(),
+			Arg.Any<decimal>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new WithdrawStatistics(1000M, 1));
+
 		await using var web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
 				.AddSingleton(fakeCashServiceClient)
 				.AddSingleton(fakePlayerServiceClient)
-				.AddSingleton(fakePlayerBucketClient));
+				.AddSingleton(fakePlayerBucketClient)
+				.AddSingleton(fakeVipLevelClient)
+				.AddSingleton(fakeWithdrawLimitClient));
 
 		var httpClient = web.CreateClient();
 
 		var sut = new PaymentServiceClient(httpClient);
 
 		var dbContext = web.Services.GetRequiredService<TgsContext>();
-
-		var brandId = Guid.NewGuid();
-		var bankInfoId = Guid.NewGuid();
 
 		_ = await dbContext.Brands.AddAsync(
 			new Brand

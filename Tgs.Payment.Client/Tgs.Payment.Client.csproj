@@ -4,7 +4,7 @@
 		<TargetFrameworks>net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
-		<Version>0.4.8</Version>
+		<Version>0.5.0</Version>
 		<Authors>Raypro</Authors>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment.git</RepositoryUrl>
@@ -23,14 +23,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.24.2" />
-		<PackageReference Include="Grpc.Tools" Version="2.57.0">
+		<PackageReference Include="Google.Protobuf" Version="3.24.3" />
+		<PackageReference Include="Grpc.Tools" Version="2.58.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" Condition="'$(TargetFramework)' == 'net5.0'" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" Condition="'$(TargetFramework)' == 'net6.0'" />
-		<PackageReference Include="Tgs.MessageQueue" Version="2.3.0" />
+		<PackageReference Include="PhoenixToolkits.MessageQueue" Version="1.0.3" />
 		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
 	</ItemGroup>
 

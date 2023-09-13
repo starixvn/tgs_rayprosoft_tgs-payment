@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tgs.Paging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Controllers.Constraints;
+using Tgs.Payment.Problems;
 using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
 using Tgs.WebApi.Toolkits;
@@ -57,6 +58,10 @@ public class WithdrawController : ControllerBase
 
 	[HttpPut(Name = "CreateWithdrawForm")]
 	[SuccessStatusCode(201)]
+	[ProducesResponseType(typeof(Guid), 201)]
+	[ProducesResponseType(typeof(ProblemDetails), 406, "application/problem+json")]
+	[ProducesResponseType(typeof(ProblemDetails), 409, "application/problem+json")]
+	[ProducesResponseType(typeof(WithdrawLimitExceedProblemDetails), 400, "application/problem+json")]
 	public async Task<Guid> CreateWithdrawFormAsync(
 		[FromServices] IGetService<CreateWithdrawFormCommand, Guid> createService,
 		[FromBody] CreateWithdrawFormViewModel request)
@@ -79,11 +84,22 @@ public class WithdrawController : ControllerBase
 		}
 		catch (InsufficientFundsException)
 		{
-			return HttpContext.TransformResult<Guid>(Problem(statusCode: 409));
+			return HttpContext.TransformResult<Guid>(Problem(statusCode: 409, title: nameof(InsufficientFundsException)));
 		}
 		catch (InsufficientBucketException)
 		{
-			return HttpContext.TransformResult<Guid>(Problem(statusCode: 406));
+			return HttpContext.TransformResult<Guid>(Problem(statusCode: 406, title: nameof(InsufficientBucketException)));
+		}
+		catch (WithdrawLimitExceedException ex)
+		{
+			return HttpContext.TransformResult<Guid>(new ObjectResult(
+				new WithdrawLimitExceedProblemDetails
+				{
+					Status = 400,
+					Title = nameof(WithdrawLimitExceedException),
+					Amount = ex.Amount,
+					Count = ex.Count
+				}));
 		}
 	}
 

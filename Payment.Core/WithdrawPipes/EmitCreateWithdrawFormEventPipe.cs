@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.Clients;
 
-namespace Tgs.Payment;
+namespace Tgs.Payment.WithdrawPipes;
 
 internal class EmitCreateWithdrawFormEventPipe : ICreateWithdrawFormPipe
 {

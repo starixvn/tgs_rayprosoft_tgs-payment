@@ -1,8 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
+using Tgs.Payment.WithdrawLimit;
+using Tgs.Payment.WithdrawLimit.Clients;
+using Tgs.PlayerService.Client;
+using Tgs.VipLevelService.Clients;
+using PlayerInfo = Tgs.PlayerService.Client.PlayerInfo;
 
 namespace Payment.IntegrationTests.Steps;
 
@@ -18,7 +24,12 @@ public class CreateAgentWithdrawFormSteps
 
 	public CreateAgentWithdrawFormSteps()
 	{
-		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(Substitute.For<IVipLevelServiceClient>())
+			.AddSingleton(Substitute.For<IPlayerServiceClient>()));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}

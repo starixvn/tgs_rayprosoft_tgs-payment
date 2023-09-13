@@ -4,6 +4,7 @@ using JSLTSharp.JsonTransforms.Abstractions;
 using JSLTSharp.JsonTransforms.Extensions;
 using Tgs.Payment;
 using Tgs.Payment.Configuration;
+using Tgs.Payment.WithdrawPipes;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +28,7 @@ public static class ServiceCollectionExtensions
 			.AddSingleton<ISystemClock, DefaultSystemClock>()
 			.AddTransient<ICreateWithdrawFormPipe, EmitCreateWithdrawFormEventPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, PlayerCashOperationCreateWithdrawFormEventPipe>()
+			.AddTransient<ICreateWithdrawFormPipe, WithdrawLimitProcessPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, CheckPlayerBucketCreateWithdrawEventPipe>()
 			.AddSerialNumberGenerator()
 			.AddOptions<BankInfoParserOptions>();
