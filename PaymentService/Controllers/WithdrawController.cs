@@ -87,6 +87,27 @@ public class WithdrawController : ControllerBase
 		}
 	}
 
+	[HttpGet("top-ten/{brandId}", Name = "GetCurrentDayTopTenWithdrawPlayers")]
+	public async IAsyncEnumerable<TopTenDepositWithdrawViewModel> GetCurrentDayTopTenWithdrawPlayersAsync(
+		[FromServices] IQueryService<GetCurrentDayTopTenWithdrawPlayersQuery, TopTenDepositWithdrawInfo> queryService,
+		Guid brandId)
+	{
+		var result = await queryService
+			.QueryAsync(new GetCurrentDayTopTenWithdrawPlayersQuery(brandId), HttpContext.RequestAborted)
+			.ToArrayAsync(HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		foreach (var item in result)
+		{
+			yield return new TopTenDepositWithdrawViewModel
+			{
+				PlayerCode = item.PlayerCode,
+				DepositTotalAmount = item.DepositTotalAmount,
+				WithdrawTotalAmount = item.WithdrawTotalAmount,
+			};
+		}
+	}
+
 	[HttpGet("{brandId}/{formId}", Name = "GetWithdrawFormWithBrandId")]
 	public async Task<WithdrawFormViewModel?> GetWithdrawFormAsync(
 		[FromServices] IGetService<GetWithdrawFormDetailQuery, WithdrawFormInfo?> getService,

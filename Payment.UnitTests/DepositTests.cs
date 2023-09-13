@@ -1337,6 +1337,24 @@ public class DepositTests
 	}
 
 	[Test]
+	public async Task 查詢當日前十大存款玩家()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		var sut = new GetCurrentDayTopTenDepositPlayersQueryService(fakePaymentRepository);
+
+		var brandId = Guid.NewGuid();
+
+		_ = await sut
+			.QueryAsync(new GetCurrentDayTopTenDepositPlayersQuery(brandId))
+			.ToArrayAsync();
+
+		_ = fakePaymentRepository
+			.Received(1)
+			.GetCurrentDayTopTenDepositPlayersAsync(Arg.Is(brandId));
+	}
+
+	[Test]
 	public async Task 站台存提差_不加總已拒絕存款金額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
