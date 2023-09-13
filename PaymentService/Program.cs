@@ -11,7 +11,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.Configuration;
-using Tgs.Payment.Repositories;
 using Tgs.Payment.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,7 +59,6 @@ var builder = WebApplication.CreateBuilder(args);
 		});
 
 	_ = builder.Services
-		.AddNpgsqlDataSource(builder.Configuration.GetConnectionString("Tgs")!)
 		.AddPaymentClient()
 		.AddPayment()
 		.UseRedis((options, sp) =>
@@ -72,7 +70,7 @@ var builder = WebApplication.CreateBuilder(args);
 		{
 			var config = sp.GetRequiredService<IConfiguration>();
 
-			_ = builder.UseNpgsql();
+			_ = builder.UseNpgsql(config.GetConnectionString("Tgs"));
 		})
 		.ConfigureBankInfoIndexParsers((options, _) =>
 		{
