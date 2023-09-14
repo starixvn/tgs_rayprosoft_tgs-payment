@@ -682,6 +682,30 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
+	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayDepositWithdrawTotalAmountAsync(
+		IEnumerable<string> playerCodes,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var playerQueryString = string.Join(
+			"&",
+			playerCodes.Select(playerCode => $"player={playerCode}"));
+
+		var response = await _httpClient
+			.GetAsync($"/player/total-amount/current-day?{playerQueryString}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		var topTenInfos = JsonSerializer.Deserialize<TopTenDepositWithdrawInfo[]>(contentJson, _SerializerOptions);
+
+		foreach (var topTenInfo in topTenInfos!)
+			yield return topTenInfo;
+	}
+
 	public async IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenDepositPlayersAsync(
 		Guid brandId,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -804,7 +828,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.ConfigureAwait(false);
 
 	public IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(
-			Guid brandId,
+		Guid brandId,
 		string tagType,
 		string tag,
 		CancellationToken cancellationToken = default)

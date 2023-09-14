@@ -9,6 +9,29 @@ namespace Tgs.Payment.Controllers;
 [ApiController]
 public class PlayerController : ControllerBase
 {
+	[HttpGet("total-amount/current-day", Name = "GetCurrentDayDepositWithdrawTotalAmount")]
+	public async IAsyncEnumerable<TopTenDepositWithdrawViewModel> GetCurrentDayDepositWithdrawTotalAmountAsync(
+		[FromServices] IQueryService<GetCurrentDayTotalAmountQuery, TopTenDepositWithdrawInfo> queryService,
+		[FromQuery(Name = "player")] IEnumerable<string> playerCodes)
+	{
+		var query = new GetCurrentDayTotalAmountQuery(playerCodes);
+
+		var result = await queryService
+			.QueryAsync(query, HttpContext.RequestAborted)
+			.ToArrayAsync(HttpContext.RequestAborted)
+			.ConfigureAwait(false);
+
+		foreach (var item in result)
+		{
+			yield return new TopTenDepositWithdrawViewModel
+			{
+				PlayerCode = item.PlayerCode,
+				DepositTotalAmount = item.DepositTotalAmount,
+				WithdrawTotalAmount = item.WithdrawTotalAmount,
+			};
+		}
+	}
+
 	[HttpGet("overview/{playerCode}", Name = "GetPlayerPaymentOverview")]
 	public async Task<PaymentOverviewViewModel> GetPlayerPaymentOverViewAsync(
 		[FromServices] IGetService<GetPaymentOverviewQuery, PaymentOverview?> getService,

@@ -84,6 +84,8 @@ public partial interface IPaymentRepository
 
 	IAsyncEnumerable<BrandPaymentVip> GetBrandPaymentVipListAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayDepositWithdrawTotalAmountAsync(IEnumerable<string> playerCodes, CancellationToken cancellationToken = default);
+
 	ValueTask<PaymentInfo> GetPaymentAsync(Guid id, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync(CancellationToken cancellationToken = default);
