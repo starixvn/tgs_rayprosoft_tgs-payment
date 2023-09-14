@@ -1276,7 +1276,7 @@ public class WithdrawServiceTests
 	}
 
 	[Test]
-	public void 提款申請的VIP累計次數設定為0時_不能提款()
+	public void 提款申請Vip累計會以Brand設定的時區來做日期計算()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
@@ -1291,6 +1291,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1309,6 +1310,112 @@ public class WithdrawServiceTests
 			"TestUser");
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI",
+				TimeSpanMinutes = (int)(5.5D * 60)
+			});
+
+		var currentTime = DateTimeOffset.Parse("2023/9/14+8");
+		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
+			.Returns(new PlayerInfo
+			{
+				PlayerCode = user.UserId,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+			.Returns(new[]
+			{
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					10000M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(user.UserId),
+			Arg.Any<DateOnly>(),
+			Arg.Is(amount))
+			.Returns(new WithdrawStatistics(11000M, 1));
+
+		var actual = Assert.ThrowsAsync<WithdrawLimitExceedException>(async () => await sut.CreateWithdrawFormAsync(
+			user,
+			brandId,
+			bankInfoId,
+			amount,
+			null));
+
+		_ = fakeWithdrawLimitClient.Received(1)
+			.DecreasePlayerWithdrawStatisticsAsync(
+				Arg.Is(user.UserId),
+				Arg.Is(DateOnly.FromDateTime(currentTime.ToOffset(TimeSpan.FromHours(5.5D)).DateTime)),
+				Arg.Is(amount));
+	}
+
+	[Test]
+	public void 提款申請的VIP累計次數設定為0時_不能提款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var withdrawLimitPipe = new WithdrawLimitProcessPipe(
+			fakeVipLevelClient,
+			fakePlayerServiceClient,
+			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
+			fakeSystemClock);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeSystemClock,
+			fakeSerialNumberGenerator,
+			new[] { withdrawLimitPipe });
+
+		var brandId = Guid.NewGuid();
+
+		var user = new WithdrawUser(
+			UserType.Player,
+			"ThisIsPlayerCode",
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
@@ -1382,6 +1489,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1400,6 +1508,13 @@ public class WithdrawServiceTests
 			"TestUser");
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
@@ -1473,6 +1588,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1595,9 +1711,6 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakeBrandServiceClient.Received(1)
-			.GetBrandInfoAsync(Arg.Is(brandId));
-
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
@@ -1629,6 +1742,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1647,6 +1761,13 @@ public class WithdrawServiceTests
 			"TestUser");
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
@@ -1720,6 +1841,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1738,6 +1860,13 @@ public class WithdrawServiceTests
 			"TestUser");
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var currentTime = DateTimeOffset.UtcNow;
 
@@ -1812,6 +1941,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -1934,9 +2064,6 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakeBrandServiceClient.Received(1)
-			.GetBrandInfoAsync(Arg.Is(brandId));
-
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
@@ -1968,6 +2095,7 @@ public class WithdrawServiceTests
 			fakeVipLevelClient,
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
+			fakeBrandServiceClient,
 			fakeSystemClock);
 
 		var sut = new WithdrawService(
@@ -2089,9 +2217,6 @@ public class WithdrawServiceTests
 			null,
 			null,
 			null);
-
-		_ = fakeBrandServiceClient.Received(1)
-			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(

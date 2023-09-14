@@ -26,6 +26,7 @@ public class WithdrawFormTests
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
 		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
@@ -34,6 +35,7 @@ public class WithdrawFormTests
 				.AddSingleton(fakePlayerBucketClient)
 				.AddSingleton(fakeVipLevelClient)
 				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient)
 				.AddHttpClientLoggingHandler());
 
 		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
@@ -60,19 +62,6 @@ public class WithdrawFormTests
 				UpdatedByUsername = "System"
 			});
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
-			{
-				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
-			});
-
 		_ = await dbContext.SaveChangesAsync();
 
 		var withdrawForm = new Tgs.Payment.Clients.WithdrawFormCreateInfo
@@ -84,6 +73,13 @@ public class WithdrawFormTests
 			BrandId = brandId,
 			UserType = Tgs.Payment.Clients.UserType.Player
 		};
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -234,6 +230,7 @@ public class WithdrawFormTests
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
 		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
@@ -242,6 +239,7 @@ public class WithdrawFormTests
 				.AddSingleton(fakePlayerBucketClient)
 				.AddSingleton(fakeVipLevelClient)
 				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient)
 				.AddHttpClientLoggingHandler());
 
 		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
@@ -268,19 +266,6 @@ public class WithdrawFormTests
 				UpdatedByUsername = "System"
 			});
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
-			{
-				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
-			});
-
 		_ = await dbContext.SaveChangesAsync();
 
 		var withdrawForm = new Tgs.Payment.Clients.WithdrawFormCreateInfo
@@ -292,6 +277,13 @@ public class WithdrawFormTests
 			BrandId = brandId,
 			UserType = Tgs.Payment.Clients.UserType.Player
 		};
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(

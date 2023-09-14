@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tgs.BrandCertificate.Clients;
 using Tgs.Payment.WithdrawLimit.Clients;
 using Tgs.PlayerService.Client;
 using Tgs.VipLevelService.Clients;
@@ -11,6 +12,7 @@ namespace Tgs.Payment.WithdrawPipes;
 
 internal class WithdrawLimitProcessPipe : ICreateWithdrawFormPipe
 {
+	private readonly IBrandServiceClient _brandServiceClient;
 	private readonly IPlayerServiceClient _playerServiceClient;
 	private readonly ISystemClock _systemClock;
 	private readonly IVipLevelServiceClient _vipLevelServiceClient;
@@ -21,11 +23,13 @@ internal class WithdrawLimitProcessPipe : ICreateWithdrawFormPipe
 		IVipLevelServiceClient vipLevelServiceClient,
 		IPlayerServiceClient playerServiceClient,
 		IWithdrawLimitClient withdrawLimitClient,
+		IBrandServiceClient brandServiceClient,
 		ISystemClock systemClock)
 	{
 		_vipLevelServiceClient = vipLevelServiceClient ?? throw new ArgumentNullException(nameof(vipLevelServiceClient));
 		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
 		_withdrawLimitClient = withdrawLimitClient ?? throw new ArgumentNullException(nameof(withdrawLimitClient));
+		_brandServiceClient = brandServiceClient ?? throw new ArgumentNullException(nameof(brandServiceClient));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 	}
 
@@ -40,6 +44,12 @@ internal class WithdrawLimitProcessPipe : ICreateWithdrawFormPipe
 		if (user.UserType is not UserType.Player)
 			return;
 
+		var brandInfo = await _brandServiceClient.GetBrandInfoAsync(
+			brandId,
+			cancellationToken).ConfigureAwait(false);
+
+		var brandTimeOffset = TimeSpan.FromMinutes(brandInfo!.TimeSpanMinutes ?? 8 * 60);
+
 		var brandVipLevels = await _vipLevelServiceClient.GetBrandAllVipLevelsAsync(brandId, cancellationToken)
 			.OrderBy(vip => vip.Level)
 			.ToArrayAsync(cancellationToken)
@@ -52,7 +62,7 @@ internal class WithdrawLimitProcessPipe : ICreateWithdrawFormPipe
 		var vipInfo = brandVipLevels.Where(vip => vip.Id == playerInfo!.VipLevelId)
 			.FirstOrDefault() ?? brandVipLevels[0];
 
-		var currentDate = DateOnly.FromDateTime(_systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D)).DateTime);
+		var currentDate = DateOnly.FromDateTime(_systemClock.UtcNow.ToOffset(brandTimeOffset).DateTime);
 
 		var result = await _withdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
 			user.UserId!,
