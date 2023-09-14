@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
+using Tgs.BrandCertificate.Clients;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
@@ -16,7 +18,16 @@ public class CreateDepositFormSteps
 
 	public CreateDepositFormSteps()
 	{
-		_testHost = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Code = "GPI"
+			});
+
+		_testHost = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandServiceClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}

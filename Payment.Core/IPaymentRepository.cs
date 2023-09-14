@@ -63,8 +63,6 @@ public partial interface IPaymentRepository
 
 	ValueTask<bool> GetBrandCheckPlayerBankInfoDuplicateIsEnabledAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default);
-
 	ValueTask<decimal?> GetBrandNetDepositAsync(Guid brandId, DateOnly date, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(

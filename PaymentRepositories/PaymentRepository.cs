@@ -492,15 +492,6 @@ internal class PaymentRepository : IPaymentRepository
 		return flag is not null && flag.IsEnabled;
 	}
 
-	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
-	{
-		var brandInfo = await _tgsContext.Brands
-			.FindAsync(new object?[] { id }, cancellationToken)
-			.ConfigureAwait(false);
-
-		return new BrandInfo(brandInfo!.Code);
-	}
-
 	public async ValueTask<decimal?> GetBrandNetDepositAsync(Guid brandId, DateOnly date, CancellationToken cancellationToken = default)
 	{
 		var netprofit = await _tgsContext.BrandDailyPaymentStatistics
@@ -717,11 +708,11 @@ internal class PaymentRepository : IPaymentRepository
 					sum(amount) AS withdraw_totadl_amount,
 					user_id AS player_code
 				FROM dbo.withdraw_forms
-				WHERE updated_on >= @currentDay
+				WHERE updated_on >= @CurrentDay
 					AND status = 9000
 					AND user_type = 1
 					AND
-					user_id = Any(@playerCodes)
+					user_id = Any(@PlayerCodes)
 				GROUP BY user_id
 			) AS WF on DF.player_code = WF.player_code
 			""";
@@ -730,8 +721,8 @@ internal class PaymentRepository : IPaymentRepository
 
 		var result = await conn.QueryAsync<TopTenInfo>(sql, new
 		{
-			currentDay = currentDay,
-			playerCodes = playerCodes.ToArray()
+			CurrentDay = currentDay,
+			PlayerCodes = playerCodes.ToArray()
 		});
 
 		foreach (var item in result.ToList())

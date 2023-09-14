@@ -15,10 +15,6 @@ using Tgs.Payment.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 {
-	_ = builder.Configuration
-		.AddJsonFile("/config/appsettings.json", true)
-		.AddEnvironmentVariables();
-
 	_ = builder.Logging
 		.AddOpenTelemetry(options =>
 		{
@@ -95,7 +91,9 @@ var builder = WebApplication.CreateBuilder(args);
 		.AddVipLevelServiceClient(httpBuilder => httpBuilder
 			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
 				builder.Configuration.GetValue<Uri>("Payment:VipLevelServiceBaseUrl")!))
-		.AddWithdrawLimitClient();
+		.AddWithdrawLimitClient()
+		.AddBrandServiceClient((options, _) => options.BrandCertificateBaseUrl =
+			builder.Configuration.GetValue<Uri>("Payment:BrandCertificateBaseUrl")!);
 
 	_ = builder.Services
 		.AddPhoenixToolkitsMessageQueue()
