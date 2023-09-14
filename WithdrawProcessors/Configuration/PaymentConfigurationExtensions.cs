@@ -47,6 +47,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<FiveSevenPayV2Processor>("FiveSevenPay-V2")
 			.RegisterWithdrawProcessor<MetaPayProcessor>("MetaPay")
 			.RegisterWithdrawProcessor<GCPayProcessor>("GCPay")
-			.RegisterWithdrawProcessor<WinPayProcessor>("WinPay");
+			.RegisterWithdrawProcessor<WinPayProcessor>("WinPay")
+			.RegisterWithdrawProcessor<MalakiPayV2Processor>("MalakiPay-V2");
 	}
 }
