@@ -12,7 +12,7 @@ public class PlayerController : ControllerBase
 	[HttpGet("total-amount/current-day", Name = "GetCurrentDayDepositWithdrawTotalAmount")]
 	public async IAsyncEnumerable<TopTenDepositWithdrawViewModel> GetCurrentDayDepositWithdrawTotalAmountAsync(
 		[FromServices] IQueryService<GetCurrentDayTotalAmountQuery, TopTenDepositWithdrawInfo> queryService,
-		[FromQuery] IEnumerable<string> playerCodes)
+		[FromQuery(Name = "player")] IEnumerable<string> playerCodes)
 	{
 		var query = new GetCurrentDayTotalAmountQuery(playerCodes);
 

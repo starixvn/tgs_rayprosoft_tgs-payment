@@ -83,6 +83,8 @@ public interface IPaymentServiceClient
 
 	ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(Guid brandId, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayDepositWithdrawTotalAmountAsync(IEnumerable<string> playerCodes, CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenDepositPlayersAsync(Guid brandId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenWithdrawPlayersAsync(Guid brandId, CancellationToken cancellationToken = default);

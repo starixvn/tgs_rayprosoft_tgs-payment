@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
@@ -78,5 +80,46 @@ public class PlayerQueryTests
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
 		Assert.AreEqual(expected, actual);
+	}
+
+	[Test]
+	public async Task 查詢當日玩家已通過存款與已支付提款金額()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(services
+			=> services.AddSingleton(fakePaymentRepository));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		var playerCodes = new string[] { "playerCode", "playerCode1" };
+
+		_ = fakePaymentRepository
+			.GetCurrentDayDepositWithdrawTotalAmountAsync(
+				Arg.Is<IEnumerable<string>>(x => x.SequenceEqual(playerCodes)),
+				Arg.Any<CancellationToken>())
+			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[]
+			{
+				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				{
+					PlayerCode = "playerCode",
+					DepositTotalAmount = 888888m,
+					WithdrawTotalAmount = 100m
+				},
+				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				{
+					PlayerCode = "playerCode1",
+					DepositTotalAmount = 16888m,
+					WithdrawTotalAmount = 100m
+				}
+			}.ToAsyncEnumerable());
+
+		var actual = await sut.GetCurrentDayDepositWithdrawTotalAmountAsync(playerCodes).ToArrayAsync();
+
+		Assert.AreEqual(2, actual.Length);
 	}
 }
