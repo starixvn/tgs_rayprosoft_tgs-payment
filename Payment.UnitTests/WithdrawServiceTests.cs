@@ -2,6 +2,7 @@
 using System.Text.Json;
 using ExpectedObjects;
 using NSubstitute;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
@@ -24,6 +25,7 @@ public class WithdrawServiceTests
 	public async Task EmitCreateWithdrawFormEventPipe會發出表單建立事件()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -32,6 +34,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -45,8 +48,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -81,6 +88,7 @@ public class WithdrawServiceTests
 	public async Task 代理提款不會執行玩家流水檢查()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -90,6 +98,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -108,8 +117,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -146,6 +159,7 @@ public class WithdrawServiceTests
 	public async Task 代理提款不會執行玩家錢包動作()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -156,6 +170,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -175,8 +190,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -215,6 +234,7 @@ public class WithdrawServiceTests
 	public void 玩家提款時扣款後錢包餘額為負數會Rollback交易_並且將表單拒絕掉()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -225,6 +245,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -243,8 +264,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -319,6 +344,7 @@ public class WithdrawServiceTests
 	public void 玩家提款時流水如果沒清空不能提款()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -328,6 +354,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -345,8 +372,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -397,6 +428,7 @@ public class WithdrawServiceTests
 	public async Task 玩家提款時流水都清空則可以建立表單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -406,6 +438,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -423,8 +456,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -502,8 +539,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -524,6 +561,7 @@ public class WithdrawServiceTests
 	public void 玩家提款時錢包餘額不足會建立表單失敗()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -534,6 +572,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -552,8 +591,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -602,6 +645,7 @@ public class WithdrawServiceTests
 	public async Task 玩家提款單建立前會先檢查錢包餘額是否足夠_建立完成後_會進行扣款()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -612,6 +656,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -630,8 +675,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -691,12 +740,14 @@ public class WithdrawServiceTests
 	public async Task 建立Agent的提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -710,8 +761,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -769,8 +824,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -791,12 +846,14 @@ public class WithdrawServiceTests
 	public void 建立代理提款單時_如果BankInfo不是自己的會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -810,8 +867,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(new AgentBankInfo(
@@ -834,12 +895,14 @@ public class WithdrawServiceTests
 	public async Task 建立玩家的提款單()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -855,8 +918,12 @@ public class WithdrawServiceTests
 		var amount = 1000M;
 		var note = "ThisIsPlayerNote";
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -915,8 +982,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -937,12 +1004,14 @@ public class WithdrawServiceTests
 	public void 建立玩家提款單_如果BankInfo不是自己的會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -956,8 +1025,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(new PlayerBankInfo(
@@ -981,6 +1054,7 @@ public class WithdrawServiceTests
 	public async Task 建立提款單時_Pipe的After會依照Order由小到大的順序執行()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -995,6 +1069,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1008,8 +1083,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -1069,6 +1148,7 @@ public class WithdrawServiceTests
 	public async Task 建立提款單時_Pipe的Before會依照Order由大到小的順序執行()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1083,6 +1163,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1096,8 +1177,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var agentBankInfo = new AgentBankInfo(
 			bankInfoId,
@@ -1154,12 +1239,14 @@ public class WithdrawServiceTests
 	public void 建立提款單時_UserType不正確時會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1173,8 +1260,12 @@ public class WithdrawServiceTests
 		var bankInfoId = Guid.NewGuid();
 		var amount = 1000M;
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.CreateWithdrawFormAsync(
 			user,
@@ -1188,6 +1279,7 @@ public class WithdrawServiceTests
 	public void 提款申請的VIP累計次數設定為0時_不能提款()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1203,6 +1295,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1230,7 +1323,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1277,6 +1370,7 @@ public class WithdrawServiceTests
 	public void 提款申請的VIP累計金額設定為0時_不能提款()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1292,6 +1386,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1319,7 +1414,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1366,6 +1461,7 @@ public class WithdrawServiceTests
 	public async Task 提款申請的VIP累計金額設定為負一時_代表不限制()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1381,6 +1477,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1396,8 +1493,12 @@ public class WithdrawServiceTests
 		var amount = 1000M;
 		var note = "ThisIsPlayerNote";
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -1431,7 +1532,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1494,8 +1595,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -1516,6 +1617,7 @@ public class WithdrawServiceTests
 	public void 提款申請時_當日提款次數累計如果超過VIP限額_會發生Exception()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1531,6 +1633,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1558,7 +1661,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1605,6 +1708,7 @@ public class WithdrawServiceTests
 	public void 提款申請時_當日提款累計如果超過VIP限額_會發生Exception()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1620,6 +1724,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1648,7 +1753,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1695,6 +1800,7 @@ public class WithdrawServiceTests
 	public async Task 提款申請時_當日提款累計金額不能超過VIP限額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1710,6 +1816,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1725,8 +1832,12 @@ public class WithdrawServiceTests
 		var amount = 1000M;
 		var note = "ThisIsPlayerNote";
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -1760,7 +1871,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1823,8 +1934,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -1845,6 +1956,7 @@ public class WithdrawServiceTests
 	public async Task 提款申請時VIP累計次數設定為負一時_代表不限制()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -1860,6 +1972,7 @@ public class WithdrawServiceTests
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
@@ -1875,8 +1988,12 @@ public class WithdrawServiceTests
 		var amount = 1000M;
 		var note = "ThisIsPlayerNote";
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var playerBankInfo = new PlayerBankInfo(
 			bankInfoId,
@@ -1910,7 +2027,7 @@ public class WithdrawServiceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -1973,8 +2090,8 @@ public class WithdrawServiceTests
 			null,
 			null);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(

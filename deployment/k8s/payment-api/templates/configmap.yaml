@@ -36,7 +36,8 @@ data:
       "Payment":{
         "PlayerServiceBaseUrl": "http://player-api",
         "CashServiceBaseUrl": "http://cashservice-api",
-        "PlayerBucketServiceBaseUrl": "http://tgs-playerbucket-service"
+        "PlayerBucketServiceBaseUrl": "http://tgs-playerbucket-service",
+        "BrandCerticateBaseUrl": "http://brand-cert-api"
       }
     }
   otel-collector-config.yaml: |

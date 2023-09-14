@@ -2,6 +2,7 @@
 using Json.Patch;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Tgs.BrandCertificate.Clients;
 using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
@@ -92,6 +93,7 @@ public class DepositTests
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
 		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 
@@ -99,6 +101,7 @@ public class DepositTests
 			fakeSerialNumberGenerator,
 			fakePaymentRepository,
 			fakePaymentClient,
+			fakeBrandServiceClient,
 			fakeTakeNumberStore,
 			fakeSystemClock);
 
@@ -120,8 +123,12 @@ public class DepositTests
 		_ = fakeSerialNumberGenerator.GenerateAsync()
 			.Returns(eventId);
 
-		_ = fakePaymentRepository.GetBrandInfoByIdAsync(brandId)
-			.Returns(new BrandInfo("GPI"));
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		_ = fakeTakeNumberStore.GetDepositFormOrderNoAsync(Arg.Is("GPI"))
 			.Returns(orderNo);
@@ -152,8 +159,8 @@ public class DepositTests
 
 		await sut.ExecuteAsync(command);
 
-		_ = fakePaymentRepository.Received(1)
-			.GetBrandInfoByIdAsync(Arg.Is(brandId));
+		_ = fakeBrandServiceClient.Received(1)
+			.GetBrandInfoAsync(Arg.Is(brandId));
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateDepositFormEventAsync(

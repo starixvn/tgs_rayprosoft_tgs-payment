@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
 using Json.Pointer;
+using Tgs.BrandCertificate.Clients;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Payment;
@@ -14,18 +15,21 @@ internal class WithdrawService : IWithdrawService
 {
 	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes;
 	private readonly IPaymentRepository _paymentRepository;
+	private readonly IBrandServiceClient _brandServiceClient;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
 	private readonly ISystemClock _systemClock;
 	private readonly ITakeNumberStore _takeNumberStore;
 
 	public WithdrawService(
 		IPaymentRepository paymentRepository,
+		IBrandServiceClient brandServiceClient,
 		ITakeNumberStore takeNumberStore,
 		ISystemClock systemClock,
 		ISerialNumberGenerator serialNumberGenerator,
 		IEnumerable<ICreateWithdrawFormPipe> createWithdrawFormPipes)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+		_brandServiceClient = brandServiceClient ?? throw new ArgumentNullException(nameof(brandServiceClient));
 		_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
@@ -51,12 +55,12 @@ internal class WithdrawService : IWithdrawService
 				note,
 				cancellationToken).ConfigureAwait(false);
 
-		var brandInfo = await _paymentRepository.GetBrandInfoByIdAsync(
+		var brandInfo = await _brandServiceClient.GetBrandInfoAsync(
 			brandId,
 			cancellationToken).ConfigureAwait(false);
 
 		var orderNo = await _takeNumberStore.GetWithdrawFormOrderNoAsync(
-			  brandInfo.Code).ConfigureAwait(false);
+			  brandInfo!.Code).ConfigureAwait(false);
 
 		var eventId = await _serialNumberGenerator.GenerateAsync(
 			cancellationToken).ConfigureAwait(false);

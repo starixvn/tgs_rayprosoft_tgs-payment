@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using TechTalk.SpecFlow;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -31,6 +32,13 @@ public class CreatePlayerWithdrawFormSteps
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Code = "GPI"
+			});
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -78,7 +86,7 @@ public class CreatePlayerWithdrawFormSteps
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					Guid.NewGuid(),
@@ -113,7 +121,8 @@ public class CreatePlayerWithdrawFormSteps
 				.AddSingleton(fakePlayerServiceClient)
 				.AddSingleton(fakePlayerBucketServiceClient)
 				.AddSingleton(fakeVipLevelClient)
-				.AddSingleton(fakeWithdrawLimitClient));
+				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();
 	}
@@ -157,19 +166,6 @@ public class CreatePlayerWithdrawFormSteps
 				CreatedOn = DateTime.Now,
 				UpdatedOn = DateTime.Now,
 				CreatedByUsername = "System",
-				UpdatedByUsername = "System"
-			});
-
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
-			{
-				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
 				UpdatedByUsername = "System"
 			});
 

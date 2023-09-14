@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
@@ -113,7 +114,7 @@ public class WithdrawFormTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -321,7 +322,7 @@ public class WithdrawFormTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -368,6 +369,7 @@ public class WithdrawFormTests
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
 		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
 			services => services
@@ -376,7 +378,8 @@ public class WithdrawFormTests
 				.AddSingleton(fakeCashServiceClient)
 				.AddSingleton(fakePlayerBucketClient)
 				.AddSingleton(fakeVipLevelClient)
-				.AddSingleton(fakeWithdrawLimitClient));
+				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -402,20 +405,14 @@ public class WithdrawFormTests
 				UpdatedByUsername = "System"
 			});
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
+		_ = await dbContext.SaveChangesAsync();
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
 			{
 				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
+				Code = "GPI"
 			});
-
-		_ = await dbContext.SaveChangesAsync();
 
 		var withdrawForm = new Tgs.Payment.Clients.WithdrawFormCreateInfo
 		{
@@ -468,7 +465,7 @@ public class WithdrawFormTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,

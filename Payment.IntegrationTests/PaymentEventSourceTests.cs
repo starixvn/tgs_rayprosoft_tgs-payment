@@ -3,6 +3,7 @@ using System.Text.Json;
 using Json.Patch;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
@@ -20,7 +21,10 @@ public class PaymentEventSourceTests
 	[Test]
 	public async Task DepositForm_EventSource_Apply後應該和快照的資料一樣()
 	{
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -30,17 +34,11 @@ public class PaymentEventSourceTests
 
 		var brandId = Guid.NewGuid();
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
 			{
 				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
+				Code = "GPI"
 			});
 
 		_ = await dbContext.SaveChangesAsync();
@@ -107,6 +105,14 @@ public class PaymentEventSourceTests
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
@@ -149,7 +155,7 @@ public class PaymentEventSourceTests
 		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new VipLevelInfo(
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -184,26 +190,14 @@ public class PaymentEventSourceTests
 				.AddSingleton(fakePlayerServiceClient)
 				.AddSingleton(fakePlayerBucketClient)
 				.AddSingleton(fakeVipLevelClient)
-				.AddSingleton(fakeWithdrawLimitClient));
+				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient));
 
 		var httpClient = web.CreateClient();
 
 		var sut = new PaymentServiceClient(httpClient);
 
 		var dbContext = web.Services.GetRequiredService<TgsContext>();
-
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
-			{
-				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
-			});
 
 		_ = await dbContext.PlayerBankInfos.AddAsync(
 			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
@@ -274,7 +268,10 @@ public class PaymentEventSourceTests
 	[Test]
 	public async Task WithdrawForm_With_Agent_EventSource_Apply後應該和快照的資料一樣()
 	{
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -286,17 +283,11 @@ public class PaymentEventSourceTests
 		var bankInfoId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
 			{
 				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
+				Code = "GPI"
 			});
 
 		_ = await dbContext.AgentBankInfoItems.AddAsync(
@@ -368,7 +359,10 @@ public class PaymentEventSourceTests
 	[Test]
 	public async Task WithdrawForm_With_Reject_EventSource_Apply後應該和快照的資料一樣()
 	{
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeBrandServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -380,17 +374,11 @@ public class PaymentEventSourceTests
 		var bankInfoId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
 
-		_ = await dbContext.Brands.AddAsync(
-			new Brand
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
 			{
 				Id = brandId,
-				Code = "GPI",
-				ApiKey = "apikey",
-				ClientId = "clientId",
-				CreatedByUsername = "System",
-				Name = "test",
-				SecretKey = "secret",
-				UpdatedByUsername = "System"
+				Code = "GPI"
 			});
 
 		_ = await dbContext.AgentBankInfoItems.AddAsync(

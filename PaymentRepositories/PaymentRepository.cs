@@ -492,15 +492,6 @@ internal class PaymentRepository : IPaymentRepository
 		return flag is not null && flag.IsEnabled;
 	}
 
-	public async ValueTask<BrandInfo> GetBrandInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
-	{
-		var brandInfo = await _tgsContext.Brands
-			.FindAsync(new object?[] { id }, cancellationToken)
-			.ConfigureAwait(false);
-
-		return new BrandInfo(brandInfo!.Code);
-	}
-
 	public async ValueTask<decimal?> GetBrandNetDepositAsync(Guid brandId, DateOnly date, CancellationToken cancellationToken = default)
 	{
 		var netprofit = await _tgsContext.BrandDailyPaymentStatistics
