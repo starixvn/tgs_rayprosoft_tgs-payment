@@ -37,6 +37,7 @@ data:
         "PlayerServiceBaseUrl": "http://player-api",
         "CashServiceBaseUrl": "http://cashservice-api",
         "PlayerBucketServiceBaseUrl": "http://tgs-playerbucket-service",
+        "VipLevelServiceBaseUrl": "http://tgs-viplevel",
         "BrandCertificateBaseUrl": "http://brand-cert-api"
       }
     }
