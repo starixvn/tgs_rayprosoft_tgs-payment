@@ -230,12 +230,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return _httpClient
 			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
 			.ToAsyncEnumerable()
-			.Do(response =>
+			.Do(response => _ = response.StatusCode switch
 			{
-				if (response.StatusCode == HttpStatusCode.Conflict)
-					throw new PlayerBankInfoDuplicateException();
+				HttpStatusCode.Conflict => throw response.Content.ReadFromJsonAsync<JsonNode>(_SerializerOptions)
+					.ToAsyncEnumerable()
+					.Select(node => node!)
+					.Select(node => node["title"]!.GetValue<string>() switch
+					{
+						nameof(PlayerBankInfoDuplicateException) => new PlayerBankInfoDuplicateException(),
+						nameof(PlayerBankInfoCountReachedLimitException) => new PlayerBankInfoCountReachedLimitException(),
+						_ => new Exception("Unknown error.")
+					})
+					.ToEnumerable()
+					.First(),
+				_ => response.EnsureSuccessStatusCode()
 			})
-			.Do(response => response.EnsureSuccessStatusCode())
 			.Select(response => response.Content.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken))
 			.SelectMany(t => t.ToAsyncEnumerable())
 			.FirstAsync(cancellationToken);

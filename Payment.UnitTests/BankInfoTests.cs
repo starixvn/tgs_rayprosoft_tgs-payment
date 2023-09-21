@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using JSLTSharp;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.ApplicationServices.Settings;
@@ -398,5 +394,113 @@ public class BankInfoTests
 			.UpdatePlayerBankInfoHashAsync(
 				Arg.Is(command.BankInfoId),
 				Arg.Any<byte[]>());
+	}
+
+	[Test]
+	public async Task 建立玩家銀行卡_Brand有開數量限制_會檢查玩家建立的銀行卡數量()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
+
+		var sut = new CreatePlayerBankInfoCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeBankInfoParserFactory,
+			new JsonTransform(),
+			fakeServiceCoordinator);
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "ThisIsPlayerCode";
+		var paymentChannelId = Guid.NewGuid();
+		var bankType = "Bank";
+		var detail = new
+		{
+			bankAccount = "1234567890"
+		};
+
+		var command = new CreatePlayerBankInfoCommand(
+			brandId,
+			playerCode,
+			paymentChannelId,
+			bankType,
+			JsonSerializer.SerializeToDocument(detail),
+			false,
+			playerCode);
+
+		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
+			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");
+
+		_ = fakePaymentRepository.GetBrandPaymentSettingsAsync(Arg.Is(brandId))
+			.Returns(new BrandPaymentSettings(10));
+
+		var actual = await sut.GetAsync(command);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateBankInfoAsync(
+				Arg.Is<PlayerBankCreateInfo>(info => info.PaymentChannelId == paymentChannelId),
+				Arg.Is(playerCode));
+		_ = fakePaymentClient.Received(1)
+			.EmitPlayerBankInfoAddedEventAsync(
+				Arg.Is(command.BrandId),
+				Arg.Is(actual));
+		_ = fakePaymentRepository.Received(1)
+			.GetBankInfosByPlayerCodeAsync(Arg.Is(playerCode));
+	}
+
+	[Test]
+	public void 建立玩家銀行卡_如果已達到設定數量限制_會發生例外()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeBankInfoParserFactory = Substitute.For<IBankInfoIndexParserFactory>();
+		var fakeServiceCoordinator = Substitute.For<IServiceCoordinator>();
+
+		var sut = new CreatePlayerBankInfoCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeBankInfoParserFactory,
+			new JsonTransform(),
+			fakeServiceCoordinator);
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "ThisIsPlayerCode";
+		var paymentChannelId = Guid.NewGuid();
+		var bankType = "Bank";
+		var detail = new
+		{
+			bankAccount = "1234567890"
+		};
+
+		var command = new CreatePlayerBankInfoCommand(
+			brandId,
+			playerCode,
+			paymentChannelId,
+			bankType,
+			JsonSerializer.SerializeToDocument(detail),
+			false,
+			playerCode);
+
+		_ = fakeBankInfoParserFactory.GetBankInfoTransformation(Arg.Is(command.BankType))
+			.Returns("{\"BankName\": \"$.bankName\",\r\n\t\t\t\"BankAccount\": \"$.bankAccount\"}");
+
+		_ = fakePaymentRepository.GetBrandPaymentSettingsAsync(Arg.Is(brandId))
+			.Returns(new BrandPaymentSettings(1));
+
+		_ = fakePaymentRepository.GetBankInfosByPlayerCodeAsync(Arg.Is(playerCode))
+			.Returns(new[]
+			{
+				new PlayerBankInfo(
+					Guid.NewGuid(),
+					playerCode,
+					brandId,
+					paymentChannelId,
+					bankType,
+					JsonDocument.Parse("{}"),
+					false)
+			}.ToAsyncEnumerable());
+
+		_ = Assert.ThrowsAsync<PlayerBankInfoCountReachedLimitException>(async () => await sut.GetAsync(command));
 	}
 }

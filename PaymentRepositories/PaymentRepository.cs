@@ -1644,4 +1644,15 @@ internal class PaymentRepository : IPaymentRepository
 			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
 				&& form.CreatedOn < currentDate);
 	}
+
+	public async ValueTask<BrandPaymentSettings?> GetBrandPaymentSettingsAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var row = await _tgsContext.BrandPaymentSettings.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		return row is null
+			? null
+			: new BrandPaymentSettings(row.PlayerBankInfoCountLimit);
+	}
 }
