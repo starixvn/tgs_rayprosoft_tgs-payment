@@ -44,6 +44,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.brand_payment_settings",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.brand_payment_vip_levels",
          "ObjectType": 0
       },
@@ -112,7 +116,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "LocalDB",
+   "UiHint": "tgs-local",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,

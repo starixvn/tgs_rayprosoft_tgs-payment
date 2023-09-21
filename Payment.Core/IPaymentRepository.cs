@@ -127,4 +127,6 @@ public partial interface IPaymentRepository
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
 
 	ValueTask UpdatePlayerBankInfoHashAsync(Guid bankInfoId, byte[]? hash, CancellationToken cancellationToken = default);
+
+	ValueTask UpsertBrandPaymentSettingsAsync(Guid brandId, BrandPaymentSettings settings, CancellationToken cancellationToken = default);
 }

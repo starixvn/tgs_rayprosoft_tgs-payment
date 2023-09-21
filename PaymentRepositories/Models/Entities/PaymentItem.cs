@@ -17,15 +17,15 @@ public partial class PaymentItem
 
     public string Code { get; set; } = null!;
 
-    public string? Name { get; set; }
+    public string CreatedByUsername { get; set; } = null!;
 
     public DateTime CreatedOn { get; set; }
 
-    public DateTime UpdatedOn { get; set; }
-
-    public string CreatedByUsername { get; set; } = null!;
+    public string? Name { get; set; }
 
     public string UpdatedByUsername { get; set; } = null!;
+
+    public DateTime UpdatedOn { get; set; }
 
     public virtual ICollection<PaymentMethodChannel> PaymentMethodChannels { get; set; } = new List<PaymentMethodChannel>();
 }

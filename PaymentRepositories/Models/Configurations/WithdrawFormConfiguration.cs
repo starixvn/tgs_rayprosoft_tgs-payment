@@ -75,7 +75,6 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.HasOne(d => d.BrandPayment).WithMany(p => p.WithdrawForms)
             .HasForeignKey(d => d.BrandPaymentId)
-            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_withdraw_forms_brand_payments_brand_payment_id");
 
             OnConfigurePartial(entity);

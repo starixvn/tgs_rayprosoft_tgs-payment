@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Web;
+using Json.Patch;
 using Stateless;
 using Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
@@ -1193,8 +1194,27 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask SetBrandPlayerBankInfoCountLimitAsync(Guid brandId, int? limit, CancellationToken cancellationToken = default)
+	{
+		var snapshot = BrandPaymentSettings._Default with
+		{
+			PlayerBankInfoCountLimit = limit
+		};
+
+		var patch = BrandPaymentSettings._Default.CreatePatch(snapshot, _SerializerOptions);
+
+		_ = await _httpClient.PatchAsync(
+			$"/setting/brand-payment/{brandId}",
+			JsonContent.Create(patch),
+			cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.FirstAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask SetDefaultPlayerBankInfoAsync(
-		string playerCode,
+			string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
 		CancellationToken cancellationToken = default)

@@ -9,11 +9,11 @@ public partial class PaymentMethodChannel
 {
     public Guid Id { get; set; }
 
-    public Guid PaymentId { get; set; }
+    public Guid ChannelId { get; set; }
 
     public Guid MethodId { get; set; }
 
-    public Guid ChannelId { get; set; }
+    public Guid PaymentId { get; set; }
 
     public short Status { get; set; }
 

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Json.Patch;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Tgs.Payment.ApplicationServices.Settings;
+using Tgs.Payment.ViewModels;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Controllers;
@@ -36,5 +39,28 @@ public class SettingController : ControllerBase
 		var query = new GetPlayerBankInfoDuplicateCheckIsEnabledQuery(brandId);
 
 		return queryService.GetAsync(query, HttpContext.RequestAborted);
+	}
+
+	[HttpPatch("brand-payment/{brandId}", Name = "PatchBrandPaymentSettings")]
+	public async Task PatchBrandPaymentSettingsAsync(
+		[FromServices] IOptions<JsonOptions> jsonOptionsAccessor,
+		[FromServices] ICommandService<UpsertBrandPaymentSettingsCommand> modifyService,
+		Guid brandId,
+		[FromBody] JsonPatch patch)
+	{
+		var viewModel = patch.Apply(
+			BrandPaymentSettingsViewModel._Default,
+			jsonOptionsAccessor.Value.JsonSerializerOptions);
+
+		if (viewModel is null)
+			return;
+
+		var settings = new BrandPaymentSettings(viewModel.PlayerBankInfoCountLimit);
+
+		var command = new UpsertBrandPaymentSettingsCommand(brandId, settings);
+
+		await modifyService.ExecuteAsync(
+			command,
+			HttpContext.RequestAborted).ConfigureAwait(false);
 	}
 }

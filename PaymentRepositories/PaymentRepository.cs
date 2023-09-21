@@ -1491,6 +1491,27 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
+	public async ValueTask UpsertBrandPaymentSettingsAsync(
+		Guid brandId,
+		BrandPaymentSettings settings,
+		CancellationToken cancellationToken = default)
+	{
+		var row = (await _tgsContext.BrandPaymentSettings.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false))
+			?? _tgsContext.BrandPaymentSettings
+				.Add(new BrandPaymentSetting
+				{
+					BrandId = brandId
+				})
+				.Entity;
+
+		row.PlayerBankInfoCountLimit = settings.PlayerBankInfoCountLimit;
+
+		_ = await _tgsContext.SaveChangesAsync(
+			cancellationToken).ConfigureAwait(false);
+	}
+
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
 	{
 		var currentDate = DateTimeOffset.UtcNow;
