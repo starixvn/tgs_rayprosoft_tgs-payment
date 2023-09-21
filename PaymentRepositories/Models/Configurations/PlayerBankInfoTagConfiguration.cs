@@ -13,15 +13,29 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
     {
         public void Configure(EntityTypeBuilder<PlayerBankInfoTag> entity)
         {
-            entity.HasKey(e => new { e.BrandId, e.PlayerCode, e.BankInfoId, e.TagType }).HasName("pk_player_bank_info_tags");
+            entity.HasKey(e => new { e.BrandId, e.BankInfoId, e.TagType }).HasName("pk_player_bank_info_tags");
 
             entity.ToTable("player_bank_info_tags", "dbo");
 
+            entity.HasIndex(e => e.BankInfoId, "ix_player_bank_info_tags_bank_info_id");
+
+            entity.HasIndex(e => e.PlayerCode, "ix_player_bank_info_tags_player_code");
+
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
-            entity.Property(e => e.PlayerCode).HasColumnName("player_code");
             entity.Property(e => e.BankInfoId).HasColumnName("bank_info_id");
             entity.Property(e => e.TagType).HasColumnName("tag_type");
+            entity.Property(e => e.PlayerCode)
+            .HasMaxLength(16)
+            .HasColumnName("player_code");
             entity.Property(e => e.Tag).HasColumnName("tag");
+
+            entity.HasOne(d => d.BankInfo).WithMany(p => p.PlayerBankInfoTags)
+            .HasForeignKey(d => d.BankInfoId)
+            .HasConstraintName("fk_player_bank_info_tags_player_bank_infos_bank_info_id");
+
+            entity.HasOne(d => d.PlayerCodeNavigation).WithMany(p => p.PlayerBankInfoTags)
+            .HasForeignKey(d => d.PlayerCode)
+            .HasConstraintName("fk_player_bank_info_tags_players_player_code");
 
             OnConfigurePartial(entity);
         }

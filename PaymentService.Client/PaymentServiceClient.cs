@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Web;
+using Json.Patch;
 using Stateless;
 using Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
@@ -229,12 +230,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return _httpClient
 			.PutAsync($"/bankinfo/player/{brandId}/{playerCode}", requestContent, cancellationToken)
 			.ToAsyncEnumerable()
-			.Do(response =>
+			.Do(response => _ = response.StatusCode switch
 			{
-				if (response.StatusCode == HttpStatusCode.Conflict)
-					throw new PlayerBankInfoDuplicateException();
+				HttpStatusCode.Conflict => throw response.Content.ReadFromJsonAsync<JsonNode>(_SerializerOptions)
+					.ToAsyncEnumerable()
+					.Select(node => node!)
+					.Select(node => node["title"]!.GetValue<string>() switch
+					{
+						nameof(PlayerBankInfoDuplicateException) => new PlayerBankInfoDuplicateException(),
+						nameof(PlayerBankInfoCountReachedLimitException) => new PlayerBankInfoCountReachedLimitException(),
+						_ => new Exception("Unknown error.")
+					})
+					.ToEnumerable()
+					.First(),
+				_ => response.EnsureSuccessStatusCode()
 			})
-			.Do(response => response.EnsureSuccessStatusCode())
 			.Select(response => response.Content.ReadFromJsonAsync<Guid>(_SerializerOptions, cancellationToken))
 			.SelectMany(t => t.ToAsyncEnumerable())
 			.FirstAsync(cancellationToken);
@@ -1193,8 +1203,27 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		_ = response.EnsureSuccessStatusCode();
 	}
 
+	public async ValueTask SetBrandPlayerBankInfoCountLimitAsync(Guid brandId, int? limit, CancellationToken cancellationToken = default)
+	{
+		var snapshot = BrandPaymentSettings._Default with
+		{
+			PlayerBankInfoCountLimit = limit
+		};
+
+		var patch = BrandPaymentSettings._Default.CreatePatch(snapshot, _SerializerOptions);
+
+		_ = await _httpClient.PatchAsync(
+			$"/setting/brand-payment/{brandId}",
+			JsonContent.Create(patch),
+			cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.FirstAsync(cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+	}
+
 	public async ValueTask SetDefaultPlayerBankInfoAsync(
-		string playerCode,
+			string playerCode,
 		Guid bankInfoId,
 		string modifyUser,
 		CancellationToken cancellationToken = default)

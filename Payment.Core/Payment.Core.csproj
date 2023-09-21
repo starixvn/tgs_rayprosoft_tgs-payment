@@ -25,7 +25,7 @@
 		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.6" />
 		<PackageReference Include="stateless" Version="5.13.0" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
-		<PackageReference Include="Tgs.BrandCertificateClient" Version="0.0.27" />
+		<PackageReference Include="Tgs.BrandCertificateClient" Version="0.0.28" />
 		<PackageReference Include="Tgs.CashService.Client" Version="0.1.9" />
 		<PackageReference Include="Tgs.Paging.AsyncEnumerable" Version="1.2.1" />
 		<PackageReference Include="Tgs.Payment.WithdrawLimit.Client" Version="0.0.2" />

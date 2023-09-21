@@ -30,6 +30,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<BrandPaymentPlayer> BrandPaymentPlayers { get; set; }
 
+    public virtual DbSet<BrandPaymentSetting> BrandPaymentSettings { get; set; }
+
     public virtual DbSet<BrandPaymentVipLevel> BrandPaymentVipLevels { get; set; }
 
     public virtual DbSet<BrandPlayerBankinfoCheckFlag> BrandPlayerBankinfoCheckFlags { get; set; }
@@ -74,6 +76,7 @@ public partial class TgsContext : DbContext
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawEventSourceConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentPlayerConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentSettingConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentVipLevelConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.BrandPlayerBankinfoCheckFlagConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.DepositFormConfiguration());

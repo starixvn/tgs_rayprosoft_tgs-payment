@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -59,6 +60,22 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 				command.PlayerCode,
 				cancellationToken).ConfigureAwait(false))
 			throw new PlayerBankInfoDuplicateException();
+
+		var paymentSettings = await _paymentRepository.GetBrandPaymentSettingsAsync(
+			command.BrandId,
+			cancellationToken).ConfigureAwait(false);
+
+		if (paymentSettings?.PlayerBankInfoCountLimit is not null)
+		{
+			var playerBankInfoCount = await _paymentRepository.GetBankInfosByPlayerCodeAsync(
+				command.PlayerCode,
+				cancellationToken)
+				.CountAsync(cancellationToken)
+				.ConfigureAwait(false);
+
+			if (playerBankInfoCount >= paymentSettings.PlayerBankInfoCountLimit.Value)
+				throw new PlayerBankInfoCountReachedLimitException();
+		}
 
 		var bankInfo = new PlayerBankCreateInfo(
 			Guid.NewGuid(),

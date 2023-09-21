@@ -11,7 +11,7 @@ namespace Tgs.Payment.Controllers;
 public class PlayerBankInfoController : ControllerBase
 {
 	[SuccessStatusCode(StatusCodes.Status200OK)]
-	[FailStatusCode(StatusCodes.Status409Conflict, "BankInfo duplicate")]
+	[FailStatusCode(StatusCodes.Status409Conflict, "see response content.")]
 	[HttpPut("{brandId}/{playerCode}", Name = "CreatePlayerBankInfo")]
 	public async Task<Guid> CreatePlayerBankInfoAsync(
 		[FromServices] IGetService<CreatePlayerBankInfoCommand, Guid> createService,
@@ -37,9 +37,16 @@ public class PlayerBankInfoController : ControllerBase
 		}
 		catch (PlayerBankInfoDuplicateException)
 		{
-			return await this
-				.FailAsync<Guid, string>(StatusCodes.Status409Conflict, "Can't create player bankinfo.")
-				.ConfigureAwait(false);
+			return HttpContext.TransformResult<Guid>(Problem(
+				statusCode: 409,
+				title: nameof(PlayerBankInfoDuplicateException),
+				detail: "Can't create player bankinfo."));
+		}
+		catch (PlayerBankInfoCountReachedLimitException)
+		{
+			return HttpContext.TransformResult<Guid>(Problem(
+				statusCode: 409,
+				title: nameof(PlayerBankInfoCountReachedLimitException)));
 		}
 	}
 

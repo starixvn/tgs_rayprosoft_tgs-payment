@@ -231,6 +231,56 @@ public class PlayerBankInfoTests
 		_ = await sut.CreatePlayerBankInfoAsync(brandId, "tester1", createInfo);
 
 		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoDuplicateException>(
-			  async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
+			async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
+	}
+
+	[Test]
+	public async Task 建立玩家銀行卡時_玩家已經建滿平台允許的銀行卡數量()
+	{
+		var bankInfoParserOptions = new OptionsWrapper<BankInfoParserOptions>(new BankInfoParserOptions
+		{
+			["Bank"] = JsonSerializer.SerializeToDocument(new
+			{
+				BankName = "$.bankName",
+				BankAccount = "$.bankAccount"
+			})
+		});
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton<IOptions<BankInfoParserOptions>>(bankInfoParserOptions)
+			.AddHttpClientLoggingHandler());
+
+		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var bankInfoId = Guid.NewGuid();
+		var brandId = Guid.NewGuid();
+		var paymentChannelId = Guid.NewGuid();
+
+		var createInfo = new BankCreateInfo
+		{
+			BankType = "Bank",
+			Detail = JsonSerializer.SerializeToDocument(new
+			{
+				bankName = "test bank",
+				bankAccount = "111111",
+				name = "Tester"
+			}),
+			IsDefault = false,
+			PaymentChannelId = paymentChannelId
+		};
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.BrandPaymentSettings.AddAsync(new BrandPaymentSetting
+		{
+			BrandId = brandId,
+			PlayerBankInfoCountLimit = 0
+		});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoCountReachedLimitException>(
+			async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
 	}
 }

@@ -1491,6 +1491,27 @@ internal class PaymentRepository : IPaymentRepository
 		_ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 	}
 
+	public async ValueTask UpsertBrandPaymentSettingsAsync(
+		Guid brandId,
+		BrandPaymentSettings settings,
+		CancellationToken cancellationToken = default)
+	{
+		var row = (await _tgsContext.BrandPaymentSettings.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false))
+			?? _tgsContext.BrandPaymentSettings
+				.Add(new BrandPaymentSetting
+				{
+					BrandId = brandId
+				})
+				.Entity;
+
+		row.PlayerBankInfoCountLimit = settings.PlayerBankInfoCountLimit;
+
+		_ = await _tgsContext.SaveChangesAsync(
+			cancellationToken).ConfigureAwait(false);
+	}
+
 	private IQueryable<DepositForm> MakeDepositFormQuery(DepositFormQueryConditions conditions)
 	{
 		var currentDate = DateTimeOffset.UtcNow;
@@ -1622,5 +1643,16 @@ internal class PaymentRepository : IPaymentRepository
 		return MakeWithdrawFormQuery(conditions)
 			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
 				&& form.CreatedOn < currentDate);
+	}
+
+	public async ValueTask<BrandPaymentSettings?> GetBrandPaymentSettingsAsync(Guid brandId, CancellationToken cancellationToken = default)
+	{
+		var row = await _tgsContext.BrandPaymentSettings.FindAsync(
+			new object?[] { brandId },
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		return row is null
+			? null
+			: new BrandPaymentSettings(row.PlayerBankInfoCountLimit);
 	}
 }
