@@ -171,6 +171,7 @@ var builder = WebApplication.CreateBuilder(args);
 				.AddEnvironmentVariableDetector())
 			.AddSource("Tgs.*")
 			.AddSource("TGS.*")
+			.AddSource("Valhalla.*")
 			.AddAspNetCoreInstrumentation()
 			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
 			.AddHttpClientInstrumentation()
