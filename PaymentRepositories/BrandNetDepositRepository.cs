@@ -17,7 +17,7 @@ internal class BrandNetDepositRepository : IBrandNetDepositRepository
 	public async ValueTask CountBrandCurrentDayNetDepositAsync(Guid brandId, double amount)
 	{
 		var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8D));
-		var expired = new DateTimeOffset(now.Date, TimeSpan.FromHours(8D)).AddHours(12D);
+		var expired = new DateTimeOffset(now.Date.AddDays(1), TimeSpan.FromHours(8D)).AddHours(12D);
 
 		var key = $"{_KeyPrefix}:{brandId}:{now:yyyyMMdd}";
 
