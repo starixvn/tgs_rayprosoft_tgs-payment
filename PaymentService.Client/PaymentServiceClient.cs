@@ -270,8 +270,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 					.Select(node => node["title"]!.GetValue<string>() switch
 					{
 						nameof(WithdrawLimitExceedException) => new WithdrawLimitExceedException(
-							node["count"]!.GetValue<int?>(),
-							node["amount"]!.GetValue<decimal?>()),
+							node["count"]?.GetValue<int?>(),
+							node["amount"]?.GetValue<decimal?>()),
 						_ => new Exception("Unknown error.")
 					})
 					.ToEnumerable()

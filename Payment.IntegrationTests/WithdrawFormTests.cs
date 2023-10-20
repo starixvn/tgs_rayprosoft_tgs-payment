@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -350,6 +351,131 @@ public class WithdrawFormTests
 			.GetBalanceAsync(
 				Arg.Is(walletId),
 				Arg.Any<CancellationToken>());
+	}
+
+	[Test]
+	public async Task 玩家提款到達限額時會發出WithdrawLimitExceedException()
+	{
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
+		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
+		var fakeWithdrawLimitClient = Substitute.For<IWithdrawLimitClient>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+		await using TestPaymentApplication web = TestSiteHelper.GetPaymentServiceTestHost(
+			services => services
+				.AddSingleton(fakePlayerServiceClient)
+				.AddSingleton(fakeCashServiceClient)
+				.AddSingleton(fakePlayerBucketClient)
+				.AddSingleton(fakeVipLevelClient)
+				.AddSingleton(fakeWithdrawLimitClient)
+				.AddSingleton(fakeBrandServiceClient)
+				.AddHttpClientLoggingHandler());
+
+		var httpClient = web.CreateDefaultClient(web.Services.ResolveLoggingHandler<PaymentServiceClient>());
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var brandId = Guid.NewGuid();
+		var playerCode = "test1";
+		var bankInfoId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.PlayerBankInfos.AddAsync(
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = bankInfoId,
+				BankType = "Bank",
+				BrandId = brandId,
+				PlayerCode = playerCode,
+				Detail = "{}",
+				CreatedOn = DateTime.Now,
+				UpdatedOn = DateTime.Now,
+				CreatedByUsername = "System",
+				UpdatedByUsername = "System"
+			});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var withdrawForm = new Tgs.Payment.Clients.WithdrawFormCreateInfo
+		{
+			Amount = 1000M,
+			BankInfoId = bankInfoId,
+			UserId = playerCode,
+			UserName = "UserName",
+			BrandId = brandId,
+			UserType = Tgs.Payment.Clients.UserType.Player
+		};
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
+
+		var walletId = Guid.NewGuid();
+		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(
+			Arg.Is(playerCode),
+			Arg.Any<CancellationToken>())
+			.Returns(new Dictionary<string, string>
+			{
+				["DefaultWalletId"] = walletId.ToString()
+			}.ToImmutableDictionary());
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(0M);
+
+		_ = fakePlayerBucketClient.ReadBucketsAsync(
+			Arg.Is(playerCode),
+			Arg.Any<CancellationToken>())
+			.Returns(new ReadBucketResult(0M, null));
+
+		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(playerCode), Arg.Any<CancellationToken>())
+			.Returns(new Tgs.PlayerService.Client.PlayerInfo
+			{
+				PlayerCode = playerCode,
+				BrandId = brandId
+			});
+
+		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(new[]
+			{
+				new Tgs.VipLevelService.Clients.VipLevelInfo(
+					Guid.NewGuid(),
+					1,
+					brandId,
+					0M,
+					0M,
+					0M,
+					0M,
+					true,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					0M,
+					5,
+					100M)
+			}.ToAsyncEnumerable());
+
+		_ = fakeWithdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
+			Arg.Is(playerCode),
+			Arg.Any<DateOnly>(),
+			Arg.Is(withdrawForm.Amount),
+			Arg.Any<CancellationToken>())
+			.Returns(new WithdrawStatistics(1000M, 1));
+
+		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.WithdrawLimitExceedException>(
+			async () => await sut.CreateWithdrawFormAsync(withdrawForm));
 	}
 
 	[Test]
