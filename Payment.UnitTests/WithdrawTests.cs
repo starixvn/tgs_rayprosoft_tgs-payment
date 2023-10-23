@@ -1142,7 +1142,7 @@ public class WithdrawTests
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(agentWithdrawForm);
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
@@ -1230,7 +1230,7 @@ public class WithdrawTests
 			.GetBrandPaymentsAsync(brandId)
 			.Returns(new BrandPaymentInfo[] { brandPayment }.ToAsyncEnumerable());
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakeSignOffWithdrawService
 			.Received(0)
@@ -1320,7 +1320,7 @@ public class WithdrawTests
 			.GetBrandPaymentsAsync(brandId)
 			.Returns(new BrandPaymentInfo[] { brandPayment }.ToAsyncEnumerable());
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakeSignOffWithdrawService
 			.Received(1)
@@ -1345,7 +1345,7 @@ public class WithdrawTests
 			.GetBrandAutoWithdrawSettingAsync(brandId)
 			.Returns(new AutoWithdrawInfo(false, 10m, Array.Empty<Guid>()));
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
@@ -1370,7 +1370,7 @@ public class WithdrawTests
 			.GetBrandAutoWithdrawSettingAsync(brandId)
 			.Returns(new AutoWithdrawInfo(true, 10m, Array.Empty<Guid>()));
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
@@ -1391,7 +1391,7 @@ public class WithdrawTests
 		var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
 		var formId = Guid.Parse("38e8bd90-7eb6-4460-bdf3-a1c1336e8044");
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
@@ -1416,7 +1416,7 @@ public class WithdrawTests
 			.GetBrandAutoWithdrawSettingAsync(brandId)
 			.Returns(new AutoWithdrawInfo(true, 100m, new Guid[] { Guid.NewGuid() }));
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
@@ -1480,7 +1480,7 @@ public class WithdrawTests
 			.GetWithdrawFormByIdAsync(formId)
 			.Returns(playerWithdrawForm);
 
-		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId));
+		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.WaitApprove));
 
 		_ = fakePaymentRepository
 			.Received(0)
