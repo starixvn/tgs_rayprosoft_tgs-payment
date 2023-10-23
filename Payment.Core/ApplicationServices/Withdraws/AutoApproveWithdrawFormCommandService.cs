@@ -27,7 +27,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 	public async ValueTask ExecuteAsync(AutoApproveWithdtawFormCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.Status != PaymentFlowState.WaitApprove)
+		if (command.Status != PaymentFlowState.Init)
 			return;
 
 		var autoWithdrawSetting = await _repository
