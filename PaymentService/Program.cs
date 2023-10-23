@@ -138,8 +138,8 @@ var builder = WebApplication.CreateBuilder(args);
 				"tgs.player.bankinfo.rebuild")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.ApproveWithdrawHandlerType,
-				"tgs.payment.withdraw.created",
-				"tgs.payment.withdraw.created")
+				"tgs.payment.withdraw.status_ex",
+				"tgs.payment.withdraw.status_ex")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandDepositApprovedType,
 				"tgs.payment.deposit.status_ex",
