@@ -59,7 +59,9 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		_logger.LogInformation("Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}", JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
+		_logger.LogInformation(
+			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}", 
+			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
 
 		var brandPaymentCandidates = couldChooseBrandPayments.Intersect(autoWithdrawSetting.BrandPaymentIds);
 
