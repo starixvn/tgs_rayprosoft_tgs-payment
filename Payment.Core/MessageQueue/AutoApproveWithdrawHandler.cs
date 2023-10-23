@@ -12,11 +12,11 @@ namespace Tgs.Payment.MessageQueue;
 internal class AutoApproveWithdrawHandler : IMessageHandler
 {
 	private readonly ICommandService<AutoApproveWithdtawFormCommand> _commandService;
-	private readonly Logger<AutoApproveWithdrawHandler> _logger;
+	private readonly ILogger<AutoApproveWithdrawHandler> _logger;
 
 	public AutoApproveWithdrawHandler(
 		ICommandService<AutoApproveWithdtawFormCommand> commandService,
-		Logger<AutoApproveWithdrawHandler> logger)
+		ILogger<AutoApproveWithdrawHandler> logger)
 	{
 		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
