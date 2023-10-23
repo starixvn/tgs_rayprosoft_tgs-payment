@@ -24,13 +24,18 @@ internal class AutoApproveWithdrawHandler : IMessageHandler
 
 	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
-		var request = FormEvent.Parser.ParseFrom(data.Span);
+		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		_logger.LogInformation("AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}", request.BrandId, request.FormId);
+		_logger.LogInformation(
+			"AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}, status:{status}",
+			request.BrandId.ToGuid(),
+			request.FormId.ToGuid(),
+			request.Status);
 
 		var command = new AutoApproveWithdtawFormCommand(
-			Guid.Parse(request.BrandId),
-			Guid.Parse(request.FormId));
+			request.BrandId.ToGuid(),
+			request.FormId.ToGuid(),
+			Enum.Parse<PaymentFlowState>(request.Status));
 
 		return _commandService.ExecuteAsync(command, cancellationToken);
 	}

@@ -27,6 +27,9 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 	public async ValueTask ExecuteAsync(AutoApproveWithdtawFormCommand command, CancellationToken cancellationToken = default)
 	{
+		if (command.Status != PaymentFlowState.WaitApprove)
+			return;
+
 		var autoWithdrawSetting = await _repository
 			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
@@ -42,6 +45,10 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			.ConfigureAwait(false);
 
 		if (withdrawForm is null)
+			return;
+
+		var fsm = StateMachine.CreateWithdrawStateMachine(withdrawForm.Status);
+		if (!fsm.CanFire(PaymentTrigger.Approve))
 			return;
 
 		if (withdrawForm.UserType is not UserType.Player)
@@ -60,7 +67,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			.ConfigureAwait(false);
 
 		_logger.LogInformation(
-			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}", 
+			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}",
 			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
 
 		var brandPaymentCandidates = couldChooseBrandPayments.Intersect(autoWithdrawSetting.BrandPaymentIds);

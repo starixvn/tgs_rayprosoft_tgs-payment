@@ -3,4 +3,5 @@
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 public record AutoApproveWithdtawFormCommand(
 	Guid BrandId,
-	Guid FormId);
+	Guid FormId,
+	PaymentFlowState Status);
