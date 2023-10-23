@@ -59,6 +59,10 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
+		_logger.LogInformation(
+			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}", 
+			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
+
 		var brandPaymentCandidates = couldChooseBrandPayments.Intersect(autoWithdrawSetting.BrandPaymentIds);
 
 		if (brandPaymentCandidates.Count() is 0)
@@ -70,6 +74,8 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		var random = _Random.Next(0, brandPaymentCandidates.Count());
 
 		var brandPaymentId = brandPaymentCandidates.ElementAt(random);
+
+		_logger.LogInformation("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
 
 		var approveWithdrawCommand = new SignOffWithdrawFormCommand(
 			command.FormId,
