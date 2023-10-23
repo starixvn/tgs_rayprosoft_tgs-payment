@@ -606,7 +606,8 @@ public class WithdrawTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitWithdrawFormStatusCommandService>.Instance);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			Guid.NewGuid(),
@@ -730,7 +731,8 @@ public class WithdrawTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitWithdrawFormStatusCommandService>.Instance);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			Guid.NewGuid(),
@@ -820,7 +822,8 @@ public class WithdrawTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitWithdrawFormStatusCommandService>.Instance);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			Guid.NewGuid(),
@@ -910,7 +913,8 @@ public class WithdrawTests
 			fakePaymentRepository,
 			fakePaymentClient,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SubmitWithdrawFormStatusCommandService>.Instance);
 
 		var command = new SubmitWithdrawFormStatusCommand(
 			Guid.NewGuid(),

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
@@ -14,18 +15,21 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
+	private readonly ILogger<SubmitWithdrawFormStatusCommandService> _logger;
 	private readonly ISystemClock _systemClock;
 
 	public SubmitWithdrawFormStatusCommandService(
 		IPaymentRepository paymentRepository,
 		IPaymentClient paymentClient,
 		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator)
+		ISerialNumberGenerator serialNumberGenerator,
+		ILogger<SubmitWithdrawFormStatusCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(SubmitWithdrawFormStatusCommand command, CancellationToken cancellationToken = default)
@@ -38,6 +42,10 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 			return;
 
 		var originStatus = formData.Status;
+
+		_logger.LogInformation("SubmitWithdrawFormStatusCommand form origin Status:{originStatus}, command:{command}",
+			originStatus,
+			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions));
 
 		var currentTime = _systemClock.UtcNow.UtcDateTime;
 		var newFormData = formData with
