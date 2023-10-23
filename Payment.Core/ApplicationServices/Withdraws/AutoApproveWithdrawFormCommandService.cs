@@ -47,7 +47,8 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (withdrawForm is null)
 			return;
 
-		if (withdrawForm.Status != PaymentFlowState.WaitApprove)
+		var fsm = StateMachine.CreateWithdrawStateMachine(withdrawForm.Status);
+		if (!fsm.CanFire(PaymentTrigger.Approve))
 			return;
 
 		if (withdrawForm.UserType is not UserType.Player)
