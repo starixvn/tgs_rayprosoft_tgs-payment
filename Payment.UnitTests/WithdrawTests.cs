@@ -197,7 +197,8 @@ public class WithdrawTests
 			fakePaymentClient,
 			fakeCalculateService,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
@@ -346,7 +347,8 @@ public class WithdrawTests
 			fakePaymentClient,
 			fakeCalculateService,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator,
+			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
@@ -476,7 +478,8 @@ public class WithdrawTests
 			fakePaymentClient,
 			fakeCalculateService,
 			fakeSystemClock,
-			fakeSerialNumberGenerator);
+			fakeSerialNumberGenerator, 
+			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
 			Guid.NewGuid(),
