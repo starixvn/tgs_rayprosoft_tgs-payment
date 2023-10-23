@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
@@ -16,6 +17,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 	private readonly IPaymentClient _paymentClient;
 	private readonly IPaymentRepository _paymentRepository;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
+	private readonly ILogger<SignOffWithdrawFormCommandService> _logger;
 	private readonly ISystemClock _systemClock;
 	private readonly IWithdrawProcessorFactory _withdrawProcessorFactory;
 
@@ -25,7 +27,8 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		IPaymentClient paymentClient,
 		IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
 		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator)
+		ISerialNumberGenerator serialNumberGenerator,
+		ILogger<SignOffWithdrawFormCommandService> logger)
 	{
 		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
 		_withdrawProcessorFactory = withdrawProcessorFactory ?? throw new ArgumentNullException(nameof(withdrawProcessorFactory));
@@ -33,6 +36,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		_calculateService = calculateService ?? throw new ArgumentNullException(nameof(calculateService));
 		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public async ValueTask ExecuteAsync(SignOffWithdrawFormCommand command, CancellationToken cancellationToken = default)
@@ -47,6 +51,10 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
 
 		var formStatus = formData.Status;
+
+		_logger.LogInformation("SignOffWithdrawFormCommand command:{command}, formData Status:{formStatus}",
+			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions),
+			formStatus);
 
 		if (command.Status == ReviewState.Approve)
 		{
