@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.Protos;
 using Tgs.ServiceUtility;
@@ -11,15 +12,21 @@ namespace Tgs.Payment.MessageQueue;
 internal class AutoApproveWithdrawHandler : IMessageHandler
 {
 	private readonly ICommandService<AutoApproveWithdtawFormCommand> _commandService;
+	private readonly Logger<AutoApproveWithdrawHandler> _logger;
 
-	public AutoApproveWithdrawHandler(ICommandService<AutoApproveWithdtawFormCommand> commandService)
+	public AutoApproveWithdrawHandler(
+		ICommandService<AutoApproveWithdtawFormCommand> commandService,
+		Logger<AutoApproveWithdrawHandler> logger)
 	{
 		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 	}
 
 	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
 	{
 		var request = FormEvent.Parser.ParseFrom(data.Span);
+
+		_logger.LogInformation("AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}", request.BrandId, request.FormId);
 
 		var command = new AutoApproveWithdtawFormCommand(
 			Guid.Parse(request.BrandId),
