@@ -66,7 +66,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		_logger.LogInformation(
+		_logger.LogDebug(
 			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}",
 			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
 
@@ -82,7 +82,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 		var brandPaymentId = brandPaymentCandidates.ElementAt(random);
 
-		_logger.LogInformation("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
+		_logger.LogDebug("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
 
 		var approveWithdrawCommand = new SignOffWithdrawFormCommand(
 			command.FormId,

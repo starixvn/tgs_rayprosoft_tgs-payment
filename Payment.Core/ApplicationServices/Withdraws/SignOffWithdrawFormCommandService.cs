@@ -52,7 +52,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 		var formStatus = formData.Status;
 
-		_logger.LogInformation("SignOffWithdrawFormCommand command:{command}, formData Status:{formStatus}",
+		_logger.LogDebug("SignOffWithdrawFormCommand command:{command}, formData Status:{formStatus}",
 			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions),
 			formStatus);
 

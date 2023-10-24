@@ -26,7 +26,7 @@ internal class AutoApproveWithdrawHandler : IMessageHandler
 	{
 		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		_logger.LogInformation(
+		_logger.LogDebug(
 			"AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}, status:{status}",
 			request.BrandId.ToGuid(),
 			request.FormId.ToGuid(),
