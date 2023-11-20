@@ -25,6 +25,7 @@ unit-test:
   extends: .unit-test-template
   variables:
     DOTNET_USE_POLLING_FILE_WATCHER: "true"  
+    Framework: net7.0
 
 push-nuget:
   extends: .push-nuget-template
@@ -37,9 +38,20 @@ push-nuget:
       - PaymentService.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
-  extends: .push-docker-image-template
+  stage: publish
+  needs:
+    - build-code
+    - unit-test
+  only:
+    - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true   
+    policy: pull
   script:
-    - push_docker "PaymentService/PaymentService.csproj" $ImageName $Tag
+    - docker build -t "$ImageName:$Tag" --build-arg [BuildConfiguration]=$BuildConfiguration -f "PaymentService/Dockerfile" . --no-cache
+    - docker push $ImageName:$Tag
+
 
 push-bankinfo-rebuild-hash-job-image:
   extends: .push-docker-image-template
