@@ -49,6 +49,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<GCPayProcessor>("GCPay")
 			.RegisterWithdrawProcessor<WinPayProcessor>("WinPay")
 			.RegisterWithdrawProcessor<MalakiPayV2Processor>("MalakiPay-V2")
-			.RegisterWithdrawProcessor<SBPayProcessor>("SBPay");
+			.RegisterWithdrawProcessor<SBPayProcessor>("SBPay")
+			.RegisterWithdrawProcessor<GanyoPayProcessor>("GanyoPay");
 	}
 }
