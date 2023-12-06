@@ -16,8 +16,8 @@ internal class DibaoPayProcessor : IWithdrawProcessor
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"accountName": "$.detail.name",
-					"accountNumber": "$.detail.bankAccount"
+					"bankAccount": "$.detail.name",
+					"bankNo": "$.detail.bankAccount"
 				}
 			}
 			"""
