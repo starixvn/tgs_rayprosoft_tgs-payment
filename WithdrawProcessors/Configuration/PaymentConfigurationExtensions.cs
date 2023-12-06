@@ -50,6 +50,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<WinPayProcessor>("WinPay")
 			.RegisterWithdrawProcessor<MalakiPayV2Processor>("MalakiPay-V2")
 			.RegisterWithdrawProcessor<SBPayProcessor>("SBPay")
-			.RegisterWithdrawProcessor<GanyoPayProcessor>("GanyoPay");
+			.RegisterWithdrawProcessor<GanyoPayProcessor>("GanyoPay")
+			.RegisterWithdrawProcessor<DibaoPayProcessor>("DibaoPay");
 	}
 }
