@@ -51,6 +51,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<MalakiPayV2Processor>("MalakiPay-V2")
 			.RegisterWithdrawProcessor<SBPayProcessor>("SBPay")
 			.RegisterWithdrawProcessor<GanyoPayProcessor>("GanyoPay")
-			.RegisterWithdrawProcessor<DibaoPayProcessor>("DibaoPay");
+			.RegisterWithdrawProcessor<DibaoPayProcessor>("DibaoPay")
+			.RegisterWithdrawProcessor<DibaoPayProcessor>("U2Pay");
 	}
 }
