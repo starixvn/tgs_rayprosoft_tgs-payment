@@ -511,22 +511,14 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	{
 		var datas = Array.Empty<BrandPaymentAcl>();
 
-		var splitCount = 50;
-		var queryTimes = Math.DivRem(brandPaymentIds.Count(), splitCount, out var rem);
-		if (rem > 0)
-			queryTimes++;
-
-		var acls = Enumerable.Range(0, queryTimes)
+		var acls = brandPaymentIds.Chunk(50)
 			.AsParallel()
-			.Select(page => Task.Run(async () => await QueryBrandPaymentAclsAsync(
+			.Select(ids => Task.Run(async () => await QueryBrandPaymentAclsAsync(
 				playerCode,
-				brandPaymentIds
-					.Skip(page * splitCount)
-					.Take(splitCount),
-				cancellationToken).ToArrayAsync(cancellationToken).ConfigureAwait(false)))
-			.ToArray()
-			.ToAsyncEnumerable()
-			.SelectMany(t => t.ToAsyncEnumerable().SelectMany(arr => arr.ToAsyncEnumerable()));
+				ids,
+				cancellationToken).ToArrayAsync(cancellationToken).ConfigureAwait(false)).ToAsyncEnumerable())
+			.Merge()
+			.SelectMany(arr => arr.ToAsyncEnumerable());
 
 		return acls;
 	}
