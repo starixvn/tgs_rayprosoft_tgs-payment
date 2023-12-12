@@ -504,28 +504,50 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		return JsonSerializer.Deserialize<decimal>(contentJson, _SerializerOptions);
 	}
 
-	public async IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
-			string playerCode,
+	public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(
+		string playerCode,
 		IEnumerable<Guid> brandPaymentIds,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default)
+	{
+		var datas = Array.Empty<BrandPaymentAcl>();
+
+		var splitCount = 50;
+		var queryTimes = Math.DivRem(brandPaymentIds.Count(), splitCount, out var rem);
+		if (rem > 0)
+			queryTimes++;
+
+		var acls = Enumerable.Range(0, queryTimes)
+			.AsParallel()
+			.Select(page => Task.Run(async () => await QueryBrandPaymentAclsAsync(
+				playerCode,
+				brandPaymentIds
+					.Skip(page * splitCount)
+					.Take(splitCount),
+				cancellationToken).ToArrayAsync(cancellationToken).ConfigureAwait(false)))
+			.ToArray()
+			.ToAsyncEnumerable()
+			.SelectMany(t => t.ToAsyncEnumerable().SelectMany(arr => arr.ToAsyncEnumerable()));
+
+		return acls;
+	}
+
+	protected virtual IAsyncEnumerable<BrandPaymentAcl> QueryBrandPaymentAclsAsync(
+		string playerCode,
+		IEnumerable<Guid> brandPaymentIds,
+		CancellationToken cancellationToken = default)
 	{
 		var brandQueryString = string.Join(
 			"&",
 			brandPaymentIds.Select(id => $"brand={id}"));
-		var response = await _httpClient
+
+		return _httpClient
 			.GetAsync($"/brand/payment/acl/{playerCode}?{brandQueryString}", cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = response.EnsureSuccessStatusCode();
-
-		var contentJson = await response.Content
-			.ReadAsStringAsync(cancellationToken)
-			.ConfigureAwait(false);
-
-		var acls = JsonSerializer.Deserialize<BrandPaymentAcl[]>(contentJson, _SerializerOptions);
-
-		foreach (var acl in acls!)
-			yield return acl;
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<BrandPaymentAcl[]>(_SerializerOptions, cancellationToken)
+				!.ToAsyncEnumerable())
+			.SelectMany(arr => arr!.ToAsyncEnumerable());
 	}
 
 	public async ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
