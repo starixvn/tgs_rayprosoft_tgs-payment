@@ -48,7 +48,8 @@ internal class DibaoPayProcessor : IWithdrawProcessor
 			"127.0.0.1",
 			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString(),
 			withdrawBankInfo.Detail.BankAccount,
-			withdrawBankInfo.Detail.BankNo);
+			withdrawBankInfo.Detail.BankNo,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, DibaoPayUtility.SerializerOptions);
 	}
