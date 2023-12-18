@@ -48,7 +48,8 @@ internal class U2PayProcessor : IWithdrawProcessor
 			formId,
 			ReceiverName: withdrawBankInfo.Detail.Name,
 			brandPaymentExtendedData.RootElement.GetProperty("bankName").GetString(),
-			withdrawBankInfo.Detail.BankAccount);
+			withdrawBankInfo.Detail.BankAccount,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, U2PayUtility.SerializerOptions);
 	}
