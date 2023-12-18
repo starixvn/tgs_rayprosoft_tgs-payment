@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using JSLTSharp;
-using Tgs.Payment.PhpGoPay.Client;
 using Tgs.Payment.SBPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
@@ -48,8 +47,9 @@ internal class SBPayProcessor : IWithdrawProcessor
 			formId,
 			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString(),
 			withdrawBankInfo.Detail.BankOwner,
-			withdrawBankInfo.Detail.AccountNumber);
+			withdrawBankInfo.Detail.AccountNumber,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
-		return JsonSerializer.Serialize(settings, PhpGoPayUtility.SerializerOptions);
+		return JsonSerializer.Serialize(settings, SBPayUtility.SerializerOptions);
 	}
 }
