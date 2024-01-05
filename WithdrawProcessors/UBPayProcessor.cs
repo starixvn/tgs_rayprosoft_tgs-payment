@@ -45,11 +45,15 @@ internal class UBPayProcessor : IWithdrawProcessor
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<UBPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 
+		var canGetCurrency = brandPaymentExtendedData.RootElement.TryGetProperty("currency", out var jsonCurrency);
+
 		var settings = new UBPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("apiToken").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("notifyToken").GetString(),
 			formId,
-			withdrawBankInfo.Detail.Address);
+			withdrawBankInfo.Detail.Address,
+			canGetCurrency ? jsonCurrency.GetString() : null,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, UBPayUtility.SerializerOptions);
 	}
