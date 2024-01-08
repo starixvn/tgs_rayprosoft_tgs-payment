@@ -78,7 +78,8 @@ public class DepositTests
 		_ = fakeService
 			.QueryAsync(new GetCurrentDayTopTenDepositPlayersQuery(brandId), Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[] {
-				new Tgs.Payment.TopTenDepositWithdrawInfo{
+				new()
+				{
 					PlayerCode = "playerCode1",
 					DepositTotalAmount = 16888m,
 					WithdrawTotalAmount = 200m

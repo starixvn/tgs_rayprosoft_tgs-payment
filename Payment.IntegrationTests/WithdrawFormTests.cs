@@ -672,7 +672,7 @@ public class WithdrawFormTests
 		_ = fakeService
 			.QueryAsync(new GetCurrentDayTopTenWithdrawPlayersQuery(brandId), Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[] {
-				new Tgs.Payment.TopTenDepositWithdrawInfo{
+				new() {
 					PlayerCode = "playerCode",
 					DepositTotalAmount = 2000m,
 					WithdrawTotalAmount = 2000m

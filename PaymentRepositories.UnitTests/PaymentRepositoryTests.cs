@@ -420,7 +420,7 @@ public class PaymentRepositoryTests
 
 		await dbContext.BrandPayments.AddRangeAsync(new BrandPayment[]
 		{
-			new BrandPayment
+			new()
 			{
 				Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
 				ReducePlayerAmount = true,
@@ -430,8 +430,7 @@ public class PaymentRepositoryTests
 				CreatedByUsername = "createdUsername",
 				UpdatedByUsername = "updatedUsername",
 			},
-			new BrandPayment
-			{
+			new() {
 				Id = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5"),
 				ReducePlayerAmount = false,
 				HandlingFeeRateTenPercentile = 0M,

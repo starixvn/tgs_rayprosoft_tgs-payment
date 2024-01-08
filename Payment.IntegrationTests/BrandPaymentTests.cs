@@ -195,13 +195,13 @@ public class BrandPaymentTests
 		var actual = await sut.GetBrandPaymentsFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
 
 		var expected = new Tgs.Payment.Clients.BrandPaymentFeeInfo[] {
-			new Tgs.Payment.Clients.BrandPaymentFeeInfo()
+			new()
 			{
 				HandlingFeeRateTenPercentile = 0m,
 				ReducePlayerAmount = false,
 				BrandPaymentId = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8")
 			},
-			new Tgs.Payment.Clients.BrandPaymentFeeInfo()
+			new()
 			{
 				HandlingFeeRateTenPercentile =10m,
 				ReducePlayerAmount = true,
@@ -296,18 +296,18 @@ public class BrandPaymentTests
 
 	[Test]
 	public async Task 查詢Brand當日存提差()
-	{		
+	{
 		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
 
 		await using TestPaymentApplication web = TestSiteHelper
-			.GetPaymentServiceTestHost(services => services			
+			.GetPaymentServiceTestHost(services => services
 			.AddSingleton(fakeBrandNetDepositRepository));
 
 		var httpClient = web.CreateClient();
 
 		var sut = new PaymentServiceClient(httpClient);
 
-		var brandId = Guid.NewGuid();		
+		var brandId = Guid.NewGuid();
 
 		_ = fakeBrandNetDepositRepository
 			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
@@ -321,12 +321,12 @@ public class BrandPaymentTests
 	[Test]
 	public async Task 查詢Brand指定日期存提差_查詢日期等於當日()
 	{
-		var fakeSystemClock = Substitute.For<ISystemClock>();		
+		var fakeSystemClock = Substitute.For<ISystemClock>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
 
 		await using TestPaymentApplication web = TestSiteHelper
-			.GetPaymentServiceTestHost(services => services			
+			.GetPaymentServiceTestHost(services => services
 			.AddSingleton(fakeSystemClock)
 			.AddSingleton(fakePaymentRepository)
 			.AddSingleton(fakeBrandNetDepositRepository));
@@ -436,7 +436,7 @@ public class BrandPaymentTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(now);		
+		_ = fakeSystemClock.UtcNow.Returns(now);
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
 

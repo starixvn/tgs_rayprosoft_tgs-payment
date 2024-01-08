@@ -104,13 +104,13 @@ public class PlayerQueryTests
 				Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[]
 			{
-				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				new()
 				{
 					PlayerCode = "playerCode",
 					DepositTotalAmount = 888888m,
 					WithdrawTotalAmount = 100m
 				},
-				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				new()
 				{
 					PlayerCode = "playerCode1",
 					DepositTotalAmount = 16888m,
