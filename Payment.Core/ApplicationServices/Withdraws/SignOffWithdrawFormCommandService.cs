@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
@@ -15,7 +16,7 @@ internal class SignOffWithdrawFormCommandService(
 	IWithdrawProcessorFactory withdrawProcessorFactory,
 	IPaymentClient paymentClient,
 	IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
 	ILogger<SignOffWithdrawFormCommandService> logger) : ICommandService<SignOffWithdrawFormCommand>
 {
@@ -71,7 +72,7 @@ internal class SignOffWithdrawFormCommandService(
 					cancellationToken)
 				.ConfigureAwait(false);
 
-			var currentTime = systemClock.UtcNow.UtcDateTime;
+			var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 			var updateFormData = formData with
 			{
 				BrandPaymentId = command.BrandPaymentId.Value,
@@ -110,7 +111,7 @@ internal class SignOffWithdrawFormCommandService(
 
 			await fsm.FireAsync(PaymentTrigger.Reject).ConfigureAwait(false);
 
-			var currentTime = systemClock.UtcNow.UtcDateTime;
+			var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 			var updateFormData = formData with
 			{
 				Status = fsm.State,

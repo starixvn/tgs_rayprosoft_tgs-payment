@@ -56,6 +56,7 @@ var builder = WebApplication.CreateBuilder(args);
 		});
 
 	_ = builder.Services
+		.AddSingleton(TimeProvider.System)
 		.AddPaymentClient()
 		.AddPayment()
 		.UseRedis((options, sp) =>
@@ -90,7 +91,10 @@ var builder = WebApplication.CreateBuilder(args);
 				builder.Configuration.GetValue<Uri>("Payment:VipLevelServiceBaseUrl")!))
 		.AddWithdrawLimitClient()
 		.AddBrandServiceClient((options, _) => options.BrandCertificateBaseUrl =
-			builder.Configuration.GetValue<Uri>("Payment:BrandCertificateBaseUrl")!);
+			builder.Configuration.GetValue<Uri>("Payment:BrandCertificateBaseUrl")!)
+		.AddAgentClient()
+			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
+				builder.Configuration.GetValue<Uri>("Payment:AgentServiceBaseUrl")!);
 
 	_ = builder.Services
 		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with

@@ -3,6 +3,9 @@ using System.Text.Json;
 using ExpectedObjects;
 using NSubstitute;
 using NUnit.Framework.Legacy;
+using Tgs.Agent.Client;
+using Tgs.Agent.Client.Models;
+using Tgs.Agent.Client.Models.Enums;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -28,8 +31,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 
@@ -37,7 +40,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { new EmitCreateWithdrawFormEventPipe(fakePaymentClient) });
 
@@ -75,7 +78,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
@@ -91,7 +94,7 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
@@ -144,7 +147,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		_ = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
@@ -162,8 +165,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
@@ -173,7 +176,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[]
 			{
@@ -217,7 +220,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
@@ -232,13 +235,353 @@ public class WithdrawServiceTests
 	}
 
 	[Test]
+	public void 代理提款時扣款後錢包餘額為負數會Rollback交易_並且將表單拒絕掉()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimpProvider = Substitute.For<TimeProvider>();
+
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakeSubmitWithdrawFormStatusCommandService = Substitute.For<ICommandService<SubmitWithdrawFormStatusCommand>>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimpProvider,
+			fakeSerialNumberGenerator,
+			new[] {
+				new AgentCashOperationCreateWithdrawFormEventPipe(
+					fakeAgentClient,
+					fakeCashServiceClient,
+					fakeSubmitWithdrawFormStatusCommandService)
+			});
+
+		var brandId = Guid.NewGuid();
+		var agentId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			agentId.ToString(),
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimpProvider.GetUtcNow().Returns(currentTime);
+
+		var walletId = Guid.NewGuid();
+		_ = fakeAgentClient.GetAgentInfoAsync(Arg.Is(new GetAgentInfoRequest(agentId)))
+			.Returns(new AgentInfoModel(
+				agentId,
+				"test1",
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				brandId,
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))
+			.Returns(1000M);
+
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Is(amount),
+			Arg.Any<string>(),
+			Arg.Any<string>())
+			.Returns(new TransactionResponse
+			{
+				Balance = -100M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
+			});
+
+		_ = Assert.ThrowsAsync<InsufficientFundsException>(
+			async () => await sut.CreateWithdrawFormAsync(
+				user,
+				brandId,
+				bankInfoId,
+				amount,
+				null));
+
+		_ = fakeCashServiceClient.Received(1)
+			.RollbackWithdrawAsync(
+				Arg.Is(walletId),
+				Arg.Is(amount),
+				Arg.Is(default(string)),
+				Arg.Any<string>(),
+				Arg.Is(default(Guid?)));
+
+		var expectedCommand = new
+		{
+			Status = PaymentFlowState.Reject
+		};
+		_ = fakeSubmitWithdrawFormStatusCommandService.Received(1)
+			.ExecuteAsync(Arg.Is<SubmitWithdrawFormStatusCommand>(
+				cmd => expectedCommand.ToExpectedObject().Matches(cmd)));
+	}
+
+	[Test]
+	public void 代理提款時錢包餘額不足會建立表單失敗()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakeSubmitWithdrawFormStatusCommandService = Substitute.For<ICommandService<SubmitWithdrawFormStatusCommand>>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			new[] {
+				new AgentCashOperationCreateWithdrawFormEventPipe(
+					fakeAgentClient,
+					fakeCashServiceClient,
+					fakeSubmitWithdrawFormStatusCommandService)
+			});
+
+		var brandId = Guid.NewGuid();
+		var agentId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			agentId.ToString(),
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var walletId = Guid.NewGuid();
+		_ = fakeAgentClient.GetAgentInfoAsync(Arg.Is(new GetAgentInfoRequest(agentId)))
+			.Returns(new AgentInfoModel(
+				agentId,
+				"test1",
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				brandId,
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))
+			.Returns(500M);
+
+		_ = Assert.ThrowsAsync<InsufficientFundsException>(
+			async () => await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null));
+
+		_ = fakeCashServiceClient.Received(0)
+			.LockWithdrawAsync(
+				Arg.Any<Guid>(),
+				Arg.Any<decimal>(),
+				Arg.Any<string>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task 代理提款單建立前會先檢查錢包餘額是否足夠_建立完成後_會進行扣款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakeSubmitWithdrawFormStatusCommandService = Substitute.For<ICommandService<SubmitWithdrawFormStatusCommand>>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			new[] {
+				new AgentCashOperationCreateWithdrawFormEventPipe(
+					fakeAgentClient,
+					fakeCashServiceClient,
+					fakeSubmitWithdrawFormStatusCommandService)
+			});
+
+		var brandId = Guid.NewGuid();
+		var agentId = Guid.NewGuid();
+		var user = new WithdrawUser(
+			UserType.Agent,
+			agentId.ToString(),
+			"TestUser");
+		var bankInfoId = Guid.NewGuid();
+		var amount = 1000M;
+
+		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId))
+			.Returns(new BrandInfo
+			{
+				Id = brandId,
+				Code = "GPI"
+			});
+
+		var agentBankInfo = new AgentBankInfo(
+			bankInfoId,
+			Guid.Parse(user.UserId),
+			brandId,
+			Guid.NewGuid(),
+			"Bank",
+			"{}");
+		_ = fakePaymentRepository.GetAgentBankInfoByIdAsync(Arg.Is(bankInfoId))
+			.Returns(agentBankInfo);
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var orderNo = "TT11234567";
+		_ = fakeTakeNumberStore.GetWithdrawFormOrderNoAsync(Arg.Is("GPI"))
+			.Returns(orderNo);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var walletId = Guid.NewGuid();
+		_ = fakeAgentClient.GetAgentInfoAsync(Arg.Is(new GetAgentInfoRequest(agentId)))
+			.Returns(new AgentInfoModel(
+				agentId,
+				"test1",
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				brandId,
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))
+			.Returns(1000M);
+
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Is(amount),
+			Arg.Is(default(string)),
+			Arg.Any<string>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 0M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
+			});
+
+		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
+
+		_ = fakeCashServiceClient.Received(1)
+			.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Is(amount),
+			Arg.Is(default(string)),
+			Arg.Is(actual.ToString()));
+	}
+
+	[Test]
 	public void 玩家提款時扣款後錢包餘額為負數會Rollback交易_並且將表單拒絕掉()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
@@ -248,7 +591,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] {
 				new PlayerCashOperationCreateWithdrawFormEventPipe(
@@ -292,7 +635,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(Arg.Is(user.UserId))
@@ -347,8 +690,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakePlayerBucketForTypesClient = Substitute.For<IPlayerBucketForTypesClient>();
@@ -357,7 +700,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] {
 				new CheckPlayerBucketCreateWithdrawEventPipe(
@@ -400,7 +743,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var gameTypes = new[] { "Game1", "Game2" };
 		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
@@ -432,8 +775,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerBucketClient = Substitute.For<IPlayerBucketClient>();
 		var fakePlayerBucketForTypesClient = Substitute.For<IPlayerBucketForTypesClient>();
@@ -442,7 +785,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] {
 				new CheckPlayerBucketCreateWithdrawEventPipe(
@@ -485,7 +828,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var gameTypes = new[] { "Game1", "Game2" };
 		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
@@ -566,8 +909,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
@@ -577,7 +920,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] {
 				new PlayerCashOperationCreateWithdrawFormEventPipe(
@@ -621,7 +964,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(Arg.Is(user.UserId))
@@ -650,8 +993,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
 		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
@@ -661,7 +1004,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] {
 				new PlayerCashOperationCreateWithdrawFormEventPipe(
@@ -705,7 +1048,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var walletId = Guid.NewGuid();
 		_ = fakePlayerServiceClient.GetPlayerPropertiesAsync(Arg.Is(user.UserId))
@@ -745,14 +1088,14 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			Array.Empty<ICreateWithdrawFormPipe>());
 
@@ -790,7 +1133,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
@@ -851,14 +1194,13 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			TimeProvider.System,
 			fakeSerialNumberGenerator,
 			Array.Empty<ICreateWithdrawFormPipe>());
 
@@ -900,14 +1242,14 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			Array.Empty<ICreateWithdrawFormPipe>());
 
@@ -948,7 +1290,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
 
@@ -1009,14 +1351,13 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			TimeProvider.System,
 			fakeSerialNumberGenerator,
 			Array.Empty<ICreateWithdrawFormPipe>());
 
@@ -1059,8 +1400,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePipe1 = Substitute.For<ICreateWithdrawFormPipe>();
 		var fakePipe2 = Substitute.For<ICreateWithdrawFormPipe>();
@@ -1074,7 +1415,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { fakePipe1, fakePipe2, fakePipe3 });
 
@@ -1112,7 +1453,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var actual = await sut.CreateWithdrawFormAsync(
 			user,
@@ -1153,8 +1494,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakePipe1 = Substitute.For<ICreateWithdrawFormPipe>();
 		var fakePipe2 = Substitute.For<ICreateWithdrawFormPipe>();
@@ -1168,7 +1509,7 @@ public class WithdrawServiceTests
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { fakePipe1, fakePipe2, fakePipe3 });
 
@@ -1206,7 +1547,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = await sut.CreateWithdrawFormAsync(
 			user,
@@ -1244,14 +1585,13 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			TimeProvider.System,
 			fakeSerialNumberGenerator,
 			Array.Empty<ICreateWithdrawFormPipe>());
 
@@ -1284,8 +1624,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1295,13 +1635,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1323,7 +1663,7 @@ public class WithdrawServiceTests
 			});
 
 		var currentTime = DateTimeOffset.Parse("2023/9/14+8");
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1383,8 +1723,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1394,13 +1734,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1421,7 +1761,7 @@ public class WithdrawServiceTests
 			});
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1482,8 +1822,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1493,13 +1833,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1520,7 +1860,7 @@ public class WithdrawServiceTests
 			});
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1581,8 +1921,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1592,13 +1932,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1639,7 +1979,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1735,8 +2075,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1746,13 +2086,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1773,7 +2113,7 @@ public class WithdrawServiceTests
 			});
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1834,8 +2174,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1845,13 +2185,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1873,7 +2213,7 @@ public class WithdrawServiceTests
 
 		var currentTime = DateTimeOffset.UtcNow;
 
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -1934,8 +2274,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -1945,13 +2285,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -1992,7 +2332,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo
@@ -2088,8 +2428,8 @@ public class WithdrawServiceTests
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
 		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
@@ -2099,13 +2439,13 @@ public class WithdrawServiceTests
 			fakePlayerServiceClient,
 			fakeWithdrawLimitClient,
 			fakeBrandServiceClient,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var sut = new WithdrawService(
 			fakePaymentRepository,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			new[] { withdrawLimitPipe });
 
@@ -2146,7 +2486,7 @@ public class WithdrawServiceTests
 			.Returns(orderNo);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		_ = fakePlayerServiceClient.GetPlayerInfoAsync(Arg.Is(user.UserId))
 			.Returns(new PlayerInfo

@@ -17,7 +17,8 @@ internal class CreateDepositFormCommandService(
 	IPaymentClient paymentClient,
 	IBrandServiceClient brandServiceClient,
 	ITakeNumberStore takeNumberStore,
-	ISystemClock systemClock) : ICommandService<CreateDepositFormCommand>
+	TimeProvider timeProvider)
+	: ICommandService<CreateDepositFormCommand>
 {
 	public async ValueTask ExecuteAsync(CreateDepositFormCommand command, CancellationToken cancellationToken = default)
 	{
@@ -31,7 +32,7 @@ internal class CreateDepositFormCommandService(
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 		var createSnapshot = new DepositFormSnapshot(
 			command.FormId,
 			command.CreateInfo.PlayerCode,

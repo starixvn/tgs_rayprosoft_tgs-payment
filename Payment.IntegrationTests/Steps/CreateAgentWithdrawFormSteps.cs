@@ -2,10 +2,15 @@
 using NSubstitute;
 using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
+using Tgs.Agent.Client;
+using Tgs.Agent.Client.Models;
+using Tgs.Agent.Client.Models.Enums;
 using Tgs.BrandCertificate.Clients;
+using Tgs.CashService.Client;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 using Tgs.PlayerService.Client;
+using Tgs.Service.PlayerBuckets;
 using Tgs.VipLevelService.Clients;
 
 namespace Payment.IntegrationTests.Steps;
@@ -22,8 +27,9 @@ public class CreateAgentWithdrawFormSteps
 
 	public CreateAgentWithdrawFormSteps()
 	{
-		var fakeVipLevelClient = Substitute.For<IVipLevelServiceClient>();
-		var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
 		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -32,9 +38,52 @@ public class CreateAgentWithdrawFormSteps
 				Code = "GPI"
 			});
 
+		var walletId = Guid.NewGuid();
+		_ = fakeAgentClient.GetAgentInfoAsync(
+			Arg.Any<GetAgentInfoRequest>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new AgentInfoModel(
+				Guid.NewGuid(),
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(10000M);
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Any<decimal>(),
+			Arg.Any<string>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 1000M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
+			});
+
 		_testHost = TestSiteHelper.GetPaymentServiceTestHost(services => services
-			.AddSingleton(Substitute.For<IVipLevelServiceClient>())
-			.AddSingleton(Substitute.For<IPlayerServiceClient>())
+			.AddSingleton(fakeCashServiceClient)
+			.AddSingleton(fakeAgentClient)
 			.AddSingleton(fakeBrandServiceClient));
 
 		_paymentServiceClient = _testHost.GetPaymentServiceClient();

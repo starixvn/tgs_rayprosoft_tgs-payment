@@ -6,13 +6,13 @@ using Tgs.ServiceUtility;
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
 internal class GetBrandReportDateNetDepositQueryService(
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	IPaymentRepository paymentRepository,
 	IBrandNetDepositRepository brandNetDepositRepository) : IGetService<GetBrandReportDateNetDepositQuery, decimal>
 {
 	public async ValueTask<decimal> GetAsync(GetBrandReportDateNetDepositQuery query, CancellationToken cancellationToken = default)
 	{
-		var now = systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
+		var now = timeProvider.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
 		var currentDate = DateOnly.FromDateTime(now.DateTime);
 		var yesterday = currentDate.AddDays(-1);
 
@@ -25,7 +25,7 @@ internal class GetBrandReportDateNetDepositQueryService(
 				.ConfigureAwait(false);
 		}
 
-		if(query.ReportDate == yesterday && now < scheduleTime)
+		if (query.ReportDate == yesterday && now < scheduleTime)
 		{
 			return await brandNetDepositRepository
 				.GetBrandYesterDayNetDepositAsync(query.BrandId)

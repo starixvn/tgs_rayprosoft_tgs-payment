@@ -15,7 +15,7 @@ internal class WithdrawService(
 	IPaymentRepository paymentRepository,
 	IBrandServiceClient brandServiceClient,
 	ITakeNumberStore takeNumberStore,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
 	IEnumerable<ICreateWithdrawFormPipe> createWithdrawFormPipes) : IWithdrawService
 {
@@ -51,7 +51,7 @@ internal class WithdrawService(
 		var eventId = await serialNumberGenerator.GenerateAsync(
 			cancellationToken).ConfigureAwait(false);
 
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 
 		var createFormId = Guid.NewGuid();
 		var createFormSnapshot = WithdrawFormSnapshot._Default with

@@ -13,7 +13,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits;
 internal class SubmitDepositFormStatusCommandService(
 	IPaymentRepository paymentRepository,
 	IPaymentClient paymentClient,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
 	ILogger<SubmitDepositFormStatusCommandService> logger) : ICommandService<SubmitDepositFormStatusCommand>
 {
@@ -42,7 +42,7 @@ internal class SubmitDepositFormStatusCommandService(
 		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 
 		await paymentRepository.CreateDepositFormEventAsync(
 			eventId,

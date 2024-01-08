@@ -25,9 +25,9 @@ public static class ServiceCollectionExtensions
 					sp,
 					configuration.GetAllRegisterWithdrawProcessorTypes()))
 			.AddSingleton<IBankInfoIndexParserFactory, BankInfoIndexParserFactory>()
-			.AddSingleton<ISystemClock, DefaultSystemClock>()
 			.AddTransient<ICreateWithdrawFormPipe, EmitCreateWithdrawFormEventPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, PlayerCashOperationCreateWithdrawFormEventPipe>()
+			.AddTransient<ICreateWithdrawFormPipe, AgentCashOperationCreateWithdrawFormEventPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, WithdrawLimitProcessPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, CheckPlayerBucketCreateWithdrawEventPipe>()
 			.AddSerialNumberGenerator()

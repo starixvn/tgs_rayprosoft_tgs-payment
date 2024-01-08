@@ -96,7 +96,7 @@ public class DepositTests
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new CreateDepositFormCommandService(
 			fakeSerialNumberGenerator,
@@ -104,7 +104,7 @@ public class DepositTests
 			fakePaymentClient,
 			fakeBrandServiceClient,
 			fakeTakeNumberStore,
-			fakeSystemClock);
+			fakeTimeProvider);
 
 		var brandId = Guid.NewGuid();
 		var command = new CreateDepositFormCommand(
@@ -135,7 +135,7 @@ public class DepositTests
 			.Returns(orderNo);
 
 		var currentDate = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentDate);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentDate);
 
 		var expectedSnapshot = new DepositFormSnapshot(
 			command.FormId,
@@ -264,13 +264,12 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SignOffDepositFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			TimeProvider.System,
 			fakeSerialNumberGenerator,
 			NullLogger<SignOffDepositFormCommandService>.Instance);
 
@@ -322,13 +321,12 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SignOffDepositFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			TimeProvider.System,
 			fakeSerialNumberGenerator,
 			NullLogger<SignOffDepositFormCommandService>.Instance);
 
@@ -420,13 +418,13 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new SignOffDepositFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			NullLogger<SignOffDepositFormCommandService>.Instance);
 
@@ -466,7 +464,7 @@ public class DepositTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = new DepositFormSnapshot(
 			command.FormId,
@@ -517,13 +515,13 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new SubmitDepositFormStatusCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
 
@@ -565,7 +563,7 @@ public class DepositTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = new DepositFormSnapshot(
 			command.FormId,
@@ -861,13 +859,13 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new SubmitDepositFormStatusCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
 
@@ -909,7 +907,7 @@ public class DepositTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = new DepositFormSnapshot(
 			command.FormId,
@@ -960,13 +958,13 @@ public class DepositTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new SubmitDepositFormStatusCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
+			fakeTimeProvider,
 			fakeSerialNumberGenerator,
 			NullLogger<SubmitDepositFormStatusCommandService>.Instance);
 
@@ -1008,7 +1006,7 @@ public class DepositTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = new DepositFormSnapshot(
 			command.FormId,
@@ -1074,7 +1072,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期前天_全部單為0()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1085,7 +1083,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(now);
+		_ = fakeSystemClock.GetUtcNow().Returns(now);
 
 		_ = fakePaymentRepository
 			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
@@ -1104,7 +1102,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期前天_整數四捨五入_捨去()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1115,7 +1113,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(now);
+		_ = fakeSystemClock.GetUtcNow().Returns(now);
 
 		_ = fakePaymentRepository
 			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
@@ -1134,7 +1132,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期前天_整數四捨五入_進位()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1145,7 +1143,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(now);
+		_ = fakeSystemClock.GetUtcNow().Returns(now);
 
 		_ = fakePaymentRepository
 			.GetReportDateDepositFormSummaryAsync(brandId, reportDate)
@@ -1164,7 +1162,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期為昨天且時間小於排程時間_全部單為0()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1175,8 +1173,15 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
 		var today = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow
-			.Returns(new DateTimeOffset(today.Year, today.Month, today.Day, hour: 6, 0, 0, TimeSpan.FromHours(8d)));
+		_ = fakeSystemClock.GetUtcNow()
+			.Returns(new DateTimeOffset(
+				today.Year,
+				today.Month,
+				today.Day,
+				hour: 6,
+				0,
+				0,
+				TimeSpan.FromHours(8d)));
 
 		_ = fakePaymentRepository
 			.CountYesterDayDepositFormsStatusAsync(brandId)
@@ -1195,7 +1200,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期為昨天且時間小於排程時間_整數四捨五入_捨去()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1206,7 +1211,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
 		var today = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow
+		_ = fakeSystemClock.GetUtcNow()
 			.Returns(new DateTimeOffset(today.Year, today.Month, today.Day, hour: 6, 0, 0, TimeSpan.FromHours(8d)));
 
 		_ = fakePaymentRepository
@@ -1226,7 +1231,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢日期為昨天且時間小於排程時間_整數四捨五入_進位()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1237,7 +1242,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
 		var today = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow
+		_ = fakeSystemClock.GetUtcNow()
 			.Returns(new DateTimeOffset(today.Year, today.Month, today.Day, hour: 6, 0, 0, TimeSpan.FromHours(8d)));
 
 		_ = fakePaymentRepository
@@ -1257,7 +1262,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢當日資料_全部單為0()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1268,7 +1273,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		_ = fakePaymentRepository
 			.CountCurrentDayDepositFormsStatusAsync(brandId)
@@ -1287,7 +1292,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢當日資料_整數四捨五入_捨去()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1298,7 +1303,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		_ = fakePaymentRepository
 			.CountCurrentDayDepositFormsStatusAsync(brandId)
@@ -1317,7 +1322,7 @@ public class DepositTests
 	[Test]
 	public async Task 指定日期存款成功率_查詢當日資料_整數四捨五入_進位()
 	{
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 
 		var sut = new ReportDateSuccessRateQueryService(
@@ -1328,7 +1333,7 @@ public class DepositTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		_ = fakePaymentRepository
 			.CountCurrentDayDepositFormsStatusAsync(brandId)

@@ -6,12 +6,12 @@ using Tgs.ServiceUtility;
 namespace Tgs.Payment.ApplicationServices.Deposits;
 
 internal class ReportDateSuccessRateQueryService(
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	IPaymentRepository paymentRepository) : IGetService<ReportDateSuccessRateQuery, decimal>
 {
 	public async ValueTask<decimal> GetAsync(ReportDateSuccessRateQuery query, CancellationToken cancellationToken = default)
 	{
-		var now = systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
+		var now = timeProvider.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
 		var currentDate = DateOnly.FromDateTime(now.DateTime);
 		var yesterday = currentDate.AddDays(-1);
 

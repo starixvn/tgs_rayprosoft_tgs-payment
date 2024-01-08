@@ -15,7 +15,7 @@ internal class WithdrawLimitProcessPipe(
 	IPlayerServiceClient playerServiceClient,
 	IWithdrawLimitClient withdrawLimitClient,
 	IBrandServiceClient brandServiceClient,
-	ISystemClock systemClock) : ICreateWithdrawFormPipe
+	TimeProvider timeProvider) : ICreateWithdrawFormPipe
 {
 	public int Order => 5;
 
@@ -48,7 +48,7 @@ internal class WithdrawLimitProcessPipe(
 		var vipInfo = brandVipLevels.Where(vip => vip.Id == playerInfo!.VipLevelId)
 			.FirstOrDefault() ?? brandVipLevels[0];
 
-		var currentDate = DateOnly.FromDateTime(systemClock.UtcNow.ToOffset(brandTimeOffset).DateTime);
+		var currentDate = DateOnly.FromDateTime(timeProvider.GetUtcNow().ToOffset(brandTimeOffset).DateTime);
 
 		var result = await withdrawLimitClient.IncreasePlayerWithdrawStatisticsAsync(
 			user.UserId!,

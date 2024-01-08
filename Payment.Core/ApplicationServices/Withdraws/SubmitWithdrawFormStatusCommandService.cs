@@ -13,7 +13,7 @@ namespace Tgs.Payment.ApplicationServices.Withdraws;
 internal class SubmitWithdrawFormStatusCommandService(
 	IPaymentRepository paymentRepository,
 	IPaymentClient paymentClient,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
 	ILogger<SubmitWithdrawFormStatusCommandService> logger)
 	: ICommandService<SubmitWithdrawFormStatusCommand>
@@ -33,7 +33,7 @@ internal class SubmitWithdrawFormStatusCommandService(
 			originStatus,
 			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions));
 
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 		var newFormData = formData with
 		{
 			Status = command.Status ?? formData.Status,

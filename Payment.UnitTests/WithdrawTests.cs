@@ -189,7 +189,7 @@ public class WithdrawTests
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SignOffWithdrawFormCommandService(
@@ -280,7 +280,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			command.FormId,
@@ -339,7 +339,7 @@ public class WithdrawTests
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SignOffWithdrawFormCommandService(
@@ -430,7 +430,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{
@@ -470,7 +470,7 @@ public class WithdrawTests
 		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
 		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SignOffWithdrawFormCommandService(
@@ -561,7 +561,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{
@@ -600,7 +600,7 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitWithdrawFormStatusCommandService(
@@ -653,7 +653,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{
@@ -725,7 +725,7 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitWithdrawFormStatusCommandService(
@@ -778,7 +778,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{
@@ -816,7 +816,7 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitWithdrawFormStatusCommandService(
@@ -869,7 +869,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{
@@ -907,7 +907,7 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<Tgs.Payment.ISystemClock>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var sut = new SubmitWithdrawFormStatusCommandService(
@@ -960,7 +960,7 @@ public class WithdrawTests
 			.Returns(eventId);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.UtcNow.Returns(currentTime);
+		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
 		var expectedSnapshot = withdrawForm with
 		{

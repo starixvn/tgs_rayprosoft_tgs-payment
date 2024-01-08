@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
@@ -10,12 +11,12 @@ namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
 internal class UpdateBrandAutoWithdrawCommandService(
 	IPaymentRepository paymentRepository,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator) : ICommandService<UpdateBrandAutoWithdrawCommand>
 {
 	public async ValueTask ExecuteAsync(UpdateBrandAutoWithdrawCommand command, CancellationToken cancellationToken = default)
 	{
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 
 		var brandAutoInfo = await paymentRepository
 			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)

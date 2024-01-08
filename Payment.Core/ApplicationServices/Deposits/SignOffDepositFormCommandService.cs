@@ -13,7 +13,7 @@ namespace Tgs.Payment.ApplicationServices.Deposits;
 internal class SignOffDepositFormCommandService(
 	IPaymentRepository paymentRepository,
 	IPaymentClient paymentClient,
-	ISystemClock systemClock,
+	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
 	ILogger<SignOffDepositFormCommandService> logger) : ICommandService<SignOffDepositFormCommand>
 {
@@ -35,7 +35,7 @@ internal class SignOffDepositFormCommandService(
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var currentTime = systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 
 		var updatedForm = formData with
 		{
