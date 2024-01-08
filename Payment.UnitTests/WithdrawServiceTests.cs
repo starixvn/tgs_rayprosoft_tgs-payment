@@ -2,6 +2,7 @@
 using System.Text.Json;
 using ExpectedObjects;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -401,8 +402,9 @@ public class WithdrawServiceTests
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
+		var gameTypes = new[] { "Game1", "Game2" };
 		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
-			.Returns(new[] { "Game1", "Game2" }.ToAsyncEnumerable());
+			.Returns(gameTypes.ToAsyncEnumerable());
 
 		_ = fakePlayerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
 			Arg.Is(user.UserId),
@@ -485,8 +487,9 @@ public class WithdrawServiceTests
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.UtcNow.Returns(currentTime);
 
+		var gameTypes = new[] { "Game1", "Game2" };
 		_ = fakePlayerBucketClient.GetBrandBucketTypesAsync(Arg.Is(brandId))
-			.Returns(new[] { "Game1", "Game2" }.ToAsyncEnumerable());
+			.Returns(gameTypes.ToAsyncEnumerable());
 
 		_ = fakePlayerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
 			Arg.Is(user.UserId),
@@ -506,7 +509,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -546,7 +549,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -791,7 +794,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, null);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -831,7 +834,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -949,7 +952,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -989,7 +992,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -1465,7 +1468,7 @@ public class WithdrawServiceTests
 			amount,
 			null));
 
-		Assert.AreEqual(1, actual.Count);
+		ClassicAssert.AreEqual(1, actual.Count);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
@@ -1564,7 +1567,7 @@ public class WithdrawServiceTests
 			amount,
 			null));
 
-		Assert.AreEqual(11000M, actual.Amount);
+		ClassicAssert.AreEqual(11000M, actual.Amount);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
@@ -1678,7 +1681,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -1715,7 +1718,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -1817,7 +1820,7 @@ public class WithdrawServiceTests
 			amount,
 			null));
 
-		Assert.AreEqual(11000M, actual.Amount);
+		ClassicAssert.AreEqual(11000M, actual.Amount);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
@@ -1917,7 +1920,7 @@ public class WithdrawServiceTests
 			amount,
 			null));
 
-		Assert.AreEqual(6, actual.Count);
+		ClassicAssert.AreEqual(6, actual.Count);
 		_ = fakeWithdrawLimitClient.Received(1)
 			.DecreasePlayerWithdrawStatisticsAsync(
 				Arg.Is(user.UserId),
@@ -2031,7 +2034,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -2068,7 +2071,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 
@@ -2185,7 +2188,7 @@ public class WithdrawServiceTests
 
 		var actual = await sut.CreateWithdrawFormAsync(user, brandId, bankInfoId, amount, note);
 
-		Assert.AreNotEqual(Guid.Empty, actual);
+		ClassicAssert.AreNotEqual(Guid.Empty, actual);
 
 		var expectedSnapshot = new WithdrawFormSnapshot(
 			actual,
@@ -2222,7 +2225,7 @@ public class WithdrawServiceTests
 			.CreateWithdrawFormEventAsync(
 				Arg.Is(eventId),
 				Arg.Is(actual),
-				Arg.Is(EventAction.Create),
+				Arg.Is(Tgs.Payment.EventAction.Create),
 				Arg.Any<JsonDocument>(),
 				Arg.Any<string>());
 

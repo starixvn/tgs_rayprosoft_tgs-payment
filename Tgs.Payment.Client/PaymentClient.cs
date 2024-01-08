@@ -37,9 +37,10 @@ internal class PaymentClient : IPaymentClient
 			Content = requestInfo
 		};
 
-		var result = await _messageSender
-			.RequestAsync(subject, request.ToByteArray(), cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
+		var result = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+			subject,
+			request.ToByteArray(),
+			cancellationToken: cancellationToken).ConfigureAwait(false);
 
 		var response = GeneralResponse.Parser.ParseFrom(result.Span);
 
@@ -56,9 +57,10 @@ internal class PaymentClient : IPaymentClient
 			Amount = amount.ToString()
 		};
 
-		var result = await _messageSender
-			.RequestAsync(subject, request.ToByteArray(), cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
+		var result = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+			subject,
+			request.ToByteArray(),
+			cancellationToken: cancellationToken).ConfigureAwait(false);
 
 		var response = DepositResponse.Parser.ParseFrom(result.Span);
 
@@ -282,9 +284,10 @@ internal class PaymentClient : IPaymentClient
 			Amount = amount.ToString()
 		};
 
-		var result = await _messageSender
-			.RequestAsync(subject, request.ToByteArray(), cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
+		var result = await _messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+			subject,
+			request.ToByteArray(),
+			cancellationToken: cancellationToken).ConfigureAwait(false);
 
 		var response = WithdrawResponse.Parser.ParseFrom(result.Span);
 

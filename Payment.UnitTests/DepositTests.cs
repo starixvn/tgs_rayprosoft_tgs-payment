@@ -2,6 +2,7 @@
 using Json.Patch;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.BrandCertificate.Clients;
 using Tgs.Paging;
 using Tgs.Payment;
@@ -51,7 +52,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 
 	[Test]
@@ -216,7 +217,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNotNull(actual);
+		ClassicAssert.IsNotNull(actual);
 	}
 
 	[Test]
@@ -255,7 +256,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNotNull(actual);
+		ClassicAssert.IsNotNull(actual);
 	}
 
 	[Test]
@@ -694,7 +695,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.AreEqual(previousFormId, actual);
+		ClassicAssert.AreEqual(previousFormId, actual);
 	}
 
 	[Test]
@@ -760,7 +761,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.AreEqual(command.FormId, actual);
+		ClassicAssert.AreEqual(command.FormId, actual);
 	}
 
 	[Test]
@@ -789,7 +790,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.AreEqual(previousFormId, actual);
+		ClassicAssert.AreEqual(previousFormId, actual);
 	}
 
 	[Test]
@@ -816,7 +817,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(command);
 
-		Assert.AreEqual(command.FormId, actual);
+		ClassicAssert.AreEqual(command.FormId, actual);
 	}
 
 	[Test]
@@ -852,7 +853,7 @@ public class DepositTests
 
 		var actual = patch.Apply(depositForm, PaymentUtility.SerializerOptions);
 
-		Assert.AreEqual(sut, actual);
+		ClassicAssert.AreEqual(sut, actual);
 	}
 
 	[Test]
@@ -1097,7 +1098,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -1127,7 +1128,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(33m, actual);
+		ClassicAssert.AreEqual(33m, actual);
 	}
 
 	[Test]
@@ -1157,7 +1158,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 
 	[Test]
@@ -1188,7 +1189,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -1219,7 +1220,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(33m, actual);
+		ClassicAssert.AreEqual(33m, actual);
 	}
 
 	[Test]
@@ -1250,7 +1251,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 
 	[Test]
@@ -1280,7 +1281,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -1310,7 +1311,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(33m, actual);
+		ClassicAssert.AreEqual(33m, actual);
 	}
 
 	[Test]
@@ -1340,7 +1341,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new ReportDateSuccessRateQuery(brandId, reportDate));
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 
 	[Test]
@@ -1489,7 +1490,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -1507,7 +1508,7 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
-		Assert.AreEqual(33m, actual);
+		ClassicAssert.AreEqual(33m, actual);
 	}
 
 	[Test]
@@ -1525,6 +1526,6 @@ public class DepositTests
 
 		var actual = await sut.GetAsync(new CurrentDaySuccessRateQuery(brandId));
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 }

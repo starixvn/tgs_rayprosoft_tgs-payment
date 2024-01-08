@@ -6,7 +6,7 @@ using Tgs.Payment.PhpGoPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class PhpGoPayProcessor : IWithdrawProcessor
+internal class PhpGoPayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -45,14 +45,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 			"""
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
-
 	public virtual string Subject => "tgs.payment.phpgopay.withdraw";
-
-	public PhpGoPayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -69,7 +62,7 @@ internal class PhpGoPayProcessor : IWithdrawProcessor
 		};
 
 		var transformation = _bankInfoTransformations[bankType];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<PhpGoPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);

@@ -7,20 +7,11 @@ using Tgs.Service.PlayerBuckets;
 
 namespace Tgs.Payment.WithdrawPipes;
 
-internal class CheckPlayerBucketCreateWithdrawEventPipe : ICreateWithdrawFormPipe
+internal class CheckPlayerBucketCreateWithdrawEventPipe(
+	IPlayerBucketClient playerBucketClient,
+	IPlayerBucketForTypesClient playerBucketForTypesClient) : ICreateWithdrawFormPipe
 {
-	private readonly IPlayerBucketClient _playerBucketClient;
-	private readonly IPlayerBucketForTypesClient _playerBucketForTypesClient;
-
 	public int Order => 10;
-
-	public CheckPlayerBucketCreateWithdrawEventPipe(
-		IPlayerBucketClient playerBucketClient,
-		IPlayerBucketForTypesClient playerBucketForTypesClient)
-	{
-		_playerBucketClient = playerBucketClient ?? throw new ArgumentNullException(nameof(playerBucketClient));
-		_playerBucketForTypesClient = playerBucketForTypesClient ?? throw new ArgumentNullException(nameof(playerBucketForTypesClient));
-	}
 
 	public async ValueTask BeforeCreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -33,9 +24,9 @@ internal class CheckPlayerBucketCreateWithdrawEventPipe : ICreateWithdrawFormPip
 		if (user.UserType is not UserType.Player)
 			return;
 
-		var bucketTypes = _playerBucketClient.GetBrandBucketTypesAsync(brandId, cancellationToken);
+		var bucketTypes = playerBucketClient.GetBrandBucketTypesAsync(brandId, cancellationToken);
 
-		var bucketNotEmpty = await _playerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
+		var bucketNotEmpty = await playerBucketForTypesClient.ReadBucketsForBucketTypesAsync(
 			user.UserId!,
 			bucketTypes.ToEnumerable(),
 			cancellationToken)

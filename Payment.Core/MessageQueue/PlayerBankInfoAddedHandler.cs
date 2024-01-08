@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.ApplicationServices.BankInfos;
@@ -8,21 +9,14 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class PlayerBankInfoAddedHandler : IMessageHandler
+internal class PlayerBankInfoAddedHandler(ICommandService<ProcessBankInfoTagsCommand> processTagsService) : IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly ICommandService<ProcessBankInfoTagsCommand> _processTagsService;
-
-	public PlayerBankInfoAddedHandler(ICommandService<ProcessBankInfoTagsCommand> processTagsService)
-	{
-		_processTagsService = processTagsService ?? throw new ArgumentNullException(nameof(processTagsService));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(string subject, ReadOnlyMemory<byte> data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
 	{
 		var request = PlayerBankInfoChangedEvent.Parser.ParseFrom(data.Span);
 
 		var command = new ProcessBankInfoTagsCommand(request.Id);
 
-		return _processTagsService.ExecuteAsync(command, cancellationToken);
+		return processTagsService.ExecuteAsync(command, cancellationToken);
 	}
 }

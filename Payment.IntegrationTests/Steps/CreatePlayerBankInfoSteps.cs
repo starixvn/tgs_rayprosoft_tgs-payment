@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -68,9 +69,9 @@ public class CreatePlayerBankInfoSteps
 
 		var data = await dbContext.PlayerBankInfos.FindAsync(_createdId);
 
-		Assert.AreEqual(_brandId, data.BrandId);
-		Assert.AreEqual(_bankInfo.PaymentChannelId, data.PaymentChannelId);
-		Assert.AreEqual(JsonSerializer.Serialize(_bankInfo.Detail), data.Detail);
+		ClassicAssert.AreEqual(_brandId, data.BrandId);
+		ClassicAssert.AreEqual(_bankInfo.PaymentChannelId, data.PaymentChannelId);
+		ClassicAssert.AreEqual(JsonSerializer.Serialize(_bankInfo.Detail), data.Detail);
 	}
 
 	[When(@"call create bank info api")]

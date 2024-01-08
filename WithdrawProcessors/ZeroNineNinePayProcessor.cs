@@ -5,19 +5,11 @@ using Tgs.Payment.ZeroNineNinePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class ZeroNineNinePayProcessor : IWithdrawProcessor
+internal class ZeroNineNinePayProcessor(
+	ZeroNineNinePaySerializer zeroNineNinePaySerializer,
+	ILogger<ZeroNineNinePayProcessor> logger) : IWithdrawProcessor
 {
-	private readonly ILogger<ZeroNineNinePayProcessor> _logger;
-	private readonly ZeroNineNinePaySerializer _zeroNineNinePaySerializer;
 	public string Subject => "tgs.payment.zeronineninepay.withdraw";
-
-	public ZeroNineNinePayProcessor(
-		ZeroNineNinePaySerializer zeroNineNinePaySerializer,
-		ILogger<ZeroNineNinePayProcessor> logger)
-	{
-		_zeroNineNinePaySerializer = zeroNineNinePaySerializer;
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -27,7 +19,7 @@ internal class ZeroNineNinePayProcessor : IWithdrawProcessor
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		_logger.LogInformation(
+		logger.LogInformation(
 			"ZeroNineNinePayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
 			formId,
 			bankInfo,
@@ -42,6 +34,6 @@ internal class ZeroNineNinePayProcessor : IWithdrawProcessor
 			withdrawBankInfo.Detail.BankBranch,
 			formId);
 
-		return _zeroNineNinePaySerializer.Serialize(settings);
+		return zeroNineNinePaySerializer.Serialize(settings);
 	}
 }

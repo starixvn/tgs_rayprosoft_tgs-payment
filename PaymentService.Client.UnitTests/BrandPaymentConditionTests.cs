@@ -1,6 +1,7 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Clients.BrandPayment.PaymentConditions;
 
@@ -78,7 +79,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -135,7 +136,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -180,7 +181,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -224,7 +225,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -269,7 +270,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -314,7 +315,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -359,7 +360,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -410,7 +411,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -455,7 +456,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -500,7 +501,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -576,7 +577,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -621,7 +622,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -666,7 +667,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -717,7 +718,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -789,7 +790,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 
 	[Test]
@@ -834,7 +835,7 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsFalse(actual);
+		ClassicAssert.IsFalse(actual);
 	}
 
 	[Test]
@@ -879,6 +880,6 @@ public class BrandPaymentConditionTests
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
-		Assert.IsTrue(actual);
+		ClassicAssert.IsTrue(actual);
 	}
 }

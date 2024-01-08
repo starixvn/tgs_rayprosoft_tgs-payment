@@ -10,31 +10,17 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWithdrawFormStatusCommand>
+internal class SubmitWithdrawFormStatusCommandService(
+	IPaymentRepository paymentRepository,
+	IPaymentClient paymentClient,
+	ISystemClock systemClock,
+	ISerialNumberGenerator serialNumberGenerator,
+	ILogger<SubmitWithdrawFormStatusCommandService> logger)
+	: ICommandService<SubmitWithdrawFormStatusCommand>
 {
-	private readonly IPaymentClient _paymentClient;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ILogger<SubmitWithdrawFormStatusCommandService> _logger;
-	private readonly ISystemClock _systemClock;
-
-	public SubmitWithdrawFormStatusCommandService(
-		IPaymentRepository paymentRepository,
-		IPaymentClient paymentClient,
-		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator,
-		ILogger<SubmitWithdrawFormStatusCommandService> logger)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
 	public async ValueTask ExecuteAsync(SubmitWithdrawFormStatusCommand command, CancellationToken cancellationToken = default)
 	{
-		var formData = await _paymentRepository
+		var formData = await paymentRepository
 			.GetCurrentWithdrawFormSnapshotAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -43,11 +29,11 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 
 		var originStatus = formData.Status;
 
-		_logger.LogInformation("SubmitWithdrawFormStatusCommand form origin Status:{originStatus}, command:{command}",
+		logger.LogInformation("SubmitWithdrawFormStatusCommand form origin Status:{originStatus}, command:{command}",
 			originStatus,
 			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions));
 
-		var currentTime = _systemClock.UtcNow.UtcDateTime;
+		var currentTime = systemClock.UtcNow.UtcDateTime;
 		var newFormData = formData with
 		{
 			Status = command.Status ?? formData.Status,
@@ -60,11 +46,11 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 		};
 
 		var changeSets = formData.CreatePatch(newFormData, PaymentUtility.SerializerOptions);
-		var eventId = await _serialNumberGenerator
+		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		await _paymentRepository.CreateWithdrawFormEventAsync(
+		await paymentRepository.CreateWithdrawFormEventAsync(
 			eventId,
 			command.FormId,
 			EventAction.ChangeStatus,
@@ -72,7 +58,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 			null,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentRepository.UpdateWithdrawFormSnapshotAsync(
+		await paymentRepository.UpdateWithdrawFormSnapshotAsync(
 			newFormData,
 			eventId,
 			currentTime,
@@ -80,7 +66,7 @@ internal class SubmitWithdrawFormStatusCommandService : ICommandService<SubmitWi
 
 		if (command.Status is not null && originStatus != command.Status)
 		{
-			await _paymentClient
+			await paymentClient
 				.EmitWithdrawFormStatusChangedEventAsync(
 					command.FormId,
 					formData.BrandId,

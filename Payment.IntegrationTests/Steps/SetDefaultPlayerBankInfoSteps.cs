@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -54,8 +55,8 @@ public class SetDefaultPlayerBankInfoSteps
 
 		var data = await dbContext.PlayerBankInfos.FindAsync(_bankInfoId);
 
-		Assert.AreEqual(_bankInfoId, data.Id);
-		Assert.IsTrue(data.Default);
+		ClassicAssert.AreEqual(_bankInfoId, data.Id);
+		ClassicAssert.IsTrue(data.Default);
 	}
 
 	[When(@"call set default bank info api")]

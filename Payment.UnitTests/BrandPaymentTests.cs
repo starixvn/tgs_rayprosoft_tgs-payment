@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.SerialNumberGenerator;
@@ -67,7 +68,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(10m, actual);
+		ClassicAssert.AreEqual(10m, actual);
 	}
 
 	[Test]
@@ -86,7 +87,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -309,7 +310,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 
 	[Test]
@@ -332,7 +333,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
-		Assert.AreEqual(16800m, actual);
+		ClassicAssert.AreEqual(16800m, actual);
 	}
 
 	[Test]
@@ -356,7 +357,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
-		Assert.AreEqual(168000m, actual);
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 
 	[Test]
@@ -379,6 +380,6 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
-		Assert.AreEqual(16800m, actual);
+		ClassicAssert.AreEqual(16800m, actual);
 	}
 }

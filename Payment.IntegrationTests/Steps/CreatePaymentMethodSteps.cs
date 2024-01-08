@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -43,8 +44,8 @@ public class CreatePaymentMethodSteps
 		var methodData = await dbContext.PaymentMethods
 			.SingleAsync(m => m.Code == _createInfo.Code);
 
-		Assert.IsNotNull(methodData);
-		Assert.AreEqual(_createInfo.BankType, methodData.BankType);
+		ClassicAssert.IsNotNull(methodData);
+		ClassicAssert.AreEqual(_createInfo.BankType, methodData.BankType);
 	}
 
 	[When(@"call create payment method api")]

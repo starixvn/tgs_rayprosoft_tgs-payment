@@ -2,12 +2,7 @@
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class HPayProcessor : GCPayProcessor
+internal class HPayProcessor(JsonTransform jsonTransform) : GCPayProcessor(jsonTransform)
 {
 	public override string Subject => "tgs.payment.hpay.withdraw";
-
-	public HPayProcessor(JsonTransform jsonTransform)
-		: base(jsonTransform)
-	{
-	}
 }

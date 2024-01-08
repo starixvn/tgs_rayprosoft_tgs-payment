@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
@@ -22,8 +23,8 @@ public class SettingTests
 		await sut.SetBrandPlayerBankInfoCountLimitAsync(brandId, 10);
 		var actual = dbContext.BrandPaymentSettings.FirstOrDefault();
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(brandId, actual.BrandId);
-		Assert.AreEqual(10, actual.PlayerBankInfoCountLimit);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(brandId, actual.BrandId);
+		ClassicAssert.AreEqual(10, actual.PlayerBankInfoCountLimit);
 	}
 }

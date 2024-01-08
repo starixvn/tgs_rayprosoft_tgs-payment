@@ -4,16 +4,10 @@ using Tgs.Payment.LeePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class LeePayProcessor : IWithdrawProcessor
+internal class LeePayProcessor(
+	LeePaySerializer leePaySerializer) : IWithdrawProcessor
 {
-	private readonly LeePaySerializer _leePaySerializer;
 	public string Subject => "tgs.payment.leepay.withdraw";
-
-	public LeePayProcessor(
-		LeePaySerializer leePaySerializer)
-	{
-		_leePaySerializer = leePaySerializer ?? throw new ArgumentNullException(nameof(leePaySerializer));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -36,6 +30,6 @@ internal class LeePayProcessor : IWithdrawProcessor
 			brandPaymentExtendedData.RootElement.GetProperty("channelCurrency").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("channel").GetString());
 
-		return _leePaySerializer.Serialize(settings);
+		return leePaySerializer.Serialize(settings);
 	}
 }

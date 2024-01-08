@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -35,11 +36,11 @@ public class ReviewDepositFormSteps
 		{
 			PlayerCode = "PlayerCode",
 			DefaultWalletCurrencyCode = "CNY",
-			Password = Array.Empty<byte>(),
-			Salt = Array.Empty<byte>(),
+			Password = [],
+			Salt = [],
 			Username = "player",
-			WithdrawPassword = Array.Empty<byte>(),
-			WithdrawSalt = Array.Empty<byte>()
+			WithdrawPassword = [],
+			WithdrawSalt = []
 		});
 
 		var pmc = new PaymentMethodChannel
@@ -87,7 +88,7 @@ public class ReviewDepositFormSteps
 
 		var formStatus = (PaymentFlowState)formData.Status;
 
-		Assert.AreEqual(PaymentFlowState.Approved, formStatus);
+		ClassicAssert.AreEqual(PaymentFlowState.Approved, formStatus);
 	}
 
 	[When(@"approve form")]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -51,7 +52,7 @@ public class GetOnePaymentSteps
 	[Then(@"return payment data")]
 	public void ThenReturnPaymentData()
 	{
-		Assert.AreEqual(_paymentCode, _actual.Code);
+		ClassicAssert.AreEqual(_paymentCode, _actual.Code);
 	}
 
 	[When(@"call get payment api")]

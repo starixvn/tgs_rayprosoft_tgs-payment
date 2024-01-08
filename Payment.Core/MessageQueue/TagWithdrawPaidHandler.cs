@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.ApplicationServices.Withdraws;
@@ -8,17 +9,15 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class TagWithdrawPaidHandler : IMessageHandler
+internal class TagWithdrawPaidHandler(
+	ICommandService<SubmitWithdrawFormStatusCommand> submitFormStatusService)
+	: IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly ICommandService<SubmitWithdrawFormStatusCommand> _submitFormStatusService;
-
-	public TagWithdrawPaidHandler(
-		ICommandService<SubmitWithdrawFormStatusCommand> submitFormStatusService)
-	{
-		_submitFormStatusService = submitFormStatusService ?? throw new ArgumentNullException(nameof(submitFormStatusService));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = TagPaidRequest.Parser.ParseFrom(data.Span);
 
@@ -31,6 +30,6 @@ internal class TagWithdrawPaidHandler : IMessageHandler
 			null,
 			null);
 
-		return _submitFormStatusService.ExecuteAsync(command, cancellationToken);
+		return submitFormStatusService.ExecuteAsync(command, cancellationToken);
 	}
 }

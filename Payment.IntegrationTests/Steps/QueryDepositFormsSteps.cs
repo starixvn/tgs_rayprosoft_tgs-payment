@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 
@@ -29,10 +30,10 @@ public class QueryDepositFormsSteps
 	[Then(@"return deposit forms list")]
 	public void ThenReturnDepositFormsList()
 	{
-		Assert.AreEqual(0, _actual.TotalCount);
-		Assert.AreEqual(-1, _actual.Rows);
-		Assert.NotNull(_actual.Items);
-		Assert.AreEqual(0, _actual.Sum);
+		ClassicAssert.AreEqual(0, _actual.TotalCount);
+		ClassicAssert.AreEqual(-1, _actual.Rows);
+		ClassicAssert.NotNull(_actual.Items);
+		ClassicAssert.AreEqual(0, _actual.Sum);
 	}
 
 	[When(@"call get deposit forms api")]

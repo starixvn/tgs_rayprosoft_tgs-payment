@@ -5,16 +5,9 @@ using Tgs.Payment.Clients;
 
 namespace Tgs.Payment.WithdrawPipes;
 
-internal class EmitCreateWithdrawFormEventPipe : ICreateWithdrawFormPipe
+internal class EmitCreateWithdrawFormEventPipe(IPaymentClient paymentClient) : ICreateWithdrawFormPipe
 {
-	private readonly IPaymentClient _paymentClient;
-
 	public int Order { get; } = 0;
-
-	public EmitCreateWithdrawFormEventPipe(IPaymentClient paymentClient)
-	{
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-	}
 
 	public ValueTask AfterCreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -24,7 +17,7 @@ internal class EmitCreateWithdrawFormEventPipe : ICreateWithdrawFormPipe
 		string? note,
 		Guid createFormId,
 		CancellationToken cancellationToken = default)
-		=> _paymentClient.EmitWithdrawFormCreatedEventAsync(
+		=> paymentClient.EmitWithdrawFormCreatedEventAsync(
 			createFormId,
 			brandId,
 			cancellationToken);

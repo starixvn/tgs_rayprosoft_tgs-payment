@@ -5,19 +5,11 @@ using Tgs.Payment.MalakiPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class MalakiPayProcessor : IWithdrawProcessor
+internal class MalakiPayProcessor(
+	MalakiPaySerializer malakiPaySerializer,
+	ILogger<MalakiPayProcessor> logger) : IWithdrawProcessor
 {
-	private readonly ILogger<MalakiPayProcessor> _logger;
-	private readonly MalakiPaySerializer _malakiPaySerializer;
 	public string Subject => "tgs.payment.malakipay.withdraw";
-
-	public MalakiPayProcessor(
-		MalakiPaySerializer malakiPaySerializer,
-		ILogger<MalakiPayProcessor> logger)
-	{
-		_malakiPaySerializer = malakiPaySerializer ?? throw new ArgumentNullException(nameof(malakiPaySerializer));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -26,7 +18,7 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		_logger.LogInformation(
+		logger.LogInformation(
 			"{nameof(MalakiPayProcessor)} formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
 			nameof(MalakiPayProcessor),
 			formId,
@@ -45,6 +37,6 @@ internal class MalakiPayProcessor : IWithdrawProcessor
 				? jsonElement.GetString()
 				: null);
 
-		return _malakiPaySerializer.Serialize(settings);
+		return malakiPaySerializer.Serialize(settings);
 	}
 }

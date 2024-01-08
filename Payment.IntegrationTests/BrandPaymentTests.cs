@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -34,7 +35,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.CalculateHandlingFeeAsync(brandPaymentId, amount);
 
-		Assert.AreEqual(10m, actual);
+		ClassicAssert.AreEqual(10m, actual);
 	}
 
 	[Test]
@@ -59,9 +60,9 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
-		Assert.AreEqual(168m, actual.AmountUpperLimit);
-		Assert.AreEqual(true, actual.EnableAutoWithdraw);
-		Assert.AreEqual(1, actual.BrandPaymentIds.Count());
+		ClassicAssert.AreEqual(168m, actual.AmountUpperLimit);
+		ClassicAssert.AreEqual(true, actual.EnableAutoWithdraw);
+		ClassicAssert.AreEqual(1, actual.BrandPaymentIds.Count());
 	}
 
 	[Test]
@@ -80,7 +81,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 
 	[Test]
@@ -105,8 +106,8 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
 
-		Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
-		Assert.AreEqual(false, actual.ReducePlayerAmount);
+		ClassicAssert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+		ClassicAssert.AreEqual(false, actual.ReducePlayerAmount);
 	}
 
 	[Test]
@@ -149,7 +150,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandPaymentByIdAsync(brandPaymentId);
 
-		Assert.AreEqual(brandPaymentId, actual.Id);
+		ClassicAssert.AreEqual(brandPaymentId, actual.Id);
 	}
 
 	[Test]
@@ -209,7 +210,7 @@ public class BrandPaymentTests
 			}
 		};
 
-		Assert.AreEqual(2, actual.Length);
+		ClassicAssert.AreEqual(2, actual.Length);
 		CollectionAssert.AreEquivalent(expected, actual);
 	}
 
@@ -315,7 +316,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandCurrentDayNetDepositAsync(brandId);
 
-		Assert.AreEqual(168000m, actual);
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 
 	[Test]
@@ -347,7 +348,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
 
-		Assert.AreEqual(168000m, actual);
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 
 	[Test]
@@ -380,7 +381,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
 
-		Assert.AreEqual(168000m, actual);
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 
 	[Test]
@@ -412,7 +413,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
 
-		Assert.AreEqual(16888m, actual);
+		ClassicAssert.AreEqual(16888m, actual);
 	}
 
 	[Test]
@@ -440,6 +441,6 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
 
-		Assert.AreEqual(0m, actual);
+		ClassicAssert.AreEqual(0m, actual);
 	}
 }

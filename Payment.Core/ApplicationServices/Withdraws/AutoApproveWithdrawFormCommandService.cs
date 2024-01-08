@@ -8,29 +8,20 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoApproveWithdtawFormCommand>
+internal class AutoApproveWithdrawFormCommandService(
+	IPaymentRepository repository,
+	ICommandService<SignOffWithdrawFormCommand> commandService,
+	ILogger<AutoApproveWithdrawFormCommandService> logger)
+	: ICommandService<AutoApproveWithdtawFormCommand>
 {
 	private static readonly Random _Random = new();
-	private readonly ICommandService<SignOffWithdrawFormCommand> _commandService;
-	private readonly ILogger<AutoApproveWithdrawFormCommandService> _logger;
-	private readonly IPaymentRepository _repository;
-
-	public AutoApproveWithdrawFormCommandService(
-		IPaymentRepository repository,
-		ICommandService<SignOffWithdrawFormCommand> commandService,
-		ILogger<AutoApproveWithdrawFormCommandService> logger)
-	{
-		_repository = repository ?? throw new ArgumentNullException(nameof(repository));
-		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
 
 	public async ValueTask ExecuteAsync(AutoApproveWithdtawFormCommand command, CancellationToken cancellationToken = default)
 	{
 		if (command.Status != PaymentFlowState.Init)
 			return;
 
-		var autoWithdrawSetting = await _repository
+		var autoWithdrawSetting = await repository
 			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -40,7 +31,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 		if (autoWithdrawSetting.EnableAutoWithdraw is false || autoWithdrawSetting.BrandPaymentIds.Count() is 0)
 			return;
 
-		var withdrawForm = await _repository
+		var withdrawForm = await repository
 			.GetWithdrawFormByIdAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -59,14 +50,14 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 		var withdrawBankInfo = JsonSerializer.Deserialize<WithdrawBankInfo<object>>(withdrawForm.BankInfo!, PaymentUtility.SerializerOptions);
 
-		var couldChooseBrandPayments = await _repository
+		var couldChooseBrandPayments = await repository
 			.GetBrandPaymentsAsync(command.BrandId, cancellationToken)
 			.Where(bp => bp.ChannelId == withdrawBankInfo!.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
 			.Select(x => x.Id)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		_logger.LogDebug(
+		logger.LogDebug(
 			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}",
 			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
 
@@ -74,7 +65,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 		if (brandPaymentCandidates.Count() is 0)
 		{
-			_logger.LogWarning("System auto approve brand payment candidates Count is 0.");
+			logger.LogWarning("System auto approve brand payment candidates Count is 0.");
 			return;
 		}
 
@@ -82,7 +73,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 
 		var brandPaymentId = brandPaymentCandidates.ElementAt(random);
 
-		_logger.LogDebug("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
+		logger.LogDebug("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
 
 		var approveWithdrawCommand = new SignOffWithdrawFormCommand(
 			command.FormId,
@@ -92,7 +83,7 @@ internal class AutoApproveWithdrawFormCommandService : ICommandService<AutoAppro
 			null,
 			"System Auto Approve");
 
-		await _commandService
+		await commandService
 			.ExecuteAsync(approveWithdrawCommand, cancellationToken)
 			.ConfigureAwait(false);
 	}

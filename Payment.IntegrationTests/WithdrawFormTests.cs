@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -681,9 +682,9 @@ public class WithdrawFormTests
 
 		var actual = await sut.GetCurrentDayTopTenWithdrawPlayersAsync(brandId).ToArrayAsync();
 
-		Assert.AreEqual(1, actual.Length);
-		Assert.AreEqual("playerCode", actual[0].PlayerCode);
-		Assert.AreEqual(2000m, actual[0].DepositTotalAmount);
-		Assert.AreEqual(2000m, actual[0].WithdrawTotalAmount);
+		ClassicAssert.AreEqual(1, actual.Length);
+		ClassicAssert.AreEqual("playerCode", actual[0].PlayerCode);
+		ClassicAssert.AreEqual(2000m, actual[0].DepositTotalAmount);
+		ClassicAssert.AreEqual(2000m, actual[0].WithdrawTotalAmount);
 	}
 }

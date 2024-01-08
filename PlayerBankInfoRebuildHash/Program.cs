@@ -2,27 +2,27 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NATS.Client.Core;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 
-var app = Host.CreateDefaultBuilder()
-	.ConfigureAppConfiguration(builder => builder
-		.AddJsonFile("appsettings.json")
-		.AddEnvironmentVariables())
-	.ConfigureServices(services => services
+var builder = Host.CreateApplicationBuilder(args);
+{
+	_ = builder.Services
+		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
+		{
+			Url = builder.Configuration.GetConnectionString("Nats")!
+		}))
 		.AddDbContext<TgsContext>(builder => builder
 			.UseNpgsql("Name=Tgs"))
 		.AddPaymentClient()
-		.AddPhoenixToolkitsMessageQueue()
+		.AddMessageQueue()
 		.AddNatsMessageQueue(config => config
-			.ConfigQueueOptions((options, sp) =>
-			{
-				var config = sp.GetRequiredService<IConfiguration>();
+			.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats")))
+		.AddNatsGlobPatternExchange("*");
+}
 
-				options.Url = config.GetConnectionString("Nats")!;
-			}))
-		.AddNatsGlobPatternExchange("*"))
-	.Build();
+using var app = builder.Build();
 
 await using var hostScope = app.Services.CreateAsyncScope();
 

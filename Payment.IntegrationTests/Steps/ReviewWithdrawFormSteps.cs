@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
@@ -127,8 +128,8 @@ public class ReviewWithdrawFormSteps
 
 		var formStatus = (PaymentFlowState)formData.Status;
 
-		Assert.AreEqual(state, formStatus);
-		Assert.AreEqual(_brandPaymentId, formData.BrandPaymentId);
+		ClassicAssert.AreEqual(state, formStatus);
+		ClassicAssert.AreEqual(_brandPaymentId, formData.BrandPaymentId);
 	}
 
 	[When(@"approve form")]

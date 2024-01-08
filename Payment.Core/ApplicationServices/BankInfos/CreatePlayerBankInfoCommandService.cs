@@ -12,47 +12,33 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BankInfos;
 
-internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBankInfoCommand, Guid>
+internal class CreatePlayerBankInfoCommandService(
+	IPaymentRepository paymentRepository,
+	IPaymentClient paymentClient,
+	IBankInfoIndexParserFactory bankInfoParserFactory,
+	JsonTransform jsonTransform,
+	IServiceCoordinator serviceCoordinator)
+	: IGetService<CreatePlayerBankInfoCommand, Guid>
 {
-	private readonly IBankInfoIndexParserFactory _bankInfoParserFactory;
-	private readonly JsonTransform _jsonTransform;
-	private readonly IPaymentClient _paymentClient;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly IServiceCoordinator _serviceCoordinator;
-
-	public CreatePlayerBankInfoCommandService(
-		IPaymentRepository paymentRepository,
-		IPaymentClient paymentClient,
-		IBankInfoIndexParserFactory bankInfoParserFactory,
-		JsonTransform jsonTransform,
-		IServiceCoordinator serviceCoordinator)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		_bankInfoParserFactory = bankInfoParserFactory ?? throw new ArgumentNullException(nameof(bankInfoParserFactory));
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-		_serviceCoordinator = serviceCoordinator ?? throw new ArgumentNullException(nameof(serviceCoordinator));
-	}
-
 	public async ValueTask<Guid> GetAsync(CreatePlayerBankInfoCommand command, CancellationToken cancellationToken = default)
 	{
-		var transformation = _bankInfoParserFactory.GetBankInfoTransformation(command.BankType);
+		var transformation = bankInfoParserFactory.GetBankInfoTransformation(command.BankType);
 		var bankInfoDetail = JsonSerializer.Serialize(command.Detail)!;
 
 		var feature = JsonSerializer.Serialize(JsonDocument.Parse(
-			  _jsonTransform.Transform(bankInfoDetail, transformation)));
+			  jsonTransform.Transform(bankInfoDetail, transformation)));
 
 		var hash = feature is "{}"
 			? null
 			: SHA256.HashData(Encoding.UTF8.GetBytes(feature));
 
-		var brandCheckIsEnabled = await _serviceCoordinator.GetAsync<GetPlayerBankInfoDuplicateCheckIsEnabledQuery, bool>(
+		var brandCheckIsEnabled = await serviceCoordinator.GetAsync<GetPlayerBankInfoDuplicateCheckIsEnabledQuery, bool>(
 			new(command.BrandId),
 			cancellationToken).ConfigureAwait(false);
 
 		if (brandCheckIsEnabled
 			&& hash is not null
-			&& await _paymentRepository.CheckPlayerBankInfoIsExistsAsync(
+			&& await paymentRepository.CheckPlayerBankInfoIsExistsAsync(
 				command.BrandId,
 				command.BankType,
 				command.PaymentChannelId,
@@ -61,13 +47,13 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 				cancellationToken).ConfigureAwait(false))
 			throw new PlayerBankInfoDuplicateException();
 
-		var paymentSettings = await _paymentRepository.GetBrandPaymentSettingsAsync(
+		var paymentSettings = await paymentRepository.GetBrandPaymentSettingsAsync(
 			command.BrandId,
 			cancellationToken).ConfigureAwait(false);
 
 		if (paymentSettings?.PlayerBankInfoCountLimit is not null)
 		{
-			var playerBankInfoCount = await _paymentRepository.GetBankInfosByPlayerCodeAsync(
+			var playerBankInfoCount = await paymentRepository.GetBankInfosByPlayerCodeAsync(
 				command.PlayerCode,
 				cancellationToken)
 				.CountAsync(cancellationToken)
@@ -87,11 +73,11 @@ internal class CreatePlayerBankInfoCommandService : IGetService<CreatePlayerBank
 			command.IsDefault,
 			hash);
 
-		await _paymentRepository
+		await paymentRepository
 			.CreateBankInfoAsync(bankInfo, command.ModifyUser, cancellationToken)
 			.ConfigureAwait(false);
 
-		await _paymentClient
+		await paymentClient
 			.EmitPlayerBankInfoAddedEventAsync(command.BrandId, bankInfo.Id, cancellationToken)
 			.ConfigureAwait(false);
 

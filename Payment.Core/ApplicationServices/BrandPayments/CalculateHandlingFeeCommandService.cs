@@ -1,22 +1,14 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
-internal class CalculateHandlingFeeCommandService : IGetService<CalculateHandlingFeeCommand, decimal>
+internal class CalculateHandlingFeeCommandService(IPaymentRepository paymentRepository) : IGetService<CalculateHandlingFeeCommand, decimal>
 {
-	private readonly IPaymentRepository _paymentRepository;
-
-	public CalculateHandlingFeeCommandService(IPaymentRepository paymentRepository)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
 	public async ValueTask<decimal> GetAsync(CalculateHandlingFeeCommand command, CancellationToken cancellationToken = default)
 	{
-		var brandPaymentFeeInfo = await _paymentRepository
+		var brandPaymentFeeInfo = await paymentRepository
 			.GetBrandPaymentFeeSettingAsync(command.BrandPaymentId, cancellationToken)
 			.ConfigureAwait(false);
 

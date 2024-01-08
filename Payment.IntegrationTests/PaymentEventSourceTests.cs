@@ -3,6 +3,7 @@ using System.Text.Json;
 using Json.Patch;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -91,7 +92,7 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentDepositFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
@@ -262,7 +263,7 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
@@ -353,7 +354,7 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
@@ -444,6 +445,6 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 }

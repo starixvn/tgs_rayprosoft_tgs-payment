@@ -6,7 +6,8 @@ using Tgs.Payment.Help2Pay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class Help2PayProcessor : IWithdrawProcessor
+internal class Help2PayProcessor(
+	Help2PaySerializer help2PaySerializer) : IWithdrawProcessor
 {
 	private static readonly Dictionary<string, string> _BankMap = new(StringComparer.OrdinalIgnoreCase)
 	{
@@ -92,15 +93,7 @@ internal class Help2PayProcessor : IWithdrawProcessor
 		["Union Bank of Philippines"] = "UBP"
 	};
 
-	private readonly Help2PaySerializer _help2PaySerializer;
-
 	public string Subject => "tgs.payment.help2pay.withdraw";
-
-	public Help2PayProcessor(
-		Help2PaySerializer help2PaySerializer)
-	{
-		_help2PaySerializer = help2PaySerializer ?? throw new ArgumentNullException(nameof(help2PaySerializer));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -136,6 +129,6 @@ internal class Help2PayProcessor : IWithdrawProcessor
 			bankCode,
 			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
-		return _help2PaySerializer.Serialize(settings);
+		return help2PaySerializer.Serialize(settings);
 	}
 }

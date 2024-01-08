@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -62,7 +63,8 @@ public class PlayerBankInfoTests
 
 		var actual = await sut.GetPlayersByBankInfoTagAsync(brandId, tagType, tag).ToArrayAsync();
 
-		CollectionAssert.AreEquivalent(new[] { "player1" }, actual);
+		var expected = new[] { "player1" };
+		CollectionAssert.AreEquivalent(expected, actual);
 	}
 
 	[Test]
@@ -109,9 +111,9 @@ public class PlayerBankInfoTests
 		var count = dbContext.PlayerBankInfoTags.Count();
 		var actual = dbContext.PlayerBankInfoTags.First();
 
-		Assert.AreEqual(1, count);
-		Assert.AreEqual("BankAccount", actual.TagType);
-		Assert.AreEqual("111111", actual.Tag);
+		ClassicAssert.AreEqual(1, count);
+		ClassicAssert.AreEqual("BankAccount", actual.TagType);
+		ClassicAssert.AreEqual("111111", actual.Tag);
 	}
 
 	[Test]
@@ -179,7 +181,7 @@ public class PlayerBankInfoTests
 
 		var dbRecord = await dbContext.PlayerBankInfos.FindAsync(actual);
 
-		Assert.AreEqual(createInfo2.PaymentChannelId, dbRecord.PaymentChannelId);
+		ClassicAssert.AreEqual(createInfo2.PaymentChannelId, dbRecord.PaymentChannelId);
 	}
 
 	[Test]

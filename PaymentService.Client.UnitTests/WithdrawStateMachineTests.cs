@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Clients;
 
 namespace PaymentService.Client.UnitTests;
@@ -15,7 +16,7 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.WithdrawCreate);
 
-		Assert.AreEqual(PaymentFlowState.WaitApprove, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.WaitApprove, sut.State);
 	}
 
 	[Test]
@@ -27,7 +28,7 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 
 	[Test]
@@ -39,7 +40,7 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.Approve);
 
-		Assert.AreEqual(PaymentFlowState.Approved, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Approved, sut.State);
 	}
 
 	[Test]
@@ -51,7 +52,7 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 
 	[Test]
@@ -63,7 +64,7 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.PaymentWithdrawCompleted);
 
-		Assert.AreEqual(PaymentFlowState.Paid, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Paid, sut.State);
 	}
 
 	[Test]
@@ -75,6 +76,6 @@ public class WithdrawStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 }

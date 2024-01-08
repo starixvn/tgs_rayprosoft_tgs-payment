@@ -11,32 +11,18 @@ using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Payment;
 
-internal class WithdrawService : IWithdrawService
+internal class WithdrawService(
+	IPaymentRepository paymentRepository,
+	IBrandServiceClient brandServiceClient,
+	ITakeNumberStore takeNumberStore,
+	ISystemClock systemClock,
+	ISerialNumberGenerator serialNumberGenerator,
+	IEnumerable<ICreateWithdrawFormPipe> createWithdrawFormPipes) : IWithdrawService
 {
-	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly IBrandServiceClient _brandServiceClient;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ISystemClock _systemClock;
-	private readonly ITakeNumberStore _takeNumberStore;
-
-	public WithdrawService(
-		IPaymentRepository paymentRepository,
-		IBrandServiceClient brandServiceClient,
-		ITakeNumberStore takeNumberStore,
-		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator,
-		IEnumerable<ICreateWithdrawFormPipe> createWithdrawFormPipes)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_brandServiceClient = brandServiceClient ?? throw new ArgumentNullException(nameof(brandServiceClient));
-		_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_createWithdrawFormPipes = (createWithdrawFormPipes ?? throw new ArgumentNullException(nameof(createWithdrawFormPipes)))
+	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes = [
+		.. (createWithdrawFormPipes ?? throw new ArgumentNullException(nameof(createWithdrawFormPipes)))
 			.OrderByDescending(pipe => pipe.Order)
-			.ToArray();
-	}
+	];
 
 	public async ValueTask<Guid> CreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -55,17 +41,17 @@ internal class WithdrawService : IWithdrawService
 				note,
 				cancellationToken).ConfigureAwait(false);
 
-		var brandInfo = await _brandServiceClient.GetBrandInfoAsync(
+		var brandInfo = await brandServiceClient.GetBrandInfoAsync(
 			brandId,
 			cancellationToken).ConfigureAwait(false);
 
-		var orderNo = await _takeNumberStore.GetWithdrawFormOrderNoAsync(
+		var orderNo = await takeNumberStore.GetWithdrawFormOrderNoAsync(
 			  brandInfo!.Code).ConfigureAwait(false);
 
-		var eventId = await _serialNumberGenerator.GenerateAsync(
+		var eventId = await serialNumberGenerator.GenerateAsync(
 			cancellationToken).ConfigureAwait(false);
 
-		var currentTime = _systemClock.UtcNow.UtcDateTime;
+		var currentTime = systemClock.UtcNow.UtcDateTime;
 
 		var createFormId = Guid.NewGuid();
 		var createFormSnapshot = WithdrawFormSnapshot._Default with
@@ -99,7 +85,7 @@ internal class WithdrawService : IWithdrawService
 			JsonPointer.Create<WithdrawFormSnapshot>(o => o),
 			JsonSerializer.SerializeToNode(createFormSnapshot, PaymentUtility.SerializerOptions)));
 
-		await _paymentRepository.CreateWithdrawFormEventAsync(
+		await paymentRepository.CreateWithdrawFormEventAsync(
 			eventId,
 			createFormId,
 			EventAction.Create,
@@ -107,7 +93,7 @@ internal class WithdrawService : IWithdrawService
 			null,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentRepository.UpdateWithdrawFormSnapshotAsync(
+		await paymentRepository.UpdateWithdrawFormSnapshotAsync(
 		createFormSnapshot,
 		eventId,
 			currentTime,
@@ -133,7 +119,7 @@ internal class WithdrawService : IWithdrawService
 	{
 		var agentId = Guid.Parse(userId);
 
-		var agentBankInfo = await _paymentRepository
+		var agentBankInfo = await paymentRepository
 			.GetAgentBankInfoByIdAsync(bankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -154,7 +140,7 @@ internal class WithdrawService : IWithdrawService
 		Guid bankInfoId,
 		CancellationToken cancellationToken = default)
 	{
-		var playerBankInfo = await _paymentRepository
+		var playerBankInfo = await paymentRepository
 			.GetBankInfoByIdAsync(bankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 

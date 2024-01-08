@@ -6,7 +6,7 @@ using Tgs.Payment.GCPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class GCPayProcessor : IWithdrawProcessor
+internal class GCPayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -45,14 +45,7 @@ internal class GCPayProcessor : IWithdrawProcessor
 			"""
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
-
 	public virtual string Subject => "tgs.payment.gcpay.withdraw";
-
-	public GCPayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -69,7 +62,7 @@ internal class GCPayProcessor : IWithdrawProcessor
 		};
 
 		var transformation = _bankInfoTransformations[bankType];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<GCPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);

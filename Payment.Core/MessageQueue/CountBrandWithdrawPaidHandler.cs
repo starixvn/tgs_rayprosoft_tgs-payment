@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,24 +10,20 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class CountBrandWithdrawPaidHandler : IMessageHandler
+internal class CountBrandWithdrawPaidHandler(
+	ICommandService<CountWithdrawPaidCommand> commandService,
+	ILogger<CountBrandWithdrawPaidHandler> logger)
+	: IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly ICommandService<CountWithdrawPaidCommand> _commandService;
-	private readonly ILogger<CountBrandWithdrawPaidHandler> _logger;
-
-	public CountBrandWithdrawPaidHandler(
-		ICommandService<CountWithdrawPaidCommand> commandService,
-		ILogger<CountBrandWithdrawPaidHandler> logger)
-	{
-		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		_logger.LogInformation("Count Brand Withdraw Form, BrandId:{brandId}, FormId:{formId}, Status:{status}",
+		logger.LogInformation("Count Brand Withdraw Form, BrandId:{brandId}, FormId:{formId}, Status:{status}",
 			request.BrandId.ToGuid(),
 			request.FormId.ToGuid(),
 			request.Status);
@@ -36,6 +33,6 @@ internal class CountBrandWithdrawPaidHandler : IMessageHandler
 			request.FormId.ToGuid(),
 			Enum.Parse<PaymentFlowState>(request.Status));
 
-		return _commandService.ExecuteAsync(command, cancellationToken);
+		return commandService.ExecuteAsync(command, cancellationToken);
 	}
 }

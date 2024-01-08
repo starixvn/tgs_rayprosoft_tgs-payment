@@ -12,7 +12,11 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class MetaPayProcessor : IWithdrawProcessor
+internal class MetaPayProcessor(
+	JsonTransform jsonTransform,
+	IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService,
+	IGetService<GetAgentInfoQuery, AgentInfo> getAgentService,
+	IPlayerServiceClient playerServiceClient) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -73,24 +77,7 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		"""
 	}.AsReadOnly();
 
-	private readonly IGetService<GetAgentInfoQuery, AgentInfo> _getAgentService;
-	private readonly IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> _getService;
-	private readonly JsonTransform _jsonTransform;
-	private readonly IPlayerServiceClient _playerServiceClient;
-
 	public string Subject => "tgs.payment.metapay.withdraw";
-
-	public MetaPayProcessor(
-		JsonTransform jsonTransform,
-		IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService,
-		IGetService<GetAgentInfoQuery, AgentInfo> getAgentService,
-		IPlayerServiceClient playerServiceClient)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-		_getService = getService ?? throw new ArgumentNullException(nameof(getService));
-		_getAgentService = getAgentService ?? throw new ArgumentNullException(nameof(getAgentService));
-		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -104,7 +91,7 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		var paySetting = brandPaymentExtendedData.RootElement.GetProperty("payType").GetString();
 
 		var transformation = _bankInfoTransformations[paySetting];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<MetaPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions)!;
@@ -135,13 +122,13 @@ internal class MetaPayProcessor : IWithdrawProcessor
 
 	private async Task<string> GetWithdrawFormUserPhoneAsync(Guid formId)
 	{
-		var withdrawForm = await _getService
+		var withdrawForm = await getService
 			.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
 			.ConfigureAwait(false);
 
 		if (withdrawForm.UserType == UserType.Player)
 		{
-			var playerProperties = await _playerServiceClient
+			var playerProperties = await playerServiceClient
 				.GetPlayerPropertiesAsync(withdrawForm.UserId)
 				.ConfigureAwait(false);
 
@@ -149,7 +136,7 @@ internal class MetaPayProcessor : IWithdrawProcessor
 		}
 		else
 		{
-			var agentInfo = await _getAgentService
+			var agentInfo = await getAgentService
 				.GetAsync(new GetAgentInfoQuery(Guid.Parse(withdrawForm.UserId)))
 				.ConfigureAwait(false);
 

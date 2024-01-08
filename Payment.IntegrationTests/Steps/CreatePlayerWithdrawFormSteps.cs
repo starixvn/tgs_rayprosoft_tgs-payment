@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
@@ -145,7 +146,7 @@ public class CreatePlayerWithdrawFormSteps
 	[Then(@"withdraw form created")]
 	public void ThenWithdrawFormCreated()
 	{
-		Assert.AreNotEqual(Guid.Empty, _createFormId);
+		ClassicAssert.AreNotEqual(Guid.Empty, _createFormId);
 	}
 
 	[When(@"call create withdraw form api")]

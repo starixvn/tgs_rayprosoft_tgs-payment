@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
@@ -9,27 +8,16 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
-internal class UpdateBrandAutoWithdrawCommandService : ICommandService<UpdateBrandAutoWithdrawCommand>
+internal class UpdateBrandAutoWithdrawCommandService(
+	IPaymentRepository paymentRepository,
+	ISystemClock systemClock,
+	ISerialNumberGenerator serialNumberGenerator) : ICommandService<UpdateBrandAutoWithdrawCommand>
 {
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ISystemClock _systemClock;
-
-	public UpdateBrandAutoWithdrawCommandService(
-		IPaymentRepository paymentRepository,
-		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-	}
-
 	public async ValueTask ExecuteAsync(UpdateBrandAutoWithdrawCommand command, CancellationToken cancellationToken = default)
 	{
-		var currentTime = _systemClock.UtcNow.UtcDateTime;
+		var currentTime = systemClock.UtcNow.UtcDateTime;
 
-		var brandAutoInfo = await _paymentRepository
+		var brandAutoInfo = await paymentRepository
 			.GetBrandAutoWithdrawSettingAsync(command.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -64,18 +52,18 @@ internal class UpdateBrandAutoWithdrawCommandService : ICommandService<UpdateBra
 			changeSets = brandAutoInfo.CreatePatch(snapshot, PaymentUtility.SerializerOptions);
 		}
 
-		var eventId = await _serialNumberGenerator
+		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		await _paymentRepository.CreateBrandAutoWithdrawEventAsync(
+		await paymentRepository.CreateBrandAutoWithdrawEventAsync(
 			eventId,
 			command.BrandId,
 			JsonSerializer.SerializeToDocument(changeSets),
 			command.UserId,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentRepository.UpdateBrandAutoWithdrawSnapshotAsync(
+		await paymentRepository.UpdateBrandAutoWithdrawSnapshotAsync(
 			snapshot,
 			command.BrandId,
 			eventId,

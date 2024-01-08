@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.BrandCertificate.Clients;
 using Tgs.Payment.Clients;
@@ -57,7 +58,7 @@ public class CreateAgentWithdrawFormSteps
 	[Then(@"withdraw form created")]
 	public void ThenWithdrawFormCreated()
 	{
-		Assert.AreNotEqual(Guid.Empty, _createFormId);
+		ClassicAssert.AreNotEqual(Guid.Empty, _createFormId);
 	}
 
 	[When(@"call create withdraw form api")]

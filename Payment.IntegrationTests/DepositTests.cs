@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Deposits;
 using Tgs.Payment.Clients;
@@ -35,7 +36,7 @@ public class DepositTests
 
 		var actual = await sut.GetBrandSuccessRateByReportDateAsync(brandId, reportDate);
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 
 	[Test]
@@ -58,7 +59,7 @@ public class DepositTests
 
 		var actual = await sut.GetCurrentDayDepositSuccessRateAsync(brandId);
 
-		Assert.AreEqual(67m, actual);
+		ClassicAssert.AreEqual(67m, actual);
 	}
 
 	[Test]
@@ -88,9 +89,9 @@ public class DepositTests
 
 		var actual = await sut.GetCurrentDayTopTenDepositPlayersAsync(brandId).ToArrayAsync();
 
-		Assert.AreEqual(1, actual.Length);
-		Assert.AreEqual("playerCode1", actual[0].PlayerCode);
-		Assert.AreEqual(16888m, actual[0].DepositTotalAmount);
-		Assert.AreEqual(200m, actual[0].WithdrawTotalAmount);
+		ClassicAssert.AreEqual(1, actual.Length);
+		ClassicAssert.AreEqual("playerCode1", actual[0].PlayerCode);
+		ClassicAssert.AreEqual(16888m, actual[0].DepositTotalAmount);
+		ClassicAssert.AreEqual(200m, actual[0].WithdrawTotalAmount);
 	}
 }

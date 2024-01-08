@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 
@@ -36,7 +37,7 @@ public class PaymentLockTests
 
 		var actual = await sut.LockDepositPaymentAsync(formId, paymentCode, playerCode);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]

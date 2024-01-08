@@ -4,16 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tgs.Payment.Configuration;
 
-public class PaymentConfiguration
+public class PaymentConfiguration(IServiceCollection services)
 {
-	private readonly Dictionary<string, Type> _processTypes = new();
+	private readonly Dictionary<string, Type> _processTypes = [];
 
-	public IServiceCollection Services { get; }
-
-	public PaymentConfiguration(IServiceCollection services)
-	{
-		Services = services ?? throw new System.ArgumentNullException(nameof(services));
-	}
+	public IServiceCollection Services { get; } = services ?? throw new ArgumentNullException(nameof(services));
 
 	public PaymentConfiguration ConfigureBankInfoIndexParsers(Action<BankInfoParserOptions, IServiceProvider> configure)
 	{

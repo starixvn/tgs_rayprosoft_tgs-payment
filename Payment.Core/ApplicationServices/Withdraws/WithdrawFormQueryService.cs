@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class WithdrawFormQueryService
-	: IQueryService<WithdrawFormQuery, WithdrawFormInfo>, IGetService<WithdrawFormQuery, int>
+internal class WithdrawFormQueryService(IPaymentRepository paymentRepository)
+	: IQueryService<WithdrawFormQuery, WithdrawFormInfo>
+	, IGetService<WithdrawFormQuery, int>
 {
-	private readonly IPaymentRepository _paymentRepository;
-
-	public WithdrawFormQueryService(IPaymentRepository paymentRepository)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
 	public ValueTask<int> GetAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.CountWithdrawFormsAsync(
+		=> paymentRepository.CountWithdrawFormsAsync(
 			new WithdrawFormQueryConditions(
 				query.BrandId,
 				query.UserId,
@@ -37,7 +30,7 @@ internal class WithdrawFormQueryService
 				query.PaidOnRange), cancellationToken);
 
 	public IAsyncEnumerable<WithdrawFormInfo> QueryAsync(WithdrawFormQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.QueryWithdrawFormsAsync(
+		=> paymentRepository.QueryWithdrawFormsAsync(
 			new WithdrawFormQueryConditions(
 				query.BrandId,
 				query.UserId,

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.BrandCertificate.Clients;
 using Tgs.Payment.Clients;
@@ -71,7 +72,7 @@ public class CreateDepositFormSteps
 	[Then(@"deposit form created")]
 	public void ThenDepositFormCreated()
 	{
-		Assert.AreNotEqual(Guid.Empty, _createdFormId);
+		ClassicAssert.AreNotEqual(Guid.Empty, _createdFormId);
 	}
 
 	[When(@"call payment api")]

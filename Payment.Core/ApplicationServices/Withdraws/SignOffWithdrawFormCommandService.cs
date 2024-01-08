@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
@@ -11,37 +10,18 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdrawFormCommand>
+internal class SignOffWithdrawFormCommandService(
+	IPaymentRepository paymentRepository,
+	IWithdrawProcessorFactory withdrawProcessorFactory,
+	IPaymentClient paymentClient,
+	IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
+	ISystemClock systemClock,
+	ISerialNumberGenerator serialNumberGenerator,
+	ILogger<SignOffWithdrawFormCommandService> logger) : ICommandService<SignOffWithdrawFormCommand>
 {
-	private readonly IGetService<CalculateHandlingFeeCommand, decimal> _calculateService;
-	private readonly IPaymentClient _paymentClient;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ILogger<SignOffWithdrawFormCommandService> _logger;
-	private readonly ISystemClock _systemClock;
-	private readonly IWithdrawProcessorFactory _withdrawProcessorFactory;
-
-	public SignOffWithdrawFormCommandService(
-		IPaymentRepository paymentRepository,
-		IWithdrawProcessorFactory withdrawProcessorFactory,
-		IPaymentClient paymentClient,
-		IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
-		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator,
-		ILogger<SignOffWithdrawFormCommandService> logger)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_withdrawProcessorFactory = withdrawProcessorFactory ?? throw new ArgumentNullException(nameof(withdrawProcessorFactory));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		_calculateService = calculateService ?? throw new ArgumentNullException(nameof(calculateService));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
 	public async ValueTask ExecuteAsync(SignOffWithdrawFormCommand command, CancellationToken cancellationToken = default)
 	{
-		var formData = await _paymentRepository
+		var formData = await paymentRepository
 			.GetCurrentWithdrawFormSnapshotAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -52,7 +32,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 		var formStatus = formData.Status;
 
-		_logger.LogDebug("SignOffWithdrawFormCommand command:{command}, formData Status:{formStatus}",
+		logger.LogDebug("SignOffWithdrawFormCommand command:{command}, formData Status:{formStatus}",
 			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions),
 			formStatus);
 
@@ -63,17 +43,17 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 			await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
 
-			var brandPayment = await _paymentRepository
+			var brandPayment = await paymentRepository
 				.GetBrandPaymentByIdAsync(command.BrandPaymentId!.Value, cancellationToken)
 				.ConfigureAwait(false);
 
-			var payment = await _paymentRepository
+			var payment = await paymentRepository
 				.GetPaymentAsync(brandPayment.PaymentId, cancellationToken)
 				.ConfigureAwait(false);
 
-			var processor = _withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
+			var processor = withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
 
-			var handlingFee = await _calculateService
+			var handlingFee = await calculateService
 				.GetAsync(new CalculateHandlingFeeCommand(command.BrandPaymentId.Value, formData.Amount), cancellationToken)
 				.ConfigureAwait(false);
 
@@ -83,7 +63,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 				formData.BankInfo,
 				brandPayment);
 
-			var applyInfo = await _paymentClient
+			var applyInfo = await paymentClient
 				.WithdrawAsync(
 					processor.Subject,
 					formData.Amount - handlingFee,
@@ -91,7 +71,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 					cancellationToken)
 				.ConfigureAwait(false);
 
-			var currentTime = _systemClock.UtcNow.UtcDateTime;
+			var currentTime = systemClock.UtcNow.UtcDateTime;
 			var updateFormData = formData with
 			{
 				BrandPaymentId = command.BrandPaymentId.Value,
@@ -105,11 +85,11 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 			};
 
 			var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
-			var eventId = await _serialNumberGenerator
+			var eventId = await serialNumberGenerator
 				.GenerateAsync(cancellationToken)
 				.ConfigureAwait(false);
 
-			await _paymentRepository.CreateWithdrawFormEventAsync(
+			await paymentRepository.CreateWithdrawFormEventAsync(
 				eventId,
 				command.FormId,
 				EventAction.Review,
@@ -117,7 +97,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 				command.ReviewUserId,
 				cancellationToken).ConfigureAwait(false);
 
-			await _paymentRepository.UpdateWithdrawFormSnapshotAsync(
+			await paymentRepository.UpdateWithdrawFormSnapshotAsync(
 				updateFormData,
 				eventId,
 				currentTime,
@@ -130,7 +110,7 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 
 			await fsm.FireAsync(PaymentTrigger.Reject).ConfigureAwait(false);
 
-			var currentTime = _systemClock.UtcNow.UtcDateTime;
+			var currentTime = systemClock.UtcNow.UtcDateTime;
 			var updateFormData = formData with
 			{
 				Status = fsm.State,
@@ -141,11 +121,11 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 			};
 
 			var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
-			var eventId = await _serialNumberGenerator
+			var eventId = await serialNumberGenerator
 				.GenerateAsync(cancellationToken)
 				.ConfigureAwait(false);
 
-			await _paymentRepository.CreateWithdrawFormEventAsync(
+			await paymentRepository.CreateWithdrawFormEventAsync(
 				eventId,
 				command.FormId,
 				EventAction.Review,
@@ -153,14 +133,14 @@ internal class SignOffWithdrawFormCommandService : ICommandService<SignOffWithdr
 				command.ReviewUserId,
 				cancellationToken).ConfigureAwait(false);
 
-			await _paymentRepository.UpdateWithdrawFormSnapshotAsync(
+			await paymentRepository.UpdateWithdrawFormSnapshotAsync(
 				updateFormData,
 				eventId,
 				currentTime,
 				cancellationToken).ConfigureAwait(false);
 		}
 
-		await _paymentClient.EmitWithdrawFormStatusChangedEventAsync(
+		await paymentClient.EmitWithdrawFormStatusChangedEventAsync(
 			formData.Id,
 			formData.BrandId,
 			formStatus.ToString(),

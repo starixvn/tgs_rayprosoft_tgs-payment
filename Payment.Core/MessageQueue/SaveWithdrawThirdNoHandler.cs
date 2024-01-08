@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,22 +10,19 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class SaveWithdrawThirdNoHandler : IMessageHandler
+internal class SaveWithdrawThirdNoHandler(
+	ICommandService<SubmitWithdrawFormStatusCommand> commandService,
+	ILogger<SaveWithdrawThirdNoHandler> logger)
+	: IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly ICommandService<SubmitWithdrawFormStatusCommand> _commandService;
-	private readonly ILogger<SaveWithdrawThirdNoHandler> _logger;
 
-	public SaveWithdrawThirdNoHandler(
-		ICommandService<SubmitWithdrawFormStatusCommand> commandService,
-		ILogger<SaveWithdrawThirdNoHandler> logger)
+	public async ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
-		_commandService = commandService;
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
-	public async ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
-	{
-		_logger.LogInformation("Receive SaveWithdrawThirdNo request.");
+		logger.LogInformation("Receive SaveWithdrawThirdNo request.");
 
 		var request = FormThirdNoRequest.Parser.ParseFrom(data.Span);
 
@@ -39,10 +37,10 @@ internal class SaveWithdrawThirdNoHandler : IMessageHandler
 			null,
 			null);
 
-		await _commandService
+		await commandService
 			.ExecuteAsync(command, cancellationToken)
 			.ConfigureAwait(false);
 
-		_logger.LogInformation("SaveWithdrawThirdNo processing completed.");
+		logger.LogInformation("SaveWithdrawThirdNo processing completed.");
 	}
 }

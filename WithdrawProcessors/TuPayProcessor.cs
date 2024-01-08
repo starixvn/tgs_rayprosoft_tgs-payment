@@ -5,19 +5,11 @@ using Tgs.Payment.TuPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class TuPayProcessor : IWithdrawProcessor
+internal class TuPayProcessor(
+	TuPaySerializer tuPaySerializer,
+	ILogger<TuPayProcessor> logger) : IWithdrawProcessor
 {
-	private readonly ILogger<TuPayProcessor> _logger;
-	private readonly TuPaySerializer _tuPaySerializer;
 	public string Subject => "tgs.payment.tupay.withdraw";
-
-	public TuPayProcessor(
-		TuPaySerializer tuPaySerializer,
-		ILogger<TuPayProcessor> logger)
-	{
-		_tuPaySerializer = tuPaySerializer ?? throw new ArgumentNullException(nameof(tuPaySerializer));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -26,7 +18,7 @@ internal class TuPayProcessor : IWithdrawProcessor
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		_logger.LogInformation(
+		logger.LogInformation(
 			"TuPayProcessor formId:{formId}, bankInfo:{bankInfo}, brandPayment ExtendedData:{brandPayment.ExtendedData}",
 			formId,
 			bankInfo,
@@ -46,6 +38,6 @@ internal class TuPayProcessor : IWithdrawProcessor
 				? jsonElement.GetString()
 				: null);
 
-		return _tuPaySerializer.Serialize(settings);
+		return tuPaySerializer.Serialize(settings);
 	}
 }

@@ -6,7 +6,7 @@ using Tgs.Payment.DibaoPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class DibaoPayProcessor : IWithdrawProcessor
+internal class DibaoPayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -23,13 +23,7 @@ internal class DibaoPayProcessor : IWithdrawProcessor
 			"""
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
 	public string Subject => "tgs.payment.dibaopay.withdraw";
-
-	public DibaoPayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -37,7 +31,7 @@ internal class DibaoPayProcessor : IWithdrawProcessor
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var transformation = _bankInfoTransformations["bank"];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<DibaoPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 

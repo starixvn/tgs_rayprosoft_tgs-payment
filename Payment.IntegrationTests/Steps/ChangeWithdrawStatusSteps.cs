@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -93,7 +94,7 @@ public class ChangeWithdrawStatusSteps
 
 		var formStatus = (PaymentFlowState)formData.Status;
 
-		Assert.AreEqual(expectedState, formStatus);
+		ClassicAssert.AreEqual(expectedState, formStatus);
 	}
 
 	[When(@"I change status to ""(.*)""")]

@@ -24,7 +24,7 @@ build-code:
 unit-test:
   extends: .unit-test-template
   variables:
-    DOTNET_USE_POLLING_FILE_WATCHER: "true"  
+    DOTNET_USE_POLLING_FILE_WATCHER: "true"
     Framework: net7.0
 
 push-nuget:
@@ -46,18 +46,16 @@ push-docker-image:
     - main
   cache:
     key: $BuildCacheKey
-    untracked: true   
+    untracked: true
     policy: pull
   script:
-    - docker build -t "$ImageName:$Tag" --build-arg [BuildConfiguration]=$BuildConfiguration -f "PaymentService/Dockerfile" . --no-cache
-    - docker push $ImageName:$Tag
-
+    - push_docker "PaymentService" $ImageName $Tag
 
 push-bankinfo-rebuild-hash-job-image:
   extends: .push-docker-image-template
   when: manual
   script:
-    - push_docker "PlayerBankInfoRebuildHash/PlayerBankInfoRebuildHash.csproj" $RebuildHashImageName $Tag
+    - push_docker "PlayerBankInfoRebuildHash" $RebuildHashImageName $Tag
 
 push-k8s-template:
   extends: .push-k8s-template

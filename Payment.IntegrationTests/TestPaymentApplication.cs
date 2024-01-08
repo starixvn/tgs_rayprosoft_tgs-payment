@@ -8,15 +8,8 @@ using OpenTelemetry.Exporter;
 
 namespace Payment.IntegrationTests;
 
-internal class TestPaymentApplication : WebApplicationFactory<Program>
+internal class TestPaymentApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
 {
-	private readonly Action<IWebHostBuilder>? _webHostConfigure;
-
-	public TestPaymentApplication(Action<IWebHostBuilder>? webHostConfigure = null)
-	{
-		_webHostConfigure = webHostConfigure;
-	}
-
 	protected override void ConfigureWebHost(IWebHostBuilder builder)
 	{
 		_ = builder.ConfigureAppConfiguration(builder => builder.Sources.Clear());
@@ -27,6 +20,6 @@ internal class TestPaymentApplication : WebApplicationFactory<Program>
 					  Options.DefaultName,
 					  exporterOptions => exporterOptions.Endpoint = null)));
 
-		_webHostConfigure?.Invoke(builder);
+		webHostConfigure?.Invoke(builder);
 	}
 }

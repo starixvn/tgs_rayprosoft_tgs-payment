@@ -6,7 +6,8 @@ using Tgs.Payment.UBPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class UBPayProcessor : IWithdrawProcessor
+internal class UBPayProcessor(
+	JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -22,14 +23,7 @@ internal class UBPayProcessor : IWithdrawProcessor
 			""",
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
 	public string Subject => "tgs.payment.ubpay.withdraw";
-
-	public UBPayProcessor(
-		JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -41,7 +35,7 @@ internal class UBPayProcessor : IWithdrawProcessor
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var transformation = _bankInfoTransformations["Crypto"];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<UBPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 

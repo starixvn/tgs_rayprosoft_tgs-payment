@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Paging;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
@@ -49,7 +50,7 @@ public class WithdrawTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 
 	[Test]
@@ -93,8 +94,8 @@ public class WithdrawTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual("PlayerNote", actual.Note);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual("PlayerNote", actual.Note);
 	}
 
 	[Test]
@@ -138,8 +139,8 @@ public class WithdrawTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual("PlayerNote", actual.Note);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual("PlayerNote", actual.Note);
 	}
 
 	[Test]
