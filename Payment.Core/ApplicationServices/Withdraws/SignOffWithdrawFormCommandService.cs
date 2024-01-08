@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Json.Patch;
 using Microsoft.Extensions.Logging;
-using Tgs.Payment.ApplicationServices.BrandPayments;
 using Tgs.Payment.Clients;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
@@ -13,12 +12,12 @@ namespace Tgs.Payment.ApplicationServices.Withdraws;
 
 internal class SignOffWithdrawFormCommandService(
 	IPaymentRepository paymentRepository,
-	IWithdrawProcessorFactory withdrawProcessorFactory,
 	IPaymentClient paymentClient,
-	IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
 	TimeProvider timeProvider,
 	ISerialNumberGenerator serialNumberGenerator,
-	ILogger<SignOffWithdrawFormCommandService> logger) : ICommandService<SignOffWithdrawFormCommand>
+	IWithdrawService withdrawService,
+	ILogger<SignOffWithdrawFormCommandService> logger)
+	: ICommandService<SignOffWithdrawFormCommand>
 {
 	public async ValueTask ExecuteAsync(SignOffWithdrawFormCommand command, CancellationToken cancellationToken = default)
 	{
@@ -44,64 +43,13 @@ internal class SignOffWithdrawFormCommandService(
 
 			await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
 
-			var brandPayment = await paymentRepository
-				.GetBrandPaymentByIdAsync(command.BrandPaymentId!.Value, cancellationToken)
-				.ConfigureAwait(false);
-
-			var payment = await paymentRepository
-				.GetPaymentAsync(brandPayment.PaymentId, cancellationToken)
-				.ConfigureAwait(false);
-
-			var processor = withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
-
-			var handlingFee = await calculateService
-				.GetAsync(new CalculateHandlingFeeCommand(command.BrandPaymentId.Value, formData.Amount), cancellationToken)
-				.ConfigureAwait(false);
-
-			var withdrawSettings = processor.MakeWithdrawSettings(
-				command.FormId,
-				formData.Amount,
-				formData.BankInfo,
-				brandPayment);
-
-			var applyInfo = await paymentClient
-				.WithdrawAsync(
-					processor.Subject,
-					formData.Amount - handlingFee,
-					withdrawSettings,
-					cancellationToken)
-				.ConfigureAwait(false);
-
-			var currentTime = timeProvider.GetUtcNow().UtcDateTime;
-			var updateFormData = formData with
-			{
-				BrandPaymentId = command.BrandPaymentId.Value,
-				ApplyInfo = applyInfo,
-				Status = fsm.State,
-				ReviewedUserId = command.ReviewUserId,
-				ReviewedUserName = command.ReviewUserName,
-				ReviewedOn = currentTime,
-				Remark = command.Remark,
-				HandlingFee = handlingFee
-			};
-
-			var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
-			var eventId = await serialNumberGenerator
-				.GenerateAsync(cancellationToken)
-				.ConfigureAwait(false);
-
-			await paymentRepository.CreateWithdrawFormEventAsync(
-				eventId,
-				command.FormId,
-				EventAction.Review,
-				JsonSerializer.SerializeToDocument(changeSets),
+			await withdrawService.ApproveWithdrawFormAsync(
+				command.BrandPaymentId!.Value,
+				formData,
+				fsm.State,
 				command.ReviewUserId,
-				cancellationToken).ConfigureAwait(false);
-
-			await paymentRepository.UpdateWithdrawFormSnapshotAsync(
-				updateFormData,
-				eventId,
-				currentTime,
+				command.ReviewUserName,
+				command.Remark,
 				cancellationToken).ConfigureAwait(false);
 		}
 		else

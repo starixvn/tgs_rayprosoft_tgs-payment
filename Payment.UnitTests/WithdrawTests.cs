@@ -186,19 +186,17 @@ public class WithdrawTests
 	public async Task Can_Reject_Form_In_WaitApprove()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
-			fakeWithdrawProcessorFactory,
 			fakePaymentClient,
-			fakeCalculateService,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
+			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
@@ -272,9 +270,6 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
 			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
 
-		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
-			.Returns(Substitute.For<IWithdrawProcessor>());
-
 		var eventId = Guid.NewGuid();
 		_ = fakeSerialNumberGenerator.GenerateAsync()
 			.Returns(eventId);
@@ -336,19 +331,17 @@ public class WithdrawTests
 	public async Task Can_Reject_Form_In_WaitPaid()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
-			fakeWithdrawProcessorFactory,
 			fakePaymentClient,
-			fakeCalculateService,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
+			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
@@ -422,9 +415,6 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
 			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
 
-		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
-			.Returns(Substitute.For<IWithdrawProcessor>());
-
 		var eventId = Guid.NewGuid();
 		_ = fakeSerialNumberGenerator.GenerateAsync()
 			.Returns(eventId);
@@ -467,19 +457,17 @@ public class WithdrawTests
 	public async Task Can_SignOff_Form()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
-			fakeWithdrawProcessorFactory,
 			fakePaymentClient,
-			fakeCalculateService,
 			fakeSystemClock,
 			fakeSerialNumberGenerator,
+			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
 		var command = new SignOffWithdrawFormCommand(
@@ -520,73 +508,16 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
 			.Returns(withdrawForm);
 
-		_ = fakePaymentRepository
-			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
-			.Returns(new BrandPaymentInfo(
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"TestChannel",
-				"TestChannelCode",
-				"{}",
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = 1000M
-				},
-				true,
-				false,
-				false,
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = decimal.MaxValue
-				},
-				ConditionMatchType.MatchOne,
-				TransferType.Withdraw,
-				true,
-				0,
-				Guid.NewGuid()));
-
-		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
-			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
-
-		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
-			.Returns(Substitute.For<IWithdrawProcessor>());
-
-		var eventId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
-
-		var expectedSnapshot = withdrawForm with
-		{
-			BrandPaymentId = command.BrandPaymentId,
-			Status = PaymentFlowState.Approved,
-			ReviewedUserId = command.ReviewUserId,
-			ReviewedUserName = command.ReviewUserName,
-			ReviewedOn = currentTime.UtcDateTime
-		};
-
 		await sut.ExecuteAsync(command);
 
-		_ = fakePaymentRepository.Received(1)
-			.CreateWithdrawFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(command.FormId),
-				Arg.Is(EventAction.Review),
-				Arg.Any<JsonDocument>(),
-				Arg.Is(command.ReviewUserId));
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateWithdrawFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
+		_ = fakeWithdrawService.Received(1)
+			.ApproveWithdrawFormAsync(
+			Arg.Is(command.BrandPaymentId.Value),
+			Arg.Is(withdrawForm),
+			Arg.Is(PaymentFlowState.Approved),
+			Arg.Is(command.ReviewUserId),
+			Arg.Is(command.ReviewUserName),
+			Arg.Is(command.Remark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
