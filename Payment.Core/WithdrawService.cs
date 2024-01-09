@@ -23,13 +23,22 @@ internal class WithdrawService(
 	IEnumerable<ICreateWithdrawFormPipe> createWithdrawFormPipes,
 	IWithdrawProcessorFactory withdrawProcessorFactory,
 	IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
-	IPaymentClient paymentClient)
+	IPaymentClient paymentClient,
+	IEnumerable<IApproveWithdrawFormPipe> approveWithdrawFormPipes,
+	IEnumerable<IRejectWithdrawFormPipe> rejectWithdrawFormPipes)
 	: IWithdrawService
 {
 	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes = [
 		.. (createWithdrawFormPipes ?? throw new ArgumentNullException(nameof(createWithdrawFormPipes)))
-			.OrderByDescending(pipe => pipe.Order)
-	];
+			.OrderByDescending(pipe => pipe.Order)];
+
+	private readonly IApproveWithdrawFormPipe[] _approveWithdrawFormPipes = [
+		.. (approveWithdrawFormPipes ?? throw new ArgumentNullException(nameof(approveWithdrawFormPipes)))
+			.OrderByDescending(pipe => pipe.Order)];
+
+	private readonly IRejectWithdrawFormPipe[] _rejectWithdrawFormPipes = [
+		.. (rejectWithdrawFormPipes ?? throw new ArgumentNullException(nameof(rejectWithdrawFormPipes)))
+			.OrderByDescending(pipe => pipe.Order)];
 
 	public async ValueTask<Guid> CreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -134,6 +143,15 @@ internal class WithdrawService(
 
 		await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
 
+		foreach (var pipe in _approveWithdrawFormPipes)
+			await pipe.BeforeApproveWithdrawFormAsync(
+				brandPaymentId,
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
+
 		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
 			brandPaymentId,
 			cancellationToken).ConfigureAwait(false);
@@ -193,6 +211,15 @@ internal class WithdrawService(
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
+
+		for (var i = _approveWithdrawFormPipes.Length - 1; i >= 0; i--)
+			await _approveWithdrawFormPipes[i].AfterApproveWithdrawFormAsync(
+				brandPaymentId,
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
 	}
 
 	public async ValueTask RejectWithdrawFormAsync(
@@ -208,6 +235,14 @@ internal class WithdrawService(
 			return;
 
 		await fsm.FireAsync(PaymentTrigger.Reject).ConfigureAwait(false);
+
+		foreach (var pipe in _rejectWithdrawFormPipes)
+			await pipe.BeforeRejectWithdrawFormAsync(
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
 
 		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 		var updateFormData = formData with
@@ -237,6 +272,14 @@ internal class WithdrawService(
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
+
+		for (var i = _rejectWithdrawFormPipes.Length - 1; i >= 0; i--)
+			await _rejectWithdrawFormPipes[i].AfterRejectWithdrawFormAsync(
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
 	}
 
 	private async ValueTask<string> GetAgentBankInfoContentAsync(

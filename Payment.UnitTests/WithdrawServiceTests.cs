@@ -48,7 +48,9 @@ public class WithdrawServiceTests
 			new[] { new EmitCreateWithdrawFormEventPipe(fakePaymentClient) },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -123,7 +125,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -202,7 +206,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -282,7 +288,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -415,7 +423,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -522,7 +532,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -640,7 +652,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -754,7 +768,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -845,7 +861,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -987,7 +1005,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1077,7 +1097,9 @@ public class WithdrawServiceTests
 			},
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1169,7 +1191,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1280,7 +1304,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1335,7 +1361,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -1449,7 +1477,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1513,7 +1543,9 @@ public class WithdrawServiceTests
 			new[] { fakePipe1, fakePipe2, fakePipe3 },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1613,7 +1645,9 @@ public class WithdrawServiceTests
 			new[] { fakePipe1, fakePipe2, fakePipe3 },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1682,6 +1716,504 @@ public class WithdrawServiceTests
 	}
 
 	[Test]
+	public async Task 通過提款單時_Pipe的Before會依照Order由大到小的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var fakePipe1 = Substitute.For<IApproveWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<IApproveWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<IApproveWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>(),
+			fakeWithdrawProcessorFactory,
+			fakeCalculateService,
+			fakePaymentClient,
+			[fakePipe1, fakePipe2, fakePipe3],
+			Array.Empty<IRejectWithdrawFormPipe>());
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		var brandPaymentId = Guid.NewGuid();
+		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
+		var reviewUserName = "reviewedUserName";
+
+		_ = fakePaymentRepository
+			.GetBrandPaymentByIdAsync(Arg.Is(brandPaymentId))
+			.Returns(new BrandPaymentInfo(
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"TestChannel",
+				"TestChannelCode",
+				"{}",
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = 1000M
+				},
+				true,
+				false,
+				false,
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = decimal.MaxValue
+				},
+				ConditionMatchType.MatchOne,
+				TransferType.Withdraw,
+				true,
+				0,
+				Guid.NewGuid()));
+
+		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
+			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
+
+		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
+			.Returns(Substitute.For<IWithdrawProcessor>());
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			BrandPaymentId = brandPaymentId,
+			Status = PaymentFlowState.Approved,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime.UtcDateTime
+		};
+
+		await sut.ApproveWithdrawFormAsync(
+			brandPaymentId,
+			withdrawForm,
+			reviewUserId,
+			reviewUserName,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe3.BeforeApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe1.BeforeApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe2.BeforeApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+		});
+	}
+
+	[Test]
+	public async Task 拒絕提款單時_Pipe的Before會依照Order由大到小的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var fakePipe1 = Substitute.For<IRejectWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<IRejectWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<IRejectWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>(),
+			fakeWithdrawProcessorFactory,
+			fakeCalculateService,
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			[fakePipe1, fakePipe2, fakePipe3]);
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
+		var reviewUserName = "reviewedUserName";
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.Reject,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime.UtcDateTime,
+			Remark = null
+		};
+
+		await sut.RejectWithdrawFormAsync(
+			withdrawForm,
+			reviewUserId,
+			reviewUserName,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe3.BeforeRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe1.BeforeRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe2.BeforeRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+		});
+	}
+
+	[Test]
+	public async Task 拒絕提款單時_Pipe的After會依照Order由小到大的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var fakePipe1 = Substitute.For<IRejectWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<IRejectWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<IRejectWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>(),
+			fakeWithdrawProcessorFactory,
+			fakeCalculateService,
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			[fakePipe1, fakePipe2, fakePipe3]);
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
+		var reviewUserName = "reviewedUserName";
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.Reject,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime.UtcDateTime,
+			Remark = null
+		};
+
+		await sut.RejectWithdrawFormAsync(
+			withdrawForm,
+			reviewUserId,
+			reviewUserName,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe2.AfterRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe1.AfterRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe3.AfterRejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+		});
+	}
+
+	[Test]
+	public async Task 通過提款單時_Pipe的After會依照Order由小到大的順序執行()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var fakePipe1 = Substitute.For<IApproveWithdrawFormPipe>();
+		var fakePipe2 = Substitute.For<IApproveWithdrawFormPipe>();
+		var fakePipe3 = Substitute.For<IApproveWithdrawFormPipe>();
+
+		_ = fakePipe3.Order.Returns(100);
+		_ = fakePipe2.Order.Returns(1);
+		_ = fakePipe1.Order.Returns(10);
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>(),
+			fakeWithdrawProcessorFactory,
+			fakeCalculateService,
+			fakePaymentClient,
+			[fakePipe1, fakePipe2, fakePipe3],
+			Array.Empty<IRejectWithdrawFormPipe>());
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		var brandPaymentId = Guid.NewGuid();
+		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
+		var reviewUserName = "reviewedUserName";
+
+		_ = fakePaymentRepository
+			.GetBrandPaymentByIdAsync(Arg.Is(brandPaymentId))
+			.Returns(new BrandPaymentInfo(
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				"TestChannel",
+				"TestChannelCode",
+				"{}",
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = 1000M
+				},
+				true,
+				false,
+				false,
+				new ValueRange<decimal>
+				{
+					From = 0M,
+					To = decimal.MaxValue
+				},
+				ConditionMatchType.MatchOne,
+				TransferType.Withdraw,
+				true,
+				0,
+				Guid.NewGuid()));
+
+		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
+			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
+
+		_ = fakeWithdrawProcessorFactory.GetWithdrawProcessor(Arg.Any<string>())
+			.Returns(Substitute.For<IWithdrawProcessor>());
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			BrandPaymentId = brandPaymentId,
+			Status = PaymentFlowState.Approved,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime.UtcDateTime
+		};
+
+		await sut.ApproveWithdrawFormAsync(
+			brandPaymentId,
+			withdrawForm,
+			reviewUserId,
+			reviewUserName,
+			null);
+
+		Received.InOrder(() =>
+		{
+			_ = fakePipe2.AfterApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe1.AfterApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+			_ = fakePipe3.AfterApproveWithdrawFormAsync(
+				Arg.Is(brandPaymentId),
+				Arg.Is(withdrawForm),
+				Arg.Is(reviewUserId),
+				Arg.Is(reviewUserName),
+				Arg.Is(default(string)));
+		});
+	}
+
+	[Test]
 	public void 建立提款單時_UserType不正確時會發生錯誤()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
@@ -1701,7 +2233,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1757,7 +2291,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -1862,7 +2398,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -1967,7 +2505,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2072,7 +2612,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2232,7 +2774,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2337,7 +2881,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2443,7 +2989,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2603,7 +3151,9 @@ public class WithdrawServiceTests
 			new[] { withdrawLimitPipe },
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var brandId = Guid.NewGuid();
 
@@ -2753,7 +3303,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -2880,7 +3432,9 @@ public class WithdrawServiceTests
 			Array.Empty<ICreateWithdrawFormPipe>(),
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
-			fakePaymentClient);
+			fakePaymentClient,
+			Array.Empty<IApproveWithdrawFormPipe>(),
+			Array.Empty<IRejectWithdrawFormPipe>());
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
