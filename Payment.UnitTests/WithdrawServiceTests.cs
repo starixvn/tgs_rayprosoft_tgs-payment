@@ -2,6 +2,7 @@
 using System.Text.Json;
 using ExpectedObjects;
 using NSubstitute;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Agent.Client;
 using Tgs.Agent.Client.Models;
@@ -2839,7 +2840,95 @@ public class WithdrawServiceTests
 		await sut.ApproveWithdrawFormAsync(
 			brandPaymentId,
 			withdrawForm,
-			PaymentFlowState.Approved,
+			reviewUserId,
+			reviewUserName,
+			null);
+
+		_ = fakePaymentRepository.Received(1)
+			.CreateWithdrawFormEventAsync(
+				Arg.Is(eventId),
+				Arg.Is(withdrawForm.Id),
+				Arg.Is(Tgs.Payment.EventAction.Review),
+				Arg.Any<JsonDocument>(),
+				Arg.Is(reviewUserId));
+
+		_ = fakePaymentRepository.Received(1)
+			.UpdateWithdrawFormSnapshotAsync(
+				Arg.Is(expectedSnapshot),
+				Arg.Is(eventId),
+				Arg.Is(currentTime.UtcDateTime));
+	}
+
+	[Test]
+	public async Task 拒絕提款單()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeTakeNumberStore = Substitute.For<ITakeNumberStore>();
+		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+		var fakeWithdrawProcessorFactory = Substitute.For<IWithdrawProcessorFactory>();
+		var fakeCalculateService = Substitute.For<IGetService<CalculateHandlingFeeCommand, decimal>>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+
+		var sut = new WithdrawService(
+			fakePaymentRepository,
+			fakeBrandServiceClient,
+			fakeTakeNumberStore,
+			fakeTimeProvider,
+			fakeSerialNumberGenerator,
+			Array.Empty<ICreateWithdrawFormPipe>(),
+			fakeWithdrawProcessorFactory,
+			fakeCalculateService,
+			fakePaymentClient);
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.WaitApprove,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
+		var reviewUserName = "reviewedUserName";
+
+		var eventId = Guid.NewGuid();
+		_ = fakeSerialNumberGenerator.GenerateAsync()
+			.Returns(eventId);
+
+		var currentTime = DateTimeOffset.UtcNow;
+		_ = fakeTimeProvider.GetUtcNow().Returns(currentTime);
+
+		var expectedSnapshot = withdrawForm with
+		{
+			Status = PaymentFlowState.Reject,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime.UtcDateTime,
+			Remark = null
+		};
+
+		await sut.RejectWithdrawFormAsync(
+			withdrawForm,
 			reviewUserId,
 			reviewUserName,
 			null);

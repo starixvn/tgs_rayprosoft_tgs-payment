@@ -187,15 +187,11 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<TimeProvider>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
-			fakeSerialNumberGenerator,
 			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
@@ -237,88 +233,14 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
 			.Returns(withdrawForm);
 
-		_ = fakePaymentRepository
-			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
-			.Returns(new BrandPaymentInfo(
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"TestChannel",
-				"TestChannelCode",
-				"{}",
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = 1000M
-				},
-				true,
-				false,
-				false,
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = decimal.MaxValue
-				},
-				ConditionMatchType.MatchOne,
-				TransferType.Withdraw,
-				true,
-				0,
-				Guid.NewGuid()));
-
-		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
-			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
-
-		var eventId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
-
-		var expectedSnapshot = new WithdrawFormSnapshot(
-			command.FormId,
-			withdrawForm.BrandId,
-			withdrawForm.UserId,
-			withdrawForm.UserName,
-			withdrawForm.UserType,
-			1000M,
-			null,
-			0M,
-			null,
-			PaymentFlowState.Reject,
-			null,
-			null,
-			withdrawForm.BankInfoId,
-			"{}",
-			null,
-			null,
-			"GPIW211028160001",
-			null,
-			withdrawForm.CreatedOn,
-			command.ReviewUserId,
-			command.ReviewUserName,
-			currentTime.UtcDateTime,
-			null,
-			null,
-			null);
-
 		await sut.ExecuteAsync(command);
 
-		_ = fakePaymentRepository.Received(1)
-			.CreateWithdrawFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(command.FormId),
-				Arg.Is(EventAction.Review),
-				Arg.Any<JsonDocument>(),
-				Arg.Is(command.ReviewUserId));
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateWithdrawFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
+		_ = fakeWithdrawService.Received(1)
+			.RejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(command.ReviewUserId),
+				Arg.Is(command.ReviewUserName),
+				Arg.Is(command.Remark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -332,15 +254,11 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<TimeProvider>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
-			fakeSerialNumberGenerator,
 			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
@@ -382,69 +300,14 @@ public class WithdrawTests
 		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
 			.Returns(withdrawForm);
 
-		_ = fakePaymentRepository
-			.GetBrandPaymentByIdAsync(Arg.Is(command.BrandPaymentId.Value))
-			.Returns(new BrandPaymentInfo(
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				Guid.NewGuid(),
-				"TestChannel",
-				"TestChannelCode",
-				"{}",
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = 1000M
-				},
-				true,
-				false,
-				false,
-				new ValueRange<decimal>
-				{
-					From = 0M,
-					To = decimal.MaxValue
-				},
-				ConditionMatchType.MatchOne,
-				TransferType.Withdraw,
-				true,
-				0,
-				Guid.NewGuid()));
-
-		_ = fakePaymentRepository.GetPaymentAsync(Arg.Any<Guid>())
-			.Returns(new PaymentInfo(Guid.NewGuid(), "LeePay"));
-
-		var eventId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync()
-			.Returns(eventId);
-
-		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
-
-		var expectedSnapshot = withdrawForm with
-		{
-			Status = PaymentFlowState.Reject,
-			ReviewedUserId = command.ReviewUserId,
-			ReviewedUserName = command.ReviewUserName,
-			ReviewedOn = currentTime.UtcDateTime
-		};
-
 		await sut.ExecuteAsync(command);
 
-		_ = fakePaymentRepository.Received(1)
-			.CreateWithdrawFormEventAsync(
-				Arg.Is(eventId),
-				Arg.Is(command.FormId),
-				Arg.Is(EventAction.Review),
-				Arg.Any<JsonDocument>(),
-				Arg.Is(command.ReviewUserId));
-
-		_ = fakePaymentRepository.Received(1)
-			.UpdateWithdrawFormSnapshotAsync(
-				Arg.Is(expectedSnapshot),
-				Arg.Is(eventId),
-				Arg.Is(currentTime.UtcDateTime));
+		_ = fakeWithdrawService.Received(1)
+			.RejectWithdrawFormAsync(
+				Arg.Is(withdrawForm),
+				Arg.Is(command.ReviewUserId),
+				Arg.Is(command.ReviewUserName),
+				Arg.Is(command.Remark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -458,15 +321,11 @@ public class WithdrawTests
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
-		var fakeSystemClock = Substitute.For<TimeProvider>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakeWithdrawService = Substitute.For<IWithdrawService>();
 
 		var sut = new SignOffWithdrawFormCommandService(
 			fakePaymentRepository,
 			fakePaymentClient,
-			fakeSystemClock,
-			fakeSerialNumberGenerator,
 			fakeWithdrawService,
 			NullLogger<SignOffWithdrawFormCommandService>.Instance);
 
@@ -514,7 +373,6 @@ public class WithdrawTests
 			.ApproveWithdrawFormAsync(
 			Arg.Is(command.BrandPaymentId.Value),
 			Arg.Is(withdrawForm),
-			Arg.Is(PaymentFlowState.Approved),
 			Arg.Is(command.ReviewUserId),
 			Arg.Is(command.ReviewUserName),
 			Arg.Is(command.Remark));

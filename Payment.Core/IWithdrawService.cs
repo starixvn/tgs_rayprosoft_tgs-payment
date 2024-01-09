@@ -17,7 +17,13 @@ public interface IWithdrawService
 	ValueTask ApproveWithdrawFormAsync(
 		Guid brandPaymentId,
 		WithdrawFormSnapshot formData,
-		PaymentFlowState status,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark,
+		CancellationToken cancellationToken = default);
+
+	ValueTask RejectWithdrawFormAsync(
+		WithdrawFormSnapshot formData,
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,

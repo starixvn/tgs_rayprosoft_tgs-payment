@@ -122,12 +122,18 @@ internal class WithdrawService(
 	public async ValueTask ApproveWithdrawFormAsync(
 		Guid brandPaymentId,
 		WithdrawFormSnapshot formData,
-		PaymentFlowState status,
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
 		CancellationToken cancellationToken = default)
 	{
+		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
+
+		if (!fsm.CanFire(PaymentTrigger.Approve))
+			return;
+
+		await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
+
 		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
 			brandPaymentId,
 			cancellationToken).ConfigureAwait(false);
@@ -161,12 +167,56 @@ internal class WithdrawService(
 		{
 			BrandPaymentId = brandPaymentId,
 			ApplyInfo = applyInfo,
-			Status = status,
+			Status = fsm.State,
 			ReviewedUserId = reviewUserId,
 			ReviewedUserName = reviewUserName,
 			ReviewedOn = currentTime,
 			Remark = remark,
 			HandlingFee = handlingFee
+		};
+
+		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
+		var eventId = await serialNumberGenerator
+			.GenerateAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		await paymentRepository.CreateWithdrawFormEventAsync(
+			eventId,
+			formData.Id,
+			EventAction.Review,
+			JsonSerializer.SerializeToDocument(changeSets),
+			reviewUserId,
+			cancellationToken).ConfigureAwait(false);
+
+		await paymentRepository.UpdateWithdrawFormSnapshotAsync(
+			updateFormData,
+			eventId,
+			currentTime,
+			cancellationToken).ConfigureAwait(false);
+	}
+
+	public async ValueTask RejectWithdrawFormAsync(
+		WithdrawFormSnapshot formData,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark,
+		CancellationToken cancellationToken = default)
+	{
+		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
+
+		if (!fsm.CanFire(PaymentTrigger.Reject))
+			return;
+
+		await fsm.FireAsync(PaymentTrigger.Reject).ConfigureAwait(false);
+
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
+		var updateFormData = formData with
+		{
+			Status = fsm.State,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime,
+			Remark = remark
 		};
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
