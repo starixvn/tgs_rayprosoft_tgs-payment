@@ -38,7 +38,8 @@ data:
         "CashServiceBaseUrl": "http://cashservice-api",
         "PlayerBucketServiceBaseUrl": "http://tgs-playerbucket-service",
         "VipLevelServiceBaseUrl": "http://tgs-viplevel",
-        "BrandCertificateBaseUrl": "http://brand-cert-api"
+        "BrandCertificateBaseUrl": "http://brand-cert-api",
+        "AgentServiceBaseUrl": "http://agent-service"
       }
     }
   otel-collector-config.yaml: |
