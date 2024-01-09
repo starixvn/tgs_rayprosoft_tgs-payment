@@ -4,19 +4,10 @@ using Tgs.Payment.SkyPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class SkyPayVNProcessor : IWithdrawProcessor
+internal class SkyPayVNProcessor(
+	SkyPaySerializer skyPaySerializer) : IWithdrawProcessor
 {
-	private readonly SkyPaySerializer _skyPaySerializer;
-
-	public string Subject { get; }
-
-	public SkyPayVNProcessor(
-		SkyPaySerializer skyPaySerializer)
-	{
-		_skyPaySerializer = skyPaySerializer ?? throw new ArgumentNullException(nameof(skyPaySerializer));
-
-		Subject = $"tgs.payment.skypay.vn.withdraw";
-	}
+	public string Subject { get; } = $"tgs.payment.skypay.vn.withdraw";
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -48,7 +39,7 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 			withdrawBankInfo.Detail.AccountNumber,
 			withdrawBankInfo.Detail.RealName);
 
-		return _skyPaySerializer.Serialize(settings);
+		return skyPaySerializer.Serialize(settings);
 	}
 
 	private string MakeMomoWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
@@ -62,7 +53,7 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 			formId,
 			withdrawBankInfo.Detail.QrCode);
 
-		return _skyPaySerializer.Serialize(settings);
+		return skyPaySerializer.Serialize(settings);
 	}
 
 	private string MakeZaloWithdrawSettings(Guid formId, string bankInfo, JsonDocument brandPaymentExtendedData)
@@ -76,6 +67,6 @@ internal class SkyPayVNProcessor : IWithdrawProcessor
 			formId,
 			withdrawBankInfo.Detail.QrCode);
 
-		return _skyPaySerializer.Serialize(settings);
+		return skyPaySerializer.Serialize(settings);
 	}
 }

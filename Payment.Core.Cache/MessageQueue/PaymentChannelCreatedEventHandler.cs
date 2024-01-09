@@ -3,20 +3,17 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.Cache.MessageQueue;
 
-internal class PaymentChannelCreatedEventHandler : IMessageHandler
+internal class PaymentChannelCreatedEventHandler(IPaymentChannelCacheCleaner paymentChannelCacheCleaner) : IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly IPaymentChannelCacheCleaner _paymentChannelCacheCleaner;
-
-	public PaymentChannelCreatedEventHandler(IPaymentChannelCacheCleaner paymentChannelCacheCleaner)
-	{
-		_paymentChannelCacheCleaner = paymentChannelCacheCleaner ?? throw new ArgumentNullException(nameof(paymentChannelCacheCleaner));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var eventData = PaymentChannelChangedEvent.Parser.ParseFrom(data.Span);
 
-		_paymentChannelCacheCleaner.Clean(eventData.Name);
+		paymentChannelCacheCleaner.Clean(eventData.Name);
 
 		return ValueTask.CompletedTask;
 	}

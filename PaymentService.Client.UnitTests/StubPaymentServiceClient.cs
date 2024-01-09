@@ -8,15 +8,11 @@ using Tgs.Payment.Clients;
 
 namespace PaymentService.Client.UnitTests;
 
-internal class StubPaymentServiceClient : PaymentServiceClient
+internal class StubPaymentServiceClient(HttpClient httpClient) : PaymentServiceClient(httpClient)
 {
-	private readonly ConcurrentBag<Guid> _brandPaymentIds = new();
+	private readonly ConcurrentBag<Guid> _brandPaymentIds = [];
 
 	public IEnumerable<Guid> CalledBrandPaymentIds => _brandPaymentIds.ToArray();
-
-	public StubPaymentServiceClient(HttpClient httpClient) : base(httpClient)
-	{
-	}
 
 	protected override IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
 	{

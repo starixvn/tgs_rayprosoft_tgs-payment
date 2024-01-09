@@ -5,7 +5,8 @@ using Tgs.Payment.MaticPay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class MaticPayProcessor : IWithdrawProcessor
+internal class MaticPayProcessor(
+	MaticPaySerializer maticPaySerializer) : IWithdrawProcessor
 {
 	private static readonly Dictionary<string, string> _BankMapping = new()
 	{
@@ -40,14 +41,7 @@ internal class MaticPayProcessor : IWithdrawProcessor
 		{ "工商银行公户", "ICBCB" }
 	};
 
-	private readonly MaticPaySerializer _maticPaySerializer;
 	public string Subject => "tgs.payment.maticpay.withdraw";
-
-	public MaticPayProcessor(
-		MaticPaySerializer maticPaySerializer)
-	{
-		_maticPaySerializer = maticPaySerializer ?? throw new ArgumentNullException(nameof(maticPaySerializer));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -74,6 +68,6 @@ internal class MaticPayProcessor : IWithdrawProcessor
 			bankName,
 			withdrawBankInfo.Detail.BankAccount);
 
-		return _maticPaySerializer.Serialize(settings);
+		return maticPaySerializer.Serialize(settings);
 	}
 }

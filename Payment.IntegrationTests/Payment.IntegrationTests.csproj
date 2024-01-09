@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -11,15 +11,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="JunitXml.TestLogger" Version="3.0.134" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.11" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="NSubstitute" Version="5.1.0" />
 		<PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.16">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit" Version="4.0.1" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
 		<PackageReference Include="coverlet.collector" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -30,9 +30,6 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="SpecFlow.NUnit" Version="3.9.74" />
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.3.1">
-		  <Aliases>Tgs</Aliases>
-		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -41,6 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Using Include="NSubstitute" />
 	  <Using Include="NUnit.Framework" />
 	</ItemGroup>
 

@@ -11,44 +11,28 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
 
-internal class CreateDepositFormCommandService : ICommandService<CreateDepositFormCommand>
+internal class CreateDepositFormCommandService(
+	ISerialNumberGenerator serialNumberGenerator,
+	IPaymentRepository paymentRepository,
+	IPaymentClient paymentClient,
+	IBrandServiceClient brandServiceClient,
+	ITakeNumberStore takeNumberStore,
+	TimeProvider timeProvider)
+	: ICommandService<CreateDepositFormCommand>
 {
-	private readonly IPaymentClient _paymentClient;
-	private readonly IBrandServiceClient _brandServiceClient;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ITakeNumberStore _takeNumberStore;
-	private readonly ISystemClock _systemClock;
-
-	public CreateDepositFormCommandService(
-		ISerialNumberGenerator serialNumberGenerator,
-		IPaymentRepository paymentRepository,
-		IPaymentClient paymentClient,
-		IBrandServiceClient brandServiceClient,
-		ITakeNumberStore takeNumberStore,
-		ISystemClock systemClock)
-	{
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		_brandServiceClient = brandServiceClient ?? throw new ArgumentNullException(nameof(brandServiceClient));
-		_takeNumberStore = takeNumberStore ?? throw new ArgumentNullException(nameof(takeNumberStore));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-	}
-
 	public async ValueTask ExecuteAsync(CreateDepositFormCommand command, CancellationToken cancellationToken = default)
 	{
-		var brandInfo = await _brandServiceClient.GetBrandInfoAsync(
+		var brandInfo = await brandServiceClient.GetBrandInfoAsync(
 			command.CreateInfo.BrandId,
 			cancellationToken).ConfigureAwait(false);
 
-		var orderNo = await _takeNumberStore.GetDepositFormOrderNoAsync(brandInfo!.Code);
+		var orderNo = await takeNumberStore.GetDepositFormOrderNoAsync(brandInfo!.Code);
 
-		var eventId = await _serialNumberGenerator
+		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var currentTime = _systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 		var createSnapshot = new DepositFormSnapshot(
 			command.FormId,
 			command.CreateInfo.PlayerCode,
@@ -74,7 +58,7 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 			JsonPointer.Create<DepositFormSnapshot>(o => o),
 			JsonSerializer.SerializeToNode(createSnapshot, PaymentUtility.SerializerOptions)));
 
-		await _paymentRepository.CreateDepositFormEventAsync(
+		await paymentRepository.CreateDepositFormEventAsync(
 			eventId,
 			command.FormId,
 			EventAction.Create,
@@ -82,13 +66,13 @@ internal class CreateDepositFormCommandService : ICommandService<CreateDepositFo
 			null,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentRepository.UpdateDepositFormSnapshotAsync(
+		await paymentRepository.UpdateDepositFormSnapshotAsync(
 			createSnapshot,
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentClient
+		await paymentClient
 			.EmitDepositFormCreatedEventAsync(command.FormId, command.CreateInfo.BrandId, cancellationToken)
 			.ConfigureAwait(false);
 	}

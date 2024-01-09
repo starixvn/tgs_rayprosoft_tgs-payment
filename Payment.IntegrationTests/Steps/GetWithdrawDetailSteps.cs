@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -41,7 +42,7 @@ public class GetWithdrawDetailSteps
 	[Then(@"return detail data")]
 	public void ThenReturnDetailData()
 	{
-		Assert.IsNotNull(_actual);
+		ClassicAssert.IsNotNull(_actual);
 	}
 
 	[When(@"call get withdraw form detail api")]

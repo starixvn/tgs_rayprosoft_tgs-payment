@@ -10,49 +10,36 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BankInfos;
 
-internal class ProcessBankInfoTagsCommandService : ICommandService<ProcessBankInfoTagsCommand>
+internal class ProcessBankInfoTagsCommandService(
+	IPaymentRepository paymentRepository,
+	IBankInfoIndexParserFactory indexParserFactory,
+	JsonTransform jsonTransform,
+	ILogger<ProcessBankInfoTagsCommandService> logger) : ICommandService<ProcessBankInfoTagsCommand>
 {
-	private readonly IBankInfoIndexParserFactory _indexParserFactory;
-	private readonly JsonTransform _jsonTransform;
-	private readonly ILogger<ProcessBankInfoTagsCommandService> _logger;
-	private readonly IPaymentRepository _paymentRepository;
-
-	public ProcessBankInfoTagsCommandService(
-		IPaymentRepository paymentRepository,
-		IBankInfoIndexParserFactory indexParserFactory,
-		JsonTransform jsonTransform,
-		ILogger<ProcessBankInfoTagsCommandService> logger)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_indexParserFactory = indexParserFactory ?? throw new ArgumentNullException(nameof(indexParserFactory));
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
 	public async ValueTask ExecuteAsync(ProcessBankInfoTagsCommand command, CancellationToken cancellationToken = default)
 	{
-		var bankInfo = await _paymentRepository
+		var bankInfo = await paymentRepository
 			.GetBankInfoByIdAsync(command.BankInfoId, cancellationToken)
 			.ConfigureAwait(false);
 
 		if (bankInfo is null)
 			return;
 
-		var transformation = _indexParserFactory.GetBankInfoTransformation(bankInfo.BankType);
+		var transformation = indexParserFactory.GetBankInfoTransformation(bankInfo.BankType);
 		var bankInfoDetail = JsonSerializer.Serialize(bankInfo.Detail);
 
-		var transformResult = _jsonTransform.Transform(bankInfoDetail, transformation);
+		var transformResult = jsonTransform.Transform(bankInfoDetail, transformation);
 
-		_logger.LogInformation("TransformResult: {transformResult}", transformResult);
+		logger.LogInformation("TransformResult: {transformResult}", transformResult);
 
 		var dict = JsonSerializer.Deserialize<Dictionary<string, string?>>(transformResult)!;
 
-		await _paymentRepository
+		await paymentRepository
 			.RemoveBankInfoTagsAsync(bankInfo.BrandId, bankInfo.Id, cancellationToken)
 			.ConfigureAwait(false);
 
 		foreach (var p in dict.Where(p => p.Value is not null))
-			await _paymentRepository.SetBankInfoTagAsync(
+			await paymentRepository.SetBankInfoTagAsync(
 				bankInfo.BrandId,
 				bankInfo.Id,
 				p.Key,

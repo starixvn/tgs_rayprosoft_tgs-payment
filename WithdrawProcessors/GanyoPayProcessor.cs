@@ -6,7 +6,7 @@ using Tgs.Payment.GanyoPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class GanyoPayProcessor : IWithdrawProcessor
+internal class GanyoPayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -45,13 +45,7 @@ internal class GanyoPayProcessor : IWithdrawProcessor
 			"""
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
 	public string Subject => "tgs.payment.ganyopay.withdraw";
-
-	public GanyoPayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -61,7 +55,7 @@ internal class GanyoPayProcessor : IWithdrawProcessor
 		var bankName = brandPaymentExtendedData.RootElement.GetProperty("bankName").GetString();
 
 		var transformation = _bankInfoTransformations[bankName];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<GanyoPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Repositories.Entities;
 using TGS.Payment.Repositories;
 
@@ -35,7 +36,7 @@ public class PaymentRepositoryTests
 
 		var eventSoruce = await dbContext.BrandPaymentAutoWithdrawEventSources.FirstAsync(x => x.Id == eventId);
 
-		Assert.AreEqual(eventId, eventSoruce.Id);
+		ClassicAssert.AreEqual(eventId, eventSoruce.Id);
 	}
 
 	[Test]
@@ -62,11 +63,11 @@ public class PaymentRepositoryTests
 
 		var brandAutoWithdrawInfo = await dbContext.BrandPaymentAutoWithdraws.FirstOrDefaultAsync(b => b.BrandId == brandId);
 
-		Assert.NotNull(brandAutoWithdrawInfo);
-		Assert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
-		Assert.True(brandAutoWithdrawInfo.EnableAutoWithdraw);
-		Assert.AreEqual(100M, brandAutoWithdrawInfo.AmountUpperLimit);
-		Assert.AreEqual("{\"brandPaymentIds\":[\"ef798189-a8c9-4d34-917c-694a2f8c5a0e\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
+		ClassicAssert.NotNull(brandAutoWithdrawInfo);
+		ClassicAssert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
+		ClassicAssert.True(brandAutoWithdrawInfo.EnableAutoWithdraw);
+		ClassicAssert.AreEqual(100M, brandAutoWithdrawInfo.AmountUpperLimit);
+		ClassicAssert.AreEqual("{\"brandPaymentIds\":[\"ef798189-a8c9-4d34-917c-694a2f8c5a0e\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
 	}
 
 	[Test]
@@ -125,8 +126,8 @@ public class PaymentRepositoryTests
 
 		await sut.SetDefaultPlayerBankInfoAsync(playerCode, newDefaultBankInfo.Id, modifyUser);
 
-		Assert.IsFalse(defaultBankInfo.Default);
-		Assert.IsTrue(newDefaultBankInfo.Default);
+		ClassicAssert.IsFalse(defaultBankInfo.Default);
+		ClassicAssert.IsTrue(newDefaultBankInfo.Default);
 	}
 
 	[Test]
@@ -200,9 +201,9 @@ public class PaymentRepositoryTests
 
 		await sut.SetDefaultPlayerBankInfoAsync(playerCode, newDefaultBankInfo.Id, modifyUser);
 
-		Assert.IsFalse(defaultBankInfo.Default);
-		Assert.IsFalse(noneDefaultBankInfo.Default);
-		Assert.IsTrue(newDefaultBankInfo.Default);
+		ClassicAssert.IsFalse(defaultBankInfo.Default);
+		ClassicAssert.IsFalse(noneDefaultBankInfo.Default);
+		ClassicAssert.IsTrue(newDefaultBankInfo.Default);
 	}
 
 	[Test]
@@ -246,8 +247,8 @@ public class PaymentRepositoryTests
 
 		var actual = await dbContext.PlayerBankInfos.FirstOrDefaultAsync(x => x.Id == testBankInfoData.Id);
 
-		Assert.NotNull(actual);
-		Assert.IsTrue(actual.Default);
+		ClassicAssert.NotNull(actual);
+		ClassicAssert.IsTrue(actual.Default);
 	}
 
 	[Test]
@@ -287,10 +288,10 @@ public class PaymentRepositoryTests
 
 		var brandAutoWithdrawInfo = await dbContext.BrandPaymentAutoWithdraws.FirstOrDefaultAsync(b => b.BrandId == brandId);
 
-		Assert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
-		Assert.False(brandAutoWithdrawInfo.EnableAutoWithdraw);
-		Assert.AreEqual(168M, brandAutoWithdrawInfo.AmountUpperLimit);
-		Assert.AreEqual("{\"brandPaymentIds\":[\"9a5afdb0-0502-49fe-b87f-0890c77be996\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
+		ClassicAssert.AreEqual(brandId, brandAutoWithdrawInfo.BrandId);
+		ClassicAssert.False(brandAutoWithdrawInfo.EnableAutoWithdraw);
+		ClassicAssert.AreEqual(168M, brandAutoWithdrawInfo.AmountUpperLimit);
+		ClassicAssert.AreEqual("{\"brandPaymentIds\":[\"9a5afdb0-0502-49fe-b87f-0890c77be996\"]}", brandAutoWithdrawInfo.BrandPaymentCandidates);
 	}
 
 	[Test]
@@ -328,10 +329,10 @@ public class PaymentRepositoryTests
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
-		Assert.True(actual.EnableAutoWithdraw);
-		Assert.AreEqual(168M, actual.AmountUpperLimit);
-		Assert.AreEqual(1, actual.BrandPaymentIds.Count());
-		Assert.AreEqual(brandPaymentIds, actual.BrandPaymentIds.First());
+		ClassicAssert.True(actual.EnableAutoWithdraw);
+		ClassicAssert.AreEqual(168M, actual.AmountUpperLimit);
+		ClassicAssert.AreEqual(1, actual.BrandPaymentIds.Count());
+		ClassicAssert.AreEqual(brandPaymentIds, actual.BrandPaymentIds.First());
 	}
 
 	[Test]
@@ -351,7 +352,7 @@ public class PaymentRepositoryTests
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 
 	[Test]
@@ -386,8 +387,8 @@ public class PaymentRepositoryTests
 
 		var actual = await sut.GetBrandPaymentFeeSettingAsync(brandPaymentId);
 
-		Assert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
-		Assert.AreEqual(true, actual.ReducePlayerAmount);
+		ClassicAssert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+		ClassicAssert.AreEqual(true, actual.ReducePlayerAmount);
 	}
 
 	[Test]
@@ -420,7 +421,7 @@ public class PaymentRepositoryTests
 
 		await dbContext.BrandPayments.AddRangeAsync(new BrandPayment[]
 		{
-			new BrandPayment
+			new()
 			{
 				Id = Guid.Parse("6482dba3-e6a2-4b91-a299-638a5fb082a8"),
 				ReducePlayerAmount = true,
@@ -430,8 +431,7 @@ public class PaymentRepositoryTests
 				CreatedByUsername = "createdUsername",
 				UpdatedByUsername = "updatedUsername",
 			},
-			new BrandPayment
-			{
+			new() {
 				Id = Guid.Parse("072a90e2-8912-4a78-3ccc-08d9262ce1a5"),
 				ReducePlayerAmount = false,
 				HandlingFeeRateTenPercentile = 0M,
@@ -448,7 +448,7 @@ public class PaymentRepositoryTests
 
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentIds).ToArrayAsync();
 
-		Assert.AreEqual(2, actual.Length);
+		ClassicAssert.AreEqual(2, actual.Length);
 	}
 
 	[Test]
@@ -485,7 +485,7 @@ public class PaymentRepositoryTests
 
 		await sut.UpdateBrandPaymentExtendedDataAsync(brandPaymentId, extendedData);
 
-		Assert.AreEqual("{\"name\":\"Test\"}", dbContext.BrandPayments.FirstAsync(bp => bp.Id == brandPaymentId).Result.ExtendedData);
+		ClassicAssert.AreEqual("{\"name\":\"Test\"}", dbContext.BrandPayments.FirstAsync(bp => bp.Id == brandPaymentId).Result.ExtendedData);
 	}
 
 	[Test]
@@ -519,8 +519,8 @@ public class PaymentRepositoryTests
 
 		var actual = await sut.GetReportDateDepositFormSummaryAsync(brandId, reportDate);
 
-		Assert.AreEqual(16, actual.Approved);
-		Assert.AreEqual(1, actual.Reject);
-		Assert.AreEqual(20, actual.Total);
+		ClassicAssert.AreEqual(16, actual.Approved);
+		ClassicAssert.AreEqual(1, actual.Reject);
+		ClassicAssert.AreEqual(20, actual.Total);
 	}
 }

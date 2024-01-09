@@ -6,7 +6,9 @@ using Tgs.Payment.PrimePay;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class PrimePayProcessor : IWithdrawProcessor
+internal class PrimePayProcessor(
+	PrimePaySerializer primePaySerializer,
+	JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly Dictionary<string, string> _bankInfoTransformations = new()
 	{
@@ -32,17 +34,7 @@ internal class PrimePayProcessor : IWithdrawProcessor
 			"""
 	};
 
-	private readonly JsonTransform _jsonTransform;
-	private readonly PrimePaySerializer _primePaySerializer;
 	public string Subject => "tgs.payment.primepay.withdraw";
-
-	public PrimePayProcessor(
-		PrimePaySerializer primePaySerializer,
-		JsonTransform jsonTransform)
-	{
-		_primePaySerializer = primePaySerializer ?? throw new ArgumentNullException(nameof(primePaySerializer));
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -54,7 +46,7 @@ internal class PrimePayProcessor : IWithdrawProcessor
 		var bankType = jsonDoc.RootElement.GetProperty("bankType").GetString();
 
 		var transformation = _bankInfoTransformations[bankType];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<PrimePayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
@@ -73,6 +65,6 @@ internal class PrimePayProcessor : IWithdrawProcessor
 			withdrawBankInfo.Detail.BankBranch,
 			withdrawBankInfo.Detail.BankName);
 
-		return _primePaySerializer.Serialize(settings);
+		return primePaySerializer.Serialize(settings);
 	}
 }

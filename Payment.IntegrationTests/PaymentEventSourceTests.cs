@@ -3,6 +3,10 @@ using System.Text.Json;
 using Json.Patch;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
+using Tgs.Agent.Client;
+using Tgs.Agent.Client.Models;
+using Tgs.Agent.Client.Models.Enums;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService.Client;
 using Tgs.Payment;
@@ -91,7 +95,7 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentDepositFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
@@ -262,16 +266,20 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
 	public async Task WithdrawForm_With_Agent_EventSource_Apply後應該和快照的資料一樣()
 	{
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 
 		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
-			.AddSingleton(fakeBrandServiceClient));
+			.AddSingleton(fakeBrandServiceClient)
+			.AddSingleton(fakeAgentClient)
+			.AddSingleton(fakeCashServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -282,12 +290,55 @@ public class PaymentEventSourceTests
 		var brandId = Guid.NewGuid();
 		var bankInfoId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
+		var walletId = Guid.NewGuid();
 
 		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new BrandInfo
 			{
 				Id = brandId,
 				Code = "GPI"
+			});
+
+		_ = fakeAgentClient.GetAgentInfoAsync(
+			Arg.Is(new GetAgentInfoRequest(agentId)),
+			Arg.Any<CancellationToken>())
+			.Returns(new AgentInfoModel(
+				agentId,
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				brandId,
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(10000M);
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Any<decimal>(),
+			Arg.Any<string>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 1000M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
 			});
 
 		_ = await dbContext.AgentBankInfoItems.AddAsync(
@@ -353,16 +404,20 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 
 	[Test]
 	public async Task WithdrawForm_With_Reject_EventSource_Apply後應該和快照的資料一樣()
 	{
 		var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 
 		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
-			.AddSingleton(fakeBrandServiceClient));
+			.AddSingleton(fakeBrandServiceClient)
+			.AddSingleton(fakeAgentClient)
+			.AddSingleton(fakeCashServiceClient));
 
 		var httpClient = web.CreateClient();
 
@@ -373,12 +428,55 @@ public class PaymentEventSourceTests
 		var brandId = Guid.NewGuid();
 		var bankInfoId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
+		var walletId = Guid.NewGuid();
 
 		_ = fakeBrandServiceClient.GetBrandInfoAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new BrandInfo
 			{
 				Id = brandId,
 				Code = "GPI"
+			});
+
+		_ = fakeAgentClient.GetAgentInfoAsync(
+			Arg.Is(new GetAgentInfoRequest(agentId)),
+			Arg.Any<CancellationToken>())
+			.Returns(new AgentInfoModel(
+				agentId,
+				"test1",
+				null,
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				brandId,
+				Guid.NewGuid(),
+				walletId,
+				false));
+
+		_ = fakeCashServiceClient.GetBalanceAsync(
+			Arg.Is(walletId),
+			Arg.Any<CancellationToken>())
+			.Returns(10000M);
+		_ = fakeCashServiceClient.LockWithdrawAsync(
+			Arg.Is(walletId),
+			Arg.Any<decimal>(),
+			Arg.Any<string>(),
+			Arg.Any<string>(),
+			Arg.Any<CancellationToken>())
+			.Returns(new TransactionResponse
+			{
+				Balance = 1000M,
+				LockedBalance = 1000M,
+				TransactionId = Guid.NewGuid()
 			});
 
 		_ = await dbContext.AgentBankInfoItems.AddAsync(
@@ -444,6 +542,6 @@ public class PaymentEventSourceTests
 			.GetRequiredService<IPaymentRepository>()
 			.GetCurrentWithdrawFormSnapshotAsync(formId);
 
-		Assert.AreEqual(currentSnapshot, actual);
+		ClassicAssert.AreEqual(currentSnapshot, actual);
 	}
 }

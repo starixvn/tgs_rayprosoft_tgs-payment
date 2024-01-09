@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using NATS.Client.Core;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
@@ -55,6 +56,7 @@ var builder = WebApplication.CreateBuilder(args);
 		});
 
 	_ = builder.Services
+		.AddSingleton(TimeProvider.System)
 		.AddPaymentClient()
 		.AddPayment()
 		.UseRedis((options, sp) =>
@@ -62,12 +64,8 @@ var builder = WebApplication.CreateBuilder(args);
 			var config = sp.GetRequiredService<IConfiguration>();
 			options.ConnectionString = config.GetConnectionString("RedisConfigurationString")!;
 		})
-		.UseTgsPaymentRepository((sp, builder) =>
-		{
-			var config = sp.GetRequiredService<IConfiguration>();
-
-			_ = builder.UseNpgsql(config.GetConnectionString("Tgs"));
-		})
+		.UseTgsPaymentRepository((sp, builder) => builder
+			.UseNpgsql("name=Tgs"))
 		.ConfigureBankInfoIndexParsers((options, _) =>
 		{
 			var parsersConfig = new Dictionary<string, Dictionary<string, string>>();
@@ -93,17 +91,19 @@ var builder = WebApplication.CreateBuilder(args);
 				builder.Configuration.GetValue<Uri>("Payment:VipLevelServiceBaseUrl")!))
 		.AddWithdrawLimitClient()
 		.AddBrandServiceClient((options, _) => options.BrandCertificateBaseUrl =
-			builder.Configuration.GetValue<Uri>("Payment:BrandCertificateBaseUrl")!);
+			builder.Configuration.GetValue<Uri>("Payment:BrandCertificateBaseUrl")!)
+		.AddAgentClient()
+			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
+				builder.Configuration.GetValue<Uri>("Payment:AgentServiceBaseUrl")!);
 
 	_ = builder.Services
-		.AddPhoenixToolkitsMessageQueue()
+		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
+		{
+			Url = builder.Configuration.GetConnectionString("Nats")!
+		}))
+		.AddMessageQueue()
 		.AddNatsMessageQueue(config => config
-			.ConfigQueueOptions((options, sp) =>
-			{
-				var config = sp.GetRequiredService<IConfiguration>();
-
-				options.Url = config.GetConnectionString("Nats")!;
-			})
+			.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
 			.AddReplyHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.SaveWithdrawThirdNoHandlerType,
 				"tgs.payment.withdraw.external_id",
@@ -149,6 +149,7 @@ var builder = WebApplication.CreateBuilder(args);
 				"tgs.payment.withdraw.status_ex"))
 		.AddNatsGlobPatternExchange("*");
 
+	var instrumentationExtenionFilters = new[] { "html", "ico", "png", "jpg" };
 	_ = builder.Services
 		.AddHealthChecks()
 		.Services
@@ -172,7 +173,14 @@ var builder = WebApplication.CreateBuilder(args);
 			.AddSource("Tgs.*")
 			.AddSource("TGS.*")
 			.AddSource("Valhalla.*")
-			.AddAspNetCoreInstrumentation()
+			.AddAspNetCoreInstrumentation(options => options.Filter =
+				httpContext => !httpContext.Request.Path.HasValue
+					|| !httpContext.Request.Path.StartsWithSegments("/swagger")
+					&& !httpContext.Request.Path.StartsWithSegments("/healthz")
+					&& !httpContext.Request.Path.StartsWithSegments("/metrics")
+					&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
+					&& !instrumentationExtenionFilters.Any(
+						ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
 			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
 			.AddHttpClientInstrumentation()
 			.AddProfileViewExporter()
@@ -184,14 +192,6 @@ var builder = WebApplication.CreateBuilder(args);
 			.AddAspNetCoreInstrumentation()
 			.AddOtlpExporter())
 		.Services
-		.Configure<AspNetCoreInstrumentationOptions>(
-			options => options.Filter = httpContext => !httpContext.Request.Path.HasValue
-				|| !httpContext.Request.Path.StartsWithSegments("/swagger")
-				&& !httpContext.Request.Path.StartsWithSegments("/healthz")
-				&& !httpContext.Request.Path.StartsWithSegments("/metrics")
-				&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
-				&& !new[] { "html", "ico", "png", "jpg" }.Any(
-					ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
 		.AddProfileViewer();
 }
 

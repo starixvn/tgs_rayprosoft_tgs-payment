@@ -5,17 +5,10 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
 
-internal class WithdrawFormForFixToolQueryService : IQueryService<WithdrawFormForFixToolQuery, WithdrawFormInfo>
+internal class WithdrawFormForFixToolQueryService(IPaymentRepository paymentRepository) : IQueryService<WithdrawFormForFixToolQuery, WithdrawFormInfo>
 {
-	private readonly IPaymentRepository _paymentRepository;
-
-	public WithdrawFormForFixToolQueryService(IPaymentRepository paymentRepository)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
 	public IAsyncEnumerable<WithdrawFormInfo> QueryAsync(WithdrawFormForFixToolQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.QueryWithdrawFormsAsync(
+		=> paymentRepository.QueryWithdrawFormsAsync(
 			WithdrawFormQueryConditions.Default with
 			{
 				BrandId = query.BrandId,

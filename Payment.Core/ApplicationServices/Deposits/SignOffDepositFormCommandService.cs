@@ -10,31 +10,16 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
 
-internal class SignOffDepositFormCommandService : ICommandService<SignOffDepositFormCommand>
+internal class SignOffDepositFormCommandService(
+	IPaymentRepository paymentRepository,
+	IPaymentClient paymentClient,
+	TimeProvider timeProvider,
+	ISerialNumberGenerator serialNumberGenerator,
+	ILogger<SignOffDepositFormCommandService> logger) : ICommandService<SignOffDepositFormCommand>
 {
-	private readonly IPaymentClient _paymentClient;
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISerialNumberGenerator _serialNumberGenerator;
-	private readonly ILogger<SignOffDepositFormCommandService> _logger;
-	private readonly ISystemClock _systemClock;
-
-	public SignOffDepositFormCommandService(
-		IPaymentRepository paymentRepository,
-		IPaymentClient paymentClient,
-		ISystemClock systemClock,
-		ISerialNumberGenerator serialNumberGenerator,
-		ILogger<SignOffDepositFormCommandService> logger)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
 	public async ValueTask ExecuteAsync(SignOffDepositFormCommand command, CancellationToken cancellationToken = default)
 	{
-		var formData = await _paymentRepository
+		var formData = await paymentRepository
 			.GetCurrentDepositFormSnapshotAsync(command.FormId, cancellationToken)
 			.ConfigureAwait(false);
 
@@ -46,11 +31,11 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 		if (formStatus is PaymentFlowState.Approved or PaymentFlowState.Reject)
 			return;
 
-		var eventId = await _serialNumberGenerator
+		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		var currentTime = _systemClock.UtcNow.UtcDateTime;
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 
 		var updatedForm = formData with
 		{
@@ -68,7 +53,7 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 
 		var changeSets = formData.CreatePatch(updatedForm, PaymentUtility.SerializerOptions);
 
-		await _paymentRepository.CreateDepositFormEventAsync(
+		await paymentRepository.CreateDepositFormEventAsync(
 			eventId,
 			command.FormId,
 			EventAction.Review,
@@ -76,18 +61,18 @@ internal class SignOffDepositFormCommandService : ICommandService<SignOffDeposit
 			command.ReviewUserId,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentRepository.UpdateDepositFormSnapshotAsync(
+		await paymentRepository.UpdateDepositFormSnapshotAsync(
 			updatedForm,
 			eventId,
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
 
-		_logger.LogInformation("Sign off deposit form send EmitDepositFormStatusChangedEvent, brandId:{brandId}, formId:{formId}, status:{status}",
-			formData.BrandId, 
+		logger.LogInformation("Sign off deposit form send EmitDepositFormStatusChangedEvent, brandId:{brandId}, formId:{formId}, status:{status}",
+			formData.BrandId,
 			command.FormId,
 			formStatus.ToString());
 
-		await _paymentClient
+		await paymentClient
 			.EmitDepositFormStatusChangedEventAsync(
 				formData.Id,
 				formData.BrandId,

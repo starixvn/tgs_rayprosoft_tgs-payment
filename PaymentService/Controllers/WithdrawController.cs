@@ -12,14 +12,8 @@ namespace Tgs.Payment.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class WithdrawController : ControllerBase
+public class WithdrawController(ILogger<WithdrawController> logger) : ControllerBase
 {
-	private readonly ILogger<WithdrawController> _logger;
-
-	public WithdrawController(ILogger<WithdrawController> logger)
-	{
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
 
 	[HttpGet("untreated/{brandId}", Name = "CountUntreatedWithdrawForms")]
 	public ValueTask<int> CountUntreatedWithdrawFormsAsync(
@@ -220,7 +214,7 @@ public class WithdrawController : ControllerBase
 		[FromQuery] WithdrawFormQueryViewModel formQuery,
 		[FromQuery] PagingViewModel paging)
 	{
-		_logger.LogInformation("Query WithdrawForms Request => {formQueryJson}", JsonSerializer.Serialize(formQuery));
+		logger.LogInformation("Query WithdrawForms Request => {formQueryJson}", JsonSerializer.Serialize(formQuery));
 
 		var createOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;
 		var updateOnRange = ((DateTimeOffset Begin, DateTimeOffset End)?)null;

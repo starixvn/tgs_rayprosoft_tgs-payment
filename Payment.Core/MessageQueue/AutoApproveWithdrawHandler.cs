@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,24 +10,20 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class AutoApproveWithdrawHandler : IMessageHandler
+internal class AutoApproveWithdrawHandler(
+	ICommandService<AutoApproveWithdtawFormCommand> commandService,
+	ILogger<AutoApproveWithdrawHandler> logger)
+	: IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly ICommandService<AutoApproveWithdtawFormCommand> _commandService;
-	private readonly ILogger<AutoApproveWithdrawHandler> _logger;
-
-	public AutoApproveWithdrawHandler(
-		ICommandService<AutoApproveWithdtawFormCommand> commandService,
-		ILogger<AutoApproveWithdrawHandler> logger)
-	{
-		_commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		_logger.LogDebug(
+		logger.LogDebug(
 			"AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}, status:{status}",
 			request.BrandId.ToGuid(),
 			request.FormId.ToGuid(),
@@ -37,6 +34,6 @@ internal class AutoApproveWithdrawHandler : IMessageHandler
 			request.FormId.ToGuid(),
 			Enum.Parse<PaymentFlowState>(request.Status));
 
-		return _commandService.ExecuteAsync(command, cancellationToken);
+		return commandService.ExecuteAsync(command, cancellationToken);
 	}
 }

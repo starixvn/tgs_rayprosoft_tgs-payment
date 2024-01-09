@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -34,7 +35,7 @@ public class GetUntreatedWithdrawFormsSteps
 	[Then(@"return form count")]
 	public void ThenReturnFormCount()
 	{
-		Assert.AreEqual(2, _actual);
+		ClassicAssert.AreEqual(2, _actual);
 	}
 
 	[When(@"call api")]

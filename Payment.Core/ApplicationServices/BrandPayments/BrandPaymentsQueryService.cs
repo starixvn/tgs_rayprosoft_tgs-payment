@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
-internal class BrandPaymentsQueryService : IQueryService<BrandPaymentsQuery, BrandPaymentInfo>
+internal class BrandPaymentsQueryService(IPaymentRepository paymentRepository) : IQueryService<BrandPaymentsQuery, BrandPaymentInfo>
 {
-	private readonly IPaymentRepository _paymentRepository;
-
-	public BrandPaymentsQueryService(IPaymentRepository paymentRepository)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
 	public IAsyncEnumerable<BrandPaymentInfo> QueryAsync(BrandPaymentsQuery query, CancellationToken cancellationToken = default)
-		=> _paymentRepository.QueryBrandPaymentsAsync(
+		=> paymentRepository.QueryBrandPaymentsAsync(
 			query.BrandId,
 			query.TransferType,
 			query.Enabled,

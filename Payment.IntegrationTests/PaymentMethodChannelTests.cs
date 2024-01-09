@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
 using Valhalla.MessageQueue;
@@ -28,9 +29,9 @@ public class PaymentMethodChannelTests
 
 		var pmc = await dbContext.PaymentMethodChannels.FindAsync(actual);
 
-		Assert.AreEqual(paymentId, pmc.PaymentId);
-		Assert.AreEqual(methodId, pmc.MethodId);
-		Assert.AreEqual(channelId, pmc.ChannelId);
+		ClassicAssert.AreEqual(paymentId, pmc.PaymentId);
+		ClassicAssert.AreEqual(methodId, pmc.MethodId);
+		ClassicAssert.AreEqual(channelId, pmc.ChannelId);
 	}
 
 	[Test]
@@ -50,17 +51,17 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment.created"),
-				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<byte[]>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+				var data = callInfo.Arg<byte[]>();
 
-				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
 					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentCreatedEventHandlerType);
 
-				handler.HandleAsync(data).GetAwaiter().GetResult();
+				handler.HandleAsync("test", data, null).GetAwaiter().GetResult();
 			});
 
 		_ = await sut.GetAllPaymentsAsync().ToArrayAsync();
@@ -74,8 +75,8 @@ public class PaymentMethodChannelTests
 			.Where(p => p.Code == paymentCode)
 			.FirstOrDefaultAsync();
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(paymentCode, actual.Code);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(paymentCode, actual.Code);
 	}
 
 	[Test]
@@ -95,17 +96,17 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-channel.created"),
-				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<byte[]>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+				var data = callInfo.Arg<byte[]>();
 
-				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
 					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentChannelCreatedEventHandlerType);
 
-				handler.HandleAsync(data).GetAwaiter().GetResult();
+				handler.HandleAsync("test", data, null).GetAwaiter().GetResult();
 			});
 
 		_ = await sut.GetAllPaymentChannelsAsync().ToArrayAsync();
@@ -116,8 +117,8 @@ public class PaymentMethodChannelTests
 			.Where(c => c.Name == channelCode)
 			.FirstOrDefaultAsync();
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(channelCode, actual.Name);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(channelCode, actual.Name);
 	}
 
 	[Test]
@@ -141,17 +142,17 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method.created"),
-				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<byte[]>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+				var data = callInfo.Arg<byte[]>();
 
-				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
 					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodCreatedEventHandlerType);
 
-				handler.HandleAsync(data).GetAwaiter().GetResult();
+				handler.HandleAsync("test", data, null).GetAwaiter().GetResult();
 			});
 
 		_ = await sut.GetAllPaymentMethodsAsync().ToArrayAsync();
@@ -162,8 +163,8 @@ public class PaymentMethodChannelTests
 			.Where(m => m.Name == "Test")
 			.FirstOrDefaultAsync();
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(createInfo.Code, actual.Name);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(createInfo.Code, actual.Name);
 	}
 
 	[Test]
@@ -181,18 +182,18 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method-channel.changed"),
-				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<byte[]>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>(),
 				Arg.Any<CancellationToken>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+				var data = callInfo.Arg<byte[]>();
 
-				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
 					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType);
 
-				handler.HandleAsync(data).GetAwaiter().GetResult();
+				handler.HandleAsync("test", data, null).GetAwaiter().GetResult();
 			});
 
 		_ = await sut.GetAllPaymentMethodChannelsAsync().ToArrayAsync();
@@ -207,10 +208,10 @@ public class PaymentMethodChannelTests
 			.Where(pmc => pmc.Id == pmcId)
 			.FirstOrDefaultAsync();
 
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(paymentId, actual.PaymentId);
-		Assert.AreEqual(methodId, actual.MethodId);
-		Assert.AreEqual(channelId, actual.ChannelId);
+		ClassicAssert.IsNotNull(actual);
+		ClassicAssert.AreEqual(paymentId, actual.PaymentId);
+		ClassicAssert.AreEqual(methodId, actual.MethodId);
+		ClassicAssert.AreEqual(channelId, actual.ChannelId);
 	}
 
 	[Test]
@@ -272,18 +273,18 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method-channel.changed"),
-				Arg.Any<ReadOnlyMemory<byte>>(),
+				Arg.Any<byte[]>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>(),
 				Arg.Any<CancellationToken>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
+				var data = callInfo.Arg<byte[]>();
 
-				var handler = (IMessageHandler)ActivatorUtilities.CreateInstance(
+				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
 					Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType);
 
-				handler.HandleAsync(data).GetAwaiter().GetResult();
+				handler.HandleAsync("test", data, null).GetAwaiter().GetResult();
 			});
 
 		_ = await sut.GetAllPaymentMethodChannelsAsync().ToArrayAsync();
@@ -294,6 +295,6 @@ public class PaymentMethodChannelTests
 			.Where(pmc => pmc.Id == pmcId)
 			.FirstOrDefaultAsync();
 
-		Assert.IsNull(actual);
+		ClassicAssert.IsNull(actual);
 	}
 }

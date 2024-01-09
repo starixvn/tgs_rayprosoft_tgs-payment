@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -52,7 +53,7 @@ public class PlayerQueryTests
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -79,7 +80,7 @@ public class PlayerQueryTests
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
-		Assert.AreEqual(expected, actual);
+		ClassicAssert.AreEqual(expected, actual);
 	}
 
 	[Test]
@@ -104,13 +105,13 @@ public class PlayerQueryTests
 				Arg.Any<CancellationToken>())
 			.Returns(new Tgs.Payment.TopTenDepositWithdrawInfo[]
 			{
-				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				new()
 				{
 					PlayerCode = "playerCode",
 					DepositTotalAmount = 888888m,
 					WithdrawTotalAmount = 100m
 				},
-				new Tgs.Payment.TopTenDepositWithdrawInfo()
+				new()
 				{
 					PlayerCode = "playerCode1",
 					DepositTotalAmount = 16888m,
@@ -120,6 +121,6 @@ public class PlayerQueryTests
 
 		var actual = await sut.GetCurrentDayDepositWithdrawTotalAmountAsync(playerCodes).ToArrayAsync();
 
-		Assert.AreEqual(2, actual.Length);
+		ClassicAssert.AreEqual(2, actual.Length);
 	}
 }

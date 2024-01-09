@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.Clients;
@@ -180,7 +181,7 @@ public class PaymentTests
 
 		var actual = await sut.GetAsync(query);
 
-		Assert.AreEqual(paymentId, actual.Id);
-		Assert.AreEqual("Test2", actual.Code);
+		ClassicAssert.AreEqual(paymentId, actual.Id);
+		ClassicAssert.AreEqual("Test2", actual.Code);
 	}
 }

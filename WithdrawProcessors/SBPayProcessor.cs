@@ -6,7 +6,7 @@ using Tgs.Payment.SBPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class SBPayProcessor : IWithdrawProcessor
+internal class SBPayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -23,13 +23,7 @@ internal class SBPayProcessor : IWithdrawProcessor
 			""",
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
 	public string Subject => "tgs.payment.sbpay.withdraw";
-
-	public SBPayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -37,7 +31,7 @@ internal class SBPayProcessor : IWithdrawProcessor
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var transformation = _bankInfoTransformations["Bank"];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<SBPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 

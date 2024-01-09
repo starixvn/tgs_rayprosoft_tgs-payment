@@ -3,16 +3,9 @@ using System.Collections.Generic;
 
 namespace Tgs.Payment;
 
-public class WithdrawLimitExceedException : Exception
+public class WithdrawLimitExceedException(IReadOnlyDictionary<string, object> errors) : Exception
 {
-	private readonly IReadOnlyDictionary<string, object> _errors;
+	public decimal? Amount => (decimal?)errors.GetValueOrDefault("Amount", null!);
 
-	public decimal? Amount => (decimal?)_errors.GetValueOrDefault("Amount", null!);
-
-	public int? Count => (int?)_errors.GetValueOrDefault("Count", null!);
-
-	public WithdrawLimitExceedException(IReadOnlyDictionary<string, object> errors)
-	{
-		_errors = errors ?? throw new ArgumentNullException(nameof(errors));
-	}
+	public int? Count => (int?)errors.GetValueOrDefault("Count", null!);
 }

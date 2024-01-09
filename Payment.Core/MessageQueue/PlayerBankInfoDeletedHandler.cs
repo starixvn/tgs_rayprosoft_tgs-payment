@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tgs.Payment.Protos;
@@ -6,19 +7,16 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
 
-internal class PlayerBankInfoDeletedHandler : IMessageHandler
+internal class PlayerBankInfoDeletedHandler(IPaymentRepository paymentRepository) : IMessageHandler<ReadOnlyMemory<byte>>
 {
-	private readonly IPaymentRepository _paymentRepository;
-
-	public PlayerBankInfoDeletedHandler(IPaymentRepository paymentRepository)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
-	public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(
+		string subject,
+		ReadOnlyMemory<byte> data,
+		IEnumerable<MessageHeaderValue>? headerValues,
+		CancellationToken cancellationToken = default)
 	{
 		var request = PlayerBankInfoChangedEvent.Parser.ParseFrom(data.Span);
 
-		return _paymentRepository.RemoveBankInfoTagsAsync(request.BrandId, request.Id, cancellationToken);
+		return paymentRepository.RemoveBankInfoTagsAsync(request.BrandId, request.Id, cancellationToken);
 	}
 }

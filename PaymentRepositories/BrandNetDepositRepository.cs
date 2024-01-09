@@ -4,15 +4,10 @@ using StackExchange.Redis;
 
 namespace Tgs.Payment.Repositories;
 
-internal class BrandNetDepositRepository : IBrandNetDepositRepository
+internal class BrandNetDepositRepository(RedisConnectionFactory redisConnectionFactory) : IBrandNetDepositRepository
 {
 	private static readonly string _KeyPrefix = "TGS:Payment:NetDeposit";
-	private readonly IDatabase _redisDatabase;
-
-	public BrandNetDepositRepository(RedisConnectionFactory redisConnectionFactory)
-	{
-		_redisDatabase = redisConnectionFactory.Database;
-	}
+	private readonly IDatabase _redisDatabase = redisConnectionFactory.Database;
 
 	public async ValueTask CountBrandCurrentDayNetDepositAsync(Guid brandId, double amount)
 	{

@@ -5,22 +5,17 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Cache;
 
-internal class AllCachedPaymentMethodsQueryService : IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo>, IPaymentMethodCacheCleaner
+internal class AllCachedPaymentMethodsQueryService(
+	IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> sourceService,
+	IMemoryCache memoryCache)
+	: IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo>
+	, IPaymentMethodCacheCleaner
 {
-	private readonly IMemoryCache _memoryCache;
-	private readonly IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> _sourceService;
-
-	public AllCachedPaymentMethodsQueryService(IQueryService<AllPaymentMethodsQuery, PaymentMethodInfo> sourceService, IMemoryCache memoryCache)
-	{
-		_sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
-		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-	}
-
 	public void Clean(string name)
 	{
 		var key = "Tgs:AllPaymentMethods";
 
-		_memoryCache.Remove(key);
+		memoryCache.Remove(key);
 	}
 
 	public async IAsyncEnumerable<PaymentMethodInfo> QueryAsync(
@@ -29,9 +24,9 @@ internal class AllCachedPaymentMethodsQueryService : IQueryService<AllPaymentMet
 	{
 		var key = "Tgs:AllPaymentMethods";
 
-		var result = await _memoryCache.GetOrCreateAsync(key, async entry =>
+		var result = await memoryCache.GetOrCreateAsync(key, async entry =>
 		{
-			var data = await _sourceService
+			var data = await sourceService
 				.QueryAsync(query, cancellationToken)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);

@@ -6,7 +6,7 @@ using Tgs.Payment.U2Pay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class U2PayProcessor : IWithdrawProcessor
+internal class U2PayProcessor(JsonTransform jsonTransform) : IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
@@ -23,13 +23,7 @@ internal class U2PayProcessor : IWithdrawProcessor
 			"""
 	}.AsReadOnly();
 
-	private readonly JsonTransform _jsonTransform;
 	public string Subject => "tgs.payment.u2pay.withdraw";
-
-	public U2PayProcessor(JsonTransform jsonTransform)
-	{
-		_jsonTransform = jsonTransform ?? throw new ArgumentNullException(nameof(jsonTransform));
-	}
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -37,7 +31,7 @@ internal class U2PayProcessor : IWithdrawProcessor
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
 		var transformation = _bankInfoTransformations["bank"];
-		var transforJson = _jsonTransform.Transform(bankInfo, transformation);
+		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<U2PayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 

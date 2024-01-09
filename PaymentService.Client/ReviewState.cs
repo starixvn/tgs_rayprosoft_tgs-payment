@@ -3,5 +3,6 @@
 public enum ReviewState
 {
 	Approve,
-	Reject
+	Reject,
+	Paid
 }

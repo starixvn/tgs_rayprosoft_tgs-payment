@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -39,7 +40,7 @@ public class CreatePaymentChannelSteps
 		var channelData = await dbContext.PaymentChannels
 			.SingleAsync(c => c.Code == _paymentChannelCode);
 
-		Assert.IsNotNull(channelData);
+		ClassicAssert.IsNotNull(channelData);
 	}
 
 	[When(@"call create payment channel api")]

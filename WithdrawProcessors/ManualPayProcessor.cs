@@ -4,16 +4,9 @@ using TGS.Payment.ManualDeposit;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
-internal class ManualPayProcessor : IWithdrawProcessor
+internal class ManualPayProcessor(ManualDepositSerializer manualDepositSerializer) : IWithdrawProcessor
 {
-	private readonly ManualDepositSerializer _manualDepositSerializer;
-
 	public string Subject => "tgs.payment.manual.withdraw";
-
-	public ManualPayProcessor(ManualDepositSerializer manualDepositSerializer)
-	{
-		_manualDepositSerializer = manualDepositSerializer ?? throw new ArgumentNullException(nameof(manualDepositSerializer));
-	}
 
 	public string MakeWithdrawSettings(
 		Guid formId,
@@ -23,6 +16,6 @@ internal class ManualPayProcessor : IWithdrawProcessor
 	{
 		var applyInfo = new ManualWithdrawApplyInfo();
 
-		return _manualDepositSerializer.Serialize(applyInfo);
+		return manualDepositSerializer.Serialize(applyInfo);
 	}
 }

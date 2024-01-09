@@ -5,22 +5,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Deposits;
 
-internal class ReportDateSuccessRateQueryService : IGetService<ReportDateSuccessRateQuery, decimal>
+internal class ReportDateSuccessRateQueryService(
+	TimeProvider timeProvider,
+	IPaymentRepository paymentRepository) : IGetService<ReportDateSuccessRateQuery, decimal>
 {
-	private readonly IPaymentRepository _paymentRepository;
-	private readonly ISystemClock _systemClock;
-
-	public ReportDateSuccessRateQueryService(
-		ISystemClock systemClock,
-		IPaymentRepository paymentRepository)
-	{
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-	}
-
 	public async ValueTask<decimal> GetAsync(ReportDateSuccessRateQuery query, CancellationToken cancellationToken = default)
 	{
-		var now = _systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
+		var now = timeProvider.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
 		var currentDate = DateOnly.FromDateTime(now.DateTime);
 		var yesterday = currentDate.AddDays(-1);
 
@@ -28,7 +19,7 @@ internal class ReportDateSuccessRateQueryService : IGetService<ReportDateSuccess
 
 		if (query.ReportDate == currentDate)
 		{
-			var currentDayData = await _paymentRepository
+			var currentDayData = await paymentRepository
 				.CountCurrentDayDepositFormsStatusAsync(query.BrandId, cancellationToken)
 				.ConfigureAwait(false);
 
@@ -39,7 +30,7 @@ internal class ReportDateSuccessRateQueryService : IGetService<ReportDateSuccess
 
 		if (query.ReportDate == yesterday && now < scheduleTime)
 		{
-			var yesterDayData = await _paymentRepository
+			var yesterDayData = await paymentRepository
 				.CountYesterDayDepositFormsStatusAsync(query.BrandId, cancellationToken)
 				.ConfigureAwait(false);
 
@@ -48,7 +39,7 @@ internal class ReportDateSuccessRateQueryService : IGetService<ReportDateSuccess
 				: Math.Round((decimal)yesterDayData.Approved / yesterDayData.Total * 100, MidpointRounding.AwayFromZero);
 		}
 
-		var reportData = await _paymentRepository
+		var reportData = await paymentRepository
 			.GetReportDateDepositFormSummaryAsync(query.BrandId, query.ReportDate, cancellationToken)
 			.ConfigureAwait(false);
 

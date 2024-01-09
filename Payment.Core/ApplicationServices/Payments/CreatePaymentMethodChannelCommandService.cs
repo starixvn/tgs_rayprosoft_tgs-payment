@@ -6,26 +6,20 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Payments;
 
-internal class CreatePaymentMethodChannelCommandService : IGetService<CreatePaymentMethodChannelCommand, Guid>
+internal class CreatePaymentMethodChannelCommandService(
+	IPaymentRepository paymentRepository,
+	IPaymentClient paymentClient)
+	: IGetService<CreatePaymentMethodChannelCommand, Guid>
 {
-	private readonly IPaymentClient _paymentClient;
-	private readonly IPaymentRepository _paymentRepository;
-
-	public CreatePaymentMethodChannelCommandService(IPaymentRepository paymentRepository, IPaymentClient paymentClient)
-	{
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
-	}
-
 	public async ValueTask<Guid> GetAsync(CreatePaymentMethodChannelCommand command, CancellationToken cancellationToken = default)
 	{
-		var id = await _paymentRepository.CreatePaymentMethodChannelAsync(
+		var id = await paymentRepository.CreatePaymentMethodChannelAsync(
 			command.PaymentId,
 			command.MethodId,
 			command.ChannelId,
 			cancellationToken).ConfigureAwait(false);
 
-		await _paymentClient
+		await paymentClient
 			.EmitPaymentMethodChannelChangedEventAsync(id, cancellationToken)
 			.ConfigureAwait(false);
 

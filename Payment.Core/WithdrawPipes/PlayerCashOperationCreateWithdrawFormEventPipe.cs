@@ -8,23 +8,12 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.WithdrawPipes;
 
-internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawFormPipe
+internal class PlayerCashOperationCreateWithdrawFormEventPipe(
+	IPlayerServiceClient playerServiceClient,
+	ICashServiceClient cashServiceClient,
+	ICommandService<SubmitWithdrawFormStatusCommand> submitWithdrawFormStatusService) : ICreateWithdrawFormPipe
 {
-	private readonly ICashServiceClient _cashServiceClient;
-	private readonly IPlayerServiceClient _playerServiceClient;
-	private readonly ICommandService<SubmitWithdrawFormStatusCommand> _submitWithdrawFormStatusService;
-
 	public int Order => 1;
-
-	public PlayerCashOperationCreateWithdrawFormEventPipe(
-		IPlayerServiceClient playerServiceClient,
-		ICashServiceClient cashServiceClient,
-		ICommandService<SubmitWithdrawFormStatusCommand> submitWithdrawFormStatusService)
-	{
-		_playerServiceClient = playerServiceClient ?? throw new ArgumentNullException(nameof(playerServiceClient));
-		_cashServiceClient = cashServiceClient ?? throw new ArgumentNullException(nameof(cashServiceClient));
-		_submitWithdrawFormStatusService = submitWithdrawFormStatusService ?? throw new ArgumentNullException(nameof(submitWithdrawFormStatusService));
-	}
 
 	public async ValueTask AfterCreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -38,13 +27,13 @@ internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawF
 		if (user.UserType is not UserType.Player)
 			return;
 
-		var playerProps = await _playerServiceClient
+		var playerProps = await playerServiceClient
 			.GetPlayerPropertiesAsync(user.UserId!, cancellationToken)
 			.ConfigureAwait(false);
 
 		var playerWalletId = Guid.Parse(playerProps["DefaultWalletId"]!);
 
-		var result = await _cashServiceClient.LockWithdrawAsync(
+		var result = await cashServiceClient.LockWithdrawAsync(
 			playerWalletId,
 			amount,
 			null,
@@ -53,7 +42,7 @@ internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawF
 
 		if (result.Balance < 0)
 		{
-			_ = await _cashServiceClient.RollbackWithdrawAsync(
+			_ = await cashServiceClient.RollbackWithdrawAsync(
 				playerWalletId,
 				amount,
 				null,
@@ -70,7 +59,7 @@ internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawF
 				null,
 				null);
 
-			await _submitWithdrawFormStatusService.ExecuteAsync(
+			await submitWithdrawFormStatusService.ExecuteAsync(
 				command,
 				cancellationToken).ConfigureAwait(false);
 
@@ -89,13 +78,13 @@ internal class PlayerCashOperationCreateWithdrawFormEventPipe : ICreateWithdrawF
 		if (user.UserType is not UserType.Player)
 			return;
 
-		var playerProps = await _playerServiceClient
+		var playerProps = await playerServiceClient
 			.GetPlayerPropertiesAsync(user.UserId!, cancellationToken)
 			.ConfigureAwait(false);
 
 		var playerWalletId = Guid.Parse(playerProps["DefaultWalletId"]!);
 
-		var balance = await _cashServiceClient
+		var balance = await cashServiceClient
 			.GetBalanceAsync(playerWalletId, cancellationToken)
 			.ConfigureAwait(false);
 

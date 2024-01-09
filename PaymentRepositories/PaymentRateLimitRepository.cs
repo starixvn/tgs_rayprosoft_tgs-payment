@@ -11,8 +11,7 @@ internal class PaymentRateLimitRepository : IPaymentRateLimitRepository
 
 	public PaymentRateLimitRepository(RedisConnectionFactory redisConnectionFactory)
 	{
-		if (redisConnectionFactory is null)
-			throw new ArgumentNullException(nameof(redisConnectionFactory));
+		ArgumentNullException.ThrowIfNull(redisConnectionFactory);
 
 		_database = redisConnectionFactory.Database;
 	}

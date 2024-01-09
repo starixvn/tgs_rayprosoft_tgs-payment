@@ -5,22 +5,16 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Cache;
 
-internal class AllCachedPaymentMethodChannelsQueryService : IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo>, IPaymentMethodChannelCacheCleaner
+internal class AllCachedPaymentMethodChannelsQueryService(
+	IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> sourceService,
+	IMemoryCache memoryCache)
+	: IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo>, IPaymentMethodChannelCacheCleaner
 {
-	private readonly IMemoryCache _memoryCache;
-	private readonly IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> _sourceService;
-
-	public AllCachedPaymentMethodChannelsQueryService(IQueryService<AllPaymentMethodChannelsQuery, PaymentMethodChannelInfo> sourceService, IMemoryCache memoryCache)
-	{
-		_sourceService = sourceService ?? throw new ArgumentNullException(nameof(sourceService));
-		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-	}
-
 	public void Clean(Guid pmcId)
 	{
 		var key = "Tgs:AllPaymentMethodChannels";
 
-		_memoryCache.Remove(key);
+		memoryCache.Remove(key);
 	}
 
 	public async IAsyncEnumerable<PaymentMethodChannelInfo> QueryAsync(
@@ -29,9 +23,9 @@ internal class AllCachedPaymentMethodChannelsQueryService : IQueryService<AllPay
 	{
 		var key = "Tgs:AllPaymentMethodChannels";
 
-		var result = await _memoryCache.GetOrCreateAsync(key, async entry =>
+		var result = await memoryCache.GetOrCreateAsync(key, async entry =>
 		{
-			var data = await _sourceService
+			var data = await sourceService
 				.QueryAsync(query, cancellationToken)
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);

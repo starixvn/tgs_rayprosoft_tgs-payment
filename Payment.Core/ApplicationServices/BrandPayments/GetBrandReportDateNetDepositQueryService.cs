@@ -5,25 +5,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
-internal class GetBrandReportDateNetDepositQueryService : IGetService<GetBrandReportDateNetDepositQuery, decimal>
+internal class GetBrandReportDateNetDepositQueryService(
+	TimeProvider timeProvider,
+	IPaymentRepository paymentRepository,
+	IBrandNetDepositRepository brandNetDepositRepository) : IGetService<GetBrandReportDateNetDepositQuery, decimal>
 {
-	private readonly IBrandNetDepositRepository _brandNetDepositRepository;
-	private readonly ISystemClock _systemClock;
-	private readonly IPaymentRepository _paymentRepository;
-
-	public GetBrandReportDateNetDepositQueryService(
-		ISystemClock systemClock,
-		IPaymentRepository paymentRepository,
-		IBrandNetDepositRepository brandNetDepositRepository)
-	{
-		_systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-		_paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
-		_brandNetDepositRepository = brandNetDepositRepository ?? throw new ArgumentNullException(nameof(brandNetDepositRepository));
-	}
-
 	public async ValueTask<decimal> GetAsync(GetBrandReportDateNetDepositQuery query, CancellationToken cancellationToken = default)
 	{
-		var now = _systemClock.UtcNow.ToOffset(TimeSpan.FromHours(8D));
+		var now = timeProvider.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
 		var currentDate = DateOnly.FromDateTime(now.DateTime);
 		var yesterday = currentDate.AddDays(-1);
 
@@ -31,19 +20,19 @@ internal class GetBrandReportDateNetDepositQueryService : IGetService<GetBrandRe
 
 		if (query.ReportDate == currentDate)
 		{
-			return await _brandNetDepositRepository
+			return await brandNetDepositRepository
 				.GetBrandCurrentDayNetDepositAsync(query.BrandId)
 				.ConfigureAwait(false);
 		}
 
-		if(query.ReportDate == yesterday && now < scheduleTime)
+		if (query.ReportDate == yesterday && now < scheduleTime)
 		{
-			return await _brandNetDepositRepository
+			return await brandNetDepositRepository
 				.GetBrandYesterDayNetDepositAsync(query.BrandId)
 				.ConfigureAwait(false);
 		}
 
-		var netDeposit = await _paymentRepository
+		var netDeposit = await paymentRepository
 			.GetBrandNetDepositAsync(query.BrandId, query.ReportDate, cancellationToken)
 			.ConfigureAwait(false);
 

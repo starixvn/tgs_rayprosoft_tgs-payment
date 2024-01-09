@@ -1,5 +1,6 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment.Clients;
 
 namespace PaymentService.Client.UnitTests;
@@ -15,7 +16,7 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.DepositCreate);
 
-		Assert.AreEqual(PaymentFlowState.WaitPayment, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.WaitPayment, sut.State);
 	}
 
 	[Test]
@@ -27,7 +28,7 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 
 	[Test]
@@ -39,7 +40,7 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.Approve);
 
-		Assert.AreEqual(PaymentFlowState.Approved, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Approved, sut.State);
 	}
 
 	[Test]
@@ -51,7 +52,7 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 
 	[Test]
@@ -61,7 +62,7 @@ public class ManualDepositStateMachineTests
 
 		var sut = client.CreateManualDepositStateMachine();
 
-		Assert.IsFalse(sut.CanFire(PaymentTrigger.Approve));
+		ClassicAssert.IsFalse(sut.CanFire(PaymentTrigger.Approve));
 	}
 
 	[Test]
@@ -73,7 +74,7 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.UploadPayCertificate);
 
-		Assert.AreEqual(PaymentFlowState.WaitApprove, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.WaitApprove, sut.State);
 	}
 
 	[Test]
@@ -85,6 +86,6 @@ public class ManualDepositStateMachineTests
 
 		sut.Fire(PaymentTrigger.Reject);
 
-		Assert.AreEqual(PaymentFlowState.Reject, sut.State);
+		ClassicAssert.AreEqual(PaymentFlowState.Reject, sut.State);
 	}
 }

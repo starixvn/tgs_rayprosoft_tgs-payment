@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
 using Tgs.Payment.Repositories.Entities;
@@ -91,7 +92,7 @@ public class GetBrandPaymentSteps
 	[Then(@"return brand payment data")]
 	public void ThenReturnBrandPaymentData()
 	{
-		Assert.NotNull(_actual);
+		ClassicAssert.NotNull(_actual);
 	}
 
 	[When(@"call get brand payment api")]
