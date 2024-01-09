@@ -37,16 +37,7 @@ push-nuget:
       - PaymentService.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
-  stage: publish
-  needs:
-    - build-code
-    - unit-test
-  only:
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true
-    policy: pull
+  extends: .push-docker-image-template
   script:
     - push_docker "PaymentService" $ImageName $Tag
 
