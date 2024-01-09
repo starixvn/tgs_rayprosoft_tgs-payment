@@ -28,4 +28,11 @@ public interface IWithdrawService
 		string? reviewUserName,
 		string? remark,
 		CancellationToken cancellationToken = default);
+
+	ValueTask PaidWithdrawFormAsync(
+		WithdrawFormSnapshot formData,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark,
+		CancellationToken cancellationToken = default);
 }

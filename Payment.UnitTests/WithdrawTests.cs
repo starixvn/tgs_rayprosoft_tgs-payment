@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Paging;
 using Tgs.Payment;
@@ -372,6 +373,73 @@ public class WithdrawTests
 		_ = fakeWithdrawService.Received(1)
 			.ApproveWithdrawFormAsync(
 			Arg.Is(command.BrandPaymentId.Value),
+			Arg.Is(withdrawForm),
+			Arg.Is(command.ReviewUserId),
+			Arg.Is(command.ReviewUserName),
+			Arg.Is(command.Remark));
+
+		_ = fakePaymentClient.Received(1)
+			.EmitWithdrawFormStatusChangedEventAsync(
+				Arg.Is(command.FormId),
+				Arg.Any<Guid>(),
+				Arg.Any<string>());
+	}
+
+	[Test]
+	public async Task SignOffWithdrawFormCommandService_完成出款()
+	{
+		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
+		var fakePaymentClient = Substitute.For<IPaymentClient>();
+		var fakeWithdrawService = Substitute.For<IWithdrawService>();
+
+		var sut = new SignOffWithdrawFormCommandService(
+			fakePaymentRepository,
+			fakePaymentClient,
+			fakeWithdrawService,
+			NullLogger<SignOffWithdrawFormCommandService>.Instance);
+
+		var command = new SignOffWithdrawFormCommand(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			ReviewState.Paid,
+			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
+			"reviewedUserName",
+			null);
+
+		var withdrawForm = new WithdrawFormSnapshot(
+			command.FormId,
+			Guid.NewGuid(),
+			"ThisIsPlayerCode",
+			"UserName",
+			UserType.Player,
+			1000M,
+			null,
+			0M,
+			null,
+			PaymentFlowState.Approved,
+			null,
+			null,
+			Guid.NewGuid(),
+			"{}",
+			null,
+			null,
+			"GPIW211028160001",
+			null,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+
+		_ = fakePaymentRepository.GetCurrentWithdrawFormSnapshotAsync(Arg.Is(command.FormId))
+			.Returns(withdrawForm);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakeWithdrawService.Received(1)
+			.PaidWithdrawFormAsync(
 			Arg.Is(withdrawForm),
 			Arg.Is(command.ReviewUserId),
 			Arg.Is(command.ReviewUserName),

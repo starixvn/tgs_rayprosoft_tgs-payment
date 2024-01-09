@@ -1,10 +1,8 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Tgs.Payment.Clients;
-using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.Withdraws;
@@ -31,21 +29,36 @@ internal class SignOffWithdrawFormCommandService(
 			JsonSerializer.Serialize(command, PaymentUtility.SerializerOptions),
 			formStatus);
 
-		if (command.Status == ReviewState.Approve)
-			await withdrawService.ApproveWithdrawFormAsync(
-				command.BrandPaymentId!.Value,
-				formData,
-				command.ReviewUserId,
-				command.ReviewUserName,
-				command.Remark,
-				cancellationToken).ConfigureAwait(false);
-		else
-			await withdrawService.RejectWithdrawFormAsync(
-				formData,
-				command.ReviewUserId,
-				command.ReviewUserName,
-				command.Remark,
-				cancellationToken).ConfigureAwait(false);
+		switch (command.Status)
+		{
+			case ReviewState.Approve:
+				await withdrawService.ApproveWithdrawFormAsync(
+					command.BrandPaymentId!.Value,
+					formData,
+					command.ReviewUserId,
+					command.ReviewUserName,
+					command.Remark,
+					cancellationToken).ConfigureAwait(false);
+				break;
+
+			case ReviewState.Paid:
+				await withdrawService.PaidWithdrawFormAsync(
+					formData,
+					command.ReviewUserId,
+					command.ReviewUserName,
+					command.Remark,
+					cancellationToken).ConfigureAwait(false);
+				break;
+
+			default:
+				await withdrawService.RejectWithdrawFormAsync(
+					formData,
+					command.ReviewUserId,
+					command.ReviewUserName,
+					command.Remark,
+					cancellationToken).ConfigureAwait(false);
+				break;
+		}
 
 		await paymentClient.EmitWithdrawFormStatusChangedEventAsync(
 			formData.Id,

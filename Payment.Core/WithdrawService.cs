@@ -25,20 +25,119 @@ internal class WithdrawService(
 	IGetService<CalculateHandlingFeeCommand, decimal> calculateService,
 	IPaymentClient paymentClient,
 	IEnumerable<IApproveWithdrawFormPipe> approveWithdrawFormPipes,
-	IEnumerable<IRejectWithdrawFormPipe> rejectWithdrawFormPipes)
+	IEnumerable<IRejectWithdrawFormPipe> rejectWithdrawFormPipes,
+	IEnumerable<IPaidWithdrawFormPipe> paidWithdrawFormPipes)
 	: IWithdrawService
 {
-	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes = [
-		.. (createWithdrawFormPipes ?? throw new ArgumentNullException(nameof(createWithdrawFormPipes)))
-			.OrderByDescending(pipe => pipe.Order)];
-
 	private readonly IApproveWithdrawFormPipe[] _approveWithdrawFormPipes = [
 		.. (approveWithdrawFormPipes ?? throw new ArgumentNullException(nameof(approveWithdrawFormPipes)))
+			.OrderByDescending(pipe => pipe.Order)];
+
+	private readonly ICreateWithdrawFormPipe[] _createWithdrawFormPipes = [
+		.. (createWithdrawFormPipes ?? throw new ArgumentNullException(nameof(createWithdrawFormPipes)))
 			.OrderByDescending(pipe => pipe.Order)];
 
 	private readonly IRejectWithdrawFormPipe[] _rejectWithdrawFormPipes = [
 		.. (rejectWithdrawFormPipes ?? throw new ArgumentNullException(nameof(rejectWithdrawFormPipes)))
 			.OrderByDescending(pipe => pipe.Order)];
+
+	private readonly IPaidWithdrawFormPipe[] _paidWithdrawFormPipes = [
+		.. (paidWithdrawFormPipes ?? throw new ArgumentNullException(nameof(paidWithdrawFormPipes)))
+			.OrderByDescending(pipe => pipe.Order)];
+
+	public async ValueTask ApproveWithdrawFormAsync(
+		Guid brandPaymentId,
+		WithdrawFormSnapshot formData,
+		string? reviewUserId,
+		string? reviewUserName,
+		string? remark,
+		CancellationToken cancellationToken = default)
+	{
+		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
+
+		if (!fsm.CanFire(PaymentTrigger.Approve))
+			return;
+
+		await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
+
+		foreach (var pipe in _approveWithdrawFormPipes)
+			await pipe.BeforeApproveWithdrawFormAsync(
+				brandPaymentId,
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
+
+		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
+			brandPaymentId,
+			cancellationToken).ConfigureAwait(false);
+
+		var payment = await paymentRepository
+			.GetPaymentAsync(brandPayment.PaymentId, cancellationToken)
+			.ConfigureAwait(false);
+
+		var processor = withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
+
+		var handlingFee = await calculateService.GetAsync(
+			new CalculateHandlingFeeCommand(brandPaymentId, formData.Amount),
+			cancellationToken).ConfigureAwait(false);
+
+		var withdrawSettings = processor.MakeWithdrawSettings(
+			formData.Id,
+			formData.Amount,
+			formData.BankInfo,
+			brandPayment);
+
+		var applyInfo = await paymentClient
+			.WithdrawAsync(
+				processor.Subject,
+				formData.Amount - handlingFee,
+				withdrawSettings,
+				cancellationToken)
+			.ConfigureAwait(false);
+
+		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
+		var updateFormData = formData with
+		{
+			BrandPaymentId = brandPaymentId,
+			ApplyInfo = applyInfo,
+			Status = fsm.State,
+			ReviewedUserId = reviewUserId,
+			ReviewedUserName = reviewUserName,
+			ReviewedOn = currentTime,
+			Remark = remark,
+			HandlingFee = handlingFee
+		};
+
+		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
+		var eventId = await serialNumberGenerator
+			.GenerateAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		await paymentRepository.CreateWithdrawFormEventAsync(
+			eventId,
+			formData.Id,
+			EventAction.Review,
+			JsonSerializer.SerializeToDocument(changeSets),
+			reviewUserId,
+			cancellationToken).ConfigureAwait(false);
+
+		await paymentRepository.UpdateWithdrawFormSnapshotAsync(
+			updateFormData,
+			eventId,
+			currentTime,
+			cancellationToken).ConfigureAwait(false);
+
+		for (var i = _approveWithdrawFormPipes.Length - 1; i >= 0; i--)
+			await _approveWithdrawFormPipes[i].AfterApproveWithdrawFormAsync(
+				brandPaymentId,
+				formData,
+				reviewUserId,
+				reviewUserName,
+				remark,
+				cancellationToken).ConfigureAwait(false);
+	}
 
 	public async ValueTask<Guid> CreateWithdrawFormAsync(
 		WithdrawUser user,
@@ -128,8 +227,7 @@ internal class WithdrawService(
 		return createFormId;
 	}
 
-	public async ValueTask ApproveWithdrawFormAsync(
-		Guid brandPaymentId,
+	public async ValueTask PaidWithdrawFormAsync(
 		WithdrawFormSnapshot formData,
 		string? reviewUserId,
 		string? reviewUserName,
@@ -138,59 +236,27 @@ internal class WithdrawService(
 	{
 		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
 
-		if (!fsm.CanFire(PaymentTrigger.Approve))
+		if (!fsm.CanFire(PaymentTrigger.PaymentWithdrawCompleted))
 			return;
 
-		await fsm.FireAsync(PaymentTrigger.Approve).ConfigureAwait(false);
+		await fsm.FireAsync(PaymentTrigger.PaymentWithdrawCompleted).ConfigureAwait(false);
 
-		foreach (var pipe in _approveWithdrawFormPipes)
-			await pipe.BeforeApproveWithdrawFormAsync(
-				brandPaymentId,
+		foreach (var pipe in _paidWithdrawFormPipes)
+			await pipe.BeforePaidWithdrawFormAsync(
 				formData,
 				reviewUserId,
 				reviewUserName,
 				remark,
 				cancellationToken).ConfigureAwait(false);
 
-		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
-			brandPaymentId,
-			cancellationToken).ConfigureAwait(false);
-
-		var payment = await paymentRepository
-			.GetPaymentAsync(brandPayment.PaymentId, cancellationToken)
-			.ConfigureAwait(false);
-
-		var processor = withdrawProcessorFactory.GetWithdrawProcessor(payment.Code);
-
-		var handlingFee = await calculateService.GetAsync(
-			new CalculateHandlingFeeCommand(brandPaymentId, formData.Amount),
-			cancellationToken).ConfigureAwait(false);
-
-		var withdrawSettings = processor.MakeWithdrawSettings(
-			formData.Id,
-			formData.Amount,
-			formData.BankInfo,
-			brandPayment);
-
-		var applyInfo = await paymentClient
-			.WithdrawAsync(
-				processor.Subject,
-				formData.Amount - handlingFee,
-				withdrawSettings,
-				cancellationToken)
-			.ConfigureAwait(false);
-
 		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
 		var updateFormData = formData with
 		{
-			BrandPaymentId = brandPaymentId,
-			ApplyInfo = applyInfo,
 			Status = fsm.State,
-			ReviewedUserId = reviewUserId,
-			ReviewedUserName = reviewUserName,
-			ReviewedOn = currentTime,
-			Remark = remark,
-			HandlingFee = handlingFee
+			PaidUserId = reviewUserId,
+			PaidUserName = reviewUserName,
+			PaidOn = currentTime,
+			Remark = remark
 		};
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
@@ -212,9 +278,8 @@ internal class WithdrawService(
 			currentTime,
 			cancellationToken).ConfigureAwait(false);
 
-		for (var i = _approveWithdrawFormPipes.Length - 1; i >= 0; i--)
-			await _approveWithdrawFormPipes[i].AfterApproveWithdrawFormAsync(
-				brandPaymentId,
+		for (var i = _paidWithdrawFormPipes.Length - 1; i >= 0; i--)
+			await _paidWithdrawFormPipes[i].AfterPaidWithdrawFormAsync(
 				formData,
 				reviewUserId,
 				reviewUserName,
