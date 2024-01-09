@@ -109,8 +109,9 @@ public class PlayerCashOperationPaidWithdrawFormEventPipeTests
 		await sut.AfterPaidWithdrawFormAsync(withdrawForm, reviewUserId, reviewUserName, null);
 
 		_ = fakeCashServiceClient.Received(0)
-			.RollbackWithdrawAsync(
+			.CommitWithdrawAsync(
 				Arg.Any<Guid>(),
+				Arg.Any<decimal>(),
 				Arg.Any<decimal>(),
 				Arg.Any<string>(),
 				Arg.Any<string>(),

@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
 			.AddTransient<ICreateWithdrawFormPipe, CheckPlayerBucketCreateWithdrawEventPipe>()
 			.AddTransient<IRejectWithdrawFormPipe, PlayerCashOperationRejectWithdrawFormEventPipe>()
 			.AddTransient<IRejectWithdrawFormPipe, AgentCashOperationRejectWithdrawFormEventPipe>()
+			.AddTransient<IPaidWithdrawFormPipe, PlayerCashOperationPaidWithdrawFormEventPipe>()
+			.AddTransient<IPaidWithdrawFormPipe, AgentCashOperationPaidWithdrawFormEventPipe>()
 			.AddSerialNumberGenerator()
 			.AddOptions<BankInfoParserOptions>();
 
