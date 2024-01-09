@@ -25,7 +25,6 @@ unit-test:
   extends: .unit-test-template
   variables:
     DOTNET_USE_POLLING_FILE_WATCHER: "true"
-    Framework: net7.0
 
 push-nuget:
   extends: .push-nuget-template
