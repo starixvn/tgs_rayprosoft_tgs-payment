@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <SqlQueryToolsConnectionString />
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="NSubstitute" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
