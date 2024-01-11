@@ -51,11 +51,11 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment.created"),
-				Arg.Any<byte[]>(),
+				Arg.Any<ReadOnlyMemory<byte>>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<byte[]>();
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
 
 				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
@@ -96,11 +96,11 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-channel.created"),
-				Arg.Any<byte[]>(),
+				Arg.Any<ReadOnlyMemory<byte>>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<byte[]>();
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
 
 				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
@@ -142,11 +142,11 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method.created"),
-				Arg.Any<byte[]>(),
+				Arg.Any<ReadOnlyMemory<byte>>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<byte[]>();
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
 
 				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
@@ -182,12 +182,12 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method-channel.changed"),
-				Arg.Any<byte[]>(),
+				Arg.Any<ReadOnlyMemory<byte>>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>(),
 				Arg.Any<CancellationToken>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<byte[]>();
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
 
 				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
@@ -273,12 +273,12 @@ public class PaymentMethodChannelTests
 		fakeMessageSender
 			.When(fake => fake.PublishAsync(
 				Arg.Is("tgs.payment-method-channel.changed"),
-				Arg.Any<byte[]>(),
+				Arg.Any<ReadOnlyMemory<byte>>(),
 				Arg.Any<IEnumerable<MessageHeaderValue>>(),
 				Arg.Any<CancellationToken>()))
 			.Do(callInfo =>
 			{
-				var data = callInfo.Arg<byte[]>();
+				var data = callInfo.Arg<ReadOnlyMemory<byte>>();
 
 				var handler = (IMessageHandler<ReadOnlyMemory<byte>>)ActivatorUtilities.CreateInstance(
 					web.Services,
