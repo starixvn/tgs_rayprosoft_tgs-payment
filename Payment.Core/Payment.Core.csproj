@@ -29,7 +29,7 @@
 		<PackageReference Include="Tgs.BrandCertificateClient" Version="0.0.29" />
 		<PackageReference Include="Tgs.CashService.Client" Version="0.2.9" />
 		<PackageReference Include="Tgs.Paging.AsyncEnumerable" Version="1.2.1" />
-		<PackageReference Include="Tgs.Payment.WithdrawLimit.Client" Version="0.0.2" />
+		<PackageReference Include="Tgs.Payment.WithdrawLimit.Client" Version="0.1.0" />
 		<PackageReference Include="Tgs.PlayerBucket.Client" Version="1.1.0" />
 		<PackageReference Include="Tgs.PlayerBucketType.Client" Version="0.1.0" />
 		<PackageReference Include="Tgs.PlayerService.Client" Version="0.2.1" />
