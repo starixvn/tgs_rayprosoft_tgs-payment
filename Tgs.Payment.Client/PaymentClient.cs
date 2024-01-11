@@ -26,8 +26,10 @@ internal class PaymentClient : IPaymentClient
 			ActualAmount = actualAmount
 		};
 
-		return _messageSender
-			.SendAsync("tgs.payment.deposit.approve", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.payment.deposit.approve",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken: cancellationToken);
 	}
 
 	public async ValueTask<string> AskAsync(string subject, string requestInfo, CancellationToken cancellationToken = default)
@@ -77,7 +79,10 @@ internal class PaymentClient : IPaymentClient
 			BrandId = brandId.ToString()
 		};
 
-		return _messageSender.PublishAsync("tgs.payment.deposit.created", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.PublishAsync(
+			"tgs.payment.deposit.created",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken: cancellationToken);
 	}
 
 	public async ValueTask EmitDepositFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status, CancellationToken cancellationToken = default)
@@ -96,9 +101,14 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		await Task.WhenAll(
-			_messageSender.PublishAsync("tgs.payment.deposit.status", request.ToByteArray(), cancellationToken: cancellationToken).AsTask(),
-			_messageSender.PublishAsync("tgs.payment.deposit.status_ex", requestEx.ToByteArray(), cancellationToken: cancellationToken).AsTask())
-			.ConfigureAwait(false);
+			_messageSender.PublishAsync(
+				"tgs.payment.deposit.status",
+				new ReadOnlyMemory<byte>(request.ToByteArray()),
+				cancellationToken: cancellationToken).AsTask(),
+			_messageSender.PublishAsync(
+				"tgs.payment.deposit.status_ex",
+				new ReadOnlyMemory<byte>(requestEx.ToByteArray()),
+				cancellationToken: cancellationToken).AsTask()).ConfigureAwait(false);
 	}
 
 	public ValueTask EmitPaymentChannelCreatedEventAsync(string paymentChannelName, CancellationToken cancellationToken = default)
@@ -108,7 +118,10 @@ internal class PaymentClient : IPaymentClient
 			Name = paymentChannelName
 		};
 
-		return _messageSender.PublishAsync("tgs.payment-channel.created", request.ToByteArray(), cancellationToken);
+		return _messageSender.PublishAsync(
+			"tgs.payment-channel.created",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask EmitPaymentCreatedEventAsync(string paymentCode, CancellationToken cancellationToken = default)
@@ -118,7 +131,10 @@ internal class PaymentClient : IPaymentClient
 			Code = paymentCode
 		};
 
-		return _messageSender.PublishAsync("tgs.payment.created", request.ToByteArray(), cancellationToken);
+		return _messageSender.PublishAsync(
+			"tgs.payment.created",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask EmitPaymentMethodChannelChangedEventAsync(Guid pmcId, CancellationToken cancellationToken = default)
@@ -128,7 +144,10 @@ internal class PaymentClient : IPaymentClient
 			Id = pmcId
 		};
 
-		return _messageSender.PublishAsync("tgs.payment-method-channel.changed", request.ToByteArray(), cancellationToken);
+		return _messageSender.PublishAsync(
+			"tgs.payment-method-channel.changed",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask EmitPaymentMethodCreatedEventAsync(string paymentMethodName, CancellationToken cancellationToken = default)
@@ -138,7 +157,10 @@ internal class PaymentClient : IPaymentClient
 			Name = paymentMethodName
 		};
 
-		return _messageSender.PublishAsync("tgs.payment-method.created", request.ToByteArray(), cancellationToken);
+		return _messageSender.PublishAsync(
+			"tgs.payment-method.created",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask EmitPlayerBankInfoAddedEventAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
@@ -151,7 +173,7 @@ internal class PaymentClient : IPaymentClient
 
 		return _messageSender.PublishAsync(
 			"tgs.player.bankinfo.added",
-			request.ToByteArray(),
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
 			cancellationToken);
 	}
 
@@ -165,7 +187,7 @@ internal class PaymentClient : IPaymentClient
 
 		return _messageSender.PublishAsync(
 			"tgs.player.bankinfo.deleted",
-			request.ToByteArray(),
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
 			cancellationToken);
 	}
 
@@ -179,8 +201,8 @@ internal class PaymentClient : IPaymentClient
 
 		return _messageSender.PublishAsync(
 			"tgs.payment.withdraw.created",
-			request.ToByteArray(),
-			cancellationToken: cancellationToken);
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public async ValueTask EmitWithdrawFormStatusChangedEventAsync(Guid formId, Guid brandId, string? status, CancellationToken cancellationToken = default)
@@ -199,8 +221,14 @@ internal class PaymentClient : IPaymentClient
 		};
 
 		await Task.WhenAll(
-			_messageSender.PublishAsync("tgs.payment.withdraw.status", request.ToByteArray(), cancellationToken: cancellationToken).AsTask(),
-			_messageSender.PublishAsync("tgs.payment.withdraw.status_ex", requestEx.ToByteArray(), cancellationToken: cancellationToken).AsTask())
+			_messageSender.PublishAsync(
+				"tgs.payment.withdraw.status",
+				new ReadOnlyMemory<byte>(request.ToByteArray()),
+				cancellationToken: cancellationToken).AsTask(),
+			_messageSender.PublishAsync(
+				"tgs.payment.withdraw.status_ex",
+				new ReadOnlyMemory<byte>(requestEx.ToByteArray()),
+				cancellationToken: cancellationToken).AsTask())
 			.ConfigureAwait(false);
 	}
 
@@ -214,8 +242,8 @@ internal class PaymentClient : IPaymentClient
 
 		return _messageSender.SendAsync(
 			"tgs.payment.withdraw.paid_ex",
-			request.ToByteArray(),
-			cancellationToken: cancellationToken);
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask RebuildPlayerBankInfoHashAsync(Guid brandId, Guid bankInfoId, CancellationToken cancellationToken = default)
@@ -226,7 +254,10 @@ internal class PaymentClient : IPaymentClient
 			Id = bankInfoId
 		};
 
-		return _messageSender.SendAsync("tgs.player.bankinfo.rebuild", request.ToByteArray(), cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.player.bankinfo.rebuild",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public ValueTask RejectDepositAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
@@ -237,8 +268,10 @@ internal class PaymentClient : IPaymentClient
 			BrandId = brandId
 		};
 
-		return _messageSender
-			.SendAsync("tgs.payment.deposit.reject", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.payment.deposit.reject",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken: cancellationToken);
 	}
 
 	public ValueTask RejectWithdrawAsync(Guid formId, Guid brandId, CancellationToken cancellationToken = default)
@@ -249,8 +282,10 @@ internal class PaymentClient : IPaymentClient
 			BrandId = brandId
 		};
 
-		return _messageSender
-			.SendAsync("tgs.payment.withdraw.reject", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.payment.withdraw.reject",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken: cancellationToken);
 	}
 
 	public ValueTask SaveWithdrawFormThirdPartyOrderNoAsync(Guid formId, string thirdPartyOrderNo, CancellationToken cancellationToken = default)
@@ -261,7 +296,10 @@ internal class PaymentClient : IPaymentClient
 			ThirdPartyOrderNo = thirdPartyOrderNo
 		};
 
-		return _messageSender.SendAsync("tgs.payment.withdraw.external_id", request.ToByteArray(), cancellationToken: cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.payment.withdraw.external_id",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken: cancellationToken);
 	}
 
 	public ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime, CancellationToken cancellationToken = default)
@@ -273,7 +311,10 @@ internal class PaymentClient : IPaymentClient
 			ScheduleTime = Timestamp.FromDateTime(scheduleTime)
 		};
 
-		return _messageSender.SendAsync("tgs.payment.countdown.schedule", request.ToByteArray(), cancellationToken);
+		return _messageSender.SendAsync(
+			"tgs.payment.countdown.schedule",
+			new ReadOnlyMemory<byte>(request.ToByteArray()),
+			cancellationToken);
 	}
 
 	public async ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default)
