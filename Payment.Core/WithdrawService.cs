@@ -255,8 +255,7 @@ internal class WithdrawService(
 			Status = fsm.State,
 			PaidUserId = reviewUserId,
 			PaidUserName = reviewUserName,
-			PaidOn = currentTime,
-			Remark = remark
+			PaidOn = currentTime
 		};
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);

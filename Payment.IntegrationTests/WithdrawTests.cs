@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Agent.Client;
 using Tgs.Agent.Client.Models;
@@ -307,5 +308,79 @@ public class WithdrawTests
 				Arg.Is(formId.ToString()),
 				Arg.Any<Guid?>(),
 				Arg.Any<CancellationToken>());
+	}
+
+	[Test]
+	public async Task 完成代理提款單後_表單的Remark欄位應該保留之前的Comments()
+	{
+		var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+		var fakeAgentClient = Substitute.For<IAgentClient>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeCashServiceClient)
+			.AddSingleton(fakeAgentClient));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var formId = Guid.NewGuid();
+		var agentId = Guid.NewGuid();
+		var agentWalletId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.WithdrawForms.AddAsync(new WithdrawForm
+		{
+			Id = formId,
+			BrandId = Guid.NewGuid(),
+			UserId = agentId.ToString(),
+			UserName = "Agent",
+			UserType = (int)UserType.Agent,
+			Amount = 1000M,
+			Status = (int)PaymentFlowState.Approved,
+			CreatedOn = DateTime.Now,
+			UpdatedOn = DateTime.Now,
+			BankInfo = "{}",
+			Remark = "aabbcc"
+		});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		_ = fakeAgentClient.GetAgentInfoAsync(Arg.Is(new GetAgentInfoRequest(agentId)), Arg.Any<CancellationToken>())
+			.Returns(new AgentInfoModel(
+				agentId,
+				"Agent",
+				null,
+				null,
+				null,
+				null,
+				null,
+				"aa1234",
+				null,
+				DateTimeOffset.UtcNow,
+				AgentStatus.Enabled,
+				AgentType.Cash,
+				AgentLevelType.Agent,
+				0M,
+				0,
+				0M,
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				agentWalletId,
+				false));
+
+		await sut.ReviewWithdrawFormAsync(
+			formId,
+			null,
+			ReviewState.Paid,
+			null,
+			null,
+			null);
+		var actual = await dbContext.WithdrawForms.FindAsync(formId);
+
+		ClassicAssert.NotNull(actual);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual.Status);
+		ClassicAssert.AreEqual("aabbcc", actual.Remark);
 	}
 }
