@@ -48,16 +48,30 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.CurrentSettlementFrom).HasColumnName("current_settlement_from");
             entity.Property(e => e.CurrentSettlementTo).HasColumnName("current_settlement_to");
             entity.Property(e => e.DepositHandlingFeeRateTenPercentile).HasColumnName("deposit_handling_fee_rate_ten_percentile");
-            entity.Property(e => e.DepositPaymentLockEnabled).HasColumnName("deposit_payment_lock_enabled");
+            entity.Property(e => e.DepositPaymentLockEnabled)
+            .HasDefaultValue(false)
+            .HasColumnName("deposit_payment_lock_enabled");
             entity.Property(e => e.Description)
             .HasMaxLength(256)
             .HasColumnName("description");
-            entity.Property(e => e.EnableAgentSms).HasColumnName("enable_agent_sms");
-            entity.Property(e => e.EnableBankInfoRegisterFlow).HasColumnName("enable_bank_info_register_flow");
-            entity.Property(e => e.EnableEmailRegisterFlow).HasColumnName("enable_email_register_flow");
-            entity.Property(e => e.EnablePlayerIdentity).HasColumnName("enable_player_identity");
-            entity.Property(e => e.EnableSms).HasColumnName("enable_sms");
-            entity.Property(e => e.EnableSmsRegisterFlow).HasColumnName("enable_sms_register_flow");
+            entity.Property(e => e.EnableAgentSms)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_agent_sms");
+            entity.Property(e => e.EnableBankInfoRegisterFlow)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_bank_info_register_flow");
+            entity.Property(e => e.EnableEmailRegisterFlow)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_email_register_flow");
+            entity.Property(e => e.EnablePlayerIdentity)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_player_identity");
+            entity.Property(e => e.EnableSms)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_sms");
+            entity.Property(e => e.EnableSmsRegisterFlow)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_sms_register_flow");
             entity.Property(e => e.LicenseeId).HasColumnName("licensee_id");
             entity.Property(e => e.LogoInfo)
             .HasColumnType("jsonb")
@@ -89,7 +103,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnName("sms_vendor_settings");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TimeSpanMinutes)
-            .HasDefaultValueSql("480")
+            .HasDefaultValue(480)
             .HasColumnName("time_span_minutes");
             entity.Property(e => e.TimeZoneId)
             .HasMaxLength(256)

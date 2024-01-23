@@ -37,9 +37,17 @@ public class PaymentConfiguration(IServiceCollection services)
 	}
 
 	public PaymentConfiguration UsePaymentRepository<TPaymentRepository>()
-			where TPaymentRepository : class, IPaymentRepository
+		where TPaymentRepository : class, IPaymentRepository
 	{
 		_ = Services.AddTransient<IPaymentRepository, TPaymentRepository>();
+		return this;
+	}
+
+	public PaymentConfiguration UseStatisticsRepository<TStatisticsRepository>()
+		where TStatisticsRepository : class, IStatisticsRepository
+	{
+		_ = Services.AddTransient<IStatisticsRepository, TStatisticsRepository>();
+
 		return this;
 	}
 

@@ -26,7 +26,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.BrandPaymentCandidates)
             .HasColumnType("jsonb")
             .HasColumnName("brand_payment_candidates");
-            entity.Property(e => e.EnableAutoWithdraw).HasColumnName("enable_auto_withdraw");
+            entity.Property(e => e.EnableAutoWithdraw)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_auto_withdraw");
             entity.Property(e => e.SnapshotEventId).HasColumnName("snapshot_event_id");
 
             OnConfigurePartial(entity);

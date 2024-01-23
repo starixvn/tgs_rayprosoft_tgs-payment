@@ -31,7 +31,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.ChannelId).HasColumnName("channel_id");
             entity.Property(e => e.MethodId).HasColumnName("method_id");
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
-            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Status)
+            .HasDefaultValue((short)0)
+            .HasColumnName("status");
 
             entity.HasOne(d => d.Channel).WithMany(p => p.PaymentMethodChannels)
             .HasForeignKey(d => d.ChannelId)

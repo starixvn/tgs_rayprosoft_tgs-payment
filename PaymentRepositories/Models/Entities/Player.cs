@@ -73,6 +73,8 @@ public partial class Player
 
     public byte[] WithdrawSalt { get; set; } = null!;
 
+    public Guid? SnapshotEventId { get; set; }
+
     public virtual Agent? Agent { get; set; }
 
     public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; } = new List<AgentBankInfoItem>();

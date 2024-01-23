@@ -33,7 +33,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasMaxLength(32)
             .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn).HasColumnName("created_on");
-            entity.Property(e => e.Default).HasColumnName("default");
+            entity.Property(e => e.Default)
+            .HasDefaultValue(false)
+            .HasColumnName("default");
             entity.Property(e => e.Detail)
             .HasColumnType("jsonb")
             .HasColumnName("detail");

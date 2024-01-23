@@ -40,6 +40,10 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<DepositFormEventSource> DepositFormEventSources { get; set; }
 
+    public virtual DbSet<FiveMinutesPaymentStatistic> FiveMinutesPaymentStatistics { get; set; }
+
+    public virtual DbSet<HourPaymentStatistic> HourPaymentStatistics { get; set; }
+
     public virtual DbSet<PaymentChannel> PaymentChannels { get; set; }
 
     public virtual DbSet<PaymentItem> PaymentItems { get; set; }
@@ -56,6 +60,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<PlayerBankinfoAttribution> PlayerBankinfoAttributions { get; set; }
 
+    public virtual DbSet<PlayerDailyPaymentStatistic> PlayerDailyPaymentStatistics { get; set; }
+
     public virtual DbSet<PlayerPaymentOverview> PlayerPaymentOverviews { get; set; }
 
     public virtual DbSet<WithdrawForm> WithdrawForms { get; set; }
@@ -68,30 +74,33 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("ltree")
             .HasPostgresExtension("pg_trgm");
 
-            modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandDailyPaymentStatisticConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawEventSourceConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentPlayerConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentSettingConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentVipLevelConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.BrandPlayerBankinfoCheckFlagConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.DepositFormConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.DepositFormEventSourceConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PaymentChannelConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PaymentItemConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PaymentMethodConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PaymentMethodChannelConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoTagConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PlayerBankinfoAttributionConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.PlayerPaymentOverviewConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormEventSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandDailyPaymentStatisticConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentAutoWithdrawEventSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentSettingConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPaymentVipLevelConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandPlayerBankinfoCheckFlagConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.DepositFormConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.DepositFormEventSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.FiveMinutesPaymentStatisticConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.HourPaymentStatisticConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PaymentChannelConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PaymentItemConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PaymentMethodConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PaymentMethodChannelConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerBankInfoTagConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerBankinfoAttributionConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerDailyPaymentStatisticConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerPaymentOverviewConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.WithdrawFormEventSourceConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 
