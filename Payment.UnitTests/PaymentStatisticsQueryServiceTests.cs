@@ -30,17 +30,17 @@ public class PaymentStatisticsQueryServiceTests
 			.QueryDailyPaymentStatisticsAsync(
 				Arg.Is(query.Start),
 				Arg.Is(query.End),
-				Arg.Is(query.UserId));
+				Arg.Is(query.UserIds));
 		_ = fakeStatisticsRepository.DidNotReceive()
 			.Query5minPaymentStatisticsAsync(
 				Arg.Any<DateTime>(),
 				Arg.Any<DateTime>(),
-				Arg.Any<string>());
+				Arg.Any<string[]>());
 		_ = fakeStatisticsRepository.DidNotReceive()
 			.QueryHourPaymentStatisticsAsync(
 				Arg.Any<DateTime>(),
 				Arg.Any<DateTime>(),
-				Arg.Any<string>());
+				Arg.Any<string[]>());
 	}
 
 	[Test]
@@ -65,17 +65,17 @@ public class PaymentStatisticsQueryServiceTests
 			.QueryDailyPaymentStatisticsAsync(
 				Arg.Is(query.Start),
 				Arg.Is(query.End),
-				Arg.Is(query.UserId));
+				Arg.Is(query.UserIds));
 		_ = fakeStatisticsRepository.Received(1)
 			.Query5minPaymentStatisticsAsync(
 				Arg.Any<DateTime>(),
 				Arg.Any<DateTime>(),
-				Arg.Any<string>());
+				Arg.Any<string[]>());
 		_ = fakeStatisticsRepository.Received(1)
 			.QueryHourPaymentStatisticsAsync(
 				Arg.Any<DateTime>(),
 				Arg.Any<DateTime>(),
-				Arg.Any<string>());
+				Arg.Any<string[]>());
 	}
 
 	[Test]
@@ -113,7 +113,7 @@ public class PaymentStatisticsQueryServiceTests
 		_ = fakeStatisticsRepository.QueryDailyPaymentStatisticsAsync(
 			Arg.Is(query.Start),
 			Arg.Is(query.End),
-			Arg.Is(query.UserId))
+			Arg.Is(query.UserIds))
 			.Returns(dailyData.ToAsyncEnumerable());
 
 		var actual = await sut.QueryAsync(query).ToArrayAsync();
@@ -264,19 +264,19 @@ public class PaymentStatisticsQueryServiceTests
 		_ = fakeStatisticsRepository.QueryDailyPaymentStatisticsAsync(
 			Arg.Is(query.Start),
 			Arg.Is(query.End),
-			Arg.Is(query.UserId))
+			Arg.Is(query.UserIds))
 			.Returns(dailyData.ToAsyncEnumerable());
 
 		_ = fakeStatisticsRepository.QueryHourPaymentStatisticsAsync(
 			Arg.Is(DateTime.ParseExact("2023-12-02T00:00:00.0000000+08:00", "o", null).ToUniversalTime()),
 			Arg.Is(currentTime.UtcDateTime),
-			Arg.Any<string>())
+			Arg.Any<string[]>())
 			.Returns(hourData.ToAsyncEnumerable());
 
 		_ = fakeStatisticsRepository.Query5minPaymentStatisticsAsync(
 			Arg.Is(DateTime.ParseExact("2023-12-03T07:00:00.0000000+08:00", "o", null).ToUniversalTime()),
 			Arg.Is(currentTime.UtcDateTime),
-			Arg.Any<string>())
+			Arg.Any<string[]>())
 			.Returns(fiveMinutesData.ToAsyncEnumerable());
 
 		var expected = new[]
@@ -447,19 +447,19 @@ public class PaymentStatisticsQueryServiceTests
 		_ = fakeStatisticsRepository.QueryDailyPaymentStatisticsAsync(
 			Arg.Is(query.Start),
 			Arg.Is(query.End),
-			Arg.Is(query.UserId))
+			Arg.Is(query.UserIds))
 			.Returns(dailyData.ToAsyncEnumerable());
 
 		_ = fakeStatisticsRepository.QueryHourPaymentStatisticsAsync(
 			Arg.Is(DateTime.ParseExact("2023-12-03T00:00:00.0000000+08:00", "o", null).ToUniversalTime()),
 			Arg.Is(currentTime.UtcDateTime),
-			Arg.Any<string>())
+			Arg.Any<string[]>())
 			.Returns(hourData.ToAsyncEnumerable());
 
 		_ = fakeStatisticsRepository.Query5minPaymentStatisticsAsync(
 			Arg.Is(DateTime.ParseExact("2023-12-03T07:00:00.0000000+08:00", "o", null).ToUniversalTime()),
 			Arg.Is(currentTime.UtcDateTime),
-			Arg.Any<string>())
+			Arg.Any<string[]>())
 			.Returns(fiveMinutesData.ToAsyncEnumerable());
 
 		var expected = new[]

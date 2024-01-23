@@ -21,7 +21,7 @@ internal class PaymentStatisticsQueryService(
 		var dailyData = await statisticsRepository.QueryDailyPaymentStatisticsAsync(
 			query.Start,
 			query.End,
-			query.UserId,
+			query.UserIds,
 			cancellationToken)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
@@ -48,7 +48,7 @@ internal class PaymentStatisticsQueryService(
 			var fiveMinutesQuery = from s in statisticsRepository.Query5minPaymentStatisticsAsync(
 									currentTime.FloorHourTime().UtcDateTime,
 									endTime,
-									query.UserId,
+									query.UserIds,
 									cancellationToken)
 								   let hourPoint = new DateTimeOffset(s.TimePoint).ToOffset(_ReportOffset).DateTime.FloorHourTime()
 								   group s by new { TimePoint = hourPoint, s.UserId } into g
@@ -93,7 +93,7 @@ internal class PaymentStatisticsQueryService(
 			var hourQuery = from s in statisticsRepository.QueryHourPaymentStatisticsAsync(
 								startTime,
 								endTime,
-								query.UserId,
+								query.UserIds,
 								cancellationToken).Concat(fiveMinutesData.ToAsyncEnumerable())
 							let date = DateOnly.FromDateTime(
 								new DateTimeOffset(s.TimePoint).ToOffset(_ReportOffset).DateTime)

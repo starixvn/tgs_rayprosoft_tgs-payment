@@ -12,7 +12,7 @@ internal class StatisticsRepository(TgsContext dbContext)
 	public IAsyncEnumerable<UserPaymentSummaryStatistics> Query5minPaymentStatisticsAsync(
 		DateTime start,
 		DateTime end,
-		string? userId,
+		string[]? userIds,
 		CancellationToken cancellationToken = default)
 	{
 		var query = dbContext.FiveMinutesPaymentStatistics
@@ -20,8 +20,8 @@ internal class StatisticsRepository(TgsContext dbContext)
 				&& row.TimePoint <= end.ToUniversalTime()
 				&& row.UserType == (int)UserType.Player);
 
-		if (userId is not null)
-			query = query.Where(row => row.UserId == userId);
+		if (userIds is not null)
+			query = query.Where(row => userIds.Contains(row.UserId));
 
 		return query.OrderBy(row => row.TimePoint)
 			.ToAsyncEnumerable()
@@ -46,7 +46,7 @@ internal class StatisticsRepository(TgsContext dbContext)
 	public IAsyncEnumerable<UserPaymentSummaryStatistics> QueryHourPaymentStatisticsAsync(
 		DateTime start,
 		DateTime end,
-		string? userId,
+		string[]? userIds,
 		CancellationToken cancellationToken = default)
 	{
 		var query = dbContext.HourPaymentStatistics
@@ -54,8 +54,8 @@ internal class StatisticsRepository(TgsContext dbContext)
 				&& row.TimePoint <= end.ToUniversalTime()
 				&& row.UserType == (int)UserType.Player);
 
-		if (userId is not null)
-			query = query.Where(row => row.UserId == userId);
+		if (userIds is not null)
+			query = query.Where(row => userIds.Contains(row.UserId));
 
 		return query.OrderBy(row => row.TimePoint)
 			.ToAsyncEnumerable()
@@ -80,15 +80,15 @@ internal class StatisticsRepository(TgsContext dbContext)
 	public IAsyncEnumerable<UserPaymentSummaryStatistics> QueryDailyPaymentStatisticsAsync(
 		DateOnly start,
 		DateOnly end,
-		string? userId,
+		string[]? userIds,
 		CancellationToken cancellationToken = default)
 	{
 		var query = dbContext.PlayerDailyPaymentStatistics
 			.Where(row => row.ReportDate >= start
 				&& row.ReportDate <= end);
 
-		if (userId is not null)
-			query = query.Where(row => row.PlayerCode == userId);
+		if (userIds is not null)
+			query = query.Where(row => userIds.Contains(row.PlayerCode));
 
 		return query.OrderBy(row => row.ReportDate)
 			.ToAsyncEnumerable()
