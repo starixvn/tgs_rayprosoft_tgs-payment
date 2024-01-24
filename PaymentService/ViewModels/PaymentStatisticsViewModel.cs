@@ -6,10 +6,6 @@ public class PaymentStatisticsViewModel
 
 	public required string UserId { get; set; }
 
-	public required UserType UserType { get; set; }
-
-	public required Guid BrandId { get; set; }
-
 	public decimal? DepositAmount { get; set; }
 
 	public decimal? DepositHandlingFee { get; set; }
