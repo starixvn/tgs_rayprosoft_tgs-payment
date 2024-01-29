@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Tgs.Payment;
@@ -14,4 +15,6 @@ public static class PaymentUtility
 		},
 		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
 	};
+
+	public static readonly TimeSpan ReportOffset = TimeSpan.FromHours(8D);
 }

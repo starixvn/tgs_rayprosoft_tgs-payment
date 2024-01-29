@@ -45,6 +45,12 @@ public class QueryStatisticsTests
 					1,
 					null,
 					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
 					null)
 			}.ToAsyncEnumerable());
 
