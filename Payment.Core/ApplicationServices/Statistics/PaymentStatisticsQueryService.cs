@@ -59,15 +59,9 @@ internal class PaymentStatisticsQueryService(
 										accumulate.DepositAmount = Add(accumulate.DepositAmount, statistics.DepositAmount);
 										accumulate.DepositCount = Add(accumulate.DepositCount, statistics.DepositCount);
 										accumulate.DepositHandlingFee = Add(accumulate.DepositHandlingFee, statistics.DepositHandlingFee);
-										accumulate.FirstDepositOn ??= statistics.FirstDepositOn;
-										accumulate.FirstDepositAmount ??= statistics.FirstDepositAmount;
-										accumulate.FirstDepositHandlingFee ??= statistics.FirstDepositHandlingFee;
 										accumulate.WithdrawAmount = Add(accumulate.WithdrawAmount, statistics.WithdrawAmount);
 										accumulate.WithdrawCount = Add(accumulate.WithdrawCount, statistics.WithdrawCount);
 										accumulate.WithdrawHandlingFee = Add(accumulate.WithdrawHandlingFee, statistics.WithdrawHandlingFee);
-										accumulate.FirstWithdrawOn ??= statistics.FirstWithdrawOn;
-										accumulate.FirstWithdrawAmount ??= statistics.FirstWithdrawAmount;
-										accumulate.FirstWithdrawHandlingFee ??= statistics.FirstWithdrawHandlingFee;
 
 										return accumulate;
 									})
@@ -78,15 +72,9 @@ internal class PaymentStatisticsQueryService(
 									summary.DepositAmount,
 									summary.DepositHandlingFee,
 									summary.DepositCount,
-									summary.FirstDepositAmount,
-									summary.FirstDepositHandlingFee,
-									summary.FirstDepositOn,
 									summary.WithdrawAmount,
 									summary.WithdrawHandlingFee,
-									summary.WithdrawCount,
-									summary.FirstWithdrawAmount,
-									summary.FirstWithdrawHandlingFee,
-									summary.FirstWithdrawOn);
+									summary.WithdrawCount);
 
 			var fiveMinutesData = await fiveMinutesQuery.ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
@@ -105,15 +93,9 @@ internal class PaymentStatisticsQueryService(
 									accumulate.DepositAmount = Add(accumulate.DepositAmount, statistics.DepositAmount);
 									accumulate.DepositCount = Add(accumulate.DepositCount, statistics.DepositCount);
 									accumulate.DepositHandlingFee = Add(accumulate.DepositHandlingFee, statistics.DepositHandlingFee);
-									accumulate.FirstDepositOn ??= statistics.FirstDepositOn;
-									accumulate.FirstDepositAmount ??= statistics.FirstDepositAmount;
-									accumulate.FirstDepositHandlingFee ??= statistics.FirstDepositHandlingFee;
 									accumulate.WithdrawAmount = Add(accumulate.WithdrawAmount, statistics.WithdrawAmount);
 									accumulate.WithdrawCount = Add(accumulate.WithdrawCount, statistics.WithdrawCount);
 									accumulate.WithdrawHandlingFee = Add(accumulate.WithdrawHandlingFee, statistics.WithdrawHandlingFee);
-									accumulate.FirstWithdrawOn ??= statistics.FirstWithdrawOn;
-									accumulate.FirstWithdrawAmount ??= statistics.FirstWithdrawAmount;
-									accumulate.FirstWithdrawHandlingFee ??= statistics.FirstWithdrawHandlingFee;
 
 									return accumulate;
 								})
@@ -127,15 +109,9 @@ internal class PaymentStatisticsQueryService(
 								summary.DepositAmount,
 								summary.DepositHandlingFee,
 								summary.DepositCount,
-								summary.FirstDepositAmount,
-								summary.FirstDepositHandlingFee,
-								summary.FirstDepositOn,
 								summary.WithdrawAmount,
 								summary.WithdrawHandlingFee,
-								summary.WithdrawCount,
-								summary.FirstWithdrawAmount,
-								summary.FirstWithdrawHandlingFee,
-								summary.FirstWithdrawOn);
+								summary.WithdrawCount);
 
 			var hourData = await hourQuery.ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
@@ -172,22 +148,10 @@ internal class PaymentStatisticsQueryService(
 
 		public int? DepositCount { get; set; }
 
-		public decimal? FirstDepositAmount { get; set; }
-
-		public decimal? FirstDepositHandlingFee { get; set; }
-
-		public DateTime? FirstDepositOn { get; set; }
-
 		public decimal? WithdrawAmount { get; set; }
 
 		public decimal? WithdrawHandlingFee { get; set; }
 
 		public int? WithdrawCount { get; set; }
-
-		public decimal? FirstWithdrawAmount { get; set; }
-
-		public decimal? FirstWithdrawHandlingFee { get; set; }
-
-		public DateTime? FirstWithdrawOn { get; set; }
 	}
 }

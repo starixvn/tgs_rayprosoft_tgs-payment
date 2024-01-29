@@ -32,15 +32,9 @@ internal class StatisticsRepository(TgsContext dbContext)
 				row.DepositAmount,
 				row.DepositHandlingFee,
 				row.DepositCount,
-				row.FirstDepositAmount,
-				row.FirstDepositHandlingFee,
-				row.FirstDepositOn,
 				row.WithdrawAmount,
 				row.WithdrawHandlingFee,
-				row.WithdrawCount,
-				row.FirstWithdrawAmount,
-				row.FirstWithdrawHandlingFee,
-				row.FirstWithdrawOn));
+				row.WithdrawCount));
 	}
 
 	public IAsyncEnumerable<UserPaymentSummaryStatistics> QueryHourPaymentStatisticsAsync(
@@ -66,15 +60,9 @@ internal class StatisticsRepository(TgsContext dbContext)
 				row.DepositAmount,
 				row.DepositHandlingFee,
 				row.DepositCount,
-				row.FirstDepositAmount,
-				row.FirstDepositHandlingFee,
-				row.FirstDepositOn,
 				row.WithdrawAmount,
 				row.WithdrawHandlingFee,
-				row.WithdrawCount,
-				row.FirstWithdrawAmount,
-				row.FirstWithdrawHandlingFee,
-				row.FirstWithdrawOn));
+				row.WithdrawCount));
 	}
 
 	public IAsyncEnumerable<UserPaymentSummaryStatistics> QueryDailyPaymentStatisticsAsync(
@@ -99,14 +87,8 @@ internal class StatisticsRepository(TgsContext dbContext)
 				row.DailyDepositAmount,
 				row.DailyDepositHandlingFee,
 				row.DailyDepositCount,
-				row.FirstDepositAmount,
-				row.FirstDepositHandlingFee,
-				row.FirstDepositOn,
 				row.DailyWithdrawAmount,
 				row.DailyWithdrawHandlingFee,
-				row.DailyWithdrawCount,
-				row.FirstWithdrawAmount,
-				row.FirstWithdrawHandlingFee,
-				row.FirstWithdrawOn));
+				row.DailyWithdrawCount));
 	}
 }

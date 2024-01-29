@@ -29,15 +29,9 @@ public class StatisticsController : ControllerBase
 				DepositAmount = s.DepositAmount,
 				DepositCount = s.DepositCount,
 				DepositHandlingFee = s.DepositHandlingFee,
-				FirstDepositAmount = s.FirstDepositAmount,
-				FirstDepositHandlingFee = s.FirstDepositHandlingFee,
-				FirstDepositOn = s.FirstDepositOn,
 				WithdrawAmount = s.WithdrawAmount,
 				WithdrawCount = s.WithdrawCount,
-				WithdrawHandlingFee = s.WithdrawHandlingFee,
-				FirstWithdrawAmount = s.FirstWithdrawAmount,
-				FirstWithdrawHandlingFee = s.FirstWithdrawHandlingFee,
-				FirstWithdrawOn = s.FirstWithdrawOn
+				WithdrawHandlingFee = s.WithdrawHandlingFee
 			});
 	}
 }
