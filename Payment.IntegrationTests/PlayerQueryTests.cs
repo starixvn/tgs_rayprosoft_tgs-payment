@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
@@ -59,13 +60,20 @@ public class PlayerQueryTests
 	[Test]
 	public async Task 查詢玩家帳戶總覽_當資料庫中沒有資料時()
 	{
-		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeTimeProvider));
 
 		var httpClient = web.CreateClient();
 
 		var sut = new PaymentServiceClient(httpClient);
 
 		var playerCode = "tester1";
+		var currentTime = DateTimeOffset.ParseExact("2024-01-29T16:16:00.0000000+08:00", "o", null);
+
+		_ = fakeTimeProvider.GetUtcNow()
+			.Returns(currentTime);
 
 		var expected = new Tgs.Payment.Clients.PaymentOverview(
 			null,
@@ -74,13 +82,80 @@ public class PlayerQueryTests
 			null,
 			null,
 			null,
-			DateOnly.MinValue,
+			DateOnly.Parse("2024-1-29"),
 			0M,
 			0M);
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
 		ClassicAssert.AreEqual(expected, actual);
+	}
+
+	[Test]
+	public async Task 查詢玩家帳戶總覽_還沒有統計出總覽資料_會從5分鐘及小時匯總資料運算出來()
+	{
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeTimeProvider));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var playerCode = "tester1";
+		var brandId = Guid.NewGuid();
+		var currentTime = DateTimeOffset.ParseExact("2024-01-29T16:16:00.0000000+08:00", "o", null);
+
+		_ = fakeTimeProvider.GetUtcNow()
+			.Returns(currentTime);
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.FiveMinutesPaymentStatistics.AddAsync(new FiveMinutesPaymentStatistic
+		{
+			TimePoint = DateTime.ParseExact("2024-01-29T16:10:00.0000000+08:00", "o", null).ToUniversalTime(),
+			BrandId = brandId,
+			UserId = playerCode,
+			UserType = (int)Tgs.Payment.UserType.Player,
+			DepositAmount = 100M,
+			DepositHandlingFee = 0M,
+			DepositCount = 1,
+			FirstDepositAmount = 100M,
+			FirstDepositHandlingFee = 0M,
+			FirstDepositOn = DateTime.ParseExact("2024-01-29T16:10:00.0000000+08:00", "o", null).ToUniversalTime()
+		});
+
+		_ = await dbContext.HourPaymentStatistics.AddAsync(new HourPaymentStatistic
+		{
+			TimePoint = DateTime.ParseExact("2024-01-29T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			BrandId = brandId,
+			UserId = playerCode,
+			UserType = (int)Tgs.Payment.UserType.Player,
+			DepositAmount = 100M,
+			DepositHandlingFee = 0M,
+			DepositCount = 2,
+			FirstDepositAmount = 50M,
+			FirstDepositHandlingFee = 0M,
+			FirstDepositOn = DateTime.ParseExact("2024-01-29T15:00:00.0000000+08:00", "o", null).ToUniversalTime()
+		});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var expected = new Tgs.Payment.Clients.PaymentOverview(
+			50M,
+			0M,
+			DateTime.ParseExact("2024-01-29T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			null,
+			null,
+			null,
+			DateOnly.Parse("2024-1-29"),
+			200M,
+			0M);
+
+		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
+
+		Assert.That(actual, Is.EqualTo(expected));
 	}
 
 	[Test]

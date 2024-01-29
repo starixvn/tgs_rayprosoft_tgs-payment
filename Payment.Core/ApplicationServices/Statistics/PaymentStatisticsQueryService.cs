@@ -12,8 +12,6 @@ internal class PaymentStatisticsQueryService(
 	IStatisticsRepository statisticsRepository)
 	: IQueryService<PaymentStatisticsQuery, UserPaymentSummaryStatistics>
 {
-	private static readonly TimeSpan _ReportOffset = TimeSpan.FromHours(8D);
-
 	public async IAsyncEnumerable<UserPaymentSummaryStatistics> QueryAsync(
 		PaymentStatisticsQuery query,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -28,10 +26,10 @@ internal class PaymentStatisticsQueryService(
 
 		var maxQueryDate = dailyData.Length > 0
 			? (DateOnly?)DateOnly.FromDateTime(
-				new DateTimeOffset(dailyData.Max(s => s.TimePoint)).ToOffset(_ReportOffset).DateTime)
+				new DateTimeOffset(dailyData.Max(s => s.TimePoint)).ToOffset(PaymentUtility.ReportOffset).DateTime)
 				.AddDays(1)
 			: null;
-		var currentTime = timeProvider.GetUtcNow().ToOffset(_ReportOffset);
+		var currentTime = timeProvider.GetUtcNow().ToOffset(PaymentUtility.ReportOffset);
 		var currentDate = DateOnly.FromDateTime(currentTime.DateTime);
 		var lastRowDate = currentDate.AddDays(-1);
 		if (maxQueryDate is not null && lastRowDate < maxQueryDate)
@@ -42,7 +40,7 @@ internal class PaymentStatisticsQueryService(
 			var startTime = new DateTimeOffset(
 				lastRowDate,
 				TimeOnly.MinValue,
-				_ReportOffset).UtcDateTime;
+				PaymentUtility.ReportOffset).UtcDateTime;
 			var endTime = currentTime.UtcDateTime;
 
 			var fiveMinutesQuery = from s in statisticsRepository.Query5minPaymentStatisticsAsync(
@@ -50,7 +48,7 @@ internal class PaymentStatisticsQueryService(
 									endTime,
 									query.UserIds,
 									cancellationToken)
-								   let hourPoint = new DateTimeOffset(s.TimePoint).ToOffset(_ReportOffset).DateTime.FloorHourTime()
+								   let hourPoint = new DateTimeOffset(s.TimePoint).ToOffset(PaymentUtility.ReportOffset).DateTime.FloorHourTime()
 								   group s by new { TimePoint = hourPoint, s.UserId } into g
 								   let summary = g.ToEnumerable().Aggregate(
 									new PaymentAggregate(),
@@ -59,9 +57,15 @@ internal class PaymentStatisticsQueryService(
 										accumulate.DepositAmount = Add(accumulate.DepositAmount, statistics.DepositAmount);
 										accumulate.DepositCount = Add(accumulate.DepositCount, statistics.DepositCount);
 										accumulate.DepositHandlingFee = Add(accumulate.DepositHandlingFee, statistics.DepositHandlingFee);
+										accumulate.FirstDepositOn ??= statistics.FirstDepositOn;
+										accumulate.FirstDepositAmount ??= statistics.FirstDepositAmount;
+										accumulate.FirstDepositHandlingFee ??= statistics.FirstDepositHandlingFee;
 										accumulate.WithdrawAmount = Add(accumulate.WithdrawAmount, statistics.WithdrawAmount);
 										accumulate.WithdrawCount = Add(accumulate.WithdrawCount, statistics.WithdrawCount);
 										accumulate.WithdrawHandlingFee = Add(accumulate.WithdrawHandlingFee, statistics.WithdrawHandlingFee);
+										accumulate.FirstWithdrawOn ??= statistics.FirstWithdrawOn;
+										accumulate.FirstWithdrawAmount ??= statistics.FirstWithdrawAmount;
+										accumulate.FirstWithdrawHandlingFee ??= statistics.FirstWithdrawHandlingFee;
 
 										return accumulate;
 									})
@@ -72,9 +76,15 @@ internal class PaymentStatisticsQueryService(
 									summary.DepositAmount,
 									summary.DepositHandlingFee,
 									summary.DepositCount,
+									summary.FirstDepositAmount,
+									summary.FirstDepositHandlingFee,
+									summary.FirstDepositOn,
 									summary.WithdrawAmount,
 									summary.WithdrawHandlingFee,
-									summary.WithdrawCount);
+									summary.WithdrawCount,
+									summary.FirstWithdrawAmount,
+									summary.FirstWithdrawHandlingFee,
+									summary.FirstWithdrawOn);
 
 			var fiveMinutesData = await fiveMinutesQuery.ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
@@ -84,7 +94,7 @@ internal class PaymentStatisticsQueryService(
 								query.UserIds,
 								cancellationToken).Concat(fiveMinutesData.ToAsyncEnumerable())
 							let date = DateOnly.FromDateTime(
-								new DateTimeOffset(s.TimePoint).ToOffset(_ReportOffset).DateTime)
+								new DateTimeOffset(s.TimePoint).ToOffset(PaymentUtility.ReportOffset).DateTime)
 							group s by new { Date = date, s.UserId } into g
 							let summary = g.ToEnumerable().Aggregate(
 								new PaymentAggregate(),
@@ -93,9 +103,15 @@ internal class PaymentStatisticsQueryService(
 									accumulate.DepositAmount = Add(accumulate.DepositAmount, statistics.DepositAmount);
 									accumulate.DepositCount = Add(accumulate.DepositCount, statistics.DepositCount);
 									accumulate.DepositHandlingFee = Add(accumulate.DepositHandlingFee, statistics.DepositHandlingFee);
+									accumulate.FirstDepositOn ??= statistics.FirstDepositOn;
+									accumulate.FirstDepositAmount ??= statistics.FirstDepositAmount;
+									accumulate.FirstDepositHandlingFee ??= statistics.FirstDepositHandlingFee;
 									accumulate.WithdrawAmount = Add(accumulate.WithdrawAmount, statistics.WithdrawAmount);
 									accumulate.WithdrawCount = Add(accumulate.WithdrawCount, statistics.WithdrawCount);
 									accumulate.WithdrawHandlingFee = Add(accumulate.WithdrawHandlingFee, statistics.WithdrawHandlingFee);
+									accumulate.FirstWithdrawOn ??= statistics.FirstWithdrawOn;
+									accumulate.FirstWithdrawAmount ??= statistics.FirstWithdrawAmount;
+									accumulate.FirstWithdrawHandlingFee ??= statistics.FirstWithdrawHandlingFee;
 
 									return accumulate;
 								})
@@ -103,15 +119,21 @@ internal class PaymentStatisticsQueryService(
 								new DateTimeOffset(
 									g.Key.Date,
 									TimeOnly.MinValue,
-									_ReportOffset).UtcDateTime,
+									PaymentUtility.ReportOffset).UtcDateTime,
 								g.Key.UserId,
 								UserType.Player,
 								summary.DepositAmount,
 								summary.DepositHandlingFee,
 								summary.DepositCount,
+								summary.FirstDepositAmount,
+								summary.FirstDepositHandlingFee,
+								summary.FirstDepositOn,
 								summary.WithdrawAmount,
 								summary.WithdrawHandlingFee,
-								summary.WithdrawCount);
+								summary.WithdrawCount,
+								summary.FirstWithdrawAmount,
+								summary.FirstWithdrawHandlingFee,
+								summary.FirstWithdrawOn);
 
 			var hourData = await hourQuery.ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
@@ -139,19 +161,4 @@ internal class PaymentStatisticsQueryService(
 			: addend is null
 				? summand
 				: summand.Value + addend.Value;
-
-	private class PaymentAggregate
-	{
-		public decimal? DepositAmount { get; set; }
-
-		public decimal? DepositHandlingFee { get; set; }
-
-		public int? DepositCount { get; set; }
-
-		public decimal? WithdrawAmount { get; set; }
-
-		public decimal? WithdrawHandlingFee { get; set; }
-
-		public int? WithdrawCount { get; set; }
-	}
 }
