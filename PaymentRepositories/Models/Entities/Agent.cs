@@ -76,6 +76,10 @@ public partial class Agent
 
     public byte[] WithdrawSalt { get; set; } = null!;
 
+    public Guid? SnapshotEventId { get; set; }
+
+    public Guid? WalletId { get; set; }
+
     public virtual Brand Brand { get; set; } = null!;
 
     public virtual ICollection<Agent> InverseParentAgent { get; set; } = new List<Agent>();

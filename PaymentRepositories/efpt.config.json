@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 3,
+   "CodeGenerationMode": 4,
    "ContextClassName": "TgsContext",
    "ContextNamespace": "Entities",
    "DefaultDacpacSchema": null,
@@ -72,6 +72,14 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.five_minutes_payment_statistics",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.hour_payment_statistics",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.payment_channels",
          "ObjectType": 0
       },
@@ -100,6 +108,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.player_daily_payment_statistics",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.player_payment_overview",
          "ObjectType": 0
       },
@@ -122,6 +134,7 @@
    "UseDatabaseNames": false,
    "UseDateOnlyTimeOnly": false,
    "UseDbContextSplitting": true,
+   "UseDecimalDataAnnotationForSprocResult": true,
    "UseFluentApiOnly": true,
    "UseHandleBars": false,
    "UseHierarchyId": false,
@@ -129,6 +142,7 @@
    "UseLegacyPluralizer": false,
    "UseManyToManyEntity": true,
    "UseNoDefaultConstructor": true,
+   "UseNoNavigations": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
    "UseNullableReferences": true,

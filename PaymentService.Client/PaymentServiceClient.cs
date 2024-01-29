@@ -1413,4 +1413,26 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.Where(arr => arr is not null)
 			.SelectMany(arr => arr!.ToAsyncEnumerable());
 	}
+
+	public IAsyncEnumerable<PaymentStatistics> QueryPaymentStatisticsAsync(
+		DateOnly start,
+		DateOnly end,
+		IEnumerable<string>? userIds = null,
+		CancellationToken cancellationToken = default)
+	{
+		var userIdQueryString = string.Join(
+			"&",
+			(userIds ?? Array.Empty<string>()).Select(id => $"userId={id}"));
+
+		return _httpClient.GetAsync(
+			$"/statistics/{start:o}/{end:o}",
+			HttpCompletionOption.ResponseHeadersRead,
+			cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<IAsyncEnumerable<PaymentStatistics>>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable()
+				.SelectMany(arr => arr!));
+	}
 }

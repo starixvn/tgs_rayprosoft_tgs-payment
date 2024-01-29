@@ -31,6 +31,7 @@ public static class PaymentConfigurationExtensions
 	{
 		_ = paymentConfiguration
 			.UsePaymentRepository<PaymentRepository>()
+			.UseStatisticsRepository<StatisticsRepository>()
 			.Services
 			.AddDbContext<TgsContext>(dbConfigure);
 

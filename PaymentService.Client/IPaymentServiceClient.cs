@@ -44,7 +44,13 @@ public interface IPaymentServiceClient
 
 	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(IEnumerable<BrandPaymentInfo> brandPaymentInfos, PlayerInfo playerInfo, IEnumerable<Guid> blockList, IEnumerable<Guid> whiteList, ILookup<Guid, Guid> brandPaymentVipLevels, CancellationToken cancellationToken = default);
+	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(
+		IEnumerable<BrandPaymentInfo> brandPaymentInfos,
+		PlayerInfo playerInfo,
+		IEnumerable<Guid> blockList,
+		IEnumerable<Guid> whiteList,
+		ILookup<Guid, Guid> brandPaymentVipLevels,
+		CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
@@ -89,9 +95,9 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<TopTenDepositWithdrawInfo> GetCurrentDayTopTenWithdrawPlayersAsync(Guid brandId, CancellationToken cancellationToken = default);
 
-	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
-
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default);
+
+	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default);
 
@@ -101,9 +107,9 @@ public interface IPaymentServiceClient
 
 	IAsyncEnumerable<string> GetPlayersByBankInfoTagAsync(Guid brandId, string tagType, string tag, CancellationToken cancellationToken = default);
 
-	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
-
 	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default);
+
+	ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<Guid> LockDepositPaymentAsync(
 		Guid formId,
@@ -182,4 +188,10 @@ public interface IPaymentServiceClient
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateBrandPaymentExtendedDataAsync(Guid brandPaymentId, JsonDocument extendedData, CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<PaymentStatistics> QueryPaymentStatisticsAsync(
+		DateOnly start,
+		DateOnly end,
+		IEnumerable<string>? userIds = null,
+		CancellationToken cancellationToken = default);
 }

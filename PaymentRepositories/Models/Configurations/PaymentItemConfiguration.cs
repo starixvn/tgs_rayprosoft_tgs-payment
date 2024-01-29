@@ -42,7 +42,9 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             .HasColumnType("jsonb")
             .HasColumnName("extend_data");
             entity.Property(e => e.Name).HasColumnName("name");
-            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Status)
+            .HasDefaultValue((short)0)
+            .HasColumnName("status");
             entity.Property(e => e.UpdatedByUsername)
             .HasMaxLength(32)
             .HasColumnName("updated_by_username");
