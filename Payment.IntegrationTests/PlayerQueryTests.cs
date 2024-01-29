@@ -159,6 +159,87 @@ public class PlayerQueryTests
 	}
 
 	[Test]
+	public async Task 查詢玩家帳戶總覽_會加總即時資料()
+	{
+		var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeTimeProvider));
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var playerCode = "tester1";
+		var brandId = Guid.NewGuid();
+		var currentTime = DateTimeOffset.ParseExact("2024-01-29T16:16:00.0000000+08:00", "o", null);
+
+		_ = fakeTimeProvider.GetUtcNow()
+			.Returns(currentTime);
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		_ = await dbContext.FiveMinutesPaymentStatistics.AddAsync(new FiveMinutesPaymentStatistic
+		{
+			TimePoint = DateTime.ParseExact("2024-01-29T16:10:00.0000000+08:00", "o", null).ToUniversalTime(),
+			BrandId = brandId,
+			UserId = playerCode,
+			UserType = (int)Tgs.Payment.UserType.Player,
+			DepositAmount = 100M,
+			DepositHandlingFee = 0M,
+			DepositCount = 1,
+			FirstDepositAmount = 100M,
+			FirstDepositHandlingFee = 0M,
+			FirstDepositOn = DateTime.ParseExact("2024-01-29T16:10:00.0000000+08:00", "o", null).ToUniversalTime()
+		});
+
+		_ = await dbContext.HourPaymentStatistics.AddAsync(new HourPaymentStatistic
+		{
+			TimePoint = DateTime.ParseExact("2024-01-29T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			BrandId = brandId,
+			UserId = playerCode,
+			UserType = (int)Tgs.Payment.UserType.Player,
+			DepositAmount = 100M,
+			DepositHandlingFee = 0M,
+			DepositCount = 2,
+			FirstDepositAmount = 50M,
+			FirstDepositHandlingFee = 0M,
+			FirstDepositOn = DateTime.ParseExact("2024-01-29T15:00:00.0000000+08:00", "o", null).ToUniversalTime()
+		});
+
+		_ = await dbContext.PlayerPaymentOverviews.AddAsync(new PlayerPaymentOverview
+		{
+			PlayerCode = playerCode,
+			FirstDepositAmount = 300M,
+			FirstDepositHandlingFee = 0,
+			FirstDepositOn = DateTime.ParseExact("2024-01-28T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			FirstWithdrawAmount = 100M,
+			FirstWithdrawHandlingFee = 0,
+			FirstWithdrawOn = DateTime.ParseExact("2024-01-28T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			RecordedBy = DateOnly.Parse("2024-1-28"),
+			TotalDepositAmount = 100M,
+			TotalWithdrawAmount = 100M
+		});
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var expected = new Tgs.Payment.Clients.PaymentOverview(
+			300M,
+			0M,
+			DateTime.ParseExact("2024-01-28T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			100M,
+			0,
+			DateTime.ParseExact("2024-01-28T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
+			DateOnly.Parse("2024-1-28"),
+			300M,
+			100M);
+
+		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
+
+		Assert.That(actual, Is.EqualTo(expected));
+	}
+
+	[Test]
 	public async Task 查詢當日玩家已通過存款與已支付提款金額()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
