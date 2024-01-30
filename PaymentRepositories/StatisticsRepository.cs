@@ -17,10 +17,10 @@ internal class StatisticsRepository(TgsContext dbContext)
 	{
 		var query = dbContext.FiveMinutesPaymentStatistics
 			.Where(row => row.TimePoint >= start.ToUniversalTime()
-				&& row.TimePoint <= end.ToUniversalTime()
+				&& row.TimePoint < end.ToUniversalTime()
 				&& row.UserType == (int)UserType.Player);
 
-		if (userIds is not null)
+		if (userIds is not null && userIds.Length > 0)
 			query = query.Where(row => userIds.Contains(row.UserId));
 
 		return query.OrderBy(row => row.TimePoint)
@@ -51,10 +51,10 @@ internal class StatisticsRepository(TgsContext dbContext)
 	{
 		var query = dbContext.HourPaymentStatistics
 			.Where(row => row.TimePoint >= start.ToUniversalTime()
-				&& row.TimePoint <= end.ToUniversalTime()
+				&& row.TimePoint < end.ToUniversalTime()
 				&& row.UserType == (int)UserType.Player);
 
-		if (userIds is not null)
+		if (userIds is not null && userIds.Length > 0)
 			query = query.Where(row => userIds.Contains(row.UserId));
 
 		return query.OrderBy(row => row.TimePoint)
@@ -85,9 +85,9 @@ internal class StatisticsRepository(TgsContext dbContext)
 	{
 		var query = dbContext.PlayerDailyPaymentStatistics
 			.Where(row => row.ReportDate >= start
-				&& row.ReportDate <= end);
+				&& row.ReportDate < end);
 
-		if (userIds is not null)
+		if (userIds is not null && userIds.Length > 0)
 			query = query.Where(row => userIds.Contains(row.PlayerCode));
 
 		return query.OrderBy(row => row.ReportDate)

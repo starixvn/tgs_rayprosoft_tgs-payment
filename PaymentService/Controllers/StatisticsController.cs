@@ -34,4 +34,10 @@ public class StatisticsController : ControllerBase
 				WithdrawHandlingFee = s.WithdrawHandlingFee
 			});
 	}
+
+	[HttpGet("5min/{start}/{end}", Name = "Query5MinPaymentStatistics")]
+	public void Query5MinPaymentStatistics()
+	{
+
+	}
 }
