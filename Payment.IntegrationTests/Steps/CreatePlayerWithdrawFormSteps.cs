@@ -84,10 +84,10 @@ public class CreatePlayerWithdrawFormSteps
 			Arg.Any<CancellationToken>())
 			.Returns(new ReadBucketResult(0M, null));
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					Guid.NewGuid(),

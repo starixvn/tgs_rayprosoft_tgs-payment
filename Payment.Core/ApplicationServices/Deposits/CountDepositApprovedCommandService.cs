@@ -28,6 +28,8 @@ internal class CountDepositApprovedCommandService(
 
 		var amount = depositForm?.ActualAmount ?? depositForm?.Amount ?? 0m;
 
-		await countRepository.CountBrandCurrentDayNetDepositAsync(command.BrandId, (double)amount);
+		await countRepository.CountBrandCurrentDayNetDepositAsync(
+			command.BrandId,
+			(double)amount).ConfigureAwait(false);
 	}
 }

@@ -108,10 +108,10 @@ public class WithdrawFormTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -312,10 +312,10 @@ public class WithdrawFormTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -442,10 +442,10 @@ public class WithdrawFormTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -580,10 +580,10 @@ public class WithdrawFormTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -731,10 +731,10 @@ public class WithdrawFormTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,

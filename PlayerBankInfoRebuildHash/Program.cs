@@ -24,14 +24,16 @@ var builder = Host.CreateApplicationBuilder(args);
 
 using var app = builder.Build();
 
-await using var hostScope = app.Services.CreateAsyncScope();
+using var hostScope = app.Services.CreateAsyncScope();
+await using (app.Services.CreateAsyncScope().ConfigureAwait(false))
+{
+	var dbContext = hostScope.ServiceProvider.GetRequiredService<TgsContext>();
+	var paymentClient = hostScope.ServiceProvider.GetRequiredService<IPaymentClient>();
 
-var dbContext = hostScope.ServiceProvider.GetRequiredService<TgsContext>();
-var paymentClient = hostScope.ServiceProvider.GetRequiredService<IPaymentClient>();
+	var allBankInfos = dbContext.PlayerBankInfos.ToAsyncEnumerable();
 
-var allBankInfos = dbContext.PlayerBankInfos.ToAsyncEnumerable();
-
-await foreach (var bankInfo in allBankInfos)
-	await paymentClient
-		.RebuildPlayerBankInfoHashAsync(bankInfo.BrandId, bankInfo.Id)
-		.ConfigureAwait(false);
+	await foreach (var bankInfo in allBankInfos)
+		await paymentClient
+			.RebuildPlayerBankInfoHashAsync(bankInfo.BrandId, bankInfo.Id)
+			.ConfigureAwait(false);
+}

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;

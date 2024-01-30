@@ -727,7 +727,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 		{
 			CurrentDay = currentDay,
 			PlayerCodes = playerCodes.ToArray()
-		});
+		}).ConfigureAwait(false);
 
 		foreach (var item in result.ToList())
 		{

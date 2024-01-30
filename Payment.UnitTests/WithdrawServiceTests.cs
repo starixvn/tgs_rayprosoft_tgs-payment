@@ -2749,10 +2749,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -2856,10 +2856,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -2964,10 +2964,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -3092,10 +3092,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -3235,10 +3235,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -3344,10 +3344,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -3472,10 +3472,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
@@ -3635,10 +3635,10 @@ public class WithdrawServiceTests
 				BrandId = brandId
 			});
 
-		_ = fakeVipLevelClient.GetBrandAllVipLevelsAsync(Arg.Is(brandId))
+		_ = fakeVipLevelClient.VipLevelQueryAsync(Arg.Is(brandId))
 			.Returns(new[]
 			{
-				new Tgs.VipLevelService.Clients.VipLevelInfo(
+				new Tgs.VipLevelService.Common.ViewModels.VipLevelInfoViewModel(
 					Guid.NewGuid(),
 					1,
 					brandId,
