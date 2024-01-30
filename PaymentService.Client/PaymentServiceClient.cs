@@ -1435,4 +1435,19 @@ internal class PaymentServiceClient : IPaymentServiceClient
 				.ToAsyncEnumerable()
 				.SelectMany(arr => arr!));
 	}
+
+	public IAsyncEnumerable<PaymentStatistics> Query5minPaymentStatisticsAsync(
+		DateTime start,
+		DateTime end,
+		CancellationToken cancellationToken = default)
+		=> _httpClient.GetAsync(
+			$"/statistics/5min/{start:o}/{end:o}",
+			HttpCompletionOption.ResponseHeadersRead,
+			cancellationToken)
+			.ToAsyncEnumerable()
+			.Do(response => response.EnsureSuccessStatusCode())
+			.SelectMany(response => response.Content
+				.ReadFromJsonAsync<IAsyncEnumerable<PaymentStatistics>>(_SerializerOptions, cancellationToken)
+				.ToAsyncEnumerable()
+				.SelectMany(arr => arr!));
 }

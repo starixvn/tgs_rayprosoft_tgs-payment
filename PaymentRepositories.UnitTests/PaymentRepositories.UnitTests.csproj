@@ -33,4 +33,12 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Users\Phoenix\source\repos\tgs-payment\PaymentRepositories.UnitTests\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Users\Phoenix\source\repos\tgs-payment\PaymentRepositories.UnitTests\.editorconfig" />
+  </ItemGroup>
+
 </Project>

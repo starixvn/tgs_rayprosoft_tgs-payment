@@ -36,7 +36,7 @@ internal class WithdrawLimitProcessPipe(
 
 		var brandTimeOffset = TimeSpan.FromMinutes(brandInfo!.TimeSpanMinutes ?? 8 * 60);
 
-		var brandVipLevels = await vipLevelServiceClient.GetBrandAllVipLevelsAsync(brandId, cancellationToken)
+		var brandVipLevels = await vipLevelServiceClient.VipLevelQueryAsync(brandId, cancellationToken)
 			.OrderBy(vip => vip.Level)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);

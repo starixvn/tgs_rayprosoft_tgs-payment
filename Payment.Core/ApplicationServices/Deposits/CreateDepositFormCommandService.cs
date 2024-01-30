@@ -26,7 +26,8 @@ internal class CreateDepositFormCommandService(
 			command.CreateInfo.BrandId,
 			cancellationToken).ConfigureAwait(false);
 
-		var orderNo = await takeNumberStore.GetDepositFormOrderNoAsync(brandInfo!.Code);
+		var orderNo = await takeNumberStore.GetDepositFormOrderNoAsync(
+			brandInfo!.Code).ConfigureAwait(false);
 
 		var eventId = await serialNumberGenerator
 			.GenerateAsync(cancellationToken)

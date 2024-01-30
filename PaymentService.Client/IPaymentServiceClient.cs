@@ -194,4 +194,9 @@ public interface IPaymentServiceClient
 		DateOnly end,
 		IEnumerable<string>? userIds = null,
 		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<PaymentStatistics> Query5minPaymentStatisticsAsync(
+		DateTime start,
+		DateTime end,
+		CancellationToken cancellationToken = default);
 }
