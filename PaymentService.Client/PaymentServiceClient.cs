@@ -787,7 +787,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	public async ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/deposit/{formId}");
-		requestMessage.Headers.Add("FormQuery", string.Empty);
+		requestMessage.Headers.Add("FormQuery", "1");
 
 		var response = await _httpClient
 			.SendAsync(requestMessage, cancellationToken)
@@ -887,7 +887,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 	public async ValueTask<WithdrawFormInfo?> GetWithdrawFormAsync(Guid formId, CancellationToken cancellationToken = default)
 	{
 		var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"/withdraw/{formId}");
-		requestMessage.Headers.Add("FormQuery", string.Empty);
+		requestMessage.Headers.Add("FormQuery", "1");
 
 		var response = await _httpClient
 			.SendAsync(requestMessage, cancellationToken)

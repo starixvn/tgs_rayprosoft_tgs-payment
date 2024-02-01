@@ -45,8 +45,8 @@ public class DepositController : ControllerBase
 
 	[HttpGet("success-rate/{brandId}", Name = "GetDepositSuccessRate")]
 	public ValueTask<decimal> GetCurrentDayDepositSuccessRateAsync(
-			[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
-			Guid brandId)
+		[FromServices] IGetService<CurrentDaySuccessRateQuery, decimal> rateService,
+		Guid brandId)
 	{
 		var query = new CurrentDaySuccessRateQuery(brandId);
 		return rateService.GetAsync(query, HttpContext.RequestAborted);
@@ -80,6 +80,7 @@ public class DepositController : ControllerBase
 	/// <param name="brandId">Brand id.</param>
 	/// <param name="formId">Form id.</param>
 	/// <returns></returns>
+	[Obsolete("淘汰")]
 	[HttpGet("{brandId}/{formId}", Name = "GetDepositFormWithBrandId")]
 	public async Task<DepositFormViewModel?> GetDepositFormAsync(
 		[FromServices] IGetService<GetDepositFormDetailQuery, DepositFormInfo?> getService,
@@ -115,6 +116,7 @@ public class DepositController : ControllerBase
 				ReviewedUserName = formData.ReviewedUserName,
 				ReviewedOn = formData.ReviewedOn,
 				HandlingFee = formData.HandlingFee,
+				ApplyAmount = (formData.ActualAmount ?? formData.Amount) - formData.HandlingFee
 			}
 			: null;
 	}
@@ -151,7 +153,9 @@ public class DepositController : ControllerBase
 				OrderNo = formData.OrderNo,
 				PromotionPlayerId = formData.PromotionPlayerId,
 				ReviewedUserName = formData.ReviewedUserName,
-				ReviewedOn = formData.ReviewedOn
+				ReviewedOn = formData.ReviewedOn,
+				HandlingFee = formData.HandlingFee,
+				ApplyAmount = (formData.ActualAmount ?? formData.Amount) - formData.HandlingFee
 			}
 			: null;
 	}
@@ -312,6 +316,7 @@ public class DepositController : ControllerBase
 				ReviewedOn = row.ReviewedOn,
 				PromotionPlayerId = row.PromotionPlayerId,
 				HandlingFee = row.HandlingFee,
+				ApplyAmount = (row.ActualAmount ?? row.Amount) - row.HandlingFee
 			});
 
 		return new()

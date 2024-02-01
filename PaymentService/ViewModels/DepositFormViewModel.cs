@@ -4,29 +4,29 @@ public class DepositFormViewModel
 {
 	public decimal? ActualAmount { get; set; }
 
-	public decimal Amount { get; set; }
+	public required decimal Amount { get; set; }
 
 	public string? ApplyInfo { get; set; }
 
-	public Guid BrandId { get; set; }
+	public required Guid BrandId { get; set; }
 
-	public Guid BrandPaymentId { get; set; }
+	public required Guid BrandPaymentId { get; set; }
 
-	public string ChannelName { get; set; } = default!;
+	public required string ChannelName { get; set; }
 
-	public DateTimeOffset CreatedOn { get; set; }
+	public required DateTimeOffset CreatedOn { get; set; }
 
-	public decimal HandlingFee { get; set; }
+	public required decimal HandlingFee { get; set; }
 
-	public Guid Id { get; set; }
+	public required Guid Id { get; set; }
 
 	public string? OrderNo { get; set; }
 
-	public Guid PaymentMethodId { get; set; }
+	public required Guid PaymentMethodId { get; set; }
 
 	public string? PaymentReturn { get; set; }
 
-	public string PlayerCode { get; set; } = default!;
+	public required string PlayerCode { get; set; }
 
 	public Guid? PromotionId { get; set; }
 
@@ -38,11 +38,13 @@ public class DepositFormViewModel
 
 	public string? ReviewedUserName { get; set; }
 
-	public PaymentFlowState Status { get; set; }
+	public required PaymentFlowState Status { get; set; }
 
 	public string? ThirdPartyOrderNo { get; set; }
 
-	public DateTimeOffset UpdatedOn { get; set; }
+	public required DateTimeOffset UpdatedOn { get; set; }
 
-	public string UserName { get; set; } = default!;
+	public required string UserName { get; set; }
+
+	public required decimal ApplyAmount { get; set; }
 }
