@@ -97,6 +97,7 @@ public interface IPaymentServiceClient
 
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid formId, CancellationToken cancellationToken = default);
 
+	[Obsolete("淘汰")]
 	ValueTask<DepositFormInfo?> GetDepositFormAsync(Guid brandId, Guid formId, CancellationToken cancellationToken = default);
 
 	ValueTask<PaymentInfo?> GetPaymentByIdAsync(Guid paymentId, CancellationToken cancellationToken = default);

@@ -45,4 +45,6 @@ public class DepositFormInfo
 	public DateTimeOffset UpdatedOn { get; init; }
 
 	public string UserName { get; init; } = default!;
+
+	public decimal ApplyAmount { get; init; }
 }
