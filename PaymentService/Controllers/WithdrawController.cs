@@ -286,6 +286,7 @@ public class WithdrawController(ILogger<WithdrawController> logger) : Controller
 				UserId = row.UserId,
 				UserType = row.UserType,
 				Remark = row.Remark,
+				PlayerRemark = row.PlayerRemark,
 				Status = row.Status,
 				UpdatedOn = row.UpdatedOn,
 				UserName = row.UserName,
