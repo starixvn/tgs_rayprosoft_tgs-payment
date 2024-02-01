@@ -40,6 +40,8 @@ public class WithdrawFormViewModel
 
 	public string? Remark { get; set; }
 
+	public string? PlayerRemark { get; set; }
+
 	public DateTimeOffset? ReviewedOn { get; set; }
 
 	public string? ReviewedUserName { get; set; }

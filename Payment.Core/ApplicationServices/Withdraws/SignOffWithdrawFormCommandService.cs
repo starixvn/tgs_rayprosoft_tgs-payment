@@ -38,6 +38,7 @@ internal class SignOffWithdrawFormCommandService(
 					command.ReviewUserId,
 					command.ReviewUserName,
 					command.Remark,
+					command.PlayerRemark,
 					cancellationToken).ConfigureAwait(false);
 				break;
 
@@ -47,6 +48,7 @@ internal class SignOffWithdrawFormCommandService(
 					command.ReviewUserId,
 					command.ReviewUserName,
 					command.Remark,
+					command.PlayerRemark,
 					cancellationToken).ConfigureAwait(false);
 				break;
 
@@ -56,6 +58,7 @@ internal class SignOffWithdrawFormCommandService(
 					command.ReviewUserId,
 					command.ReviewUserName,
 					command.Remark,
+					command.PlayerRemark,
 					cancellationToken).ConfigureAwait(false);
 				break;
 		}

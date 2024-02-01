@@ -61,6 +61,8 @@ public partial class WithdrawForm
 
     public int UserType { get; set; }
 
+    public string? PlayerRemark { get; set; }
+
     public virtual Brand Brand { get; set; } = null!;
 
     public virtual BrandPayment? BrandPayment { get; set; }

@@ -72,7 +72,8 @@ public partial class TgsContext : DbContext
     {
         modelBuilder
             .HasPostgresExtension("ltree")
-            .HasPostgresExtension("pg_trgm");
+            .HasPostgresExtension("pg_trgm")
+            .HasPostgresExtension("uuid-ossp");
 
         modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());

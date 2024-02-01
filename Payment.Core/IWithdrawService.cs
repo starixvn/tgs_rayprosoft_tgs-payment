@@ -20,6 +20,7 @@ public interface IWithdrawService
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default);
 
 	ValueTask RejectWithdrawFormAsync(
@@ -27,6 +28,7 @@ public interface IWithdrawService
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default);
 
 	ValueTask PaidWithdrawFormAsync(
@@ -34,5 +36,6 @@ public interface IWithdrawService
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default);
 }
