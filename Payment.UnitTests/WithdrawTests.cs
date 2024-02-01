@@ -38,6 +38,7 @@ public class WithdrawTests
 				  null,
 				  null,
 				  null,
+				  null,
 				  "GPIW211028160001",
 				  Guid.NewGuid(),
 				  DateTimeOffset.Now,
@@ -73,6 +74,7 @@ public class WithdrawTests
 				  1000M,
 				  null,
 				  PaymentFlowState.WaitApprove,
+				  null,
 				  null,
 				  null,
 				  null,
@@ -118,6 +120,7 @@ public class WithdrawTests
 				  1000M,
 				  null,
 				  PaymentFlowState.WaitApprove,
+				  null,
 				  null,
 				  null,
 				  null,
@@ -202,7 +205,8 @@ public class WithdrawTests
 			ReviewState.Reject,
 			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 			"reviewedUserName",
-			null);
+			null,
+			"playerRemark");
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			command.FormId,
@@ -216,6 +220,7 @@ public class WithdrawTests
 			null,
 			PaymentFlowState.WaitApprove,
 			null,
+			"playerRemark",
 			null,
 			Guid.NewGuid(),
 			"{}",
@@ -241,7 +246,8 @@ public class WithdrawTests
 				Arg.Is(withdrawForm),
 				Arg.Is(command.ReviewUserId),
 				Arg.Is(command.ReviewUserName),
-				Arg.Is(command.Remark));
+				Arg.Is(command.Remark),
+				Arg.Is(command.PlayerRemark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -269,7 +275,8 @@ public class WithdrawTests
 			ReviewState.Reject,
 			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 			"reviewedUserName",
-			null);
+			null,
+			"playerRemark");
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			command.FormId,
@@ -283,6 +290,7 @@ public class WithdrawTests
 			null,
 			PaymentFlowState.Approved,
 			null,
+			"playerRemark",
 			null,
 			Guid.NewGuid(),
 			"{}",
@@ -308,7 +316,8 @@ public class WithdrawTests
 				Arg.Is(withdrawForm),
 				Arg.Is(command.ReviewUserId),
 				Arg.Is(command.ReviewUserName),
-				Arg.Is(command.Remark));
+				Arg.Is(command.Remark),
+				Arg.Is(command.PlayerRemark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -336,7 +345,8 @@ public class WithdrawTests
 			ReviewState.Approve,
 			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 			"reviewedUserName",
-			null);
+			null,
+			"playerRemark");
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			command.FormId,
@@ -349,6 +359,7 @@ public class WithdrawTests
 			0M,
 			null,
 			PaymentFlowState.WaitApprove,
+			null,
 			null,
 			null,
 			Guid.NewGuid(),
@@ -376,7 +387,8 @@ public class WithdrawTests
 			Arg.Is(withdrawForm),
 			Arg.Is(command.ReviewUserId),
 			Arg.Is(command.ReviewUserName),
-			Arg.Is(command.Remark));
+			Arg.Is(command.Remark),
+			Arg.Is(command.PlayerRemark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -404,7 +416,8 @@ public class WithdrawTests
 			ReviewState.Paid,
 			"93a723b2-9ebb-4607-ee8d-08d978fba75f",
 			"reviewedUserName",
-			null);
+			null,
+			"playerRemark");
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			command.FormId,
@@ -417,6 +430,7 @@ public class WithdrawTests
 			0M,
 			null,
 			PaymentFlowState.Approved,
+			null,
 			null,
 			null,
 			Guid.NewGuid(),
@@ -443,7 +457,8 @@ public class WithdrawTests
 			Arg.Is(withdrawForm),
 			Arg.Is(command.ReviewUserId),
 			Arg.Is(command.ReviewUserName),
-			Arg.Is(command.Remark));
+			Arg.Is(command.Remark),
+			Arg.Is(command.PlayerRemark));
 
 		_ = fakePaymentClient.Received(1)
 			.EmitWithdrawFormStatusChangedEventAsync(
@@ -487,6 +502,7 @@ public class WithdrawTests
 			0M,
 			Guid.NewGuid(),
 			PaymentFlowState.Init,
+			null,
 			null,
 			null,
 			Guid.NewGuid(),
@@ -614,6 +630,7 @@ public class WithdrawTests
 			PaymentFlowState.Approved,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -705,6 +722,7 @@ public class WithdrawTests
 			PaymentFlowState.Approved,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -794,6 +812,7 @@ public class WithdrawTests
 			0M,
 			Guid.NewGuid(),
 			PaymentFlowState.Approved,
+			null,
 			null,
 			null,
 			Guid.NewGuid(),
@@ -918,6 +937,7 @@ public class WithdrawTests
 			null,
 			PaymentFlowState.Paid,
 			null,
+			null,
 			"reviewedUsername",
 			DateTimeOffset.Now,
 			null,
@@ -991,6 +1011,7 @@ public class WithdrawTests
 			null,
 			null,
 			null,
+			null,
 			"GPIW230828000001",
 			Guid.Parse("94278519-99b9-4844-b1a9-522b46b32f4e"),
 			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
@@ -1041,6 +1062,7 @@ public class WithdrawTests
 			168m,
 			null,
 			PaymentFlowState.WaitApprove,
+			null,
 			null,
 			null,
 			null,
@@ -1134,6 +1156,7 @@ public class WithdrawTests
 			null,
 			null,
 			null,
+			null,			
 			"GPIW230828000001",
 			BankInfoId: playerBankInfoId,
 			new DateTimeOffset(2023, 8, 28, 0, 0, 0, TimeSpan.FromHours(8d)),
@@ -1315,6 +1338,7 @@ public class WithdrawTests
 			101m,
 			null,
 			PaymentFlowState.WaitApprove,
+			null,
 			null,
 			null,
 			null,

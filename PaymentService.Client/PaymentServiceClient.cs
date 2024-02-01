@@ -1194,6 +1194,7 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark = null,
+		string? playerRemark = null,
 		CancellationToken cancellationToken = default)
 	{
 		var request = new SignOffForm

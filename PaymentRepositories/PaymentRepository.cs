@@ -908,6 +908,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 			form.BrandPaymentId,
 			(PaymentFlowState)form.Status,
 			form.Remark,
+			form.PlayerRemark,
 			form.Note,
 			form.BankInfoId,
 			form.BankInfo,
@@ -1043,6 +1044,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 						wf.ActualAmount,
 						(PaymentFlowState)wf.Status,
 						wf.Remark,
+						wf.PlayerRemark,
 						wf.ReviewedUserName,
 						wf.ReviewedOn,
 						wf.OrderNo,
@@ -1191,6 +1193,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				form.ActualAmount,
 				(PaymentFlowState)form.Status,
 				form.Remark,
+				form.PlayerRemark,
 				form.ReviewedUserName,
 				form.ReviewedOn,
 				form.OrderNo,
@@ -1239,6 +1242,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				form.ActualAmount,
 				(PaymentFlowState)form.Status,
 				form.Remark,
+				form.PlayerRemark,
 				form.ReviewedUserName,
 				form.ReviewedOn,
 				form.OrderNo,
@@ -1471,6 +1475,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 			dbSnapshot.BrandPaymentId = snapshot.BrandPaymentId;
 			dbSnapshot.Status = (int)snapshot.Status;
 			dbSnapshot.Remark = snapshot.Remark;
+			dbSnapshot.PlayerRemark = snapshot.PlayerRemark;
 			dbSnapshot.Note = snapshot.Note;
 			dbSnapshot.BankInfoId = snapshot.BankInfoId;
 			dbSnapshot.BankInfo = snapshot.BankInfo;

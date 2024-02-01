@@ -12,6 +12,7 @@ public record WithdrawFormInfo(
 	decimal? ActualAmount,
 	PaymentFlowState Status,
 	string? Remark,
+	string? PlayerRemark,
 	string? ReviewedUserName,
 	DateTimeOffset? ReviewedOn,
 	string? OrderNo,

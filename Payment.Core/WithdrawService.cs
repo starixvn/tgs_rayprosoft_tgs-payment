@@ -51,6 +51,7 @@ internal class WithdrawService(
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default)
 	{
 		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
@@ -66,7 +67,7 @@ internal class WithdrawService(
 				formData,
 				reviewUserId,
 				reviewUserName,
-				remark,
+				remark,				
 				cancellationToken).ConfigureAwait(false);
 
 		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
@@ -107,6 +108,7 @@ internal class WithdrawService(
 			ReviewedUserName = reviewUserName,
 			ReviewedOn = currentTime,
 			Remark = remark,
+			PlayerRemark = playerRemark,
 			HandlingFee = handlingFee
 		};
 
@@ -232,6 +234,7 @@ internal class WithdrawService(
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default)
 	{
 		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
@@ -255,7 +258,8 @@ internal class WithdrawService(
 			Status = fsm.State,
 			PaidUserId = reviewUserId,
 			PaidUserName = reviewUserName,
-			PaidOn = currentTime
+			PaidOn = currentTime,
+			PlayerRemark = playerRemark,
 		};
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
@@ -291,6 +295,7 @@ internal class WithdrawService(
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark,
+		string? playerRemark,
 		CancellationToken cancellationToken = default)
 	{
 		var fsm = StateMachine.CreateWithdrawStateMachine(formData.Status);
@@ -305,7 +310,7 @@ internal class WithdrawService(
 				formData,
 				reviewUserId,
 				reviewUserName,
-				remark,
+				remark,				
 				cancellationToken).ConfigureAwait(false);
 
 		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
@@ -315,7 +320,8 @@ internal class WithdrawService(
 			ReviewedUserId = reviewUserId,
 			ReviewedUserName = reviewUserName,
 			ReviewedOn = currentTime,
-			Remark = remark
+			Remark = remark,
+			PlayerRemark = playerRemark,
 		};
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);

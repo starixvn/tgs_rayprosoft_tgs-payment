@@ -8,4 +8,5 @@ public record SignOffWithdrawFormCommand(
 	ReviewState Status,
 	string? ReviewUserId,
 	string? ReviewUserName,
-	string? Remark);
+	string? Remark,
+	string? PlayerRemark);

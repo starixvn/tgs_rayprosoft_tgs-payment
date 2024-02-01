@@ -674,6 +674,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.Approved,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -701,7 +702,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		Received.InOrder(() =>
 		{
@@ -770,6 +772,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.Approved,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -797,7 +800,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		Received.InOrder(() =>
 		{
@@ -858,6 +862,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.WaitApprove,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -887,14 +892,16 @@ public class WithdrawServiceTests
 			ReviewedUserId = reviewUserId,
 			ReviewedUserName = reviewUserName,
 			ReviewedOn = currentTime.UtcDateTime,
-			Remark = null
+			Remark = null,
+			PlayerRemark = "playerRemark",
 		};
 
 		await sut.RejectWithdrawFormAsync(
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -958,6 +965,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.WaitApprove,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -973,6 +981,7 @@ public class WithdrawServiceTests
 			null);
 		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
 		var reviewUserName = "reviewedUserName";
+		var playerRemark = "playerRemark";
 
 		var eventId = Guid.NewGuid();
 		_ = fakeSerialNumberGenerator.GenerateAsync()
@@ -985,7 +994,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			playerRemark);
 
 		Received.InOrder(() =>
 		{
@@ -1054,6 +1064,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.WaitApprove,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -1069,6 +1080,7 @@ public class WithdrawServiceTests
 			null);
 		var reviewUserId = "93a723b2-9ebb-4607-ee8d-08d978fba75f";
 		var reviewUserName = "reviewedUserName";
+		var playerRemark = "playerRemark";
 
 		var eventId = Guid.NewGuid();
 		_ = fakeSerialNumberGenerator.GenerateAsync()
@@ -1083,14 +1095,16 @@ public class WithdrawServiceTests
 			ReviewedUserId = reviewUserId,
 			ReviewedUserName = reviewUserName,
 			ReviewedOn = currentTime.UtcDateTime,
-			Remark = null
+			Remark = null,
+			PlayerRemark = playerRemark
 		};
 
 		await sut.RejectWithdrawFormAsync(
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			playerRemark);
 
 		Received.InOrder(() =>
 		{
@@ -1432,6 +1446,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.Init,
 			null,
 			null,
+			null,
 			bankInfoId,
 			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
 				playerBankInfo.Id,
@@ -1744,6 +1759,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.Init,
 			null,
 			null,
+			null,
 			bankInfoId,
 			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
 				agentBankInfo.Id,
@@ -1917,6 +1933,7 @@ public class WithdrawServiceTests
 			0M,
 			null,
 			PaymentFlowState.Init,
+			null,
 			null,
 			note,
 			bankInfoId,
@@ -2303,6 +2320,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.WaitApprove,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -2369,7 +2387,8 @@ public class WithdrawServiceTests
 			Status = PaymentFlowState.Approved,
 			ReviewedUserId = reviewUserId,
 			ReviewedUserName = reviewUserName,
-			ReviewedOn = currentTime.UtcDateTime
+			ReviewedOn = currentTime.UtcDateTime,
+			PlayerRemark = "playerRemark"
 		};
 
 		await sut.ApproveWithdrawFormAsync(
@@ -2377,7 +2396,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(
@@ -2441,6 +2461,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.WaitApprove,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -2515,7 +2536,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		Received.InOrder(() =>
 		{
@@ -2585,6 +2607,7 @@ public class WithdrawServiceTests
 			0M,
 			null,
 			PaymentFlowState.WaitApprove,
+			null,			
 			null,
 			null,
 			Guid.NewGuid(),
@@ -2661,7 +2684,8 @@ public class WithdrawServiceTests
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		Received.InOrder(() =>
 		{
@@ -3139,6 +3163,7 @@ public class WithdrawServiceTests
 			null,
 			PaymentFlowState.Init,
 			null,
+			null,
 			note,
 			bankInfoId,
 			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
@@ -3519,6 +3544,7 @@ public class WithdrawServiceTests
 			null,
 			PaymentFlowState.Init,
 			null,
+			null,
 			note,
 			bankInfoId,
 			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
@@ -3682,6 +3708,7 @@ public class WithdrawServiceTests
 			null,
 			PaymentFlowState.Init,
 			null,
+			null,
 			note,
 			bankInfoId,
 			JsonSerializer.Serialize(new WithdrawBankInfo<JsonDocument>(
@@ -3755,6 +3782,7 @@ public class WithdrawServiceTests
 			PaymentFlowState.Approved,
 			null,
 			null,
+			null,
 			Guid.NewGuid(),
 			"{}",
 			null,
@@ -3784,14 +3812,16 @@ public class WithdrawServiceTests
 			PaidUserId = reviewUserId,
 			PaidUserName = reviewUserName,
 			PaidOn = currentTime.UtcDateTime,
-			Remark = null
+			Remark = null,
+			PlayerRemark = "playerRemark"
 		};
 
 		await sut.PaidWithdrawFormAsync(
 			withdrawForm,
 			reviewUserId,
 			reviewUserName,
-			null);
+			null,
+			"playerRemark");
 
 		_ = fakePaymentRepository.Received(1)
 			.CreateWithdrawFormEventAsync(

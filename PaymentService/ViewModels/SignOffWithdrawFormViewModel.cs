@@ -6,6 +6,8 @@ public class SignOffWithdrawFormViewModel
 
 	public string? Remark { get; set; }
 
+	public string? PlayerRemark { get; set; }
+
 	public ReviewState ReviewState { get; set; }
 
 	public string? ReviewUserId { get; set; }

@@ -40,6 +40,8 @@ public class WithdrawFormInfo
 
 	public string? Remark { get; init; }
 
+	public string? PlayerRemark { get; init; }
+
 	public DateTimeOffset? ReviewedOn { get; init; }
 
 	public string? ReviewedUserName { get; init; }

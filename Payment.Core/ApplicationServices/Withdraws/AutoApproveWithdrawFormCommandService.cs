@@ -81,7 +81,8 @@ internal class AutoApproveWithdrawFormCommandService(
 			ReviewState.Approve,
 			null,
 			null,
-			"System Auto Approve");
+			"System Auto Approve",
+			null);
 
 		await commandService
 			.ExecuteAsync(approveWithdrawCommand, cancellationToken)

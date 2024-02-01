@@ -144,6 +144,7 @@ public class WithdrawController(ILogger<WithdrawController> logger) : Controller
 				PaymentMethodId = formData.PaymentMethodId,
 				PaymentReturn = formData.PaymentReturn,
 				Remark = formData.Remark,
+				PlayerRemark = formData.PlayerRemark,
 				Status = formData.Status,
 				UpdatedOn = formData.UpdatedOn,
 				UserId = formData.UserId,
@@ -285,6 +286,7 @@ public class WithdrawController(ILogger<WithdrawController> logger) : Controller
 				UserId = row.UserId,
 				UserType = row.UserType,
 				Remark = row.Remark,
+				PlayerRemark = row.PlayerRemark,
 				Status = row.Status,
 				UpdatedOn = row.UpdatedOn,
 				UserName = row.UserName,
@@ -331,7 +333,8 @@ public class WithdrawController(ILogger<WithdrawController> logger) : Controller
 			request.ReviewState,
 			request.ReviewUserId,
 			request.ReviewUserName,
-			request.Remark);
+			request.Remark,
+			request.PlayerRemark);
 
 		await signOffService.ExecuteAsync(command).ConfigureAwait(false);
 	}

@@ -145,6 +145,7 @@ public interface IPaymentServiceClient
 		string? reviewUserId,
 		string? reviewUserName,
 		string? remark = null,
+		string? playerRemark = null,
 		CancellationToken cancellationToken = default);
 
 	ValueTask SetDefaultPlayerBankInfoAsync(

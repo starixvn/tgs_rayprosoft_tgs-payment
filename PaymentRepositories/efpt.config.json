@@ -128,7 +128,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "tgs-local",
+   "UiHint": "LocalDB",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,
