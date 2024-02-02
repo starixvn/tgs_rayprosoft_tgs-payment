@@ -1203,7 +1203,8 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			Remark = remark,
 			ReviewUserId = reviewUserId,
 			ReviewUserName = reviewUserName,
-			BrandPaymentId = brandPaymentId
+			BrandPaymentId = brandPaymentId,
+			PlayerRemark = playerRemark,
 		};
 
 		var requestContent = new StringContent(
