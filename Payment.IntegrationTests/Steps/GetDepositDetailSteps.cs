@@ -11,7 +11,7 @@ namespace Payment.IntegrationTests.Steps;
 [Scope(Scenario = "Get deposit detail")]
 public class GetDepositDetailSteps
 {
-	private DepositFormInfo _actual;
+	private DepositFormInfo? _actual;
 	private Guid _brandId;
 	private Guid _formId;
 	private readonly PaymentServiceClient _paymentServiceClient;

@@ -14,7 +14,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 	private Guid _formId;
-	private string _thirdPartyOrderNo;
+	private string? _thirdPartyOrderNo;
 
 	public DepositSaveThirdPartyOrderNoSteps()
 	{
@@ -40,7 +40,7 @@ public class DepositSaveThirdPartyOrderNoSteps
 
 		var formData = await dbContext.DepositForms.FindAsync(_formId);
 
-		ClassicAssert.AreEqual(thirdPartyOrderNo, formData.ThirdPartyOrderNo);
+		ClassicAssert.AreEqual(thirdPartyOrderNo, formData!.ThirdPartyOrderNo);
 	}
 
 	[When(@"I call save api")]
@@ -96,6 +96,6 @@ public class DepositSaveThirdPartyOrderNoSteps
 
 		var form = await _paymentServiceClient.GetDepositFormAsync(_formId);
 
-		await _paymentServiceClient.SubmitDepositFormStatusAsync(_formId, form.Status, thirdPartyOrderNo: _thirdPartyOrderNo);
+		await _paymentServiceClient.SubmitDepositFormStatusAsync(_formId, form!.Status, thirdPartyOrderNo: _thirdPartyOrderNo);
 	}
 }

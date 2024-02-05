@@ -14,11 +14,11 @@ public class CreatePlayerBankInfoSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
-	private BankCreateInfo _bankInfo;
+	private BankCreateInfo? _bankInfo;
 	private Guid _brandId;
 	private Guid _createdId;
-	private string _modifyUser;
-	private string _playerCode;
+	private string? _modifyUser;
+	private string? _playerCode;
 
 	public CreatePlayerBankInfoSteps()
 	{
@@ -69,8 +69,8 @@ public class CreatePlayerBankInfoSteps
 
 		var data = await dbContext.PlayerBankInfos.FindAsync(_createdId);
 
-		ClassicAssert.AreEqual(_brandId, data.BrandId);
-		ClassicAssert.AreEqual(_bankInfo.PaymentChannelId, data.PaymentChannelId);
+		ClassicAssert.AreEqual(_brandId, data!.BrandId);
+		ClassicAssert.AreEqual(_bankInfo!.PaymentChannelId, data.PaymentChannelId);
 		ClassicAssert.AreEqual(JsonSerializer.Serialize(_bankInfo.Detail), data.Detail);
 	}
 
@@ -78,13 +78,13 @@ public class CreatePlayerBankInfoSteps
 	public async Task WhenCallCreateBankInfoApiAsync()
 	{
 		_createdId = await _paymentServiceClient
-			.CreatePlayerBankInfoAsync(_brandId, _playerCode, _bankInfo);
+			.CreatePlayerBankInfoAsync(_brandId, _playerCode!, _bankInfo!);
 	}
 
 	[When(@"call create bank info api with modify user")]
 	public async Task WhenCallCreateBankInfoApiWithModifyUserAsync()
 	{
 		_createdId = await _paymentServiceClient
-			.CreatePlayerBankInfoAsync(_brandId, _playerCode, _bankInfo, _modifyUser);
+			.CreatePlayerBankInfoAsync(_brandId, _playerCode!, _bankInfo!, _modifyUser);
 	}
 }

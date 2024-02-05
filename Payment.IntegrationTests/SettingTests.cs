@@ -24,7 +24,7 @@ public class SettingTests
 		var actual = dbContext.BrandPaymentSettings.FirstOrDefault();
 
 		ClassicAssert.IsNotNull(actual);
-		ClassicAssert.AreEqual(brandId, actual.BrandId);
+		ClassicAssert.AreEqual(brandId, actual!.BrandId);
 		ClassicAssert.AreEqual(10, actual.PlayerBankInfoCountLimit);
 	}
 }

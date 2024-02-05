@@ -10,7 +10,7 @@ public class QueryDepositFormsSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
-	private DepositForms _actual;
+	private DepositForms? _actual;
 
 	public QueryDepositFormsSteps()
 	{
@@ -30,7 +30,7 @@ public class QueryDepositFormsSteps
 	[Then(@"return deposit forms list")]
 	public void ThenReturnDepositFormsList()
 	{
-		ClassicAssert.AreEqual(0, _actual.TotalCount);
+		ClassicAssert.AreEqual(0, _actual!.TotalCount);
 		ClassicAssert.AreEqual(-1, _actual.Rows);
 		ClassicAssert.NotNull(_actual.Items);
 		ClassicAssert.AreEqual(0, _actual.Sum);

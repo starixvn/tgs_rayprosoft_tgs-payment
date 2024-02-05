@@ -11,7 +11,7 @@ namespace Payment.IntegrationTests.Steps;
 [Scope(Scenario = "Get withdraw detail")]
 public class GetWithdrawDetailSteps
 {
-	private WithdrawFormInfo _actual;
+	private WithdrawFormInfo? _actual;
 	private Guid _brandId;
 	private Guid _formId;
 	private readonly PaymentServiceClient _paymentServiceClient;
@@ -87,6 +87,6 @@ public class GetWithdrawDetailSteps
 
 		_ = await dbContext.SaveChangesAsync();
 
-		_actual = await _paymentServiceClient.GetWithdrawFormAsync(_brandId, _formId);
+		_actual = await _paymentServiceClient.GetWithdrawFormAsync(_brandId!, _formId!);
 	}
 }

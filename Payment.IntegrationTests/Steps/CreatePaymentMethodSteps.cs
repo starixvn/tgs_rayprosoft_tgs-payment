@@ -14,7 +14,7 @@ public class CreatePaymentMethodSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
-	private PaymentMethodCreateInfo _createInfo;
+	private PaymentMethodCreateInfo? _createInfo;
 
 	public CreatePaymentMethodSteps()
 	{
@@ -42,15 +42,15 @@ public class CreatePaymentMethodSteps
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
 		var methodData = await dbContext.PaymentMethods
-			.SingleAsync(m => m.Code == _createInfo.Code);
+			.SingleAsync(m => m.Code == _createInfo!.Code);
 
 		ClassicAssert.IsNotNull(methodData);
-		ClassicAssert.AreEqual(_createInfo.BankType, methodData.BankType);
+		ClassicAssert.AreEqual(_createInfo!.BankType, methodData.BankType);
 	}
 
 	[When(@"call create payment method api")]
 	public async Task WhenCallCreatePaymentMethodApiAsync()
 	{
-		await _paymentServiceClient.CreatePaymentMethodAsync(_createInfo);
+		await _paymentServiceClient.CreatePaymentMethodAsync(_createInfo!);
 	}
 }

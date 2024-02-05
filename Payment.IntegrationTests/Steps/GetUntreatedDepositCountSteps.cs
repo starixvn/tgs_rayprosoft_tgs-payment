@@ -76,59 +76,58 @@ public class GetUntreatedDepositCountSteps
 		_ = await dbContext.BrandPayments.AddAsync(bp);
 
 		await dbContext.DepositForms.AddRangeAsync(
-			new[]
-			{
-					new DepositForm
-					{
-						Id = Guid.NewGuid(),
-						BrandId = _brandId,
-						PlayerCode = "PlayerCode",
-						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.WaitApprove,
-						CreatedOn = DateTime.Now.AddMinutes(-5),
-						UpdatedOn = DateTime.Now
-					},
-					new DepositForm
-					{
-						Id = Guid.NewGuid(),
-						BrandId = _brandId,
-						PlayerCode = "PlayerCode",
-						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Approved,
-						CreatedOn = DateTime.Now.AddMinutes(-5),
-						UpdatedOn = DateTime.Now
-					},
-					new DepositForm
-					{
-						Id = Guid.NewGuid(),
-						BrandId = _brandId,
-						PlayerCode = "PlayerCode",
-						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Init,
-						CreatedOn = DateTime.Now.AddMinutes(-5),
-						UpdatedOn = DateTime.Now
-					},
-					new DepositForm
-					{
-						Id = Guid.NewGuid(),
-						BrandId = _brandId,
-						PlayerCode = "PlayerCode",
-						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.Reject,
-						CreatedOn = DateTime.Now.AddMinutes(-5),
-						UpdatedOn = DateTime.Now
-					},
-					new DepositForm
-					{
-						Id = Guid.NewGuid(),
-						BrandId = _brandId,
-						PlayerCode = "PlayerCode",
-						BrandPaymentId = bp.Id,
-						Status = (int)PaymentFlowState.WaitPayment,
-						CreatedOn = DateTime.Now.AddMinutes(-5),
-						UpdatedOn = DateTime.Now
-					}
-			});
+			[
+				new DepositForm
+				{
+					Id = Guid.NewGuid(),
+					BrandId = _brandId,
+					PlayerCode = "PlayerCode",
+					BrandPaymentId = bp.Id,
+					Status = (int)PaymentFlowState.WaitApprove,
+					CreatedOn = DateTime.Now.AddMinutes(-5),
+					UpdatedOn = DateTime.Now
+				},
+				new DepositForm
+				{
+					Id = Guid.NewGuid(),
+					BrandId = _brandId,
+					PlayerCode = "PlayerCode",
+					BrandPaymentId = bp.Id,
+					Status = (int)PaymentFlowState.Approved,
+					CreatedOn = DateTime.Now.AddMinutes(-5),
+					UpdatedOn = DateTime.Now
+				},
+				new DepositForm
+				{
+					Id = Guid.NewGuid(),
+					BrandId = _brandId,
+					PlayerCode = "PlayerCode",
+					BrandPaymentId = bp.Id,
+					Status = (int)PaymentFlowState.Init,
+					CreatedOn = DateTime.Now.AddMinutes(-5),
+					UpdatedOn = DateTime.Now
+				},
+				new DepositForm
+				{
+					Id = Guid.NewGuid(),
+					BrandId = _brandId,
+					PlayerCode = "PlayerCode",
+					BrandPaymentId = bp.Id,
+					Status = (int)PaymentFlowState.Reject,
+					CreatedOn = DateTime.Now.AddMinutes(-5),
+					UpdatedOn = DateTime.Now
+				},
+				new DepositForm
+				{
+					Id = Guid.NewGuid(),
+					BrandId = _brandId,
+					PlayerCode = "PlayerCode",
+					BrandPaymentId = bp.Id,
+					Status = (int)PaymentFlowState.WaitPayment,
+					CreatedOn = DateTime.Now.AddMinutes(-5),
+					UpdatedOn = DateTime.Now
+				}
+			]);
 
 		_ = await dbContext.SaveChangesAsync();
 

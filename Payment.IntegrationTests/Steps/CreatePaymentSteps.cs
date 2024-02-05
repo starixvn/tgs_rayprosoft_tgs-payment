@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using TechTalk.SpecFlow;
 using Tgs.Payment.Clients;
@@ -14,7 +13,7 @@ public class CreatePaymentSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
-	private PaymentCreateInfo _createInfo;
+	private PaymentCreateInfo? _createInfo;
 
 	public CreatePaymentSteps()
 	{
@@ -41,7 +40,7 @@ public class CreatePaymentSteps
 		var dbContext = _testHost.Services.GetRequiredService<TgsContext>();
 
 		var paymentData = await dbContext.PaymentItems
-			.SingleAsync(p => p.Code == _createInfo.Code);
+			.SingleAsync(p => p.Code == _createInfo!.Code);
 
 		ClassicAssert.IsNotNull(paymentData);
 	}
@@ -49,6 +48,6 @@ public class CreatePaymentSteps
 	[When(@"call create payment api")]
 	public async Task WhenCallCreatePaymentApiAsync()
 	{
-		await _paymentServiceClient.CreatePaymentAsync(_createInfo);
+		await _paymentServiceClient.CreatePaymentAsync(_createInfo!);
 	}
 }

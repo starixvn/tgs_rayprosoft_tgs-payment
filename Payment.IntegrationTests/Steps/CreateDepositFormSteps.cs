@@ -15,7 +15,7 @@ public class CreateDepositFormSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 	private Guid _createdFormId;
-	private DepositFormCreateInfo _depositForm;
+	private DepositFormCreateInfo? _depositForm;
 
 	public CreateDepositFormSteps()
 	{
@@ -79,6 +79,6 @@ public class CreateDepositFormSteps
 	public async Task WhenCallPaymentApiAsync()
 	{
 		_createdFormId = Guid.NewGuid();
-		_ = await _paymentServiceClient.CreateDepositFormAsync(_createdFormId, _depositForm);
+		_ = await _paymentServiceClient.CreateDepositFormAsync(_createdFormId, _depositForm!);
 	}
 }

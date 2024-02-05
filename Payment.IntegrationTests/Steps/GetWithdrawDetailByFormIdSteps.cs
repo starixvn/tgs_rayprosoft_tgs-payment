@@ -11,7 +11,7 @@ namespace Payment.IntegrationTests.Steps;
 [Scope(Scenario = "Get withdraw detail by form id")]
 public class GetWithdrawDetailByFormIdSteps
 {
-	private object _actual;
+	private object? _actual;
 	private Guid _formId;
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;

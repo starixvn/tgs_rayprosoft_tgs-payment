@@ -64,48 +64,53 @@ public class GetUntreatedWithdrawFormsSteps
 		};
 		_ = await dbContext.BrandPayments.AddAsync(bp);
 
-		await dbContext.WithdrawForms.AddRangeAsync(new[] {
-				new WithdrawForm{
-					Id = Guid.NewGuid(),
-					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Init,
-					CreatedOn = DateTime.Now.AddMinutes(-15),
-					UpdatedOn = DateTime.Now,
-					BankInfo = "{}"
-				},
-				new WithdrawForm{
-					Id = Guid.NewGuid(),
-					BrandId = _brandId,
-					Status = (int)PaymentFlowState.WaitApprove,
-					CreatedOn = DateTime.Now.AddMinutes(-15),
-					UpdatedOn = DateTime.Now,
-					BankInfo = "{}"
-				},
-				new WithdrawForm{
-					Id = Guid.NewGuid(),
-					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Approved,
-					CreatedOn = DateTime.Now.AddMinutes(-15),
-					UpdatedOn = DateTime.Now,
-					BankInfo = "{}"
-				},
-				new WithdrawForm{
-					Id = Guid.NewGuid(),
-					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Reject,
-					CreatedOn = DateTime.Now.AddMinutes(-15),
-					UpdatedOn = DateTime.Now,
-					BankInfo = "{}"
-				},
-				new WithdrawForm{
-					Id = Guid.NewGuid(),
-					BrandId = _brandId,
-					Status = (int)PaymentFlowState.Paid,
-					CreatedOn = DateTime.Now.AddMinutes(-15),
-					UpdatedOn = DateTime.Now,
-					BankInfo = "{}"
-				}
-			});
+		await dbContext.WithdrawForms.AddRangeAsync([
+			new WithdrawForm
+			{
+				Id = Guid.NewGuid(),
+				BrandId = _brandId,
+				Status = (int)PaymentFlowState.Init,
+				CreatedOn = DateTime.Now.AddMinutes(-15),
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
+			},
+			new WithdrawForm
+			{
+				Id = Guid.NewGuid(),
+				BrandId = _brandId,
+				Status = (int)PaymentFlowState.WaitApprove,
+				CreatedOn = DateTime.Now.AddMinutes(-15),
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
+			},
+			new WithdrawForm
+			{
+				Id = Guid.NewGuid(),
+				BrandId = _brandId,
+				Status = (int)PaymentFlowState.Approved,
+				CreatedOn = DateTime.Now.AddMinutes(-15),
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
+			},
+			new WithdrawForm
+			{
+				Id = Guid.NewGuid(),
+				BrandId = _brandId,
+				Status = (int)PaymentFlowState.Reject,
+				CreatedOn = DateTime.Now.AddMinutes(-15),
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
+			},
+			new WithdrawForm
+			{
+				Id = Guid.NewGuid(),
+				BrandId = _brandId,
+				Status = (int)PaymentFlowState.Paid,
+				CreatedOn = DateTime.Now.AddMinutes(-15),
+				UpdatedOn = DateTime.Now,
+				BankInfo = "{}"
+			}
+			]);
 
 		_ = await dbContext.SaveChangesAsync();
 

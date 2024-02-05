@@ -13,7 +13,7 @@ public class DeletePlayerBankInfoSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 	private Guid _bankInfoId;
-	private string _playerCode;
+	private string? _playerCode;
 
 	public DeletePlayerBankInfoSteps()
 	{
@@ -56,7 +56,7 @@ public class DeletePlayerBankInfoSteps
 		_ = await dbContext.PlayerBankInfos.AddAsync(
 			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
 			{
-				PlayerCode = _playerCode,
+				PlayerCode = _playerCode!,
 				Id = _bankInfoId,
 				BankType = "Bank",
 				CreatedByUsername = "System",
@@ -66,6 +66,6 @@ public class DeletePlayerBankInfoSteps
 		_ = await dbContext.SaveChangesAsync();
 
 		await _paymentServiceClient
-			.DeletePlayerBankInfoAsync(_playerCode, _bankInfoId);
+			.DeletePlayerBankInfoAsync(_playerCode!, _bankInfoId);
 	}
 }

@@ -15,8 +15,8 @@ public class SetDefaultPlayerBankInfoSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 	private Guid _bankInfoId;
-	private string _modifyUser;
-	private string _playerCode;
+	private string? _modifyUser;
+	private string? _playerCode;
 
 	public SetDefaultPlayerBankInfoSteps()
 	{
@@ -55,7 +55,7 @@ public class SetDefaultPlayerBankInfoSteps
 
 		var data = await dbContext.PlayerBankInfos.FindAsync(_bankInfoId);
 
-		ClassicAssert.AreEqual(_bankInfoId, data.Id);
+		ClassicAssert.AreEqual(_bankInfoId, data!.Id);
 		ClassicAssert.IsTrue(data.Default);
 	}
 
@@ -67,7 +67,7 @@ public class SetDefaultPlayerBankInfoSteps
 		_ = await dbContext.PlayerBankInfos.AddAsync(
 			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
 			{
-				PlayerCode = _playerCode,
+				PlayerCode = _playerCode!,
 				Id = _bankInfoId,
 				BankType = "Bank",
 				Default = false,
@@ -78,6 +78,6 @@ public class SetDefaultPlayerBankInfoSteps
 		_ = await dbContext.SaveChangesAsync();
 
 		await _paymentServiceClient
-			.SetDefaultPlayerBankInfoAsync(_playerCode, _bankInfoId, _modifyUser);
+			.SetDefaultPlayerBankInfoAsync(_playerCode!, _bankInfoId, _modifyUser!);
 	}
 }

@@ -86,7 +86,7 @@ public class ChangeDepositFormStatus
 
 		var formData = await dbContext.DepositForms.FindAsync(_formId);
 
-		var formStatus = (PaymentFlowState)formData.Status;
+		var formStatus = (PaymentFlowState)formData!.Status;
 
 		ClassicAssert.AreEqual(expectedState, formStatus);
 	}

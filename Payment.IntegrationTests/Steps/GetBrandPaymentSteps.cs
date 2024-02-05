@@ -11,7 +11,7 @@ namespace Payment.IntegrationTests.Steps;
 public class GetBrandPaymentSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
-	private BrandPaymentInfo _actual;
+	private BrandPaymentInfo? _actual;
 	private Guid _brandPaymentId;
 	private readonly TestPaymentApplication _testHost;
 
@@ -98,6 +98,6 @@ public class GetBrandPaymentSteps
 	[When(@"call get brand payment api")]
 	public async Task WhenCallGetBrandPaymentApiAsync()
 	{
-		_actual = await _paymentServiceClient.GetBrandPaymentByIdAsync(_brandPaymentId);
+		_actual = await _paymentServiceClient.GetBrandPaymentByIdAsync(_brandPaymentId!);
 	}
 }
