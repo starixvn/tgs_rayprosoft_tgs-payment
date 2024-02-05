@@ -76,6 +76,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.five_minutes_payment_statistics_delta",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.hour_payment_statistics",
          "ObjectType": 0
       },
@@ -128,7 +132,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "LocalDB",
+   "UiHint": "tgs-local",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,

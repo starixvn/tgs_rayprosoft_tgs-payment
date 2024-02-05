@@ -7,6 +7,9 @@ internal static class DateTimeExtensions
 	public static DateTime CeilingFiveMinutesTime(this DateTime time)
 		=> time.FloorFiveMinutesTime().AddMinutes(5D);
 
+	public static DateTimeOffset CeilingFiveMinutesTime(this DateTimeOffset time)
+		=> time.FloorFiveMinutesTime().AddMinutes(5D);
+
 	public static DateTime FloorFiveMinutesTime(this DateTime time)
 	{
 		var floorMinutes = (int)Math.Floor(time.Minute / 5D) * 5;
@@ -14,6 +17,18 @@ internal static class DateTimeExtensions
 		var timePoint = new TimeOnly(time.Hour, floorMinutes);
 
 		var calculateTime = new DateTime(DateOnly.FromDateTime(time), timePoint, time.Kind);
+
+		return calculateTime < time
+			? calculateTime
+			: calculateTime.AddMinutes(-5D);
+	}
+
+	public static DateTimeOffset FloorFiveMinutesTime(this DateTimeOffset time)
+	{
+		var floorMinutes = (int)Math.Floor(time.Minute / 5D) * 5;
+		var timePoint = new TimeOnly(time.Hour, floorMinutes);
+
+		var calculateTime = new DateTimeOffset(DateOnly.FromDateTime(time.DateTime), timePoint, time.Offset);
 
 		return calculateTime < time
 			? calculateTime

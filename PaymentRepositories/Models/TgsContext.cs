@@ -42,6 +42,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<FiveMinutesPaymentStatistic> FiveMinutesPaymentStatistics { get; set; }
 
+    public virtual DbSet<FiveMinutesPaymentStatisticsDeltum> FiveMinutesPaymentStatisticsDelta { get; set; }
+
     public virtual DbSet<HourPaymentStatistic> HourPaymentStatistics { get; set; }
 
     public virtual DbSet<PaymentChannel> PaymentChannels { get; set; }
@@ -72,8 +74,7 @@ public partial class TgsContext : DbContext
     {
         modelBuilder
             .HasPostgresExtension("ltree")
-            .HasPostgresExtension("pg_trgm")
-            .HasPostgresExtension("uuid-ossp");
+            .HasPostgresExtension("pg_trgm");
 
         modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.AgentBankInfoItemConfiguration());
@@ -89,6 +90,7 @@ public partial class TgsContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.DepositFormConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.DepositFormEventSourceConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.FiveMinutesPaymentStatisticConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.FiveMinutesPaymentStatisticsDeltumConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.HourPaymentStatisticConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.PaymentChannelConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.PaymentItemConfiguration());

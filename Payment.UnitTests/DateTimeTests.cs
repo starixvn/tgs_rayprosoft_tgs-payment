@@ -1,4 +1,5 @@
-﻿using NUnit.Framework.Legacy;
+﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Tgs.Payment;
 
 namespace Payment.UnitTests;
@@ -21,12 +22,42 @@ public class DateTimeTests
 	}
 
 	[Test]
+	public void DateTimeOffset_取得指定時間落在計算的5分時間區段起始時間()
+	{
+		// Arrange
+		var sut = DateTimeOffset.ParseExact("2024-01-17T09:56:00.0000000Z", "o", null);
+
+		var expected = DateTimeOffset.ParseExact("2024-01-17T09:55:00.0000000Z", "o", null);
+
+		// Act
+		var actual = sut.FloorFiveMinutesTime();
+
+		// Assert
+		ClassicAssert.AreEqual(expected, actual);
+	}
+
+	[Test]
 	public void DateTime_取得指定時間落在計算的5分時間區段結尾時間()
 	{
 		// Arrange
 		var sut = DateTime.ParseExact("2024-01-17T09:56:00.0000000Z", "o", null);
 
 		var expected = DateTime.ParseExact("2024-01-17T10:00:00.0000000Z", "o", null);
+
+		// Act
+		var actual = sut.CeilingFiveMinutesTime();
+
+		// Assert
+		ClassicAssert.AreEqual(expected, actual);
+	}
+
+	[Test]
+	public void DateTimeOffset_取得指定時間落在計算的5分時間區段結尾時間()
+	{
+		// Arrange
+		var sut = DateTimeOffset.ParseExact("2024-01-17T09:56:00.0000000Z", "o", null);
+
+		var expected = DateTimeOffset.ParseExact("2024-01-17T10:00:00.0000000Z", "o", null);
 
 		// Act
 		var actual = sut.CeilingFiveMinutesTime();

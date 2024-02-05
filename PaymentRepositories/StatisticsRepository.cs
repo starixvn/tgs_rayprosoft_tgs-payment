@@ -109,4 +109,26 @@ internal class StatisticsRepository(TgsContext dbContext)
 				row.FirstWithdrawHandlingFee,
 				row.FirstWithdrawOn));
 	}
+
+	public IAsyncEnumerable<UserPaymentStatisticsDelta> Query5minPaymentStatisticsDeltaAsync(
+		Guid anchorId,
+		Guid stopId,
+		CancellationToken cancellationToken = default)
+		=> dbContext.FiveMinutesPaymentStatisticsDelta
+			.Where(row => row.Id > anchorId
+				&& row.Id < stopId
+				&& row.UserType == (int)UserType.Player)
+			.Take(1000)
+			.ToAsyncEnumerable()
+			.Select(row => new UserPaymentStatisticsDelta(
+				row.Id,
+				row.TimePoint,
+				row.UserId,
+				UserType.Player,
+				row.DepositAmount,
+				row.DepositHandlingFee,
+				row.DepositCount,
+				row.WithdrawAmount,
+				row.WithdrawHandlingFee,
+				row.WithdrawCount));
 }

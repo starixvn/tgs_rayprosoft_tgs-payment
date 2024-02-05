@@ -174,7 +174,7 @@ public class DepositTests
 			Arg.Any<DepositFormQuery>(),
 			Arg.Any<CancellationToken>())
 			.Returns(1000M);
-		fakeQueryService.QueryAsync(Arg.Any<DepositFormQuery>(), Arg.Any<CancellationToken>())
+		_ = fakeQueryService.QueryAsync(Arg.Any<DepositFormQuery>(), Arg.Any<CancellationToken>())
 			.Returns(new[]
 			{
 				new Tgs.Payment.DepositFormInfo(
