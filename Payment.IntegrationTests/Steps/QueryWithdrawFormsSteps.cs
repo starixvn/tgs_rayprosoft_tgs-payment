@@ -8,7 +8,7 @@ namespace Payment.IntegrationTests.Steps;
 [Binding]
 public class QueryWithdrawFormsSteps
 {
-	private WithdrawForms _actual;
+	private WithdrawForms? _actual;
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 
@@ -30,7 +30,7 @@ public class QueryWithdrawFormsSteps
 	[Then(@"return withdraw forms list")]
 	public void ThenReturnWithdrawFormsList()
 	{
-		ClassicAssert.AreEqual(0, _actual.TotalCount);
+		ClassicAssert.AreEqual(0, _actual!.TotalCount);
 		ClassicAssert.AreEqual(-1, _actual.Rows);
 		ClassicAssert.NotNull(_actual.Items);
 		ClassicAssert.AreEqual(0, _actual.Sum);

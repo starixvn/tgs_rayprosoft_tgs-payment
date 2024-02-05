@@ -11,7 +11,7 @@ public class QueryBrandPaymentAclsSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private Guid _brandPaymentId1;
 	private Guid _brandPaymentId2;
-	private string _playerCode;
+	private string? _playerCode;
 	private readonly TestPaymentApplication _testHost;
 
 	public QueryBrandPaymentAclsSteps()
@@ -52,7 +52,7 @@ public class QueryBrandPaymentAclsSteps
 	public async Task WhenCallGetBrandPaymentAclApiAsync()
 	{
 		var acls = _paymentServiceClient.GetBrandPaymentAclsAsync(
-			_playerCode,
+			_playerCode!,
 			new[] { _brandPaymentId1, _brandPaymentId2 });
 
 		_ = await acls.ToArrayAsync();

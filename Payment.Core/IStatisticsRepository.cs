@@ -12,6 +12,11 @@ public interface IStatisticsRepository
 		string[]? userIds,
 		CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<UserPaymentStatisticsDelta> Query5minPaymentStatisticsDeltaAsync(
+		Guid anchorId,
+		Guid stopId,
+		CancellationToken cancellationToken = default);
+
 	IAsyncEnumerable<UserPaymentSummaryStatistics> QueryHourPaymentStatisticsAsync(
 		DateTime start,
 		DateTime end,

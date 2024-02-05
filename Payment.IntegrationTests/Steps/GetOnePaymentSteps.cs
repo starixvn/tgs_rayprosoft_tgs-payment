@@ -10,8 +10,8 @@ namespace Payment.IntegrationTests.Steps;
 [Binding]
 public class GetOnePaymentSteps
 {
-	private PaymentInfo _actual;
-	private string _paymentCode;
+	private PaymentInfo? _actual;
+	private string? _paymentCode;
 	private Guid _paymentId;
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
@@ -52,7 +52,7 @@ public class GetOnePaymentSteps
 	[Then(@"return payment data")]
 	public void ThenReturnPaymentData()
 	{
-		ClassicAssert.AreEqual(_paymentCode, _actual.Code);
+		ClassicAssert.AreEqual(_paymentCode, _actual!.Code);
 	}
 
 	[When(@"call get payment api")]

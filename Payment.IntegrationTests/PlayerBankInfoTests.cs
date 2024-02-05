@@ -181,7 +181,7 @@ public class PlayerBankInfoTests
 
 		var dbRecord = await dbContext.PlayerBankInfos.FindAsync(actual);
 
-		ClassicAssert.AreEqual(createInfo2.PaymentChannelId, dbRecord.PaymentChannelId);
+		ClassicAssert.AreEqual(createInfo2.PaymentChannelId, dbRecord!.PaymentChannelId);
 	}
 
 	[Test]

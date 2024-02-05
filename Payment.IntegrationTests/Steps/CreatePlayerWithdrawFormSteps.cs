@@ -23,7 +23,7 @@ public class CreatePlayerWithdrawFormSteps
 	private readonly TestPaymentApplication _testHost;
 	private Guid _bankInfoId;
 	private Guid _createFormId;
-	private string _playerCode;
+	private string? _playerCode;
 
 	public CreatePlayerWithdrawFormSteps()
 	{
@@ -162,7 +162,7 @@ public class CreatePlayerWithdrawFormSteps
 				Id = _bankInfoId,
 				BankType = "Bank",
 				BrandId = brandId,
-				PlayerCode = _playerCode,
+				PlayerCode = _playerCode!,
 				Detail = "{}",
 				CreatedOn = DateTime.Now,
 				UpdatedOn = DateTime.Now,

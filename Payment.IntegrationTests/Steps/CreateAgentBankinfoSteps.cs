@@ -15,8 +15,8 @@ public class CreateAgentBankinfoSteps
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
 	private Guid _agentId;
-	private string _agentName;
-	private BankCreateInfo _bankInfo;
+	private string? _agentName;
+	private BankCreateInfo? _bankInfo;
 	private Guid _brandId;
 	private Guid _createdId;
 
@@ -69,14 +69,14 @@ public class CreateAgentBankinfoSteps
 
 		var data = await dbContext.AgentBankInfoItems.FindAsync(_createdId);
 
-		ClassicAssert.AreEqual(_brandId, data.BrandId);
-		ClassicAssert.AreEqual(_bankInfo.PaymentChannelId, data.PaymentChannelId);
+		ClassicAssert.AreEqual(_brandId, data!.BrandId);
+		ClassicAssert.AreEqual(_bankInfo!.PaymentChannelId, data.PaymentChannelId);
 	}
 
 	[When(@"call create bank info api")]
 	public async Task WhenCallCreateBankInfoApiAsync()
 	{
 		_createdId = await _paymentServiceClient
-			.CreateAgentBankInfoAsync(_brandId, _agentId, _agentName, _bankInfo);
+			.CreateAgentBankInfoAsync(_brandId, _agentId, _agentName!, _bankInfo!);
 	}
 }

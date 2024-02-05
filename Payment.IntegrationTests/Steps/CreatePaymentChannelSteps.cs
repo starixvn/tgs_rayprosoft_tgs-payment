@@ -14,7 +14,7 @@ public class CreatePaymentChannelSteps
 {
 	private readonly PaymentServiceClient _paymentServiceClient;
 	private readonly TestPaymentApplication _testHost;
-	private string _paymentChannelCode;
+	private string? _paymentChannelCode;
 
 	public CreatePaymentChannelSteps()
 	{
@@ -46,6 +46,6 @@ public class CreatePaymentChannelSteps
 	[When(@"call create payment channel api")]
 	public async Task WhenCallCreatePaymentChannelApiAsync()
 	{
-		await _paymentServiceClient.CreatePaymentChannelAsync(_paymentChannelCode);
+		await _paymentServiceClient.CreatePaymentChannelAsync(_paymentChannelCode!);
 	}
 }

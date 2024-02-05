@@ -45,7 +45,7 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.Birthdate).HasColumnName("birthdate");
             entity.Property(e => e.Birthday)
             .HasMaxLength(4)
-            .HasComputedColumnSql("(lpad((date_part('month'::text, birthdate))::text, 2, '0'::text) || lpad((date_part('day'::text, birthdate))::text, 2, '0'::text))", true)
+            .HasComputedColumnSql("(lpad((EXTRACT(month FROM birthdate))::text, 2, '0'::text) || lpad((EXTRACT(day FROM birthdate))::text, 2, '0'::text))", true)
             .HasColumnName("birthday");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.DefaultWalletCurrencyCode)

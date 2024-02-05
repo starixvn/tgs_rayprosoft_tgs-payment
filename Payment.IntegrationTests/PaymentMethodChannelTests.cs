@@ -29,7 +29,7 @@ public class PaymentMethodChannelTests
 
 		var pmc = await dbContext.PaymentMethodChannels.FindAsync(actual);
 
-		ClassicAssert.AreEqual(paymentId, pmc.PaymentId);
+		ClassicAssert.AreEqual(paymentId, pmc!.PaymentId);
 		ClassicAssert.AreEqual(methodId, pmc.MethodId);
 		ClassicAssert.AreEqual(channelId, pmc.ChannelId);
 	}
@@ -76,7 +76,7 @@ public class PaymentMethodChannelTests
 			.FirstOrDefaultAsync();
 
 		ClassicAssert.IsNotNull(actual);
-		ClassicAssert.AreEqual(paymentCode, actual.Code);
+		ClassicAssert.AreEqual(paymentCode, actual!.Code);
 	}
 
 	[Test]
@@ -118,7 +118,7 @@ public class PaymentMethodChannelTests
 			.FirstOrDefaultAsync();
 
 		ClassicAssert.IsNotNull(actual);
-		ClassicAssert.AreEqual(channelCode, actual.Name);
+		ClassicAssert.AreEqual(channelCode, actual!.Name);
 	}
 
 	[Test]
@@ -164,7 +164,7 @@ public class PaymentMethodChannelTests
 			.FirstOrDefaultAsync();
 
 		ClassicAssert.IsNotNull(actual);
-		ClassicAssert.AreEqual(createInfo.Code, actual.Name);
+		ClassicAssert.AreEqual(createInfo.Code, actual!.Name);
 	}
 
 	[Test]
@@ -209,7 +209,7 @@ public class PaymentMethodChannelTests
 			.FirstOrDefaultAsync();
 
 		ClassicAssert.IsNotNull(actual);
-		ClassicAssert.AreEqual(paymentId, actual.PaymentId);
+		ClassicAssert.AreEqual(paymentId, actual!.PaymentId);
 		ClassicAssert.AreEqual(methodId, actual.MethodId);
 		ClassicAssert.AreEqual(channelId, actual.ChannelId);
 	}

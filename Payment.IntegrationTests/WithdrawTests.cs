@@ -68,7 +68,7 @@ public class WithdrawTests
 		var actual = await dbContext.WithdrawForms.FindAsync(formId);
 
 		ClassicAssert.NotNull(actual);
-		ClassicAssert.AreEqual((int)PaymentFlowState.Reject, actual.Status);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Reject, actual!.Status);
 
 		_ = fakeCashServiceClient.Received(1)
 			.RollbackWithdrawAsync(
@@ -149,7 +149,7 @@ public class WithdrawTests
 		var actual = await dbContext.WithdrawForms.FindAsync(formId);
 
 		ClassicAssert.NotNull(actual);
-		ClassicAssert.AreEqual((int)PaymentFlowState.Reject, actual.Status);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Reject, actual!.Status);
 
 		_ = fakeCashServiceClient.Received(1)
 			.RollbackWithdrawAsync(
@@ -215,7 +215,7 @@ public class WithdrawTests
 		var actual = await dbContext.WithdrawForms.FindAsync(formId);
 
 		ClassicAssert.NotNull(actual);
-		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual.Status);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual!.Status);
 
 		_ = fakeCashServiceClient.Received(1)
 			.CommitWithdrawAsync(
@@ -297,7 +297,7 @@ public class WithdrawTests
 		var actual = await dbContext.WithdrawForms.FindAsync(formId);
 
 		ClassicAssert.NotNull(actual);
-		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual.Status);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual!.Status);
 
 		_ = fakeCashServiceClient.Received(1)
 			.CommitWithdrawAsync(
@@ -380,7 +380,7 @@ public class WithdrawTests
 		var actual = await dbContext.WithdrawForms.FindAsync(formId);
 
 		ClassicAssert.NotNull(actual);
-		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual.Status);
+		ClassicAssert.AreEqual((int)PaymentFlowState.Paid, actual!.Status);
 		ClassicAssert.AreEqual("aabbcc", actual.Remark);
 	}
 }

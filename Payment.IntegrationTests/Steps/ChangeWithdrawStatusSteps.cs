@@ -92,7 +92,7 @@ public class ChangeWithdrawStatusSteps
 
 		var formData = await dbContext.WithdrawForms.FindAsync(_formId);
 
-		var formStatus = (PaymentFlowState)formData.Status;
+		var formStatus = (PaymentFlowState)formData!.Status;
 
 		ClassicAssert.AreEqual(expectedState, formStatus);
 	}

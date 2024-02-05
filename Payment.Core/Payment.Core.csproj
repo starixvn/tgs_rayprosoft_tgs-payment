@@ -10,6 +10,7 @@
 		<Version>0.0.8-alpha</Version>
 		<IsPackable>true</IsPackable>
 		<SqlQueryToolsConnectionString />
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>

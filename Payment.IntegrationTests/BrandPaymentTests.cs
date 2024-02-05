@@ -59,7 +59,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
-		ClassicAssert.AreEqual(168m, actual.AmountUpperLimit);
+		ClassicAssert.AreEqual(168m, actual!.AmountUpperLimit);
 		ClassicAssert.AreEqual(true, actual.EnableAutoWithdraw);
 		ClassicAssert.AreEqual(1, actual.BrandPaymentIds.Count());
 	}
@@ -105,7 +105,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandPaymentFeeSettingsAsync(brandPaymentId);
 
-		ClassicAssert.AreEqual(10m, actual.HandlingFeeRateTenPercentile);
+		ClassicAssert.AreEqual(10m, actual!.HandlingFeeRateTenPercentile);
 		ClassicAssert.AreEqual(false, actual.ReducePlayerAmount);
 	}
 
@@ -149,7 +149,7 @@ public class BrandPaymentTests
 
 		var actual = await sut.GetBrandPaymentByIdAsync(brandPaymentId);
 
-		ClassicAssert.AreEqual(brandPaymentId, actual.Id);
+		ClassicAssert.AreEqual(brandPaymentId, actual!.Id);
 	}
 
 	[Test]

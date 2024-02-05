@@ -7,7 +7,7 @@ public class TestMessageProcessor<TMessage, TReply> : IMessageProcessor<TMessage
 	public virtual ValueTask<TReply> HandleAsync(
 		string subject,
 		TMessage data,
-		IEnumerable<MessageHeaderValue> headerValues,
+		IEnumerable<MessageHeaderValue>? headerValues,
 		CancellationToken cancellationToken = default)
-		=> ValueTask.FromResult(default(TReply));
+		=> ValueTask.FromResult(default(TReply)!);
 }
