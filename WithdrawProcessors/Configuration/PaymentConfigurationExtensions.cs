@@ -55,6 +55,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<U2PayProcessor>("U2Pay")
 			.RegisterWithdrawProcessor<HPayProcessor>("HPay")
 			.RegisterWithdrawProcessor<UBPayProcessor>("UBPay")
-			.RegisterWithdrawProcessor<OneTwoThreePayProcessor>("123Pay");
+			.RegisterWithdrawProcessor<OneTwoThreePayProcessor>("123Pay")
+			.RegisterWithdrawProcessor<FeibaoPayProcessor>("FeibaoPay");
 	}
 }
