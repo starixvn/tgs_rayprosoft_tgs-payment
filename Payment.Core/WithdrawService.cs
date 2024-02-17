@@ -67,7 +67,7 @@ internal class WithdrawService(
 				formData,
 				reviewUserId,
 				reviewUserName,
-				remark,				
+				remark,
 				cancellationToken).ConfigureAwait(false);
 
 		var brandPayment = await paymentRepository.GetBrandPaymentByIdAsync(
@@ -310,10 +310,11 @@ internal class WithdrawService(
 				formData,
 				reviewUserId,
 				reviewUserName,
-				remark,				
+				remark,
 				cancellationToken).ConfigureAwait(false);
 
 		var currentTime = timeProvider.GetUtcNow().UtcDateTime;
+
 		var updateFormData = formData with
 		{
 			Status = fsm.State,
@@ -323,6 +324,18 @@ internal class WithdrawService(
 			Remark = remark,
 			PlayerRemark = playerRemark,
 		};
+
+		if (remark is null)
+		{
+			updateFormData = formData with
+			{
+				Status = fsm.State,
+				ReviewedUserId = reviewUserId,
+				ReviewedUserName = reviewUserName,
+				ReviewedOn = currentTime,
+				PlayerRemark = playerRemark,
+			};
+		}
 
 		var changeSets = formData.CreatePatch(updateFormData, PaymentUtility.SerializerOptions);
 		var eventId = await serialNumberGenerator
