@@ -10,17 +10,39 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
 	{
-		["ThirdParty"] = """
+		["Bank"] = """
 			{
 				"id": "$.id",
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankOwner": "$.detail.name",
-					"accountNumber": "$.detail.bankAccount"
+					"bankCardName": "$.detail.name",
+					"bankCardAccount": "$.detail.bankAccount"
 				}
 			}
 			""",
+		["GCash"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": {
+					"bankCardName": "$.detail.phone",
+					"bankCardAccount": "$.detail.phone"
+				}
+			}
+			""",
+		["PayMaya"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": {
+					"bankCardName": "$.detail.phone",
+					"bankCardAccount": "$.detail.phone"
+				}
+			}
+			"""
 	}.AsReadOnly();
 
 	public string Subject => "tgs.payment.alfapay.withdraw";
@@ -30,11 +52,21 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		var transformation = _bankInfoTransformations["ThirdParty"];
+		var bankCode = brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString();
+
+		var bankType = bankCode switch
+		{
+			"GCASH" => "GCash",
+			"PAYMAYA" => "PayMaya",
+			_ => "Bank"
+		};
+
+		var transformation = _bankInfoTransformations[bankType];
+
 		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
 		var withdrawBankInfo = JsonSerializer
-			.Deserialize<WithdrawBankInfo<AlfaPayBankInfo>>(bankInfo, PaymentUtility.SerializerOptions);
+			.Deserialize<WithdrawBankInfo<AlfaPayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 
 		var settings = new AlfaPayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("apiToken").GetString(),
