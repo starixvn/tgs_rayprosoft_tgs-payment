@@ -16,8 +16,8 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.name",
-					"bankCardAccount": "$.detail.bankAccount"
+					"bankOwner": "$.detail.name",
+					"accountNumber": "$.detail.bankAccount"
 				}
 			}
 			""",
@@ -27,8 +27,8 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"bankOwner": "$.detail.phone",
+					"accountNumber": "$.detail.phone"
 				}
 			}
 			""",
@@ -38,8 +38,8 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"bankOwner": "$.detail.phone",
+					"accountNumber": "$.detail.phone"
 				}
 			}
 			"""
