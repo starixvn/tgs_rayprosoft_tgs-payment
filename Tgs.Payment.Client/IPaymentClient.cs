@@ -41,4 +41,6 @@ public interface IPaymentClient
 	ValueTask ScheduleAsync(string subject, Guid formId, DateTime scheduleTime, CancellationToken cancellationToken = default);
 
 	ValueTask<string> WithdrawAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default);
+
+	ValueTask<decimal?> GetMerchantBalanceAsync(string paymentCode, string brandPaymentExtendData, CancellationToken cancellationToken = default);
 }

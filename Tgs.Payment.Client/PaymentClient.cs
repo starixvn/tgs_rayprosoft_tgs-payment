@@ -336,4 +336,21 @@ internal class PaymentClient : IPaymentClient
 
 		return response.Result;
 	}
+
+	public async ValueTask<decimal?> GetMerchantBalanceAsync(string paymentCode, string brandPaymentExtendData, CancellationToken cancellationToken = default)
+	{
+		var subject = $"tgs.payment.dispatch-balance.{paymentCode.ToLower()}";
+
+		var request = new PaymentBalanceRequest
+		{
+			BrandPaymentSettings = brandPaymentExtendData
+		};
+
+		var response = await _messageSender.RequestAsync<PaymentBalanceRequest, PaymentBalanceResponse>(
+			subject,
+			request,
+			cancellationToken).ConfigureAwait(false);
+
+		return response.Balance.ToDecimal();
+	}
 }
