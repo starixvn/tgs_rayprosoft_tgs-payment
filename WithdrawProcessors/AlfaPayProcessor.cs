@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Tgs.Payment.AlfaPay;
+using Tgs.Payment.AlfaPay.Client;
 
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class AlfaPayProcessor(
-	AlfaPaySerializer alfaPaySerializer,
 	ILogger<AlfaPayProcessor> logger)
 	: IWithdrawProcessor
 {
@@ -34,6 +33,6 @@ internal class AlfaPayProcessor(
 			withdrawBankInfo.Detail.BankOwner.Trim(),
 			formId);
 
-		return alfaPaySerializer.Serialize(settings);
+		return JsonSerializer.Serialize(settings, AlfaPayUtility.SerializerOptions);
 	}
 }
