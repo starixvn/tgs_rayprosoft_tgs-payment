@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 option csharp_namespace = "Tgs.Payment.Protos";
 package payment;
@@ -99,4 +99,12 @@ message PaymentMethodChannelChangedEvent {
 message PlayerBankInfoChangedEvent {
 	phoenix.protobuf.GuidValue id = 1;
 	phoenix.protobuf.GuidValue brand_id = 2;
+}
+
+message PaymentBalanceRequest {
+	string brand_payment_settings = 1;
+}
+
+message PaymentBalanceResponse {
+	phoenix.protobuf.DecimalValue balance = 1;
 }

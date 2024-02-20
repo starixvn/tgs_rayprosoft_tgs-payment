@@ -11,6 +11,7 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.MessageQueue.Nats.Serializers;
 using Tgs.Payment.Configuration;
 using Tgs.Payment.Swagger;
 
@@ -99,7 +100,8 @@ var builder = WebApplication.CreateBuilder(args);
 	_ = builder.Services
 		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
 		{
-			Url = builder.Configuration.GetConnectionString("Nats")!
+			Url = builder.Configuration.GetConnectionString("Nats")!,
+			SerializerRegistry = TgsNatsSerializerRegistration.Default
 		}))
 		.AddMessageQueue()
 		.AddNatsMessageQueue(config => config
@@ -144,9 +146,14 @@ var builder = WebApplication.CreateBuilder(args);
 				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandDepositApprovedType,
 				"tgs.payment.deposit.status_ex",
 				"tgs.payment.deposit.status_ex")
-			.AddHandler(Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandWithdrawPaidType,
+			.AddHandler(
+				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandWithdrawPaidType,
 				"tgs.payment.withdraw.status_ex",
-				"tgs.payment.withdraw.status_ex"))
+				"tgs.payment.withdraw.status_ex")
+			.AddProcessor(
+				Tgs.Payment.MessageQueue.ProcessorTypes.PaymentBalanceDispatchProcessorType,
+				"tgs.payment.dispatch-balance.>",
+				"tgs.payment.dispatch-balance"))
 		.AddNatsGlobPatternExchange("*");
 
 	var instrumentationExtenionFilters = new[] { "html", "ico", "png", "jpg" };
