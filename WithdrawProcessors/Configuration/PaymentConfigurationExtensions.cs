@@ -26,8 +26,7 @@ public static class PaymentConfigurationExtensions
 			.AddSingleton<SkyPaySerializer>()
 			.AddSingleton<ZeroNineNinePaySerializer>()
 			.AddSingleton<TuPaySerializer>()
-			.AddSingleton<MalakiPaySerializer>()
-			.AddSingleton<AlfaPaySerializer>();
+			.AddSingleton<MalakiPaySerializer>();
 
 		return configuration
 			.RegisterWithdrawProcessor<LeePayProcessor>("LeePay")
