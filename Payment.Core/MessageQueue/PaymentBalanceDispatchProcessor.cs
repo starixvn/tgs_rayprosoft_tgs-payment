@@ -7,7 +7,10 @@ using Tgs.Payment.Protos;
 using Valhalla.MessageQueue;
 
 namespace Tgs.Payment.MessageQueue;
-internal class PaymentBalanceDispatchProcessor(IMessageSender messageSender)
+
+internal class PaymentBalanceDispatchProcessor(
+	HashSet<string> supportCodes,
+	IMessageSender messageSender)
 	: IMessageProcessor<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>
 {
 	private static readonly ReadOnlyMemory<byte> _NullResponse = new PaymentBalanceResponse().ToByteArray();
@@ -23,9 +26,7 @@ internal class PaymentBalanceDispatchProcessor(IMessageSender messageSender)
 
 		return paymentCode switch
 		{
-			var _ when paymentCode.Equals(
-				"MalakiPay-V2",
-				StringComparison.InvariantCultureIgnoreCase) => await messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+			var _ when supportCodes.Contains(paymentCode) => await messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 					$"tgs.payment.{paymentCode}.balance",
 					data,
 					cancellationToken).ConfigureAwait(false),

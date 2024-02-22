@@ -39,7 +39,15 @@ data:
         "PlayerBucketServiceBaseUrl": "http://tgs-playerbucket-service",
         "VipLevelServiceBaseUrl": "http://tgs-viplevel",
         "BrandCertificateBaseUrl": "http://brand-cert-api",
-        "AgentServiceBaseUrl": "http://agent-service"
+        "AgentServiceBaseUrl": "http://agent-service",
+        "SupportQueryBalancePaymentCodes": [
+          "PhpGoPay",
+          "FiveSevenPay-V2",
+          "WinPay",
+          "MalakiPay-V2",
+          "123Pay",
+          "DibaoPay"
+        ]
       }
     }
   otel-collector-config.yaml: |

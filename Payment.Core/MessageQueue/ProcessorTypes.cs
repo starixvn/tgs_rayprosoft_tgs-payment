@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tgs.Payment.MessageQueue;
 
@@ -13,4 +15,10 @@ public static class ProcessorTypes
 	public static readonly Type SaveWithdrawThirdNoHandlerType = typeof(SaveWithdrawThirdNoHandler);
 	public static readonly Type TagWithdrawPaidHandlerType = typeof(TagWithdrawPaidHandler);
 	public static readonly Type PaymentBalanceDispatchProcessorType = typeof(PaymentBalanceDispatchProcessor);
+
+	public static Delegate MakePaymentBalanceDispatchProcessorFactory(Func<IServiceProvider, HashSet<string>> resolveSupportCodes)
+		=> new Func<IServiceProvider, PaymentBalanceDispatchProcessor>(
+			sp => ActivatorUtilities.CreateInstance<PaymentBalanceDispatchProcessor>(
+				sp,
+				resolveSupportCodes(sp)));
 }
