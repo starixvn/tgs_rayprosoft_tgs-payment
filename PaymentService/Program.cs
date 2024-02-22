@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NATS.Client.Core;
 using OpenTelemetry.Exporter;
-using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -98,6 +97,12 @@ var builder = WebApplication.CreateBuilder(args);
 				builder.Configuration.GetValue<Uri>("Payment:AgentServiceBaseUrl")!);
 
 	_ = builder.Services
+		.AddKeyedSingleton(
+			"SupportCodes",
+			(sp, _) => builder.Configuration
+				.GetValue<string[]>("Payment:SupportQueryBalancePaymentCodes")
+				!.Select(v => v.ToLower())
+				.ToHashSet())
 		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
 		{
 			Url = builder.Configuration.GetConnectionString("Nats")!,
@@ -153,7 +158,9 @@ var builder = WebApplication.CreateBuilder(args);
 			.AddProcessor(
 				Tgs.Payment.MessageQueue.ProcessorTypes.PaymentBalanceDispatchProcessorType,
 				"tgs.payment.dispatch-balance.>",
-				"tgs.payment.dispatch-balance"))
+				"tgs.payment.dispatch-balance",
+				processorFactory: Tgs.Payment.MessageQueue.ProcessorTypes.MakePaymentBalanceDispatchProcessorFactory(
+					sp => sp.GetRequiredKeyedService<HashSet<string>>("SupportCodes"))))
 		.AddNatsGlobPatternExchange("*");
 
 	var instrumentationExtenionFilters = new[] { "html", "ico", "png", "jpg" };
