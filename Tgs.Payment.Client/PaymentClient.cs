@@ -339,7 +339,7 @@ internal class PaymentClient : IPaymentClient
 
 	public async ValueTask<decimal?> GetMerchantBalanceAsync(string paymentCode, string brandPaymentExtendData, CancellationToken cancellationToken = default)
 	{
-		var subject = $"tgs.payment.dispatch-balance.{paymentCode.ToLower()}";
+		var subject = $"tgs.payment.dispatch_balance.{paymentCode.ToLower()}";
 
 		var request = new PaymentBalanceRequest
 		{
