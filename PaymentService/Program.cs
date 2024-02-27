@@ -100,8 +100,10 @@ var builder = WebApplication.CreateBuilder(args);
 		.AddKeyedSingleton(
 			"SupportCodes",
 			(sp, _) => builder.Configuration
-				.GetValue<string[]>("Payment:SupportQueryBalancePaymentCodes")
-				!.Select(v => v.ToLower())
+				.GetSection("Payment:SupportQueryBalancePaymentCodes")
+				.GetChildren()
+				.ToArray()
+				.Select(v => v.Value!.ToLower())
 				.ToHashSet())
 		.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
 		{
