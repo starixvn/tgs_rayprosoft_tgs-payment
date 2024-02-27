@@ -48,7 +48,9 @@ data:
           "123Pay",
           "DibaoPay",
           "FeibaoPay",
-          "AlfaPay"
+          "AlfaPay",
+          "SBPay",
+          "U2Pay"
         ]
       }
     }
