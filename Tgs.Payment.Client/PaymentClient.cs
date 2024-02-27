@@ -351,6 +351,6 @@ internal class PaymentClient : IPaymentClient
 			request,
 			cancellationToken).ConfigureAwait(false);
 
-		return (decimal?)response.Balance;
+		return (decimal?)response?.Balance;
 	}
 }
