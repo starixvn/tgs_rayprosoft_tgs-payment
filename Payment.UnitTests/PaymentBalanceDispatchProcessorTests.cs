@@ -1,4 +1,6 @@
 ﻿using Google.Protobuf;
+using Microsoft.Extensions.Logging.Abstractions;
+using NUnit.Framework.Internal;
 using Tgs.Payment.MessageQueue;
 using Tgs.Payment.Protos;
 using Valhalla.MessageQueue;
@@ -14,7 +16,8 @@ public class PaymentBalanceDispatchProcessorTests
 
 		var sut = new PaymentBalanceDispatchProcessor(
 			["test"],
-			fakeMessageSender);
+			fakeMessageSender,
+			NullLogger<PaymentBalanceDispatchProcessor>.Instance);
 
 		var request = new PaymentBalanceRequest
 		{
@@ -36,7 +39,8 @@ public class PaymentBalanceDispatchProcessorTests
 
 		var sut = new PaymentBalanceDispatchProcessor(
 			[],
-			fakeMessageSender);
+			fakeMessageSender,
+			NullLogger<PaymentBalanceDispatchProcessor>.Instance);
 
 		var request = new PaymentBalanceRequest
 		{
