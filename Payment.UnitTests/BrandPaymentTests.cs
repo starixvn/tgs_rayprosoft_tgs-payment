@@ -23,7 +23,7 @@ public class BrandPaymentTests
 			brandId,
 			true,
 			168M,
-			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
+			[Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945")],
 			"userId");
 
 		var sut = new UpdateBrandAutoWithdrawCommandService(
@@ -180,9 +180,7 @@ public class BrandPaymentTests
 
 		var query = new BrandPaymentAclQuery(
 			"ThisIsPlayerCode",
-			new[] {
-					Guid.NewGuid()
-			});
+			[Guid.NewGuid()]);
 
 		_ = sut.QueryAsync(query);
 
@@ -223,9 +221,7 @@ public class BrandPaymentTests
 		var sut = new BrandPaymentVipQueryService(fakePaymentRepository);
 
 		var query = new BrandPaymentVipQuery(
-			new[] {
-					Guid.NewGuid()
-			});
+			[Guid.NewGuid()]);
 
 		_ = sut.QueryAsync(query);
 
@@ -247,7 +243,7 @@ public class BrandPaymentTests
 			brandId,
 			true,
 			1680M,
-			new Guid[] { Guid.Parse("95e7c419-127e-46fd-a322-a29ddaac6276") },
+			[Guid.Parse("95e7c419-127e-46fd-a322-a29ddaac6276")],
 			"userId");
 
 		var sut = new UpdateBrandAutoWithdrawCommandService(
@@ -261,7 +257,7 @@ public class BrandPaymentTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 168M, Array.Empty<Guid>()));
+			.Returns(new AutoWithdrawInfo(true, 168M, []));
 
 		await sut.ExecuteAsync(command);
 

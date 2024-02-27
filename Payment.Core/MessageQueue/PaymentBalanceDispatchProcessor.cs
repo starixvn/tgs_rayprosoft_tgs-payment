@@ -26,7 +26,7 @@ internal class PaymentBalanceDispatchProcessor(
 
 		return paymentCode switch
 		{
-			var _ when supportCodes.Contains(paymentCode) => await messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+			_ when supportCodes.Contains(paymentCode) => await messageSender.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 					$"tgs.payment.{paymentCode}.balance",
 					data,
 					cancellationToken).ConfigureAwait(false),

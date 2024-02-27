@@ -53,7 +53,7 @@ public class QueryBrandPaymentAclsSteps
 	{
 		var acls = _paymentServiceClient.GetBrandPaymentAclsAsync(
 			_playerCode!,
-			new[] { _brandPaymentId1, _brandPaymentId2 });
+			[_brandPaymentId1, _brandPaymentId2]);
 
 		_ = await acls.ToArrayAsync();
 	}

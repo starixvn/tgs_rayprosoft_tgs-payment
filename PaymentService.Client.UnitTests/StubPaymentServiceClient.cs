@@ -10,15 +10,15 @@ namespace PaymentService.Client.UnitTests;
 
 internal class StubPaymentServiceClient(HttpClient httpClient) : PaymentServiceClient(httpClient)
 {
-	private readonly ConcurrentBag<Guid> _brandPaymentIds = [];
+    private readonly ConcurrentBag<Guid> _brandPaymentIds = [];
 
-	public IEnumerable<Guid> CalledBrandPaymentIds => _brandPaymentIds.ToArray();
+    public IEnumerable<Guid> CalledBrandPaymentIds => [.. _brandPaymentIds];
 
-	protected override IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
-	{
-		foreach (var id in brandPaymentIds)
-			_brandPaymentIds.Add(id);
+    protected override IAsyncEnumerable<BrandPaymentVip> QueryBrandPaymentVipsAsync(IEnumerable<Guid> brandPaymentIds, CancellationToken cancellationToken)
+    {
+        foreach (var id in brandPaymentIds)
+            _brandPaymentIds.Add(id);
 
-		return Array.Empty<BrandPaymentVip>().ToAsyncEnumerable();
-	}
+        return Array.Empty<BrandPaymentVip>().ToAsyncEnumerable();
+    }
 }

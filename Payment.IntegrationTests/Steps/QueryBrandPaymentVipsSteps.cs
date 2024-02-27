@@ -44,7 +44,7 @@ public class QueryBrandPaymentVipsSteps
 	public async Task WhenCallGetBrandPaymentVipApiAsync()
 	{
 		var vips = _paymentServiceClient.GetBrandPaymentVipsAsync(
-			new[] { _brandPaymentId1, _brandPaymentId2 });
+			[_brandPaymentId1, _brandPaymentId2]);
 
 		_ = await vips.ToArrayAsync();
 	}

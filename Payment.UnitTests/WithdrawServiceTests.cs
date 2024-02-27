@@ -48,9 +48,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -126,9 +126,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -208,9 +208,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -291,9 +291,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -427,9 +427,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -537,9 +537,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var agentId = Guid.NewGuid();
@@ -653,12 +653,12 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
+			[],
+			[],
 			[fakePipe1, fakePipe2, fakePipe3]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
@@ -751,12 +751,12 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
+			[],
+			[],
 			[fakePipe1, fakePipe2, fakePipe3]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
@@ -841,13 +841,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -944,13 +944,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
+			[],
 			[fakePipe1, fakePipe2, fakePipe3],
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -1043,13 +1043,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
+			[],
 			[fakePipe1, fakePipe2, fakePipe3],
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -1157,9 +1157,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1274,9 +1274,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1368,9 +1368,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1514,9 +1514,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1607,9 +1607,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1698,13 +1698,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1813,13 +1813,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			TimeProvider.System,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -1871,13 +1871,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -1989,13 +1989,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			TimeProvider.System,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -2056,13 +2056,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			new[] { fakePipe1, fakePipe2, fakePipe3 },
+			[fakePipe1, fakePipe2, fakePipe3],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -2159,13 +2159,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			new[] { fakePipe1, fakePipe2, fakePipe3 },
+			[fakePipe1, fakePipe2, fakePipe3],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -2250,13 +2250,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			TimeProvider.System,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 		var user = new WithdrawUser(
@@ -2299,13 +2299,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -2440,13 +2440,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
 			[fakePipe1, fakePipe2, fakePipe3],
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -2588,13 +2588,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
 			[fakePipe1, fakePipe2, fakePipe3],
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),
@@ -2607,7 +2607,7 @@ public class WithdrawServiceTests
 			0M,
 			null,
 			PaymentFlowState.WaitApprove,
-			null,			
+			null,
 			null,
 			null,
 			Guid.NewGuid(),
@@ -2742,9 +2742,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -2850,9 +2850,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -2958,9 +2958,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3066,9 +3066,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3230,9 +3230,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3338,9 +3338,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3447,9 +3447,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3611,9 +3611,9 @@ public class WithdrawServiceTests
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var brandId = Guid.NewGuid();
 
@@ -3761,13 +3761,13 @@ public class WithdrawServiceTests
 			fakeTakeNumberStore,
 			fakeTimeProvider,
 			fakeSerialNumberGenerator,
-			Array.Empty<ICreateWithdrawFormPipe>(),
+			[],
 			fakeWithdrawProcessorFactory,
 			fakeCalculateService,
 			fakePaymentClient,
-			Array.Empty<IApproveWithdrawFormPipe>(),
-			Array.Empty<IRejectWithdrawFormPipe>(),
-			Array.Empty<IPaidWithdrawFormPipe>());
+			[],
+			[],
+			[]);
 
 		var withdrawForm = new WithdrawFormSnapshot(
 			Guid.NewGuid(),

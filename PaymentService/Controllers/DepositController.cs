@@ -200,10 +200,10 @@ public class DepositController : ControllerBase
 			null,
 			null,
 			null,
-			new[] {
+			[
 				PaymentFlowState.WaitApprove,
 				PaymentFlowState.WaitPayment
-			},
+			],
 			null,
 			(Begin: currentDate.AddDays(-1D), End: currentDate),
 			sourcePaging);
@@ -283,7 +283,7 @@ public class DepositController : ControllerBase
 			formQuery.FormId,
 			formQuery.PaymentId,
 			formQuery.PaymentMethodId,
-			formQuery.Status ?? Array.Empty<PaymentFlowState>(),
+			formQuery.Status ?? [],
 			createOnRange,
 			updateOnRange,
 			sourcePaging);
