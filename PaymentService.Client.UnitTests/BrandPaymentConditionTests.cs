@@ -129,8 +129,8 @@ public class BrandPaymentConditionTests
 			.Returns(true);
 
 		var sut = new BrandPaymentFilterCondition(
-			new BlockListCondition(Array.Empty<Guid>()),
-			new WhiteListCondition(Array.Empty<Guid>()),
+			new BlockListCondition([]),
+			new WhiteListCondition([]),
 			new ShowOnAllPlayersCondition(),
 			fakeCondition.Object);
 
@@ -404,8 +404,8 @@ public class BrandPaymentConditionTests
 		var fakeCondition = new Mock<IBrandPaymentCondition>();
 
 		var sut = new BrandPaymentFilterCondition(
-			new BlockListCondition(new[] { brandPayment.Id }),
-			new WhiteListCondition(new[] { brandPayment.Id }),
+			new BlockListCondition([brandPayment.Id]),
+			new WhiteListCondition([brandPayment.Id]),
 			new ShowOnAllPlayersCondition(),
 			fakeCondition.Object);
 
@@ -567,8 +567,8 @@ public class BrandPaymentConditionTests
 			.Returns(true);
 
 		var sut = new BrandPaymentFilterCondition(
-			new BlockListCondition(Array.Empty<Guid>()),
-			new WhiteListCondition(Array.Empty<Guid>()),
+			new BlockListCondition([]),
+			new WhiteListCondition([]),
 			new ShowOnAllPlayersCondition(),
 			new MatchAllCondition(
 				fakeCondition1.Object,
@@ -618,7 +618,7 @@ public class BrandPaymentConditionTests
 			TransferType = TransferType.Deposit
 		};
 
-		var sut = new BlockListCondition(new[] { brandPayment.Id });
+		var sut = new BlockListCondition([brandPayment.Id]);
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
@@ -663,7 +663,7 @@ public class BrandPaymentConditionTests
 			TransferType = TransferType.Deposit
 		};
 
-		var sut = new WhiteListCondition(new[] { brandPayment.Id });
+		var sut = new WhiteListCondition([brandPayment.Id]);
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
@@ -711,8 +711,8 @@ public class BrandPaymentConditionTests
 		var fakeCondition = new Mock<IBrandPaymentCondition>();
 
 		var sut = new BrandPaymentFilterCondition(
-			new BlockListCondition(Array.Empty<Guid>()),
-			new WhiteListCondition(new[] { brandPayment.Id }),
+			new BlockListCondition([]),
+			new WhiteListCondition([brandPayment.Id]),
 			new ShowOnAllPlayersCondition(),
 			fakeCondition.Object);
 
@@ -831,7 +831,7 @@ public class BrandPaymentConditionTests
 			TransferType = TransferType.Deposit
 		};
 
-		var sut = new VipCondition(Array.Empty<Guid>());
+		var sut = new VipCondition([]);
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 
@@ -876,7 +876,7 @@ public class BrandPaymentConditionTests
 			TransferType = TransferType.Deposit
 		};
 
-		var sut = new VipCondition(new[] { playerInfo.VipLevelId!.Value });
+		var sut = new VipCondition([playerInfo.VipLevelId!.Value]);
 
 		var actual = sut.IsValid(brandPayment, playerInfo);
 

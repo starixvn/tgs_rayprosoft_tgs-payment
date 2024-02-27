@@ -72,12 +72,12 @@ public class DepositTests
 			null,
 			null,
 			null,
-			new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-			},
+			[
+				PaymentFlowState.WaitPayment,
+				PaymentFlowState.WaitApprove,
+				PaymentFlowState.Approved,
+				PaymentFlowState.Reject
+			],
 			null,
 			null,
 			null);
@@ -391,12 +391,12 @@ public class DepositTests
 			null,
 			null,
 			null,
-			new[] {
+			[
 				PaymentFlowState.WaitPayment,
 				PaymentFlowState.WaitApprove,
 				PaymentFlowState.Approved,
 				PaymentFlowState.Reject
-			},
+			],
 			null,
 			null,
 			new Tgs.Paging.Paging<DepositFormInfo>
@@ -626,12 +626,12 @@ public class DepositTests
 			null,
 			null,
 			null,
-			new[] {
-					PaymentFlowState.WaitPayment,
-					PaymentFlowState.WaitApprove,
-					PaymentFlowState.Approved,
-					PaymentFlowState.Reject
-			},
+			[
+				PaymentFlowState.WaitPayment,
+				PaymentFlowState.WaitApprove,
+				PaymentFlowState.Approved,
+				PaymentFlowState.Reject
+			],
 			null,
 			null,
 			null);

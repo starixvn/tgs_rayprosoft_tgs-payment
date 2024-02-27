@@ -381,7 +381,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 	public async ValueTask<AgentInfo> GetAgentInfoByAgentIdAsync(Guid agentId, CancellationToken cancellationToken = default)
 	{
 		var agentInfo = await tgsContext.Agents
-			.FindAsync(new object[] { agentId }, cancellationToken)
+			.FindAsync([agentId], cancellationToken)
 			.ConfigureAwait(false);
 
 		return new AgentInfo(agentInfo!.Phone);
@@ -466,9 +466,9 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 		var jsonNode = JsonNode.Parse(autoWithdrawSetting.BrandPaymentCandidates);
 
 		brandPaymentIds = jsonNode is null
-			? Array.Empty<Guid>()
+			? []
 			: jsonNode!["brandPaymentIds"]?.AsArray().Select(x => x!.GetValue<Guid>()).AsEnumerable()
-				?? Array.Empty<Guid>();
+				?? [];
 
 		return new AutoWithdrawInfo(
 				autoWithdrawSetting.EnableAutoWithdraw,

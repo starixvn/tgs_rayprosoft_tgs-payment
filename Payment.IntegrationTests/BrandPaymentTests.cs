@@ -55,7 +55,7 @@ public class BrandPaymentTests
 			.GetBrandAutoWithdrawSettingAsync(
 				Arg.Is(brandId),
 				Arg.Any<CancellationToken>())
-			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, new Guid[] { Guid.NewGuid() }));
+			.Returns(new Tgs.Payment.AutoWithdrawInfo(true, 168m, [Guid.NewGuid()]));
 
 		var actual = await sut.GetBrandAutoWithdrawSettingAsync(brandId);
 
@@ -272,7 +272,7 @@ public class BrandPaymentTests
 			brandId,
 			true,
 			168M,
-			new Guid[] { Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945") },
+			[Guid.Parse("018a2193-4282-0000-0001-07e7e07dc945")],
 			"186f897e-56d2-47e6-b349-08d920ec59b6");
 
 		_ = fakePaymentRepository

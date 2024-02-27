@@ -165,13 +165,13 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			new[] {
+			[
 				PaymentFlowState.WaitPayment,
 				PaymentFlowState.WaitApprove,
 				PaymentFlowState.Approved,
 				PaymentFlowState.Reject
-			},
-			Array.Empty<Guid>(),
+			],
+			[],
 			null,
 			null,
 			null,
@@ -574,13 +574,13 @@ public class WithdrawTests
 			null,
 			null,
 			null,
-			new[] {
+			[
 				PaymentFlowState.WaitPayment,
 				PaymentFlowState.WaitApprove,
 				PaymentFlowState.Approved,
 				PaymentFlowState.Reject
-			},
-			Array.Empty<Guid>(),
+			],
+			[],
 			null,
 			null,
 			null,
@@ -997,7 +997,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 200m, new Guid[] { brandPaymentId }));
+			.Returns(new AutoWithdrawInfo(true, 200m, [brandPaymentId]));
 
 		var agentWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1051,7 +1051,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 200m, new Guid[] { Guid.Parse("07e50f08-e0ca-4679-b043-7cc6c48f9826") }));
+			.Returns(new AutoWithdrawInfo(true, 200m, [Guid.Parse("07e50f08-e0ca-4679-b043-7cc6c48f9826")]));
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1142,7 +1142,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 200m, new Guid[] { brandPaymentId }));
+			.Returns(new AutoWithdrawInfo(true, 200m, [brandPaymentId]));
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
@@ -1228,7 +1228,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(false, 10m, Array.Empty<Guid>()));
+			.Returns(new AutoWithdrawInfo(false, 10m, []));
 
 		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.Init));
 
@@ -1253,7 +1253,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 10m, Array.Empty<Guid>()));
+			.Returns(new AutoWithdrawInfo(true, 10m, []));
 
 		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.Init));
 
@@ -1299,7 +1299,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 100m, new Guid[] { Guid.NewGuid() }));
+			.Returns(new AutoWithdrawInfo(true, 100m, [Guid.NewGuid()]));
 
 		await sut.ExecuteAsync(new AutoApproveWithdtawFormCommand(brandId, formId, PaymentFlowState.Init));
 
@@ -1327,7 +1327,7 @@ public class WithdrawTests
 
 		_ = fakePaymentRepository
 			.GetBrandAutoWithdrawSettingAsync(brandId)
-			.Returns(new AutoWithdrawInfo(true, 100m, new Guid[] { Guid.NewGuid() }));
+			.Returns(new AutoWithdrawInfo(true, 100m, [Guid.NewGuid()]));
 
 		var playerWithdrawForm = new WithdrawFormInfo(
 			formId,
