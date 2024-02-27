@@ -25,7 +25,7 @@ internal class PaymentBalanceDispatchProcessor(
 	{
 		logger.LogInformation("Handle balance dispatch {subject}", subject);
 
-		// tgs.payment.dispatch-balance.code
+		// tgs.payment.dispatch_balance.code
 		var paymentCode = subject.Split('.')[^1];
 
 		return paymentCode switch

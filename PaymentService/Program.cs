@@ -154,7 +154,13 @@ var builder = WebApplication.CreateBuilder(args);
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandWithdrawPaidType,
 				"tgs.payment.withdraw.status_ex",
-				"tgs.payment.withdraw.status_ex"))
+				"tgs.payment.withdraw.status_ex")
+			.AddProcessor(
+				Tgs.Payment.MessageQueue.ProcessorTypes.PaymentBalanceDispatchProcessorType,
+				"tgs.payment.dispatch_balance.*",
+				"tgs.payment.dispatch_balance",
+				processorFactory: Tgs.Payment.MessageQueue.ProcessorTypes.MakePaymentBalanceDispatchProcessorFactory(
+					sp => sp.GetRequiredKeyedService<HashSet<string>>("SupportCodes"))))
 		.AddNatsGlobPatternExchange("*");
 
 	var instrumentationExtenionFilters = new[] { "html", "ico", "png", "jpg" };
