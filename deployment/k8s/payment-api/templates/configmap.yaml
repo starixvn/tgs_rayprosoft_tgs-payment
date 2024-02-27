@@ -47,7 +47,8 @@ data:
           "MalakiPay-V2",
           "123Pay",
           "DibaoPay",
-          "FeibaoPay"
+          "FeibaoPay",
+          "AlfaPay"
         ]
       }
     }
