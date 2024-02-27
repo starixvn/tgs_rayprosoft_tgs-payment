@@ -157,7 +157,7 @@ var builder = WebApplication.CreateBuilder(args);
 				"tgs.payment.withdraw.status_ex")
 			.AddProcessor(
 				Tgs.Payment.MessageQueue.ProcessorTypes.PaymentBalanceDispatchProcessorType,
-				"tgs.payment.dispatch-balance.>",
+				"tgs.payment.dispatch-balance.*",
 				"tgs.payment.dispatch-balance",
 				processorFactory: Tgs.Payment.MessageQueue.ProcessorTypes.MakePaymentBalanceDispatchProcessorFactory(
 					sp => sp.GetRequiredKeyedService<HashSet<string>>("SupportCodes"))))
