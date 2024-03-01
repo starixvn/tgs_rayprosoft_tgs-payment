@@ -26,26 +26,26 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.HasIndex(e => e.PaymentId, "ix_payment_method_channels_payment_id");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.ChannelId).HasColumnName("channel_id");
             entity.Property(e => e.MethodId).HasColumnName("method_id");
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
             entity.Property(e => e.Status)
-            .HasDefaultValue((short)0)
-            .HasColumnName("status");
+                .HasDefaultValue((short)0)
+                .HasColumnName("status");
 
             entity.HasOne(d => d.Channel).WithMany(p => p.PaymentMethodChannels)
-            .HasForeignKey(d => d.ChannelId)
-            .HasConstraintName("fk_payment_method_channels_payment_channels_id");
+                .HasForeignKey(d => d.ChannelId)
+                .HasConstraintName("fk_payment_method_channels_payment_channels_id");
 
             entity.HasOne(d => d.Method).WithMany(p => p.PaymentMethodChannels)
-            .HasForeignKey(d => d.MethodId)
-            .HasConstraintName("fk_payment_method_channels_payment_methods_id");
+                .HasForeignKey(d => d.MethodId)
+                .HasConstraintName("fk_payment_method_channels_payment_methods_id");
 
             entity.HasOne(d => d.Payment).WithMany(p => p.PaymentMethodChannels)
-            .HasForeignKey(d => d.PaymentId)
-            .HasConstraintName("fk_payment_method_channels_payments_id");
+                .HasForeignKey(d => d.PaymentId)
+                .HasConstraintName("fk_payment_method_channels_payments_id");
 
             OnConfigurePartial(entity);
         }

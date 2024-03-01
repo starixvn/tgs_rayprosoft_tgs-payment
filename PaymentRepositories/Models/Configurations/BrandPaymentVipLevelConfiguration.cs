@@ -23,8 +23,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.VipLevelId).HasColumnName("vip_level_id");
 
             entity.HasOne(d => d.BrandPayment).WithMany(p => p.BrandPaymentVipLevels)
-            .HasForeignKey(d => d.BrandPaymentId)
-            .HasConstraintName("fk_brand_payment_vip_levels_brand_payments_brand_payment_id");
+                .HasForeignKey(d => d.BrandPaymentId)
+                .HasConstraintName("fk_brand_payment_vip_levels_brand_payments_brand_payment_id");
 
             OnConfigurePartial(entity);
         }

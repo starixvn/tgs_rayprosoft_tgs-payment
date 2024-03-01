@@ -95,6 +95,10 @@ public partial class Brand
 
     public DateTime UpdatedOn { get; set; }
 
+    public bool EnablePlayerAgent { get; set; }
+
+    public bool EnablePlatformAccountFundCheck { get; set; }
+
     public virtual ICollection<AgentBankInfoItem> AgentBankInfoItems { get; set; } = new List<AgentBankInfoItem>();
 
     public virtual ICollection<Agent> Agents { get; set; } = new List<Agent>();

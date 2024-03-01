@@ -22,16 +22,16 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.BankInfoHash).HasColumnName("bank_info_hash");
             entity.Property(e => e.PlayerCode)
-            .HasMaxLength(16)
-            .HasColumnName("player_code");
+                .HasMaxLength(16)
+                .HasColumnName("player_code");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.PlayerBankinfoAttributions)
-            .HasForeignKey(d => d.BrandId)
-            .HasConstraintName("fk_brands_brand_id");
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_brands_brand_id");
 
             entity.HasOne(d => d.PlayerCodeNavigation).WithMany(p => p.PlayerBankinfoAttributions)
-            .HasForeignKey(d => d.PlayerCode)
-            .HasConstraintName("fk_players_player_code");
+                .HasForeignKey(d => d.PlayerCode)
+                .HasConstraintName("fk_players_player_code");
 
             OnConfigurePartial(entity);
         }

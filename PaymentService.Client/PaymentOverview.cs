@@ -8,4 +8,6 @@ public record PaymentOverview(
 	DateTime? FirstWithdrawOn,
 	DateOnly RecordedBy,
 	decimal TotalDepositAmount,
-	decimal TotalWithdrawAmount);
+	int TotalDepositCount,
+	decimal TotalWithdrawAmount,
+	int TotalWithdrawCount);

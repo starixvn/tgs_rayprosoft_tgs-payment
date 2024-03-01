@@ -21,17 +21,17 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.Property(e => e.BrandPaymentId).HasColumnName("brand_payment_id");
             entity.Property(e => e.PlayerCode)
-            .HasMaxLength(16)
-            .HasColumnName("player_code");
+                .HasMaxLength(16)
+                .HasColumnName("player_code");
             entity.Property(e => e.ListType).HasColumnName("list_type");
 
             entity.HasOne(d => d.BrandPayment).WithMany(p => p.BrandPaymentPlayers)
-            .HasForeignKey(d => d.BrandPaymentId)
-            .HasConstraintName("fk_brand_payment_players_brand_payments_brand_payment_id");
+                .HasForeignKey(d => d.BrandPaymentId)
+                .HasConstraintName("fk_brand_payment_players_brand_payments_brand_payment_id");
 
             entity.HasOne(d => d.PlayerCodeNavigation).WithMany(p => p.BrandPaymentPlayers)
-            .HasForeignKey(d => d.PlayerCode)
-            .HasConstraintName("fk_brand_payment_players_players_player_code");
+                .HasForeignKey(d => d.PlayerCode)
+                .HasConstraintName("fk_brand_payment_players_players_player_code");
 
             OnConfigurePartial(entity);
         }

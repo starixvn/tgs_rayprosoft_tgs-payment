@@ -10,9 +10,9 @@ internal class GetPaymentOverviewQueryService(
 	TimeProvider timeProvider,
 	IPaymentRepository paymentRepository,
 	IStatisticsRepository statisticsRepository)
-	: IGetService<GetPaymentOverviewQuery, PaymentOverview?>
+	: IGetService<GetPaymentOverviewQuery, PaymentOverview>
 {
-	public async ValueTask<PaymentOverview?> GetAsync(GetPaymentOverviewQuery query, CancellationToken cancellationToken = default)
+	public async ValueTask<PaymentOverview> GetAsync(GetPaymentOverviewQuery query, CancellationToken cancellationToken = default)
 	{
 		var currentTime = timeProvider.GetUtcNow().ToOffset(PaymentUtility.ReportOffset);
 
@@ -89,7 +89,9 @@ internal class GetPaymentOverviewQueryService(
 		return (overview ?? PaymentOverview.Default with { RecordedBy = currentDate }) with
 		{
 			TotalDepositAmount = (overview?.TotalDepositAmount ?? 0M) + (realTimeData?.DepositAmount ?? 0M),
+			TotalDepositCount = (overview?.TotalDepositCount ?? 0) + (realTimeData?.DepositCount ?? 0),
 			TotalWithdrawAmount = (overview?.TotalWithdrawAmount ?? 0M) + (realTimeData?.WithdrawAmount ?? 0M),
+			TotalWithdrawCount = (overview?.TotalWithdrawCount ?? 0) + (realTimeData?.WithdrawCount ?? 0),
 			FirstDepositAmount = overview?.FirstDepositAmount ?? realTimeData?.FirstDepositAmount,
 			FirstDepositHandlingFee = overview?.FirstDepositHandlingFee ?? realTimeData?.FirstDepositHandlingFee,
 			FirstDepositOn = overview?.FirstDepositOn ?? realTimeData?.FirstDepositOn,

@@ -10,7 +10,9 @@ public record PaymentOverview(
 	DateTime? FirstWithdrawOn,
 	DateOnly RecordedBy,
 	decimal TotalDepositAmount,
-	decimal TotalWithdrawAmount)
+	int TotalDepositCount,
+	decimal TotalWithdrawAmount,
+	int TotalWithdrawCount)
 {
 	public static readonly PaymentOverview Default = new(
 		null,
@@ -21,5 +23,7 @@ public record PaymentOverview(
 		null,
 		DateOnly.MinValue,
 		0M,
-		0M);
+		0,
+		0M,
+		0);
 }
