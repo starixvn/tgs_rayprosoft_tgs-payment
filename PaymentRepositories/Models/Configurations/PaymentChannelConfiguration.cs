@@ -18,14 +18,14 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.ToTable("payment_channels", "dbo");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.Code)
-            .HasMaxLength(50)
-            .HasColumnName("code");
+                .HasMaxLength(50)
+                .HasColumnName("code");
             entity.Property(e => e.Description)
-            .HasMaxLength(128)
-            .HasColumnName("description");
+                .HasMaxLength(128)
+                .HasColumnName("description");
 
             OnConfigurePartial(entity);
         }

@@ -22,63 +22,63 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.HasIndex(e => e.PaymentMethodChannelId, "ix_brand_payments_payment_method_channel_id");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.AllPlayers).HasColumnName("all_players");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.ChannelName)
-            .HasMaxLength(50)
-            .HasColumnName("channel_name");
+                .HasMaxLength(50)
+                .HasColumnName("channel_name");
             entity.Property(e => e.CreatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("created_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("created_on");
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_on");
             entity.Property(e => e.DepositedAmountMax)
-            .HasPrecision(18, 6)
-            .HasColumnName("deposited_amount_max");
+                .HasPrecision(18, 6)
+                .HasColumnName("deposited_amount_max");
             entity.Property(e => e.DepositedAmountMin)
-            .HasPrecision(18, 6)
-            .HasColumnName("deposited_amount_min");
+                .HasPrecision(18, 6)
+                .HasColumnName("deposited_amount_min");
             entity.Property(e => e.DepositedAmountUnlimited).HasColumnName("deposited_amount_unlimited");
             entity.Property(e => e.DisplayOrder).HasColumnName("display_order");
             entity.Property(e => e.ExtendedData)
-            .HasColumnType("jsonb")
-            .HasColumnName("extended_data");
+                .HasColumnType("jsonb")
+                .HasColumnName("extended_data");
             entity.Property(e => e.HandlingFeeRateTenPercentile)
-            .HasPrecision(18, 6)
-            .HasColumnName("handling_fee_rate_ten_percentile");
+                .HasPrecision(18, 6)
+                .HasColumnName("handling_fee_rate_ten_percentile");
             entity.Property(e => e.IdentityAuthentication).HasColumnName("identity_authentication");
             entity.Property(e => e.PaymentMethodChannelId).HasColumnName("payment_method_channel_id");
             entity.Property(e => e.PaymentStatus).HasColumnName("payment_status");
             entity.Property(e => e.PhoneAuthentication).HasColumnName("phone_authentication");
             entity.Property(e => e.PlayerListCondition).HasColumnName("player_list_condition");
             entity.Property(e => e.Reason)
-            .HasMaxLength(4000)
-            .HasColumnName("reason");
+                .HasMaxLength(4000)
+                .HasColumnName("reason");
             entity.Property(e => e.ReducePlayerAmount).HasColumnName("reduce_player_amount");
             entity.Property(e => e.TransferLimitFrom)
-            .HasPrecision(18, 6)
-            .HasColumnName("transfer_limit_from");
+                .HasPrecision(18, 6)
+                .HasColumnName("transfer_limit_from");
             entity.Property(e => e.TransferLimitTo)
-            .HasPrecision(18, 6)
-            .HasColumnName("transfer_limit_to");
+                .HasPrecision(18, 6)
+                .HasColumnName("transfer_limit_to");
             entity.Property(e => e.TransferType).HasColumnName("transfer_type");
             entity.Property(e => e.UpdatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("updated_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("updated_by_username");
             entity.Property(e => e.UpdatedOn)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("updated_on");
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_on");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.BrandPayments)
-            .HasForeignKey(d => d.BrandId)
-            .HasConstraintName("fk_brand_payments_brands_brand_id");
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_brand_payments_brands_brand_id");
 
             entity.HasOne(d => d.PaymentMethodChannel).WithMany(p => p.BrandPayments)
-            .HasForeignKey(d => d.PaymentMethodChannelId)
-            .HasConstraintName("fk_brand_payments_payment_method_channels_id");
+                .HasForeignKey(d => d.PaymentMethodChannelId)
+                .HasConstraintName("fk_brand_payments_payment_method_channels_id");
 
             OnConfigurePartial(entity);
         }

@@ -14,9 +14,13 @@ public class PaymentOverviewViewModel
 
 	public DateTime? FirstWithdrawOn { get; set; }
 
-	public DateOnly RecordedBy { get; set; }
+	public required DateOnly RecordedBy { get; set; }
 
-	public decimal TotalDepositAmount { get; set; }
+	public required decimal TotalDepositAmount { get; set; }
 
-	public decimal TotalWithdrawAmount { get; set; }
+	public required int TotalDepositCount { get; set; }
+
+	public required decimal TotalWithdrawAmount { get; set; }
+
+	public required int TotalWithdrawCount { get; set; }
 }

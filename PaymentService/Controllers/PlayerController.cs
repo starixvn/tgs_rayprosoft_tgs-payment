@@ -34,15 +34,14 @@ public class PlayerController : ControllerBase
 
 	[HttpGet("overview/{playerCode}", Name = "GetPlayerPaymentOverview")]
 	public async Task<PaymentOverviewViewModel> GetPlayerPaymentOverViewAsync(
-		[FromServices] IGetService<GetPaymentOverviewQuery, PaymentOverview?> getService,
+		[FromServices] IGetService<GetPaymentOverviewQuery, PaymentOverview> getService,
 		string playerCode)
 	{
 		var query = new GetPaymentOverviewQuery(playerCode);
 
 		var result = await getService.GetAsync(
 			query,
-			HttpContext.RequestAborted).ConfigureAwait(false)
-			?? PaymentOverview.Default;
+			HttpContext.RequestAborted).ConfigureAwait(false);
 
 		return new PaymentOverviewViewModel
 		{
@@ -53,7 +52,9 @@ public class PlayerController : ControllerBase
 			FirstWithdrawHandlingFee = result.FirstWithdrawHandlingFee,
 			FirstWithdrawOn = result.FirstWithdrawOn,
 			TotalDepositAmount = result.TotalDepositAmount,
+			TotalDepositCount = result.TotalDepositCount,
 			TotalWithdrawAmount = result.TotalWithdrawAmount,
+			TotalWithdrawCount = result.TotalWithdrawCount,
 			RecordedBy = result.RecordedBy
 		};
 	}

@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
-using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
@@ -36,7 +34,9 @@ public class PlayerQueryTests
 			FirstWithdrawOn = currentTime,
 			RecordedBy = DateOnly.FromDateTime(currentTime),
 			TotalDepositAmount = 0,
-			TotalWithdrawAmount = 0
+			TotalWithdrawAmount = 0,
+			TotalDepositCount = 1,
+			TotalWithdrawCount = 1
 		});
 
 		_ = await dbContext.SaveChangesAsync();
@@ -50,7 +50,9 @@ public class PlayerQueryTests
 			currentTime,
 			DateOnly.FromDateTime(currentTime),
 			0M,
-			0M);
+			1,
+			0M,
+			1);
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
@@ -84,7 +86,9 @@ public class PlayerQueryTests
 			null,
 			DateOnly.Parse("2024-1-29"),
 			0M,
-			0M);
+			0,
+			0M,
+			0);
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
@@ -151,7 +155,9 @@ public class PlayerQueryTests
 			null,
 			DateOnly.Parse("2024-1-29"),
 			200M,
-			0M);
+			3,
+			0M,
+			0);
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 
@@ -232,7 +238,9 @@ public class PlayerQueryTests
 			DateTime.ParseExact("2024-01-28T15:00:00.0000000+08:00", "o", null).ToUniversalTime(),
 			DateOnly.Parse("2024-1-28"),
 			300M,
-			100M);
+			3,
+			100M,
+			0);
 
 		var actual = await sut.GetPlayerPaymentOverviewAsync(playerCode);
 

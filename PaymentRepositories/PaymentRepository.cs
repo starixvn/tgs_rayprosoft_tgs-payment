@@ -1008,7 +1008,9 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				overview.FirstWithdrawOn,
 				overview.RecordedBy,
 				overview.TotalDepositAmount,
-				overview.TotalWithdrawAmount);
+				overview.TotalDepositCount,
+				overview.TotalWithdrawAmount,
+				overview.TotalWithdrawCount);
 	}
 
 	public async ValueTask<DepositFormsStatusCount> GetReportDateDepositFormSummaryAsync(Guid brandId, DateOnly reportDate, CancellationToken cancellationToken = default)

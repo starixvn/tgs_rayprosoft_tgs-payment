@@ -18,13 +18,13 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.ToTable("brand_payment_settings", "dbo");
 
             entity.Property(e => e.BrandId)
-            .ValueGeneratedNever()
-            .HasColumnName("brand_id");
+                .ValueGeneratedNever()
+                .HasColumnName("brand_id");
             entity.Property(e => e.PlayerBankInfoCountLimit).HasColumnName("player_bank_info_count_limit");
 
             entity.HasOne(d => d.Brand).WithOne(p => p.BrandPaymentSetting)
-            .HasForeignKey<BrandPaymentSetting>(d => d.BrandId)
-            .HasConstraintName("fk_brands");
+                .HasForeignKey<BrandPaymentSetting>(d => d.BrandId)
+                .HasConstraintName("fk_brands");
 
             OnConfigurePartial(entity);
         }

@@ -18,17 +18,17 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.ToTable("brand_payment_auto_withdraw", "dbo");
 
             entity.Property(e => e.BrandId)
-            .ValueGeneratedNever()
-            .HasColumnName("brand_id");
+                .ValueGeneratedNever()
+                .HasColumnName("brand_id");
             entity.Property(e => e.AmountUpperLimit)
-            .HasPrecision(18, 6)
-            .HasColumnName("amount_upper_limit");
+                .HasPrecision(18, 6)
+                .HasColumnName("amount_upper_limit");
             entity.Property(e => e.BrandPaymentCandidates)
-            .HasColumnType("jsonb")
-            .HasColumnName("brand_payment_candidates");
+                .HasColumnType("jsonb")
+                .HasColumnName("brand_payment_candidates");
             entity.Property(e => e.EnableAutoWithdraw)
-            .HasDefaultValue(false)
-            .HasColumnName("enable_auto_withdraw");
+                .HasDefaultValue(false)
+                .HasColumnName("enable_auto_withdraw");
             entity.Property(e => e.SnapshotEventId).HasColumnName("snapshot_event_id");
 
             OnConfigurePartial(entity);

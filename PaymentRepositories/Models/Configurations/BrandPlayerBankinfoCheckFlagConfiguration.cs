@@ -18,8 +18,8 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.ToTable("brand_player_bankinfo_check_flags", "dbo");
 
             entity.Property(e => e.BrandId)
-            .ValueGeneratedNever()
-            .HasColumnName("brand_id");
+                .ValueGeneratedNever()
+                .HasColumnName("brand_id");
             entity.Property(e => e.IsEnabled).HasColumnName("is_enabled");
 
             OnConfigurePartial(entity);

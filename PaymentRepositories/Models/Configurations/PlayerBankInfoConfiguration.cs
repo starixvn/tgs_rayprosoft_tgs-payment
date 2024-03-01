@@ -24,41 +24,41 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
             entity.HasIndex(e => e.PlayerCode, "ix_player_bank_infos_player_code");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.BankInfoHash).HasColumnName("bank_info_hash");
             entity.Property(e => e.BankType).HasColumnName("bank_type");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.CreatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("created_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn).HasColumnName("created_on");
             entity.Property(e => e.Default)
-            .HasDefaultValue(false)
-            .HasColumnName("default");
+                .HasDefaultValue(false)
+                .HasColumnName("default");
             entity.Property(e => e.Detail)
-            .HasColumnType("jsonb")
-            .HasColumnName("detail");
+                .HasColumnType("jsonb")
+                .HasColumnName("detail");
             entity.Property(e => e.PaymentChannelId).HasColumnName("payment_channel_id");
             entity.Property(e => e.PlayerCode)
-            .HasMaxLength(16)
-            .HasColumnName("player_code");
+                .HasMaxLength(16)
+                .HasColumnName("player_code");
             entity.Property(e => e.UpdatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("updated_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("updated_by_username");
             entity.Property(e => e.UpdatedOn).HasColumnName("updated_on");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.PlayerBankInfos)
-            .HasForeignKey(d => d.BrandId)
-            .HasConstraintName("fk_player_bank_infos_brands_brand_id");
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("fk_player_bank_infos_brands_brand_id");
 
             entity.HasOne(d => d.PaymentChannel).WithMany(p => p.PlayerBankInfos)
-            .HasForeignKey(d => d.PaymentChannelId)
-            .HasConstraintName("fk_player_bank_infos_payment_channels_payment_channel_id");
+                .HasForeignKey(d => d.PaymentChannelId)
+                .HasConstraintName("fk_player_bank_infos_payment_channels_payment_channel_id");
 
             entity.HasOne(d => d.PlayerCodeNavigation).WithMany(p => p.PlayerBankInfos)
-            .HasForeignKey(d => d.PlayerCode)
-            .HasConstraintName("fk_player_bank_infos_players_player_code");
+                .HasForeignKey(d => d.PlayerCode)
+                .HasConstraintName("fk_player_bank_infos_players_player_code");
 
             OnConfigurePartial(entity);
         }

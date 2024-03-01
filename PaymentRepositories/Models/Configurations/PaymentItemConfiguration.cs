@@ -17,40 +17,34 @@ namespace Tgs.Payment.Repositories.Entities.Configurations
 
             entity.ToTable("payments", "dbo");
 
-            entity.HasIndex(e => e.Name, "ix_payments_name");
-
-            entity.HasIndex(e => e.Name, "ix_trgm_payments_name")
-            .HasMethod("gin")
-            .HasOperators(new[] { "gin_trgm_ops" });
-
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.Code)
-            .HasMaxLength(50)
-            .HasColumnName("code");
+                .HasMaxLength(50)
+                .HasColumnName("code");
             entity.Property(e => e.CreatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("created_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("created_on");
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_on");
             entity.Property(e => e.Description)
-            .HasMaxLength(128)
-            .HasColumnName("description");
+                .HasMaxLength(128)
+                .HasColumnName("description");
             entity.Property(e => e.ExtendData)
-            .HasColumnType("jsonb")
-            .HasColumnName("extend_data");
+                .HasColumnType("jsonb")
+                .HasColumnName("extend_data");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Status)
-            .HasDefaultValue((short)0)
-            .HasColumnName("status");
+                .HasDefaultValue((short)0)
+                .HasColumnName("status");
             entity.Property(e => e.UpdatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("updated_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("updated_by_username");
             entity.Property(e => e.UpdatedOn)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("updated_on");
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_on");
 
             OnConfigurePartial(entity);
         }
