@@ -46,6 +46,8 @@ data:
           "WinPay",
           "MalakiPay-V2",
           "123Pay",
+          "LPay",
+          "SunnyPay",
           "DibaoPay",
           "FeibaoPay",
           "AlfaPay",
