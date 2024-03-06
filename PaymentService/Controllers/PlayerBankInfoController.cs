@@ -74,7 +74,9 @@ public class PlayerBankInfoController : ControllerBase
 				BrandId = bankInfo.BrandId,
 				PaymentChannelId = bankInfo.PaymentChannelId,
 				Detail = bankInfo.Detail,
-				IsDefault = bankInfo.IsDefault
+				IsDefault = bankInfo.IsDefault,
+				UpdatedOn = bankInfo.UpdatedOn,
+				Modifier = bankInfo.Modifier
 			});
 	}
 

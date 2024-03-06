@@ -10,4 +10,6 @@ public record PlayerBankInfo(
 	Guid PaymentChannelId,
 	string BankType,
 	JsonDocument Detail,
-	bool IsDefault);
+	bool IsDefault,
+	DateTime UpdatedOn,
+	string? Modifier);

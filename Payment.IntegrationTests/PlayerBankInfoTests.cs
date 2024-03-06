@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.Clients;
@@ -284,5 +285,116 @@ public class PlayerBankInfoTests
 
 		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.PlayerBankInfoCountReachedLimitException>(
 			async () => await sut.CreatePlayerBankInfoAsync(brandId, "tester2", createInfo));
+	}
+
+	[Test]
+	public async Task 整合測試_取得玩家銀行卡列表()
+	{
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var playerCode = "test1";
+		var brandId = Guid.NewGuid();
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		var playerBankInfoRows = new[]
+		{
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = Guid.NewGuid(),
+				PlayerCode = "test1",
+				BrandId = brandId,
+				PaymentChannelId = Guid.NewGuid(),
+				BankType = "Bank",
+				Default = false,
+				Detail = "{}",
+				CreatedOn = DateTime.UtcNow,
+				CreatedByUsername = string.Empty,
+				UpdatedOn = DateTime.UtcNow,
+				UpdatedByUsername = string.Empty
+			},
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = Guid.NewGuid(),
+				PlayerCode = "test2",
+				BrandId = brandId,
+				PaymentChannelId = Guid.NewGuid(),
+				BankType = "Bank",
+				Default = false,
+				Detail = "{}",
+				CreatedOn = DateTime.UtcNow,
+				CreatedByUsername = string.Empty,
+				UpdatedOn = DateTime.UtcNow,
+				UpdatedByUsername = string.Empty
+			},
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = Guid.NewGuid(),
+				PlayerCode = "test1",
+				BrandId = brandId,
+				PaymentChannelId = Guid.NewGuid(),
+				BankType = "Bank",
+				Default = false,
+				Detail = "{}",
+				CreatedOn = DateTime.UtcNow,
+				CreatedByUsername = string.Empty,
+				UpdatedOn = DateTime.UtcNow,
+				UpdatedByUsername = string.Empty
+			},
+		};
+		await dbContext.PlayerBankInfos.AddRangeAsync(playerBankInfoRows);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var actual = await sut.GetPlayerBankInfosAsync(playerCode).ToArrayAsync();
+
+		Assert.That(actual.Length, Is.EqualTo(2));
+	}
+
+	[Test]
+	public async Task 整合測試_取得玩家銀行卡列表_會回傳修改者及修改日期資料()
+	{
+		await using var web = TestSiteHelper.GetPaymentServiceTestHost();
+
+		var httpClient = web.CreateClient();
+
+		var sut = new PaymentServiceClient(httpClient);
+
+		var playerCode = "test1";
+		var brandId = Guid.NewGuid();
+		var modifier = "system";
+		var updatedOn = DateTime.UtcNow;
+
+		var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+		var playerBankInfoRows = new[]
+		{
+			new Tgs.Payment.Repositories.Entities.PlayerBankInfo
+			{
+				Id = Guid.NewGuid(),
+				PlayerCode = "test1",
+				BrandId = brandId,
+				PaymentChannelId = Guid.NewGuid(),
+				BankType = "Bank",
+				Default = false,
+				Detail = "{}",
+				CreatedOn = DateTime.UtcNow.AddDays(-1D),
+				CreatedByUsername = string.Empty,
+				UpdatedOn = updatedOn,
+				UpdatedByUsername = modifier
+			}
+		};
+		await dbContext.PlayerBankInfos.AddRangeAsync(playerBankInfoRows);
+
+		_ = await dbContext.SaveChangesAsync();
+
+		var actual = await sut.GetPlayerBankInfosAsync(playerCode).ToArrayAsync();
+
+		Assert.That(actual[0].UpdatedOn, Is.EqualTo(updatedOn));
+		Assert.That(actual[0].Modifier, Is.EqualTo(modifier));
 	}
 }
