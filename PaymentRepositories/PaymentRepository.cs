@@ -426,7 +426,9 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				bankInfo.PaymentChannelId,
 				bankInfo.BankType,
 				string.IsNullOrEmpty(bankInfo.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(bankInfo.Detail),
-				bankInfo.Default);
+				bankInfo.Default,
+				DateTime.UtcNow,
+				null);
 	}
 
 	public IAsyncEnumerable<Tgs.Payment.PlayerBankInfo> GetBankInfosByPlayerCodeAsync(string playerCode, CancellationToken cancellationToken = default)
@@ -440,7 +442,9 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				info.PaymentChannelId,
 				info.BankType,
 				info.Detail,
-				info.Default
+				info.Default,
+				info.UpdatedOn,
+				info.UpdatedByUsername
 			})
 			.ToAsyncEnumerable()
 			.Select(info => new Tgs.Payment.PlayerBankInfo(
@@ -450,7 +454,9 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				info.PaymentChannelId,
 				info.BankType,
 				string.IsNullOrEmpty(info.Detail) ? JsonDocument.Parse("{}") : JsonDocument.Parse(info.Detail),
-				info.Default));
+				info.Default,
+				info.UpdatedOn,
+				info.UpdatedByUsername));
 
 	public async ValueTask<AutoWithdrawInfo?> GetBrandAutoWithdrawSettingAsync(Guid brandId, CancellationToken cancellationToken = default)
 	{

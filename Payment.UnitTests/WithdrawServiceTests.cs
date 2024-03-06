@@ -1183,7 +1183,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -1300,7 +1302,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -1394,7 +1398,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -1540,7 +1546,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -1633,7 +1641,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -1903,7 +1913,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -2020,7 +2032,9 @@ public class WithdrawServiceTests
 				Guid.NewGuid(),
 				"Bank",
 				JsonDocument.Parse("{}"),
-				false));
+				false,
+				DateTime.UtcNow,
+				null));
 
 		_ = Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.CreateWithdrawFormAsync(
 			user,
@@ -3094,7 +3108,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -3475,7 +3491,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 
@@ -3639,7 +3657,9 @@ public class WithdrawServiceTests
 			Guid.NewGuid(),
 			"Bank",
 			JsonDocument.Parse("{}"),
-			false);
+			false,
+			DateTime.UtcNow,
+			null);
 		_ = fakePaymentRepository.GetBankInfoByIdAsync(Arg.Is(bankInfoId))
 			.Returns(playerBankInfo);
 

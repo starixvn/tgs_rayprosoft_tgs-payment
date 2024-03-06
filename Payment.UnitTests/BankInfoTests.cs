@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using JSLTSharp;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BankInfos;
 using Tgs.Payment.ApplicationServices.Settings;
@@ -174,7 +173,9 @@ public class BankInfoTests
 				Guid.NewGuid(),
 				"Bank",
 				JsonDocument.Parse("{}"),
-				false));
+				false,
+				DateTime.UtcNow,
+				null));
 
 		await sut.ExecuteAsync(command);
 
@@ -338,7 +339,9 @@ public class BankInfoTests
 					bankName = "bank1",
 					bankAccount = "1111111"
 				}),
-				false));
+				false,
+				DateTime.UtcNow,
+				null));
 
 		_ = fakeBankInfoIndexParserFactory.GetBankInfoTransformation(Arg.Any<string>())
 			.Returns(JsonSerializer.Serialize(new
@@ -380,7 +383,9 @@ public class BankInfoTests
 				Guid.NewGuid(),
 				"Bank",
 				JsonDocument.Parse("{}"),
-				false));
+				false,
+				DateTime.UtcNow,
+				null));
 
 		_ = fakeBankInfoIndexParserFactory.GetBankInfoTransformation(Arg.Any<string>())
 			.Returns(JsonSerializer.Serialize(new
@@ -498,7 +503,9 @@ public class BankInfoTests
 					paymentChannelId,
 					bankType,
 					JsonDocument.Parse("{}"),
-					false)
+					false,
+					DateTime.UtcNow,
+					null)
 			}.ToAsyncEnumerable());
 
 		_ = Assert.ThrowsAsync<PlayerBankInfoCountReachedLimitException>(async () => await sut.GetAsync(command));

@@ -4,17 +4,21 @@ namespace Tgs.Payment.ViewModels;
 
 public class PlayerBankInfoViewModel
 {
-	public string BankType { get; set; } = default!;
+	public required Guid Id { get; set; }
 
-	public Guid BrandId { get; set; }
+	public required string PlayerCode { get; set; }
 
-	public JsonDocument Detail { get; set; } = default!;
+	public required Guid BrandId { get; set; }
 
-	public Guid Id { get; set; }
+	public required Guid PaymentChannelId { get; set; }
 
-	public bool IsDefault { get; set; }
+	public required string BankType { get; set; }
 
-	public Guid PaymentChannelId { get; set; }
+	public required JsonDocument Detail { get; set; }
 
-	public string PlayerCode { get; set; } = default!;
+	public required bool IsDefault { get; set; }
+
+	public required DateTime UpdatedOn { get; set; }
+
+	public string? Modifier { get; set; }
 }
