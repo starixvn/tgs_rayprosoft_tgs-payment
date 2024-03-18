@@ -33,8 +33,8 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"cardNumber": "$.detail.phone",
+					"cardHolder": "$.detail.username"
 				}
 			}
 			""",
@@ -44,8 +44,8 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"cardNumber": "$.detail.phone",
+					"cardHolder": "$.detail.username"
 				}
 			}
 			""",
@@ -55,8 +55,8 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"cardNumber": "$.detail.phone",
+					"cardHolder": "$.detail.username"
 				}
 			}
 			""",
@@ -66,8 +66,8 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.phone",
-					"bankCardAccount": "$.detail.phone"
+					"cardNumber": "$.detail.phone",
+					"cardHolder": "$.detail.username"
 				}
 			}
 			""",
@@ -87,8 +87,8 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankCardName": "$.detail.username",
-					"bankCardAccount": "$.detail.phone"
+					"cardHolder": "$.detail.username",
+					"cardNumber": "$.detail.phone"
 			}
 		}
 		""",
