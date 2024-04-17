@@ -45,7 +45,7 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 
 		var bankType = bankCode switch
 		{
-			"GCASH" => "GCash",			
+			"gcash" => "GCash",			
 			_ => "Bank"
 		};
 
