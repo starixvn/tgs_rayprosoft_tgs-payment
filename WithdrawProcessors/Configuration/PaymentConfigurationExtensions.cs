@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tgs.Payment.AlfaPay;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.LeePay;
 using Tgs.Payment.MalakiPay;
@@ -58,6 +57,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<FeibaoPayProcessor>("FeibaoPay")
 			.RegisterWithdrawProcessor<LPayProcessor>("LPay")
 			.RegisterWithdrawProcessor<SunnyPayProcessor>("SunnyPay")
-			.RegisterWithdrawProcessor<EzPayProcessor>("EzPay");
+			.RegisterWithdrawProcessor<EzPayProcessor>("EzPay")
+			.RegisterWithdrawProcessor<ShunfaPayProcessor>("ShunfaPay");
 	}
 }
