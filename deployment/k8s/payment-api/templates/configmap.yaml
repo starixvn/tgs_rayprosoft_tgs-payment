@@ -55,7 +55,8 @@ data:
           "U2Pay",
           "GCPay",
           "HPay",
-          "EzPay"
+          "EzPay",
+          "ShunfaPay"
         ]
       }
     }
