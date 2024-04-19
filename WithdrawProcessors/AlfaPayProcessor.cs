@@ -45,7 +45,7 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 			"""
 	}.AsReadOnly();
 
-	public string Subject => "tgs.payment.alfapay.withdraw";
+	public virtual string Subject => "tgs.payment.alfapay.withdraw";
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
