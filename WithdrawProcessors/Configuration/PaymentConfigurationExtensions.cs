@@ -58,6 +58,8 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<LPayProcessor>("LPay")
 			.RegisterWithdrawProcessor<SunnyPayProcessor>("SunnyPay")
 			.RegisterWithdrawProcessor<EzPayProcessor>("EzPay")
-			.RegisterWithdrawProcessor<ShunfaPayProcessor>("ShunfaPay");
+			.RegisterWithdrawProcessor<ShunfaPayProcessor>("ShunfaPay")
+			.RegisterWithdrawProcessor<AlfaPayProcessor>("AlfaPay-IDR")
+			.RegisterWithdrawProcessor<AlfaPayProcessor>("MegaPay");
 	}
 }
