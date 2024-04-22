@@ -74,7 +74,8 @@ internal class AlfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 			withdrawBankInfo.Detail.AccountNumber,
 			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString(),
 			withdrawBankInfo.Detail.BankOwner,
-			formId);
+			formId,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, AlfaPayUtility.SerializerOptions);
 	}
