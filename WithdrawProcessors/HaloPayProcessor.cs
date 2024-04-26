@@ -62,7 +62,8 @@ internal class HaloPayProcessor(JsonTransform jsonTransform) : IWithdrawProcesso
 			formId,
 			withdrawBankInfo.Detail.AccountNumber,
 			withdrawBankInfo.Detail.AccountName,
-			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString());
+			brandPaymentExtendedData.RootElement.GetProperty("bankId").GetString(),
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, HaloPayUtility.SerializerOptions);
 	}
