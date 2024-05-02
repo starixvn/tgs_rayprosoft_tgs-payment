@@ -77,7 +77,7 @@ internal class FeibaoPayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"address": "$.detail.address"
+					"cardNumber": "$.detail.address"
 				}
 			}
 			""",
@@ -155,7 +155,7 @@ internal class FeibaoPayProcessor(
 			brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 			withdrawBankInfo.Detail.CardHolder,
 			withdrawBankInfo.Detail.CardNumber,
-			brandPaymentExtendedData.RootElement.GetProperty("gateWay").GetString(),
+			"gcash",
 			userId,
 			"127.0.0.1");
 
