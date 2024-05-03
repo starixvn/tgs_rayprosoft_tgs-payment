@@ -27,7 +27,10 @@ internal class GetPaymentOverviewQueryService(
 
 		if (overview is not null)
 		{
-			var recordedOn = new DateTimeOffset(overview.RecordedBy, TimeOnly.MinValue, PaymentUtility.ReportOffset).UtcDateTime;
+			var recordedOn = new DateTimeOffset(
+				overview.RecordedBy.AddDays(1),
+				TimeOnly.MinValue,
+				PaymentUtility.ReportOffset).UtcDateTime;
 
 			if (recordedOn > start)
 				start = recordedOn;
@@ -86,7 +89,7 @@ internal class GetPaymentOverviewQueryService(
 
 		var realTimeData = await hourQuery.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
-		return (overview ?? PaymentOverview.Default with { RecordedBy = currentDate }) with
+		return (overview ?? PaymentOverview.Default) with
 		{
 			TotalDepositAmount = (overview?.TotalDepositAmount ?? 0M) + (realTimeData?.DepositAmount ?? 0M),
 			TotalDepositCount = (overview?.TotalDepositCount ?? 0) + (realTimeData?.DepositCount ?? 0),
@@ -97,7 +100,8 @@ internal class GetPaymentOverviewQueryService(
 			FirstDepositOn = overview?.FirstDepositOn ?? realTimeData?.FirstDepositOn,
 			FirstWithdrawAmount = overview?.FirstWithdrawAmount ?? realTimeData?.FirstWithdrawAmount,
 			FirstWithdrawHandlingFee = overview?.FirstWithdrawHandlingFee ?? realTimeData?.FirstWithdrawHandlingFee,
-			FirstWithdrawOn = overview?.FirstWithdrawOn ?? realTimeData?.FirstWithdrawOn
+			FirstWithdrawOn = overview?.FirstWithdrawOn ?? realTimeData?.FirstWithdrawOn,
+			RecordedBy = realTimeData is not null || overview is null ? currentDate : overview.RecordedBy
 		};
 	}
 
