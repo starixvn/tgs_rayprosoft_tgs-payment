@@ -322,6 +322,7 @@ public class PaymentEventSourceTests
 				brandId,
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(
@@ -460,6 +461,7 @@ public class PaymentEventSourceTests
 				brandId,
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(

@@ -79,6 +79,7 @@ public class AgentCashOperationRejectWithdrawFormEventPipeTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		await sut.AfterRejectWithdrawFormAsync(withdrawForm, reviewUserId, reviewUserName, null);

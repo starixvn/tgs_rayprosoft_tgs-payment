@@ -354,6 +354,7 @@ public class WithdrawServiceTests
 				brandId,
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))
@@ -490,6 +491,7 @@ public class WithdrawServiceTests
 				brandId,
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))
@@ -600,6 +602,7 @@ public class WithdrawServiceTests
 				brandId,
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(Arg.Is(walletId))

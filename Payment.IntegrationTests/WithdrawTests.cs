@@ -137,6 +137,7 @@ public class WithdrawTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				agentWalletId,
+				false,
 				false));
 
 		await sut.ReviewWithdrawFormAsync(
@@ -285,6 +286,7 @@ public class WithdrawTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				agentWalletId,
+				false,
 				false));
 
 		await sut.ReviewWithdrawFormAsync(
@@ -368,6 +370,7 @@ public class WithdrawTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				agentWalletId,
+				false,
 				false));
 
 		await sut.ReviewWithdrawFormAsync(
