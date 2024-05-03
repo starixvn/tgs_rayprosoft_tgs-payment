@@ -18,7 +18,7 @@ internal class TestPaymentApplication(Action<IWebHostBuilder>? webHostConfigure 
 			  .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 				  sp => new ConfigureNamedOptions<OtlpExporterOptions>(
 					  Options.DefaultName,
-					  exporterOptions => exporterOptions.Endpoint = null)));
+					  exporterOptions => exporterOptions.TimeoutMilliseconds = 0)));
 
 		webHostConfigure?.Invoke(builder);
 	}

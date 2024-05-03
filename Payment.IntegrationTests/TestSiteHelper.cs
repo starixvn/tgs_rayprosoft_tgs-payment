@@ -43,11 +43,7 @@ internal static class TestSiteHelper
 				_ = services.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 					sp => new ConfigureNamedOptions<OtlpExporterOptions>(
 						Options.DefaultName,
-						exporterOptions =>
-						{
-							exporterOptions.Endpoint = null;
-							exporterOptions.TimeoutMilliseconds = 0;
-						}));
+						exporterOptions => exporterOptions.TimeoutMilliseconds = 0));
 
 				configureServices(services);
 			}));

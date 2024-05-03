@@ -73,6 +73,7 @@ public class AgentCashOperationPaidWithdrawFormEventPipeTests
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		await sut.AfterPaidWithdrawFormAsync(withdrawForm, reviewUserId, reviewUserName, null);

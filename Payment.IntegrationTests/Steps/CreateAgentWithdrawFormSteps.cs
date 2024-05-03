@@ -62,6 +62,7 @@ public class CreateAgentWithdrawFormSteps
 				Guid.NewGuid(),
 				Guid.NewGuid(),
 				walletId,
+				false,
 				false));
 
 		_ = fakeCashServiceClient.GetBalanceAsync(
