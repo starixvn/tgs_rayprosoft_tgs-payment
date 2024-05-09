@@ -8,7 +8,7 @@ namespace Tgs.Payment.ApplicationServices.BrandPayments;
 internal class GetBrandReportDateNetDepositQueryService(
 	TimeProvider timeProvider,
 	IPaymentRepository paymentRepository,
-	IBrandNetDepositRepository brandNetDepositRepository) : IGetService<GetBrandReportDateNetDepositQuery, decimal>
+	IStatisticsRepository  repository) : IGetService<GetBrandReportDateNetDepositQuery, decimal>
 {
 	public async ValueTask<decimal> GetAsync(GetBrandReportDateNetDepositQuery query, CancellationToken cancellationToken = default)
 	{
@@ -20,16 +20,26 @@ internal class GetBrandReportDateNetDepositQueryService(
 
 		if (query.ReportDate == currentDate)
 		{
-			return await brandNetDepositRepository
-				.GetBrandCurrentDayNetDepositAsync(query.BrandId)
+			var start = new DateTimeOffset(currentDate.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
+
+			var result = await repository
+				.QueryBrandNetDepositAsync(start.UtcDateTime, DateTime.UtcNow, query.BrandId, cancellationToken)
 				.ConfigureAwait(false);
+
+			return result;
 		}
 
 		if (query.ReportDate == yesterday && now < scheduleTime)
 		{
-			return await brandNetDepositRepository
-				.GetBrandYesterDayNetDepositAsync(query.BrandId)
+			var start = new DateTimeOffset(yesterday.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
+
+			var end = start.AddDays(1);
+
+			var result = await repository
+				.QueryBrandNetDepositAsync(start.UtcDateTime, end.UtcDateTime, query.BrandId, cancellationToken)
 				.ConfigureAwait(false);
+
+			return result;
 		}
 
 		var netDeposit = await paymentRepository

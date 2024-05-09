@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Tgs.Payment.Repositories.Entities;
 
 namespace Tgs.Payment.Repositories;
@@ -131,4 +133,21 @@ internal class StatisticsRepository(TgsContext dbContext)
 				row.WithdrawAmount,
 				row.WithdrawHandlingFee,
 				row.WithdrawCount));
+
+	public async ValueTask<decimal> QueryBrandNetDepositAsync(
+		DateTime start,
+		DateTime end,
+		Guid brandId,
+		CancellationToken cancellationToken = default)
+	{
+		var query = await dbContext.FiveMinutesPaymentStatistics
+			.Where(row => row.TimePoint >= start.ToUniversalTime()
+				&& row.TimePoint < end.ToUniversalTime()
+				&& row.UserType == (int)UserType.Player
+				&& row.BrandId == brandId)
+			.SumAsync(row => row.DepositAmount.GetValueOrDefault(0m) - row.WithdrawAmount.GetValueOrDefault(0m), cancellationToken)
+			.ConfigureAwait(false);
+
+		return query;
+	}
 }

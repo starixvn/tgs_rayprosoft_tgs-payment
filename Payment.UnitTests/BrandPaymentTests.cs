@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using NSubstitute;
 using NUnit.Framework.Legacy;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.BrandPayments;
@@ -281,7 +280,7 @@ public class BrandPaymentTests
 	[Test]
 	public async Task Get_Brand_Net_Deposit()
 	{
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeBrandNetDepositRepository = Substitute.For<IStatisticsRepository>();
 
 		var sut = new GetBrandCurrentDayNetDepositQueryService(fakeBrandNetDepositRepository);
 
@@ -291,7 +290,7 @@ public class BrandPaymentTests
 
 		_ = fakeBrandNetDepositRepository
 			.Received(1)
-			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId));
+			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Is(brandId));
 	}
 
 	[Test]
@@ -299,9 +298,9 @@ public class BrandPaymentTests
 	{
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
-		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeRepository);
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
@@ -318,9 +317,9 @@ public class BrandPaymentTests
 	{
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
-		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeRepository);
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
@@ -340,13 +339,13 @@ public class BrandPaymentTests
 	public async Task 查詢Brand存提差_查詢日期為昨天且時間小於排程時間()
 	{
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 		var fakeTimeProvider = Substitute.For<TimeProvider>();
 
 		var sut = new GetBrandReportDateNetDepositQueryService(
 			fakeTimeProvider,
 			fakePaymentRepository,
-			fakeBrandNetDepositRepository);
+			fakeRepository);
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
@@ -361,8 +360,8 @@ public class BrandPaymentTests
 				0,
 				TimeSpan.FromHours(8d)));
 
-		_ = fakeBrandNetDepositRepository
-			.GetBrandYesterDayNetDepositAsync(Arg.Is(brandId))
+		_ = fakeRepository
+			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Is(brandId))
 			.Returns(168000m);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
@@ -375,17 +374,17 @@ public class BrandPaymentTests
 	{
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
-		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeBrandNetDepositRepository);
+		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeRepository);
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
 		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
 
-		_ = fakeBrandNetDepositRepository
-			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
+		_ = fakeRepository
+			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(),Arg.Any<DateTime>(),Arg.Is(brandId))
 			.Returns(16800m);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));

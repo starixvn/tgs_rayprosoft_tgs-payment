@@ -1,11 +1,21 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.ApplicationServices.BrandPayments;
 
-internal class GetBrandCurrentDayNetDepositQueryService(IBrandNetDepositRepository repository) : IGetService<GetBrandCurrentDayNetDepositQuery, decimal>
+internal class GetBrandCurrentDayNetDepositQueryService(IStatisticsRepository repository)
+	: IGetService<GetBrandCurrentDayNetDepositQuery, decimal>
 {
-	public ValueTask<decimal> GetAsync(GetBrandCurrentDayNetDepositQuery query, CancellationToken cancellationToken = default)
-		=> repository.GetBrandCurrentDayNetDepositAsync(query.BrandId);
+	public async ValueTask<decimal> GetAsync(GetBrandCurrentDayNetDepositQuery query, CancellationToken cancellationToken = default)
+	{
+		var start = new DateTimeOffset(DateTimeOffset.UtcNow.ToOffset(PaymentUtility.ReportOffset).Date, PaymentUtility.ReportOffset);
+
+		var result = await repository
+			.QueryBrandNetDepositAsync(start.UtcDateTime, DateTime.UtcNow, query.BrandId, cancellationToken)
+			.ConfigureAwait(false);
+
+		return result;
+	}
 }
