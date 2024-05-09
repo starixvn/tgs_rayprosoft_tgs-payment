@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Tgs.Payment;
 
@@ -27,5 +28,11 @@ public interface IStatisticsRepository
 		DateOnly start,
 		DateOnly end,
 		string[]? userIds,
+		CancellationToken cancellationToken = default);
+
+	ValueTask<decimal> QueryBrandNetDepositAsync(
+		DateTime start,
+		DateTime end,
+		Guid brandId,
 		CancellationToken cancellationToken = default);
 }
