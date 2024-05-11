@@ -56,7 +56,8 @@ data:
           "GCPay",
           "HPay",
           "EzPay",
-          "ShunfaPay"
+          "ShunfaPay",
+          "MegaPay"
         ]
       }
     }
