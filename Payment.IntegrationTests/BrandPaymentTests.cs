@@ -294,13 +294,15 @@ public class BrandPaymentTests
 				Arg.Any<CancellationToken>());
 	}
 
-	[Test, Ignore("temp")]
+	[Test]
 	public async Task 查詢Brand當日存提差()
 	{
+		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
 		await using TestPaymentApplication web = TestSiteHelper
 			.GetPaymentServiceTestHost(services => services
+			.AddSingleton(fakeSystemClock)
 			.AddSingleton(fakeRepository));
 
 		var httpClient = web.CreateClient();
@@ -308,9 +310,16 @@ public class BrandPaymentTests
 		var sut = new PaymentServiceClient(httpClient);
 
 		var brandId = Guid.NewGuid();
+		var currentTime = DateTimeOffset.UtcNow;
+
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(currentTime);
+
+		var start = new DateTimeOffset(fakeSystemClock.GetUtcNow().ToOffset(PaymentUtility.ReportOffset).Date, PaymentUtility.ReportOffset);
 
 		_ = fakeRepository
-			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(),Arg.Any<DateTime>(),Arg.Is(brandId))
+			.QueryBrandNetDepositAsync(Arg.Is(start.UtcDateTime), Arg.Is(fakeSystemClock.GetUtcNow().DateTime), Arg.Is(brandId), Arg.Any<CancellationToken>())
 			.Returns(168000m);
 
 		var actual = await sut.GetBrandCurrentDayNetDepositAsync(brandId);
@@ -318,18 +327,18 @@ public class BrandPaymentTests
 		ClassicAssert.AreEqual(168000m, actual);
 	}
 
-	[Test, Ignore("temp")]
+	[Test]
 	public async Task 查詢Brand指定日期存提差_查詢日期等於當日()
 	{
 		var fakeSystemClock = Substitute.For<TimeProvider>();
 		var fakePaymentRepository = Substitute.For<IPaymentRepository>();
-		var fakeBrandNetDepositRepository = Substitute.For<IBrandNetDepositRepository>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
 		await using TestPaymentApplication web = TestSiteHelper
 			.GetPaymentServiceTestHost(services => services
 			.AddSingleton(fakeSystemClock)
 			.AddSingleton(fakePaymentRepository)
-			.AddSingleton(fakeBrandNetDepositRepository));
+			.AddSingleton(fakeRepository));
 
 		var httpClient = web.CreateClient();
 
@@ -339,10 +348,20 @@ public class BrandPaymentTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(currentTime);
 
-		_ = fakeBrandNetDepositRepository
-			.GetBrandCurrentDayNetDepositAsync(Arg.Is(brandId))
+
+		var cuurentDate = DateOnly.FromDateTime(fakeSystemClock.GetUtcNow().ToOffset(TimeSpan.FromHours(8D)).DateTime);
+		var start = new DateTimeOffset(cuurentDate.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
+
+		_ = fakeRepository
+			.QueryBrandNetDepositAsync(
+				Arg.Is(start.UtcDateTime),
+				Arg.Is(fakeSystemClock.GetUtcNow().DateTime),
+				Arg.Is(brandId),
+				Arg.Any<CancellationToken>())
 			.Returns(168000m);
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);
@@ -350,7 +369,7 @@ public class BrandPaymentTests
 		ClassicAssert.AreEqual(168000m, actual);
 	}
 
-	[Test, Ignore("temp")]
+	[Test]
 	public async Task 查詢Brand指定日期存提差_查詢日期為昨天且還時間小於排程時間()
 	{
 		var fakeSystemClock = Substitute.For<TimeProvider>();
@@ -381,8 +400,20 @@ public class BrandPaymentTests
 				0,
 				TimeSpan.FromHours(8d)));
 
+		var now = fakeSystemClock.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
+		var currentDate = DateOnly.FromDateTime(now.DateTime);
+		var yesterday = currentDate.AddDays(-1);
+
+		var start = new DateTimeOffset(yesterday.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
+
+		var end = start.AddDays(1);
+
 		_ = fakeRepository
-			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Is(brandId))
+			.QueryBrandNetDepositAsync(
+				Arg.Is(start.UtcDateTime), 
+				Arg.Is(end.UtcDateTime), 
+				Arg.Is(brandId),
+				Arg.Any<CancellationToken>())
 			.Returns(168000m);
 
 		var actual = await sut.GetBrandReportDateNetDepositAsync(brandId, reportDate);

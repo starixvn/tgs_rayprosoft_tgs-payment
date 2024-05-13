@@ -280,17 +280,29 @@ public class BrandPaymentTests
 	[Test]
 	public async Task Get_Brand_Net_Deposit()
 	{
-		var fakeBrandNetDepositRepository = Substitute.For<IStatisticsRepository>();
+		var fakeSystemClock = Substitute.For<TimeProvider>();
+		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
-		var sut = new GetBrandCurrentDayNetDepositQueryService(fakeBrandNetDepositRepository);
+		var sut = new GetBrandCurrentDayNetDepositQueryService(
+			fakeSystemClock,
+			fakeRepository);
 
 		var brandId = Guid.NewGuid();
+		var currentTime = DateTimeOffset.UtcNow;
 
-		_ = await sut.GetAsync(new GetBrandCurrentDayNetDepositQuery(brandId));
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(currentTime);
 
-		_ = fakeBrandNetDepositRepository
-			.Received(1)
-			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Is(brandId));
+		var start = new DateTimeOffset(fakeSystemClock.GetUtcNow().ToOffset(PaymentUtility.ReportOffset).Date, PaymentUtility.ReportOffset);
+
+		_ = fakeRepository
+			.QueryBrandNetDepositAsync(Arg.Is(start.UtcDateTime), Arg.Is(fakeSystemClock.GetUtcNow().DateTime), Arg.Is(brandId), Arg.Any<CancellationToken>())
+			.Returns(168000m);
+
+		var actual = await sut.GetAsync(new GetBrandCurrentDayNetDepositQuery(brandId));
+
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 
 	[Test]
@@ -301,11 +313,14 @@ public class BrandPaymentTests
 		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
 		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeRepository);
+		
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(now);
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(now);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
@@ -320,11 +335,14 @@ public class BrandPaymentTests
 		var fakeRepository = Substitute.For<IStatisticsRepository>();
 
 		var sut = new GetBrandReportDateNetDepositQueryService(fakeSystemClock, fakePaymentRepository, fakeRepository);
+		
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
 
 		var now = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(now);
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(now);
 
 		_ = fakePaymentRepository
 			.GetBrandNetDepositAsync(Arg.Is(brandId), Arg.Is(reportDate))
@@ -346,10 +364,12 @@ public class BrandPaymentTests
 			fakeTimeProvider,
 			fakePaymentRepository,
 			fakeRepository);
+
 		var brandId = Guid.NewGuid();
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
 		var today = DateTimeOffset.UtcNow;
+
 		_ = fakeTimeProvider.GetUtcNow()
 			.Returns(new DateTimeOffset(
 				today.Year,
@@ -360,8 +380,15 @@ public class BrandPaymentTests
 				0,
 				TimeSpan.FromHours(8d)));
 
+		var now = fakeTimeProvider.GetUtcNow().ToOffset(TimeSpan.FromHours(8D));
+		var currentDate = DateOnly.FromDateTime(now.DateTime);
+		var yesterday = currentDate.AddDays(-1);
+
+		var start = new DateTimeOffset(yesterday.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
+		var end = start.AddDays(1);
+
 		_ = fakeRepository
-			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Is(brandId))
+			.QueryBrandNetDepositAsync(Arg.Is(start.UtcDateTime), Arg.Is(end.UtcDateTime), Arg.Is(brandId))
 			.Returns(168000m);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
@@ -381,14 +408,24 @@ public class BrandPaymentTests
 		var reportDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
 		var currentTime = DateTimeOffset.UtcNow;
-		_ = fakeSystemClock.GetUtcNow().Returns(currentTime);
+
+		_ = fakeSystemClock
+			.GetUtcNow()
+			.Returns(currentTime);
+
+		var cuurentDate = DateOnly.FromDateTime(fakeSystemClock.GetUtcNow().ToOffset(TimeSpan.FromHours(8D)).DateTime);
+		var start = new DateTimeOffset(cuurentDate.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
 
 		_ = fakeRepository
-			.QueryBrandNetDepositAsync(Arg.Any<DateTime>(),Arg.Any<DateTime>(),Arg.Is(brandId))
-			.Returns(16800m);
+			.QueryBrandNetDepositAsync(
+				Arg.Is(start.UtcDateTime),
+				Arg.Is(fakeSystemClock.GetUtcNow().DateTime),
+				Arg.Is(brandId),
+				Arg.Any<CancellationToken>())
+			.Returns(168000m);
 
 		var actual = await sut.GetAsync(new GetBrandReportDateNetDepositQuery(brandId, reportDate));
 
-		ClassicAssert.AreEqual(16800m, actual);
+		ClassicAssert.AreEqual(168000m, actual);
 	}
 }
