@@ -23,7 +23,7 @@ internal class GetBrandReportDateNetDepositQueryService(
 			var start = new DateTimeOffset(currentDate.ToDateTime(TimeOnly.MinValue), PaymentUtility.ReportOffset);
 
 			var result = await repository
-				.QueryBrandNetDepositAsync(start.UtcDateTime, DateTime.UtcNow, query.BrandId, cancellationToken)
+				.QueryBrandNetDepositAsync(start.UtcDateTime, timeProvider.GetUtcNow().DateTime, query.BrandId, cancellationToken)
 				.ConfigureAwait(false);
 
 			return result;
