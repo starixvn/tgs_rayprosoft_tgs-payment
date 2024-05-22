@@ -57,7 +57,8 @@ data:
           "HPay",
           "EzPay",
           "ShunfaPay",
-          "MegaPay"
+          "MegaPay",
+          "FuKaiPay"
         ]
       }
     }
