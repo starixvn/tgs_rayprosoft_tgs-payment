@@ -31,6 +31,17 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 					"receiverAccount": "$.detail.phone"
 				}
 			}
+			""",
+		["PayMaya"] = """
+			{
+				"id": "$.id",
+				"paymentChannelId": "$.paymentChannelId",
+				"bankType": "$.bankType",
+				"detail": {
+					"receiverName": "$.detail.phone",
+					"receiverAccount": "$.detail.phone"
+				}
+			}
 			"""
 	}.AsReadOnly();
 
@@ -45,7 +56,8 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 
 		var bankType = bankCode switch
 		{
-			"gcash" => "GCash",			
+			"gcash" => "GCash",
+			"PayMaya Philippines" => "PayMaya",
 			_ => "Bank"
 		};
 
