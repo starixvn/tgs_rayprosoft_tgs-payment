@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using JSLTSharp;
 using Tgs.Payment.ShunfaPay.Client;
 
@@ -21,18 +22,7 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 				}
 			}
 			""",
-		["GCash"] = """
-			{
-				"id": "$.id",
-				"paymentChannelId": "$.paymentChannelId",
-				"bankType": "$.bankType",
-				"detail": {
-					"receiverName": "$.detail.phone",
-					"receiverAccount": "$.detail.phone"
-				}
-			}
-			""",
-		["PayMaya"] = """
+		["ThirdParty"] = """
 			{
 				"id": "$.id",
 				"paymentChannelId": "$.paymentChannelId",
@@ -52,16 +42,9 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		var bankCode = brandPaymentExtendedData.RootElement.GetProperty("bank").GetString();
+		var withdrawInfo = JsonSerializer.Deserialize<WithdrawBankInfo<JsonDocument>>(bankInfo, PaymentUtility.SerializerOptions);	
 
-		var bankType = bankCode switch
-		{
-			"gcash" => "GCash",
-			"PayMaya Philippines" => "PayMaya",
-			_ => "Bank"
-		};
-
-		var transformation = _bankInfoTransformations[bankType];
+		var transformation = _bankInfoTransformations[withdrawInfo.BankType];
 
 		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
@@ -72,7 +55,7 @@ internal class ShunfaPayProcessor(JsonTransform jsonTransform) : IWithdrawProces
 			brandPaymentExtendedData.RootElement.GetProperty("clientId").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("apiKey").GetString(),
 			formId,
-			bankCode,
+			brandPaymentExtendedData.RootElement.GetProperty("bank").GetString(),
 			withdrawBankInfo.Detail.ReceiverName,
 			withdrawBankInfo.Detail.ReceiverAccount);
 
