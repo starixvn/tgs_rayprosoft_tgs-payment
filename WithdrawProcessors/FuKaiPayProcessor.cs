@@ -21,28 +21,17 @@ internal class FuKaiPayProcessor(JsonTransform jsonTransform) : IWithdrawProcess
 				}
 			}
 			""",
-		["GCASH"] = """
+		["ThirdParty"] = """
 			{
-				"id": "$.id",
-				"paymentChannelId": "$.paymentChannelId",
-				"bankType": "$.bankType",
-				"detail": {
-					"payerAccount": "$.detail.phone",
-					"payerName": "$.detail.phone"
+			"id": "$.id",
+			"paymentChannelId": "$.paymentChannelId",
+			"bankType": "$.bankType",
+			"detail": {
+				"payerName": "$.detail.phone",
+				"payerAccount": "$.detail.phone"
 				}
 			}
-			""",
-		["MAYA"] = """
-			{
-				"id": "$.id",
-				"paymentChannelId": "$.paymentChannelId",
-				"bankType": "$.bankType",
-				"detail": {
-					"payerAccount": "$.detail.phone",
-					"payerName": "$.detail.phone"
-				}
-			}
-			"""
+		"""
 	}.AsReadOnly();
 
 	public string Subject => "tgs.payment.fukaipay.withdraw";
@@ -52,16 +41,9 @@ internal class FuKaiPayProcessor(JsonTransform jsonTransform) : IWithdrawProcess
 		var brandPaymentExtendedData = JsonSerializer
 			.Deserialize<JsonDocument>(brandPayment.ExtendedData, PaymentUtility.SerializerOptions);
 
-		var channelCode = brandPaymentExtendedData.RootElement.GetProperty("channelCode").GetString();
+		var withdrawInfo = JsonSerializer.Deserialize<WithdrawBankInfo<JsonDocument>>(bankInfo, PaymentUtility.SerializerOptions);
 
-		var bankType = channelCode switch
-		{
-			"GCASH" => "GCASH",
-			"MAYA" => "MAYA",
-			_ => "Bank"
-		};
-
-		var transformation = _bankInfoTransformations[bankType];
+		var transformation = _bankInfoTransformations[withdrawInfo.BankType];
 
 		var transforJson = jsonTransform.Transform(bankInfo, transformation);
 
@@ -72,7 +54,7 @@ internal class FuKaiPayProcessor(JsonTransform jsonTransform) : IWithdrawProcess
 			brandPaymentExtendedData.RootElement.GetProperty("merchantId").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("merchantKey").GetString(),
 			formId,
-			channelCode,
+			brandPaymentExtendedData.RootElement.GetProperty("channelCode").GetString(),
 			withdrawBankInfo.Detail.PayerName,
 			withdrawBankInfo.Detail.PayerAccount,
 			brandPaymentExtendedData.RootElement.GetProperty("payerBankName").GetString(),
