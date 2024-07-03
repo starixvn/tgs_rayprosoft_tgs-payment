@@ -58,7 +58,8 @@ data:
           "EzPay",
           "ShunfaPay",
           "MegaPay",
-          "FuKaiPay"
+          "FuKaiPay",
+          "UBPay"
         ]
       }
     }
