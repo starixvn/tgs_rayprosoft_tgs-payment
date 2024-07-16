@@ -59,7 +59,8 @@ data:
           "ShunfaPay",
           "MegaPay",
           "FuKaiPay",
-          "UBPay"
+          "UBPay",
+          "S88Pay"
         ]
       }
     }
