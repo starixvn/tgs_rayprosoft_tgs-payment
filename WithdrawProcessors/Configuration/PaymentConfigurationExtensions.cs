@@ -62,6 +62,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<AlfaPayIdrProcessor>("AlfaPay-IDR")
 			.RegisterWithdrawProcessor<MegaPayProcessor>("MegaPay")
 			.RegisterWithdrawProcessor<HaloPayProcessor>("HaloPay")
-			.RegisterWithdrawProcessor<FuKaiPayProcessor>("FuKaiPay");
+			.RegisterWithdrawProcessor<FuKaiPayProcessor>("FuKaiPay")
+			.RegisterWithdrawProcessor<S88PayProcessor>("S88Pay");
 	}
 }
