@@ -12,7 +12,7 @@ namespace Tgs.Payment.WithdrawProcessors;
 
 internal class S88PayProcessor(
 	JsonTransform jsonTransform,
-	IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService) 
+	IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService)
 	: IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
@@ -70,7 +70,8 @@ internal class S88PayProcessor(
 			withdrawBankInfo.Detail.BankAccountNumber,
 			withdrawBankInfo.Detail.AccountName,
 			brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
-			brandPaymentExtendedData.RootElement.GetProperty("bankName").GetString());
+			brandPaymentExtendedData.RootElement.GetProperty("bankName").GetString(),
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, S88PayUtility.SerializerOptions);
 	}
