@@ -60,7 +60,8 @@ data:
           "MegaPay",
           "FuKaiPay",
           "UBPay",
-          "S88Pay"
+          "S88Pay",
+          "DirePay"
         ]
       }
     }
