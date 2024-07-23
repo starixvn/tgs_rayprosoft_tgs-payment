@@ -23,7 +23,7 @@ internal class DirePayProcessor(
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"accountName": "$.detail.name",
+					"bankAccountName": "$.detail.name",
 					"bankAccountNumber": "$.detail.bankAccount"
 				}
 			}
@@ -34,7 +34,7 @@ internal class DirePayProcessor(
 			"paymentChannelId": "$.paymentChannelId",
 			"bankType": "$.bankType",
 			"detail": {
-				"accountName": "$.detail.phone",
+				"bankAccountName": "$.detail.phone",
 				"bankAccountNumber": "$.detail.phone"
 				}
 			}
