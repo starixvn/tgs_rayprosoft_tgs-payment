@@ -16,6 +16,12 @@ using Tgs.Payment.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 {
+	_ = builder.Configuration.AddJsonFile("appsettings.json",
+		optional: true,
+		reloadOnChange: true);
+
+	_ = builder.WebHost.UseUrls($"http://0.0.0.0:{builder.Configuration["HostingPort"]}");
+
 	_ = builder.Logging
 		.AddOpenTelemetry(options =>
 		{
