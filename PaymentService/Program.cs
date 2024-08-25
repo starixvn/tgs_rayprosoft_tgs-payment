@@ -22,6 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 	_ = builder.WebHost.UseUrls($"http://0.0.0.0:{builder.Configuration["HostingPort"]}");
 
+	_ = builder.WebHost.UseSentry();
+
 	_ = builder.Logging
 		.AddOpenTelemetry(options =>
 		{
@@ -29,9 +31,9 @@ var builder = WebApplication.CreateBuilder(args);
 			options.ParseStateValues = true;
 			_ = options.AddFluentdForwardExporter(fluentOptions =>
 			{
-				var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
+				var nodeIp = builder.Configuration.GetValue<string>("Otel:NodeIp")!;
 				fluentOptions.Host = nodeIp;
-				fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
+				fluentOptions.Tag = builder.Configuration.GetValue<string>("Otel:ServiceName")!;
 				fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
 					"MachineName",
 					() => Environment.MachineName));
@@ -189,6 +191,7 @@ var builder = WebApplication.CreateBuilder(args);
 					config.GetSection("Opentelemetry:Tracing").Bind(exporterOptions);
 				}))
 		.AddOpenTelemetry()
+		.ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:ServiceName")))
 		.WithTracing(tracingBuilder => tracingBuilder
 			.SetResourceBuilder(ResourceBuilder.CreateDefault()
 				.AddEnvironmentVariableDetector())
@@ -206,7 +209,7 @@ var builder = WebApplication.CreateBuilder(args);
 			.AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
 			.AddHttpClientInstrumentation()
 			.AddProfileViewExporter()
-			.AddOtlpExporter())
+			.AddOtlpExporter(options => options.Endpoint = builder.Configuration.GetValue<Uri>("Otel:Collector")))
 		.WithMetrics(meterBuiler => meterBuiler
 			.SetResourceBuilder(ResourceBuilder.CreateDefault()
 				.AddEnvironmentVariableDetector())
@@ -226,5 +229,7 @@ var app = builder.Build();
 	_ = app.MapSwagger();
 	app.MapProfileViewer();
 }
+
+SentrySdk.CaptureMessage($"Started result Tgs-PaymentService at {DateTime.Now.ToString()}");
 
 app.Run();
