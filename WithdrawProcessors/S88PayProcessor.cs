@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using JSLTSharp;
+using Microsoft.Extensions.DependencyInjection;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.S88Pay.Client;
 using Tgs.ServiceUtility;
@@ -11,8 +12,7 @@ using Tgs.ServiceUtility;
 namespace Tgs.Payment.WithdrawProcessors;
 
 internal class S88PayProcessor(
-	JsonTransform jsonTransform,
-	IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService)
+	JsonTransform jsonTransform, IServiceProvider serviceProvider)
 	: IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
@@ -57,7 +57,7 @@ internal class S88PayProcessor(
 		var withdrawBankInfo = JsonSerializer
 			.Deserialize<WithdrawBankInfo<S88PayBankInfo>>(transforJson, PaymentUtility.SerializerOptions);
 
-		var playerCode = GetWithdrawFormUserAsync(formId).ToAsyncEnumerable().ToEnumerable().First();
+		var playerCode =  GetWithdrawFormUserAsync(formId).ToAsyncEnumerable().ToEnumerable().First();
 
 		var settings = new S88PayWithdrawSettings(
 			brandPaymentExtendedData.RootElement.GetProperty("merchantCode").GetString(),
@@ -78,9 +78,11 @@ internal class S88PayProcessor(
 
 	private async Task<string> GetWithdrawFormUserAsync(Guid formId)
 	{
+		using var scope = serviceProvider.CreateScope();
+		var getService = scope.ServiceProvider.GetRequiredService<IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo>>();
 		var withdrawForm = await getService
-			.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
-			.ConfigureAwait(false);
+		.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
+		.ConfigureAwait(false);
 
 		return withdrawForm.UserId;
 	}

@@ -332,7 +332,7 @@ internal class PaymentClient : IPaymentClient
 
 		var response = WithdrawResponse.Parser.ParseFrom(result.Span);
 
-		_logger.LogInformation("{response.Result}", response.Result);
+		_logger.LogInformation("Withdraw {subject} with {request} receive {response.Result}",subject, request, response.Result);
 
 		return response.Result;
 	}

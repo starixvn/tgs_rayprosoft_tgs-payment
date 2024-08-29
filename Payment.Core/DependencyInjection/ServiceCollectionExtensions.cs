@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
 			.AddTransient<ICreateWithdrawFormPipe, PlayerCashOperationCreateWithdrawFormEventPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, AgentCashOperationCreateWithdrawFormEventPipe>()
 			.AddTransient<ICreateWithdrawFormPipe, WithdrawLimitProcessPipe>()
-			.AddTransient<ICreateWithdrawFormPipe, CheckPlayerBucketCreateWithdrawEventPipe>()
+			//Todo .AddTransient<ICreateWithdrawFormPipe, CheckPlayerBucketCreateWithdrawEventPipe>()
 			.AddTransient<IRejectWithdrawFormPipe, PlayerCashOperationRejectWithdrawFormEventPipe>()
 			.AddTransient<IRejectWithdrawFormPipe, AgentCashOperationRejectWithdrawFormEventPipe>()
 			.AddTransient<IPaidWithdrawFormPipe, PlayerCashOperationPaidWithdrawFormEventPipe>()
