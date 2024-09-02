@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
+using NATS.Client.Core;
 using Tgs.Payment.Protos;
 using Valhalla.MessageQueue;
 
@@ -53,6 +54,36 @@ internal class PaymentClient : IPaymentClient
 
 	public async ValueTask<string> DepositAsync(string subject, decimal amount, string? applyInfo, CancellationToken cancellationToken = default)
 	{
+		if (subject == "tgs.payment.s88pay.deposit")
+		{
+			_logger.LogInformation("S88Pay Deposit");
+			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://127.0.0.1:4222";
+			var opts = NatsOpts.Default with { Url = url };
+#pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
+			await using var nats = new NatsConnection(opts);
+#pragma warning restore CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
+
+			var req = new DepositRequest
+			{
+				ApplyInfo = applyInfo ?? string.Empty,
+				Amount = amount.ToString()
+			};
+
+#pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
+			var reply = await nats.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
+				subject,
+				req.ToByteArray(),
+				replyOpts: new NatsSubOpts { Timeout = TimeSpan.FromSeconds(20) },
+				cancellationToken: cancellationToken);
+#pragma warning restore CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
+
+			var resp = DepositResponse.Parser.ParseFrom(reply.Data.Span);
+
+			_logger.LogInformation("{resp}", resp.Result);
+
+			return resp.Result;
+		}
+
 		var request = new DepositRequest
 		{
 			ApplyInfo = applyInfo ?? string.Empty,
