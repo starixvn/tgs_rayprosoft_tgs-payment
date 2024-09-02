@@ -57,7 +57,7 @@ internal class PaymentClient : IPaymentClient
 		if (subject == "tgs.payment.s88pay.deposit")
 		{
 			_logger.LogInformation("S88Pay Deposit");
-			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://127.0.0.1:4222";
+			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://nats:4222";
 			var opts = NatsOpts.Default with { Url = url };
 #pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
 			await using var nats = new NatsConnection(opts);
