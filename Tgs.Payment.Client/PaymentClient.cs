@@ -58,7 +58,7 @@ internal class PaymentClient : IPaymentClient
 		if (subject == "tgs.payment.s88pay.deposit")
 		{
 			using var activity = new ActivitySource("Valhalla.MessageQueue.Nats").StartActivity("Nats Request");
-			
+
 			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://nats:4222";
 			var opts = NatsOpts.Default with { Url = url };
 #pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
@@ -70,11 +70,17 @@ internal class PaymentClient : IPaymentClient
 				ApplyInfo = applyInfo ?? string.Empty,
 				Amount = amount.ToString()
 			};
+			var store = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+			_ = store.TryAdd("traceId", activity?.TraceId.ToString());
+			_ = store.TryAdd("spanId", activity?.SpanId.ToString());			
+
+			var headers = new NatsHeaders(store);
 
 #pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
 			var reply = await nats.RequestAsync<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>>(
 				subject,
 				req.ToByteArray(),
+				headers: headers,
 				replyOpts: new NatsSubOpts { Timeout = TimeSpan.FromSeconds(20) },
 				cancellationToken: cancellationToken);
 #pragma warning restore CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
