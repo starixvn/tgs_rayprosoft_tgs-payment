@@ -1,4 +1,5 @@
-﻿using Google.Protobuf;
+﻿using System.Diagnostics;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using NATS.Client.Core;
@@ -56,6 +57,7 @@ internal class PaymentClient : IPaymentClient
 	{
 		if (subject == "tgs.payment.s88pay.deposit")
 		{
+			using var activity = new ActivitySource("Tgs.MessageQueue.Nats").StartActivity("Nats Request");
 			_logger.LogInformation("S88Pay Deposit");
 			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://nats:4222";
 			var opts = NatsOpts.Default with { Url = url };
