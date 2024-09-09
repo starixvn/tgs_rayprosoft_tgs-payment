@@ -57,8 +57,8 @@ internal class PaymentClient : IPaymentClient
 	{
 		if (subject == "tgs.payment.s88pay.deposit")
 		{
-			using var activity = new ActivitySource("Tgs.MessageQueue.Nats").StartActivity("Nats Request");
-			_logger.LogInformation("S88Pay Deposit");
+			using var activity = new ActivitySource("Valhalla.MessageQueue.Nats").StartActivity("Nats Request");
+			
 			var url = Environment.GetEnvironmentVariable("ConnectionStrings__Nats") ?? "nats://nats:4222";
 			var opts = NatsOpts.Default with { Url = url };
 #pragma warning disable CA2007 // 請考慮對等候的工作呼叫 ConfigureAwait
