@@ -18,8 +18,8 @@ internal class GameWalletProcessor(JsonTransform jsonTransform) : IWithdrawProce
 				"paymentChannelId": "$.paymentChannelId",
 				"bankType": "$.bankType",
 				"detail": {
-					"bankAccountName": "$.detail.name",
-					"bankAccountNumber": "$.detail.bankAccount"
+					"name": "$.detail.name",
+					"bankAccount": "$.detail.bankAccount"
 				}
 			}
 			"""
@@ -47,7 +47,7 @@ internal class GameWalletProcessor(JsonTransform jsonTransform) : IWithdrawProce
 			Reference: formId,
 			Amount: amount,
 			AccountNumber: withdrawBankInfo.Detail.BankAccount,
-			AccountName: withdrawBankInfo.Detail.BankName,
+			AccountName: withdrawBankInfo.Detail.Name,
 			MerchantSecurityCode: brandPaymentExtendedData.RootElement.GetProperty("securityCode").GetString()
 		);
 
