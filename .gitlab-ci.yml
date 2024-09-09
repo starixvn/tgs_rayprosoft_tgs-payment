@@ -75,10 +75,6 @@ deploy-dev:
     - push-docker-image
     - job: push-k8s-template
       artifacts: true
-  tags:
-    - dev
-    - kubernetes
-    - deploy
   only:
     - main
   script:
@@ -100,10 +96,6 @@ deploy-staging:
     - deploy-dev
     - job: push-k8s-template
       artifacts: true
-  tags:
-    - staging
-    - kubernetes
-    - deploy
   only:
     - main
   when: manual
@@ -125,10 +117,6 @@ deploy-prod:
     - deploy-staging
     - job: push-k8s-template
       artifacts: true
-  tags:
-    - prod
-    - kubernetes
-    - deploy
   only:
     - main
   when: manual
