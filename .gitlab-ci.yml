@@ -63,7 +63,6 @@ deploy-dev:
   extends: .deploy-template
   variables:
     namespace: dev
-    kube_config: KubeConfig_Raypro_dev
   environment:
     name: dev
   stage: deploy-dev
@@ -72,6 +71,10 @@ deploy-dev:
     - push-docker-image
     - job: push-k8s-template
       artifacts: true
+  tags:
+    - dev
+    - kubernetes
+    - deploy
   only:
     - main
   script:
@@ -82,7 +85,6 @@ deploy-staging:
   extends: .deploy-template
   variables:
     namespace: staging
-    kube_config: KubeConfig_Raypro_staging
   environment:
     name: staging
   stage: deploy-staging
@@ -90,6 +92,10 @@ deploy-staging:
     - deploy-dev
     - job: push-k8s-template
       artifacts: true
+  tags:
+    - staging
+    - kubernetes
+    - deploy
   only:
     - main
   when: manual
@@ -100,7 +106,6 @@ deploy-prod:
   extends: .deploy-template
   variables:
     namespace: prod
-    kube_config: KubeConfig_Raypro_prod
   environment:
     name: prod
   stage: deploy-prod
@@ -108,6 +113,10 @@ deploy-prod:
     - deploy-staging
     - job: push-k8s-template
       artifacts: true
+  tags:
+    - prod
+    - kubernetes
+    - deploy
   only:
     - main
   when: manual
