@@ -2,14 +2,15 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Payment.SpeedPay.Client;
 using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.ServiceUtility;
 
-internal class SpeedPayProcessor(IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService) : IWithdrawProcessor
+internal class SpeedPayProcessor(IServiceProvider serviceProvider) : IWithdrawProcessor
 {
-	public string Subject => "tgs.payment.gamewallet.withdraw";
+	public string Subject => "tgs.payment.speedpay.withdraw";
 
 	public string MakeWithdrawSettings(Guid formId, decimal amount, string bankInfo, BrandPaymentInfo brandPayment)
 	{
@@ -38,6 +39,8 @@ internal class SpeedPayProcessor(IGetService<GetWithdrawFormDetailByFormIdQuery,
 
 	private async Task<string> GetWithdrawFormUserAsync(Guid formId)
 	{
+		using var scope = serviceProvider.CreateScope();
+		var getService = scope.ServiceProvider.GetService<IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo>>();
 		var withdrawForm = await getService
 			.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
 			.ConfigureAwait(false);
