@@ -38,4 +38,6 @@ public partial interface IPaymentRepository
 		CancellationToken cancellationToken = default);
 
 	ValueTask UpdateWithdrawFormSnapshotAsync(WithdrawFormSnapshot snapshot, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default);
+
+	ValueTask SaveApplyInfo(Guid formId, string? appyInfo, DateTime updatedOn, CancellationToken cancellationToken = default);
 }
