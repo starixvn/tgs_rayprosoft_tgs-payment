@@ -65,6 +65,6 @@ internal class GameWalletProcessor(JsonTransform jsonTransform, IServiceProvider
 		using var scope = serviceProvider.CreateScope();
 		var service = scope.ServiceProvider.GetService<IPaymentRepository>();
 
-		await service.SaveApplyInfo(formId, applyInfo).ConfigureAwait(false);
+		await service.SaveApplyInfoAsync(formId, applyInfo).ConfigureAwait(false);
 	}
 }

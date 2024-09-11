@@ -1660,7 +1660,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 				&& form.CreatedOn < currentDate);
 	}
 
-	public async ValueTask SaveApplyInfo(Guid formId, string? appyInfo, DateTime updatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask SaveApplyInfoAsync(Guid formId, string? appyInfo, CancellationToken cancellationToken = default)
 	{
 		var withdrawForm = await tgsContext.WithdrawForms
 			.FindAsync([formId], cancellationToken: cancellationToken)
