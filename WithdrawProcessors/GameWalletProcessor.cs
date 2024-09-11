@@ -55,7 +55,7 @@ internal class GameWalletProcessor(JsonTransform jsonTransform, IServiceProvider
 
 		var applyInfo = new GameWalletWithdrawApplyInfo(settings, new GameWalletWithdrawResponse(formId, string.Empty, amount));
 
-		var applyInfoData = JsonSerializer.Serialize(settings, GameWalletUtility.SerializerOptions);
+		var applyInfoData = JsonSerializer.Serialize(applyInfo, GameWalletUtility.SerializerOptions);
 
 		_ = Task.Run(() => SaveApplyInfoAsync(formId, applyInfoData));
 
