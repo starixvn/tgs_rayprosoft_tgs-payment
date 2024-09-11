@@ -53,11 +53,13 @@ internal class GameWalletProcessor(JsonTransform jsonTransform, IServiceProvider
 			MerchantSecurityCode: brandPaymentExtendedData.RootElement.GetProperty("securityCode").GetString()
 		);
 
-		var applyInfo = JsonSerializer.Serialize(settings, GameWalletUtility.SerializerOptions);
+		var applyInfo = new GameWalletWithdrawApplyInfo(settings, new GameWalletWithdrawResponse(formId, string.Empty, amount));
 
-		_ = Task.Run(() => SaveApplyInfoAsync(formId, applyInfo));
+		var applyInfoData = JsonSerializer.Serialize(settings, GameWalletUtility.SerializerOptions);
 
-		return applyInfo;
+		_ = Task.Run(() => SaveApplyInfoAsync(formId, applyInfoData));
+
+		return applyInfoData;
 	}
 
 	private async Task SaveApplyInfoAsync(Guid formId, string applyInfo)
