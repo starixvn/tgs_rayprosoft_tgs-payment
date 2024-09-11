@@ -1659,4 +1659,15 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 			.Where(form => form.CreatedOn >= currentDate.AddDays(-90)
 				&& form.CreatedOn < currentDate);
 	}
+
+	public async ValueTask SaveApplyInfoAsync(Guid formId, string? appyInfo, CancellationToken cancellationToken = default)
+	{
+		var withdrawForm = await tgsContext.WithdrawForms
+			.FindAsync([formId], cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		withdrawForm!.ApplyInfo = appyInfo;
+
+		_ = await tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+	}
 }
