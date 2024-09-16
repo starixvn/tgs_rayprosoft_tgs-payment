@@ -359,6 +359,42 @@ internal class PaymentServiceClient : IPaymentServiceClient
 		}
 	}
 
+	public async IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(
+		IEnumerable<BrandPaymentInfo> brandPaymentInfos,
+		PlayerInfo playerInfo,
+		IEnumerable<Guid> blockList,
+		IEnumerable<Guid> whiteList,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var blockListCondition = new BlockListCondition(blockList);
+		var whiteListCondition = new WhiteListCondition(whiteList);
+		var showOnAllPlayerCondition = new ShowOnAllPlayersCondition();
+
+		await foreach (var bp in brandPaymentInfos.ToAsyncEnumerable())
+		{
+			if (!bp.Enabled)
+				continue;
+
+			var depositedAmountCondition = new DepositedAmountCondition(bp.DepositedAmountLimit);
+			var identityCondition = new IdentityCondition(bp.AuthenticateIdentity);
+
+			var filterCondition = new BrandPaymentFilterCondition(
+				blockListCondition,
+				whiteListCondition,
+				showOnAllPlayerCondition,
+				bp.ConditionMatchType == ConditionMatchType.MatchAll
+					? new MatchAllCondition(
+						depositedAmountCondition,
+						identityCondition)
+					: new MatchOneCondition(
+						depositedAmountCondition,
+						identityCondition));
+
+			if (filterCondition.IsValid(bp, playerInfo!))
+				yield return bp;
+		}
+	}
+
 	public async IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(
 		Guid agentId,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)

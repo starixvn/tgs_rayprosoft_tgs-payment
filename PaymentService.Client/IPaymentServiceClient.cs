@@ -44,6 +44,7 @@ public interface IPaymentServiceClient
 
 	ValueTask DeletePlayerBankInfoAsync(string playerCode, Guid bankInfoId, CancellationToken cancellationToken = default);
 
+	[Obsolete("Currently unsupported VipLevel and Phone Authentication on this phase")]
 	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(
 		IEnumerable<BrandPaymentInfo> brandPaymentInfos,
 		PlayerInfo playerInfo,
@@ -51,6 +52,14 @@ public interface IPaymentServiceClient
 		IEnumerable<Guid> whiteList,
 		ILookup<Guid, Guid> brandPaymentVipLevels,
 		CancellationToken cancellationToken = default);
+
+	IAsyncEnumerable<BrandPaymentInfo> FilterBrandPaymentsAsync(
+	IEnumerable<BrandPaymentInfo> brandPaymentInfos,
+	PlayerInfo playerInfo,
+	IEnumerable<Guid> blockList,
+	IEnumerable<Guid> whiteList,
+	CancellationToken cancellationToken = default);
+
 
 	IAsyncEnumerable<AgentBankInfo> GetAgentBankInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
