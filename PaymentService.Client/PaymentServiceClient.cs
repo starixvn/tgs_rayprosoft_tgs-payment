@@ -578,6 +578,21 @@ internal class PaymentServiceClient : IPaymentServiceClient
 			.SelectMany(arr => arr!.ToAsyncEnumerable());
 	}
 
+	public async ValueTask<BrandPaymentPlayerAccess?> GetBrandPaymentPlayerAccessAsync(Guid brandPaymentId, CancellationToken cancellationToken= default)
+	{
+		var response = await _httpClient
+			.GetAsync($"/brand/payment/player-acl/{brandPaymentId}", cancellationToken)
+			.ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var contentJson = await response.Content
+			.ReadAsStringAsync(cancellationToken)
+			.ConfigureAwait(false);
+
+		return JsonSerializer.Deserialize<BrandPaymentPlayerAccess>(contentJson, _SerializerOptions);
+	}
+
 	public async ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient

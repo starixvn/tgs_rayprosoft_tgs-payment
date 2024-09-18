@@ -61,6 +61,20 @@ public class BrandPaymentController : ControllerBase
 				PlayerCode = acl.PlayerCode
 			});
 
+	[HttpGet("player-acl/{brandPaymentId}", Name = "GetBrandPaymentPlayerAccess")]
+	public async ValueTask<BrandPaymentPlayerAccessViewModel> GetBrandPaymentPlayerAccessAsync(
+		[FromServices] IGetService<BrandPaymentPlayerAccessQuery, BrandPaymentPlayerAccess> getService,
+		Guid brandPaymentId) {
+			var query = await getService
+				.GetAsync(new BrandPaymentPlayerAccessQuery(brandPaymentId))
+				.ConfigureAwait(false);
+
+			return new BrandPaymentPlayerAccessViewModel {
+				Blacklist = query.Blacklist,
+				Whitelist = query.Whitelist,
+			};
+		}
+
 	[HttpGet("{id}", Name = "GetBrandPayment")]
 	public async ValueTask<BrandPaymentViewModel> GetBrandPaymentAsync(
 		[FromServices] IGetService<GetBrandPaymentQuery, BrandPaymentInfo> getService,

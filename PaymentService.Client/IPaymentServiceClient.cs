@@ -83,6 +83,8 @@ public interface IPaymentServiceClient
 	ValueTask<BrandPaymentInfo?> GetBrandPaymentByIdAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 
 	IAsyncEnumerable<BrandPaymentPlayerInfo> GetBrandPaymentDesignatedUsersAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
+	
+	ValueTask<BrandPaymentPlayerAccess?> GetBrandPaymentPlayerAccessAsync(Guid brandPaymentId, CancellationToken cancellationToken= default);
 
 	ValueTask<BrandPaymentFeeInfo?> GetBrandPaymentFeeSettingsAsync(Guid brandPaymentId, CancellationToken cancellationToken = default);
 

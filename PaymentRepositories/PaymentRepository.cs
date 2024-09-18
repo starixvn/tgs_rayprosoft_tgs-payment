@@ -502,6 +502,17 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 			: netprofit.DailyDepositAmount - netprofit.DailyWithdrawAmount;
 	}
 
+	public IAsyncEnumerable<BrandPaymentPlayerAccessListItem> GetBrandPaymentPlayerAccessListAsync(Guid brandPaymentId, CancellationToken cancellationToken = default)
+	{
+		var query = from acl in tgsContext.BrandPaymentPlayers.AsQueryable()
+					join players in tgsContext.Players
+					on acl.PlayerCode equals players.PlayerCode
+					where acl.BrandPaymentId == brandPaymentId
+					select new BrandPaymentPlayerAccessListItem(players.Username, acl.ListType == 1);
+
+		return query.ToAsyncEnumerable();
+	}
+
 	public IAsyncEnumerable<BrandPaymentAcl> GetBrandPaymentAclsAsync(IEnumerable<Guid> brandPaymentIds, string playerCode, CancellationToken cancellationToken = default)
 	{
 		var ids = brandPaymentIds.ToArray();
