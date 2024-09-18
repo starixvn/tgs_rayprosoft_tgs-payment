@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using JSLTSharp;
+using Microsoft.Extensions.DependencyInjection;
 using Tgs.Payment.ApplicationServices.Withdraws;
 using Tgs.Payment.DirePay.Client;
 using Tgs.ServiceUtility;
@@ -12,7 +13,7 @@ namespace Tgs.Payment.WithdrawProcessors;
 
 internal class DirePayProcessor(
 	JsonTransform jsonTransform,
-	IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo> getService)
+	IServiceProvider serviceProvider)
 	: IWithdrawProcessor
 {
 	private readonly IReadOnlyDictionary<string, string> _bankInfoTransformations = new Dictionary<string, string>()
@@ -63,8 +64,8 @@ internal class DirePayProcessor(
 			brandPaymentExtendedData.RootElement.GetProperty("email").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("password").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("secret").GetString(),
-			formId,			
-			"VND",		
+			formId,
+			brandPaymentExtendedData.RootElement.GetProperty("currencyCode").GetString(),
 			playerCode,
 			withdrawBankInfo.Detail.BankAccountName,
 			withdrawBankInfo.Detail.BankAccountNumber,
@@ -77,6 +78,8 @@ internal class DirePayProcessor(
 
 	private async Task<string> GetWithdrawFormUserAsync(Guid formId)
 	{
+		using var scope = serviceProvider.CreateScope();
+		var getService = scope.ServiceProvider.GetService<IGetService<GetWithdrawFormDetailByFormIdQuery, WithdrawFormInfo>>();
 		var withdrawForm = await getService
 			.GetAsync(new GetWithdrawFormDetailByFormIdQuery(formId))
 			.ConfigureAwait(false);
