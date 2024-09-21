@@ -52,12 +52,16 @@ internal class AutoApproveWithdrawFormCommandService(
 
 		var couldChooseBrandPayments = await repository
 			.GetBrandPaymentsAsync(command.BrandId, cancellationToken)
-			.Where(bp => bp.ChannelId == withdrawBankInfo!.PaymentChannelId && bp.TransferType == TransferType.Withdraw && bp.Enabled == true)
+			.Where(bp => bp.ChannelId == withdrawBankInfo!.PaymentChannelId && 
+						bp.TransferType == TransferType.Withdraw && 
+						bp.Enabled == true && 
+						bp.TransferLimit.From <= withdrawForm.Amount && 
+						bp.TransferLimit.To >= withdrawForm.Amount)
 			.Select(x => x.Id)
 			.ToArrayAsync(cancellationToken)
 			.ConfigureAwait(false);
 
-		logger.LogDebug(
+		logger.LogInformation(
 			"Auto Approve Withdtaw Form Command could choose BrandPayment Ids: {couldChooseBrandPayments}",
 			JsonSerializer.Serialize(couldChooseBrandPayments, PaymentUtility.SerializerOptions));
 
@@ -73,7 +77,7 @@ internal class AutoApproveWithdrawFormCommandService(
 
 		var brandPaymentId = brandPaymentCandidates.ElementAt(random);
 
-		logger.LogDebug("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
+		logger.LogInformation("Auto Approve Withdtaw Form Command Select BrandPayment Id:{brandPaymentId}", brandPaymentId);
 
 		var approveWithdrawCommand = new SignOffWithdrawFormCommand(
 			command.FormId,

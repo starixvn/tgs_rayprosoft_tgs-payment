@@ -23,7 +23,7 @@ internal class AutoApproveWithdrawHandler(
 	{
 		var request = FormEventEx.Parser.ParseFrom(data.Span);
 
-		logger.LogDebug(
+		logger.LogInformation(
 			"AutoApproveWithdrawHandler received: brandId:{brandId}, formId:{formId}, status:{status}",
 			request.BrandId.ToGuid(),
 			request.FormId.ToGuid(),
