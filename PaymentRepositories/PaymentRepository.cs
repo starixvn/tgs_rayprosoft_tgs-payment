@@ -408,7 +408,7 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 
 	public IAsyncEnumerable<PaymentInfo> GetAllPaymentsAsync(CancellationToken cancellationToken = default)
 		=> tgsContext.PaymentItems.AsQueryable()
-			.Select(row => new PaymentInfo(row.Id, row.Code))
+			.Select(row => new PaymentInfo(row.Id, row.Code, row.Description))
 			.ToAsyncEnumerable();
 
 	public async ValueTask<Tgs.Payment.PlayerBankInfo?> GetBankInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -985,7 +985,8 @@ internal class PaymentRepository(TgsContext tgsContext) : IPaymentRepository
 
 		return new PaymentInfo(
 			payment!.Id,
-			payment.Code);
+			payment.Code,
+			payment.Description);
 	}
 
 	public IAsyncEnumerable<PaymentMethodChannelInfo> GetPaymentMethodChannelsAsync(CancellationToken cancellationToken = default)

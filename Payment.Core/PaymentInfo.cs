@@ -4,4 +4,5 @@ namespace Tgs.Payment;
 
 public record PaymentInfo(
 	Guid Id,
-	string Code);
+	string Code,
+	string? Description);

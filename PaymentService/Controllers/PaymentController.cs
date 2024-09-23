@@ -38,7 +38,8 @@ public class PaymentController : ControllerBase
 		return allPayments.Select(payment => new PaymentViewModel
 		{
 			Id = payment.Id,
-			Code = payment.Code
+			Code = payment.Code,
+			Description = payment.Description ?? "",
 		});
 	}
 
