@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using OpenTelemetry.Exporter;
 using Tgs.Payment;
 using Tgs.Payment.Repositories.Entities;
@@ -16,8 +17,19 @@ internal static class TestSiteHelper
 		=> GetPaymentServiceTestHost(services => { });
 
 	public static TestPaymentApplication GetPaymentServiceTestHost(Action<IServiceCollection> configureServices)
-		=> new(webBuilder => _ = webBuilder
-			.ConfigureAppConfiguration((ctx, builder) => builder.Sources.Clear())
+	{
+		var inMemorySettings = new Dictionary<string, string> {
+								{"Otel:ServiceName", "Tgs"},
+								{"Otel:Collector", "http://localhost"},
+							};
+
+		return new(webBuilder => _ = webBuilder
+			.UseSentry("")
+			.ConfigureAppConfiguration((ctx, builder) =>
+			{
+				builder.Sources.Clear();
+				_ = builder.AddInMemoryCollection(inMemorySettings!);
+			})
 			.ConfigureServices(services =>
 			{
 				_ = services
@@ -34,11 +46,11 @@ internal static class TestSiteHelper
 					}));
 
 				_ = services.AddSingleton(services =>
-					{
-						var fakeStore = Substitute.For<ITakeNumberStore>();
+				{
+					var fakeStore = Substitute.For<ITakeNumberStore>();
 
-						return fakeStore;
-					});
+					return fakeStore;
+				});
 
 				_ = services.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 					sp => new ConfigureNamedOptions<OtlpExporterOptions>(
@@ -47,4 +59,5 @@ internal static class TestSiteHelper
 
 				configureServices(services);
 			}));
+		}
 }

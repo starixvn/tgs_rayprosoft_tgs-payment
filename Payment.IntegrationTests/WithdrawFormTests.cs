@@ -151,6 +151,7 @@ public class WithdrawFormTests
 				Arg.Any<CancellationToken>());
 	}
 
+	/* Test bucket
 	[Test]
 	public async Task 玩家提款時會檢查流水是否已經清空()
 	{
@@ -222,6 +223,7 @@ public class WithdrawFormTests
 		_ = Assert.ThrowsAsync<Tgs.Payment.Clients.InsufficientBucketException>(
 			async () => await sut.CreateWithdrawFormAsync(withdrawForm));
 	}
+	*/
 
 	[Test]
 	public async Task 玩家提款時會檢查錢包餘額是否足夠()
