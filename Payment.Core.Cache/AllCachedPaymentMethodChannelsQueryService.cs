@@ -30,7 +30,7 @@ internal class AllCachedPaymentMethodChannelsQueryService(
 				.ToArrayAsync(cancellationToken)
 				.ConfigureAwait(false);
 
-			entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(8D);
+			entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1);
 
 			return data;
 		}).ConfigureAwait(false);
