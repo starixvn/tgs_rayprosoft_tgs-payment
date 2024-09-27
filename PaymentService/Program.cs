@@ -104,6 +104,8 @@ var builder = WebApplication.CreateBuilder(args);
 			.ConfigureHttpClient(httpClient => httpClient.BaseAddress =
 				builder.Configuration.GetValue<Uri>("Payment:AgentServiceBaseUrl")!);
 
+	var natPrefix = builder.Configuration.GetValue<string>("NatPrefix");
+
 	_ = builder.Services
 		.AddKeyedSingleton(
 			"SupportCodes",
@@ -123,52 +125,52 @@ var builder = WebApplication.CreateBuilder(args);
 			.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
 			.AddReplyHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.SaveWithdrawThirdNoHandlerType,
-				"tgs.payment.withdraw.external_id",
-				"tgs.payment.withdraw.external_id")
+				natPrefix + "tgs.payment.withdraw.external_id",
+				natPrefix + "tgs.payment.withdraw.external_id")
 			.AddReplyHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.TagWithdrawPaidHandlerType,
-				"tgs.payment.withdraw.paid",
-				"tgs.payment.withdraw.paid")
+				natPrefix + "tgs.payment.withdraw.paid",
+				natPrefix + "tgs.payment.withdraw.paid")
 			.AddHandler(
 				Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentCreatedEventHandlerType,
-				"tgs.payment.created")
+				natPrefix + "tgs.payment.created")
 			.AddHandler(
 				Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodCreatedEventHandlerType,
-				"tgs.payment-method.created")
+				natPrefix + "tgs.payment-method.created")
 			.AddHandler(
 				Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentChannelCreatedEventHandlerType,
-				"tgs.payment-channel.created")
+				natPrefix + "tgs.payment-channel.created")
 			.AddHandler(
 				Tgs.Payment.Cache.MessageQueue.ProcessorTypes.PaymentMethodChannelChangedEventHandlerType,
-				"tgs.payment-method-channel.changed")
+				natPrefix + "tgs.payment-method-channel.changed")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.PlayerBankInfoAddedHandlerType,
-				"tgs.player.bankinfo.added",
-				"tgs.player.bankinfo.added")
+				natPrefix + "tgs.player.bankinfo.added",
+				natPrefix + "tgs.player.bankinfo.added")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.PlayerBankInfoDeletedHandlerType,
-				"tgs.player.bankinfo.deleted",
-				"tgs.player.bankinfo.deleted")
+				natPrefix + "tgs.player.bankinfo.deleted",
+				natPrefix + "tgs.player.bankinfo.deleted")
 			.AddReplyHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.RebuildPlayerBankInfoTagHandlerType,
-				"tgs.player.bankinfo.rebuild",
-				"tgs.player.bankinfo.rebuild")
+				natPrefix + "tgs.player.bankinfo.rebuild",
+				natPrefix + "tgs.player.bankinfo.rebuild")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.ApproveWithdrawHandlerType,
-				"tgs.payment.withdraw.status_ex",
-				"tgs.payment.withdraw.auto_approve")
+				natPrefix + "tgs.payment.withdraw.status_ex",
+				natPrefix + "tgs.payment.withdraw.auto_approve")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandDepositApprovedType,
-				"tgs.payment.deposit.status_ex",
-				"tgs.payment.deposit.status_ex")
+				natPrefix + "tgs.payment.deposit.status_ex",
+				natPrefix + "tgs.payment.deposit.status_ex")
 			.AddHandler(
 				Tgs.Payment.MessageQueue.ProcessorTypes.CountBrandWithdrawPaidType,
-				"tgs.payment.withdraw.status_ex",
-				"tgs.payment.withdraw.status_ex")
+				natPrefix + "tgs.payment.withdraw.status_ex",
+				natPrefix + "tgs.payment.withdraw.status_ex")
 			.AddProcessor(
 				Tgs.Payment.MessageQueue.ProcessorTypes.PaymentBalanceDispatchProcessorType,
-				"tgs.payment.dispatch_balance.*",
-				"tgs.payment.dispatch_balance",
+				natPrefix + "tgs.payment.dispatch_balance.*",
+				natPrefix + "tgs.payment.dispatch_balance",
 				processorFactory: Tgs.Payment.MessageQueue.ProcessorTypes.MakePaymentBalanceDispatchProcessorFactory(
 					sp => sp.GetRequiredKeyedService<HashSet<string>>("SupportCodes"))))
 		.AddNatsGlobPatternExchange("*");

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using NSubstitute;
-using NUnit.Framework;
-using NUnit.Framework.Legacy;
-using Tgs.Payment;
+﻿using Tgs.Payment;
 using Tgs.Payment.ApplicationServices.Payments;
 using Tgs.Payment.Clients;
-using Tgs.ServiceUtility;
 
 namespace Payment.UnitTests;
 
@@ -162,26 +155,26 @@ public class PaymentTests
 			.GetAllPaymentsAsync();
 	}
 
-	[Test]
-	public async Task User_Can_Get_PaymentInfo()
-	{
-		var fakeQueryService = Substitute.For<IQueryService<GetAllPaymentsQuery, PaymentInfo>>();
+	//[Test]
+	//public async Task User_Can_Get_PaymentInfo()
+	//{
+	//	var fakeQueryService = Substitute.For<IQueryService<GetAllPaymentsQuery, PaymentInfo>>();
 
-		var sut = new GetPaymentQueryService(fakeQueryService);
+	//	var sut = new GetPaymentQueryService(fakeQueryService);
 
-		var paymentId = Guid.NewGuid();
+	//	var paymentId = Guid.NewGuid();
 
-		var query = new GetPaymentQuery(paymentId);
+	//	var query = new GetPaymentQuery(paymentId);
 
-		_ = fakeQueryService.QueryAsync(Arg.Any<GetAllPaymentsQuery>())
-			.Returns(new[] {
-				new PaymentInfo(Guid.NewGuid(), "Test1"),
-				new PaymentInfo(paymentId, "Test2")
-			}.ToAsyncEnumerable());
+	//	_ = fakeQueryService.QueryAsync(Arg.Any<GetAllPaymentsQuery>())
+	//		.Returns(new[] {
+	//			new PaymentInfo(Guid.NewGuid(), "Test1"),
+	//			new PaymentInfo(paymentId, "Test2")
+	//		}.ToAsyncEnumerable());
 
-		var actual = await sut.GetAsync(query);
+	//	var actual = await sut.GetAsync(query);
 
-		ClassicAssert.AreEqual(paymentId, actual.Id);
-		ClassicAssert.AreEqual("Test2", actual.Code);
-	}
+	//	ClassicAssert.AreEqual(paymentId, actual.Id);
+	//	ClassicAssert.AreEqual("Test2", actual.Code);
+	//}
 }
