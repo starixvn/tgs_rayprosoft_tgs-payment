@@ -61,7 +61,8 @@ data:
           "FuKaiPay",
           "UBPay",
           "S88Pay",
-          "DirePay"
+          "DirePay",
+          "WFPay"
         ]
       }
     }
