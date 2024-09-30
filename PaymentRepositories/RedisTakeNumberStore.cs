@@ -6,6 +6,7 @@ namespace Tgs.Payment.Repositories;
 
 internal class RedisTakeNumberStore(RedisConnectionFactory redisConnectionFactory) : ITakeNumberStore
 {
+	private const int MAX_FOUR_DIGIT = 9999;
 	private static readonly TimeSpan _Expire = TimeSpan.FromHours(2);
 	private static readonly string _KeyPrefix = "TGS:Payment";
 	private readonly IDatabase _redisDatabase = redisConnectionFactory.Database;
@@ -23,7 +24,7 @@ internal class RedisTakeNumberStore(RedisConnectionFactory redisConnectionFactor
 				.KeyExpireAsync(dataKey, _Expire, CommandFlags.FireAndForget)
 				.ConfigureAwait(false);
 
-		return $"{brandCode}T{dateRule}{serialNumber:D4}";
+		return serialNumber <= MAX_FOUR_DIGIT ? $"{brandCode}T{dateRule}{serialNumber:D4}" : $"{brandCode}T{dateRule}{serialNumber}";
 	}
 
 	public async ValueTask<string> GetWithdrawFormOrderNoAsync(string brandCode)
@@ -39,6 +40,6 @@ internal class RedisTakeNumberStore(RedisConnectionFactory redisConnectionFactor
 				.KeyExpireAsync(dataKey, _Expire, CommandFlags.FireAndForget)
 				.ConfigureAwait(false);
 
-		return $"{brandCode}W{dateRule}{serialNumber:D4}";
+		return serialNumber <= MAX_FOUR_DIGIT ? $"{brandCode}T{dateRule}{serialNumber:D4}" : $"{brandCode}T{dateRule}{serialNumber}";
 	}
 }
