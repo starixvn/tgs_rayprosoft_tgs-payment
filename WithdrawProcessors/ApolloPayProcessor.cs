@@ -48,7 +48,8 @@ internal class ApolloPayProcessor(
 			brandPaymentExtendedData.RootElement.GetProperty("channelType").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 			withdrawBankInfo.Detail.BankCardNo,
-			withdrawBankInfo.Detail.AccountName);
+			withdrawBankInfo.Detail.AccountName,
+			brandPaymentExtendedData.RootElement.GetProperty("exchangeRate").GetDecimal());
 
 		return JsonSerializer.Serialize(settings, ApolloPayUtility.SerializerOptions);
 	}
