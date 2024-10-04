@@ -62,7 +62,8 @@ data:
           "UBPay",
           "S88Pay",
           "DirePay",
-          "WFPay"
+          "WFPay",
+          "ApolloPay"
         ]
       }
     }
