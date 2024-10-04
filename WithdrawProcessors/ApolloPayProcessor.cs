@@ -45,7 +45,7 @@ internal class ApolloPayProcessor(
 			brandPaymentExtendedData.RootElement.GetProperty("merchantNo").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("apiKey").GetString(),
 			formId,
-			brandPaymentExtendedData.RootElement.GetProperty("channelCode").GetString(),
+			brandPaymentExtendedData.RootElement.GetProperty("channelType").GetString(),
 			brandPaymentExtendedData.RootElement.GetProperty("bankCode").GetString(),
 			withdrawBankInfo.Detail.BankCardNo,
 			withdrawBankInfo.Detail.AccountName);
