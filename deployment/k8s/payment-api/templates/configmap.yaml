@@ -63,7 +63,8 @@ data:
           "S88Pay",
           "DirePay",
           "WFPay",
-          "ApolloPay"
+          "ApolloPay",
+          "NinghongPay"
         ]
       }
     }

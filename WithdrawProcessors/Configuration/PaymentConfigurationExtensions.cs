@@ -65,6 +65,7 @@ public static class PaymentConfigurationExtensions
 			.RegisterWithdrawProcessor<FuKaiPayProcessor>("FuKaiPay")
 			.RegisterWithdrawProcessor<S88PayProcessor>("S88Pay")
 			.RegisterWithdrawProcessor<DirePayProcessor>("DirePay")
-			.RegisterWithdrawProcessor<ApolloPayProcessor>("ApolloPay");
+			.RegisterWithdrawProcessor<ApolloPayProcessor>("ApolloPay")
+			.RegisterWithdrawProcessor<NinghongPayProcessor>("NinghongPay");
 	}
 }
